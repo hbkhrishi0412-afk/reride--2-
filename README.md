@@ -90,14 +90,17 @@ Make sure to set these in your hosting platform:
 ```
 reride/
 ├── api/              # Backend API routes (Vercel serverless functions)
+│   ├── _lib/        # Backend utilities (database connection)
+│   ├── _models/     # Mongoose models (User, Vehicle)
+│   └── *.ts         # API endpoints
 ├── components/       # React components
 ├── services/         # Service layer for business logic
-├── models/          # MongoDB models
-├── lib/             # Database connection and utilities
 ├── data/            # Static data
 ├── types.ts         # TypeScript type definitions
 └── App.tsx          # Main application component
 ```
+
+**Note:** The `api/_lib/` and `api/_models/` folders use underscore prefix so Vercel treats them as utilities, not API routes.
 
 ## Default Login Credentials
 

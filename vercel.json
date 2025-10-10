@@ -4,5 +4,10 @@
       "source": "/((?!api/|_).*)",
       "destination": "/index.html"
     }
-  ]
+  ],
+  "functions": {
+    "api/**/*.ts": {
+      "includeFiles": "api/_lib/**,api/_models/**"
+    }
+  }
 }
