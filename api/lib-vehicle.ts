@@ -1,3 +1,5 @@
+// Vehicle model for MongoDB
+// This file doesn't export a default handler, so it won't become an API route
 
 import { Schema, model, models } from 'mongoose';
 
@@ -52,7 +54,7 @@ const vehicleSchema = new Schema({
   accidentHistory: [Schema.Types.Mixed],
   documents: [Schema.Types.Mixed],
 }, {
-  timestamps: true // Add createdAt and updatedAt fields
+  timestamps: true
 });
 
 const Vehicle = models.Vehicle || model('Vehicle', vehicleSchema);

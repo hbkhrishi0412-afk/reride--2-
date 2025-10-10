@@ -94,9 +94,17 @@ The project is optimized for Vercel deployment:
 
 **Note:** All API routes are in the `api/` folder and work as serverless functions.
 
-## 📁 Project Structure
+## 📁 Project Structure (Flat API)
 
 ```
+api/
+├── lib-db.ts          # Database utility
+├── lib-user.ts        # User model
+├── lib-vehicle.ts     # Vehicle model
+├── auth.ts            # Authentication endpoint
+├── users.ts           # User management endpoint
+└── vehicles.ts        # Vehicle management endpoint
+
 reride/
 ├── api/              # Backend API routes
 ├── components/       # React components

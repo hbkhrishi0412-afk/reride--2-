@@ -1,3 +1,5 @@
+// Database connection utility for Vercel serverless functions
+// This file doesn't export a default handler, so it won't become an API route
 
 import mongoose from 'mongoose';
 import type { Mongoose } from 'mongoose';

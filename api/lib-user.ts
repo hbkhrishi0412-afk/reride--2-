@@ -1,3 +1,5 @@
+// User model for MongoDB
+// This file doesn't export a default handler, so it won't become an API route
 
 import { Schema, model, models } from 'mongoose';
 
@@ -59,10 +61,9 @@ const userSchema = new Schema({
     default: 0
   }
 }, {
-  timestamps: true // Adds createdAt and updatedAt managed by Mongoose
+  timestamps: true
 });
 
-// The `models.User` check prevents Mongoose from recompiling the model during hot-reloads in development
 const User = models.User || model('User', userSchema);
 
 export default User;
