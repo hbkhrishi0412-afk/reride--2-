@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+  <defs>
+    <linearGradient id="carGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:hsl(9, 78%, 56%);stop-opacity:1" />
+      <stop offset="100%" style="stop-color:hsl(9, 80%, 35%);stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  
+  <!-- Background Circle -->
+  <circle cx="50" cy="50" r="48" fill="url(#carGradient)"/>
+  
+  <!-- Simple Car Icon -->
+  <path d="M 25 55 L 30 40 L 70 40 L 75 55 M 20 55 L 80 55 L 80 65 L 75 65 L 75 60 L 25 60 L 25 65 L 20 65 Z" 
+        fill="white" stroke="white" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
+  
+  <!-- Wheels -->
+  <circle cx="32" cy="65" r="6" fill="hsl(207, 82%, 18%)"/>
+  <circle cx="68" cy="65" r="6" fill="hsl(207, 82%, 18%)"/>
+  <circle cx="32" cy="65" r="3" fill="white"/>
+  <circle cx="68" cy="65" r="3" fill="white"/>
+  
+  <!-- Windows -->
+  <path d="M 35 45 L 38 42 L 48 42 L 48 45 Z M 52 45 L 62 42 L 65 45 Z" 
+        fill="hsl(210, 30%, 98%)" opacity="0.8"/>
+</svg>
+
