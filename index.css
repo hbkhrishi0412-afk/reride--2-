@@ -148,7 +148,7 @@ button:disabled {
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-/* CarAndBike exact color scheme from website analysis */
+/* Premium Design System */
 :root {
   --carandbike-primary-blue: #1e40af;
   --carandbike-dark-blue: #1e3a8a;
@@ -163,6 +163,20 @@ button:disabled {
   --carandbike-purple: #8b5cf6;
   --carandbike-border: #e5e7eb;
   --carandbike-shadow: rgba(0, 0, 0, 0.1);
+  
+  /* Premium colors */
+  --premium-gold: #fbbf24;
+  --premium-silver: #e5e7eb;
+  --premium-gradient-start: #667eea;
+  --premium-gradient-end: #764ba2;
+  --premium-gradient-orange: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+  --premium-gradient-blue: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  --premium-gradient-dark: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+  --premium-shadow-soft: 0 10px 40px rgba(0, 0, 0, 0.1);
+  --premium-shadow-medium: 0 20px 60px rgba(0, 0, 0, 0.15);
+  --premium-shadow-strong: 0 30px 80px rgba(0, 0, 0, 0.2);
+  --glass-bg: rgba(255, 255, 255, 0.1);
+  --glass-border: rgba(255, 255, 255, 0.2);
 }
 
 /* CarAndBike exact styling */
@@ -256,6 +270,200 @@ button:disabled {
 .carandbike-nav-link:hover {
   color: var(--carandbike-primary-blue);
   background-color: var(--carandbike-off-white);
+}
+
+/* Premium Animations and Effects */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeInLeft {
+  from {
+    opacity: 0;
+    transform: translateX(-30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes fadeInRight {
+  from {
+    opacity: 0;
+    transform: translateX(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes pulse {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.05);
+  }
+}
+
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+@keyframes glow {
+  0%, 100% {
+    box-shadow: 0 0 20px rgba(102, 126, 234, 0.4);
+  }
+  50% {
+    box-shadow: 0 0 40px rgba(102, 126, 234, 0.8);
+  }
+}
+
+/* Premium Components */
+.premium-card {
+  background: linear-gradient(145deg, #ffffff 0%, #f8fafc 100%);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 20px;
+  box-shadow: var(--premium-shadow-soft);
+  backdrop-filter: blur(10px);
+  transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  position: relative;
+  overflow: hidden;
+}
+
+.premium-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+  transition: left 0.5s;
+}
+
+.premium-card:hover::before {
+  left: 100%;
+}
+
+.premium-card:hover {
+  transform: translateY(-10px) scale(1.02);
+  box-shadow: var(--premium-shadow-strong);
+  border-color: rgba(102, 126, 234, 0.3);
+}
+
+.premium-hero {
+  background: var(--premium-gradient-blue);
+  position: relative;
+  overflow: hidden;
+}
+
+.premium-hero::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grain" width="100" height="100" patternUnits="userSpaceOnUse"><circle cx="50" cy="50" r="1" fill="white" opacity="0.1"/></pattern></defs><rect width="100" height="100" fill="url(%23grain)"/></svg>');
+  animation: float 6s ease-in-out infinite;
+}
+
+.glass-morphism {
+  background: var(--glass-bg);
+  backdrop-filter: blur(20px);
+  border: 1px solid var(--glass-border);
+  border-radius: 16px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+}
+
+.premium-button {
+  background: var(--premium-gradient-orange);
+  color: white;
+  padding: 16px 32px;
+  border-radius: 12px;
+  font-weight: 600;
+  border: none;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 4px 20px rgba(240, 147, 251, 0.4);
+}
+
+.premium-button::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+  transition: left 0.5s;
+}
+
+.premium-button:hover::before {
+  left: 100%;
+}
+
+.premium-button:hover {
+  transform: translateY(-2px) scale(1.05);
+  box-shadow: 0 8px 30px rgba(240, 147, 251, 0.6);
+}
+
+.premium-text-gradient {
+  background: var(--premium-gradient-blue);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  font-weight: 700;
+}
+
+.animate-fadeInUp {
+  animation: fadeInUp 0.8s ease-out forwards;
+}
+
+.animate-fadeInLeft {
+  animation: fadeInLeft 0.8s ease-out forwards;
+}
+
+.animate-fadeInRight {
+  animation: fadeInRight 0.8s ease-out forwards;
+}
+
+.animate-pulse {
+  animation: pulse 2s infinite;
+}
+
+.animate-float {
+  animation: float 3s ease-in-out infinite;
+}
+
+.animate-glow {
+  animation: glow 2s ease-in-out infinite;
 }
 
 /* Enhanced vehicle card styles */

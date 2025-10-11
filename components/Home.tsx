@@ -58,7 +58,7 @@ const FeaturedVehicleCard: React.FC<Pick<HomeProps, 'onSelectVehicle' | 'onToggl
     return (
       <div 
         onClick={() => onSelectVehicle(vehicle)}
-        className="carandbike-card group cursor-pointer"
+        className="premium-card group cursor-pointer"
       >
         <div className="relative overflow-hidden">
           <img className="w-full h-48 sm:h-56 object-cover group-hover:scale-105 transition-transform duration-500 ease-in-out" src={vehicle.images[0]} alt={`${vehicle.make} ${vehicle.model}`} loading="lazy" />
@@ -173,85 +173,167 @@ const Home: React.FC<HomeProps> = ({ onSearch, onSelectCategory, featuredVehicle
 
     return (
         <>
-            {/* Hero Section - CarAndBike style */}
-            <section className="carandbike-hero">
-                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                    <div className="text-center">
-                        <h1 className="text-4xl md:text-6xl font-bold mb-6">
-                            Find Your Desired Vehicle
+            {/* Premium Hero Section */}
+            <section className="premium-hero relative min-h-screen flex items-center justify-center">
+                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+                    <div className="text-center animate-fadeInUp">
+                        <h1 className="text-5xl md:text-7xl font-bold mb-6 text-white">
+                            Find Your 
+                            <span className="block premium-text-gradient animate-pulse">
+                                Dream Vehicle
+                            </span>
                         </h1>
-                        <p className="text-xl md:text-2xl mb-8" style={{color: 'rgba(255, 255, 255, 0.9)'}}>
-                            BY BRAND • BY BUDGET
+                        <p className="text-xl md:text-2xl mb-8 text-white/90 max-w-3xl mx-auto leading-relaxed">
+                            Discover premium vehicles with AI-powered recommendations
+                            <span className="block text-lg mt-2 text-white/70">
+                                BY BRAND • BY BUDGET • BY PREFERENCE
+                            </span>
                         </p>
                         
-                        {/* Search Bar - CarAndBike style */}
-                        <div className="max-w-4xl mx-auto">
-                            <div className="carandbike-search">
-                                <div className="flex flex-col md:flex-row gap-2">
-                                    <div className="flex-1">
+                        {/* Premium Search Bar */}
+                        <div className="max-w-5xl mx-auto animate-fadeInUp" style={{animationDelay: '0.3s'}}>
+                            <div className="glass-morphism p-2">
+                                <div className="flex flex-col md:flex-row gap-3">
+                                    <div className="flex-1 relative">
                                         <input
                                             type="text"
-                                            placeholder="Any specific type of car in mind"
+                                            placeholder="Search for your perfect vehicle..."
                                             value={aiSearchQuery}
                                             onChange={(e) => setAiSearchQuery(e.target.value)}
                                             onKeyDown={(e) => { if (e.key === 'Enter') handleAiSearch(); }}
-                                            className="w-full px-4 py-3 text-gray-900 placeholder-gray-500 border-0 focus:outline-none rounded-md"
+                                            className="w-full px-6 py-4 text-gray-900 placeholder-gray-500 border-0 focus:outline-none rounded-xl bg-white/90 backdrop-blur-sm text-lg font-medium"
                                         />
+                                        <div className="absolute right-4 top-1/2 transform -translate-y-1/2">
+                                            <svg className="w-6 h-6 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                                            </svg>
+                                        </div>
                                     </div>
                                     <button 
                                         onClick={handleAiSearch} 
                                         disabled={isAiSearching}
-                                        className="carandbike-button-orange"
+                                        className="premium-button px-8 py-4 text-lg font-semibold"
                                     >
-                                        {isAiSearching ? '...' : 'Search'}
+                                        {isAiSearching ? (
+                                            <div className="flex items-center gap-2">
+                                                <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                                                Searching...
+                                            </div>
+                                        ) : (
+                                            'Search Now'
+                                        )}
                                     </button>
                                 </div>
                             </div>
                         </div>
+                        
+                        {/* Premium Stats */}
+                        <div className="mt-16 grid grid-cols-1 md:grid-cols-3 gap-8 animate-fadeInUp" style={{animationDelay: '0.6s'}}>
+                            <div className="glass-morphism p-6 text-center">
+                                <div className="text-3xl font-bold text-white mb-2">10K+</div>
+                                <div className="text-white/80">Premium Vehicles</div>
+                            </div>
+                            <div className="glass-morphism p-6 text-center">
+                                <div className="text-3xl font-bold text-white mb-2">50K+</div>
+                                <div className="text-white/80">Happy Customers</div>
+                            </div>
+                            <div className="glass-morphism p-6 text-center">
+                                <div className="text-3xl font-bold text-white mb-2">99%</div>
+                                <div className="text-white/80">Satisfaction Rate</div>
+                            </div>
+                        </div>
                     </div>
+                </div>
+                
+                {/* Floating Elements */}
+                <div className="absolute top-20 left-10 animate-float" style={{animationDelay: '0s'}}>
+                    <div className="w-20 h-20 bg-white/10 rounded-full backdrop-blur-sm"></div>
+                </div>
+                <div className="absolute top-40 right-20 animate-float" style={{animationDelay: '1s'}}>
+                    <div className="w-16 h-16 bg-white/10 rounded-full backdrop-blur-sm"></div>
+                </div>
+                <div className="absolute bottom-20 left-20 animate-float" style={{animationDelay: '2s'}}>
+                    <div className="w-12 h-12 bg-white/10 rounded-full backdrop-blur-sm"></div>
                 </div>
             </section>
             
-            {/* Category Section */}
-            <section className="py-16 bg-white">
+            {/* Premium Category Section */}
+            <section className="py-20 bg-gradient-to-br from-gray-50 to-white relative overflow-hidden">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                     <h2 className="text-3xl font-bold text-center mb-12 text-gray-900">Browse by Category</h2>
-                     <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-6">
-                         {Object.values(CategoryEnum).map(category => (
+                     <div className="text-center mb-16 animate-fadeInUp">
+                         <h2 className="text-4xl md:text-5xl font-bold mb-4 premium-text-gradient">
+                             Explore by Category
+                         </h2>
+                         <p className="text-xl text-gray-600 max-w-2xl mx-auto">
+                             Find your perfect vehicle across different categories
+                         </p>
+                     </div>
+                     <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-8">
+                         {Object.values(CategoryEnum).map((category, index) => (
                             <button
                                 key={category}
                                 onClick={() => onSelectCategory(category)}
-                                className="group p-6 bg-gray-50 border border-gray-200 rounded-lg text-center transition-all duration-300 hover:border-blue-500 hover:shadow-lg hover:-translate-y-1"
+                                className="group premium-card p-8 text-center animate-fadeInUp"
+                                style={{animationDelay: `${index * 0.1}s`}}
                             >
-                                <div className="text-blue-600 mx-auto mb-3 group-hover:text-blue-700 transition-colors">{categoryIcons[category]}</div>
-                                <span className="font-semibold text-gray-700 group-hover:text-gray-900 transition-colors">{category}</span>
+                                <div className="mx-auto mb-4 group-hover:scale-110 transition-transform duration-300">
+                                    <div className="p-4 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 text-white shadow-lg">
+                                        {categoryIcons[category]}
+                                    </div>
+                                </div>
+                                <span className="font-semibold text-gray-700 group-hover:text-gray-900 transition-colors text-sm">
+                                    {category}
+                                </span>
+                                <div className="mt-2 w-8 h-1 bg-gradient-to-r from-blue-500 to-purple-600 mx-auto rounded-full opacity-0 group-hover:opacity-100 transition-opacity"></div>
                             </button>
                          ))}
                      </div>
                 </div>
+                
+                {/* Background decorative elements */}
+                <div className="absolute top-0 left-0 w-full h-full pointer-events-none">
+                    <div className="absolute top-20 left-20 w-32 h-32 bg-blue-100 rounded-full opacity-20 animate-float"></div>
+                    <div className="absolute bottom-20 right-20 w-24 h-24 bg-purple-100 rounded-full opacity-20 animate-float" style={{animationDelay: '1s'}}></div>
+                </div>
             </section>
 
-            {/* Recommended For You */}
+            {/* Premium Recommended Section */}
             {recommendations.length > 0 && (
-                 <section className="py-16 bg-gray-50">
+                 <section className="py-20 bg-white relative overflow-hidden">
                     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                        <h2 className="text-3xl font-bold text-center mb-12 text-gray-900">Recommended For You</h2>
-                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                            {recommendations.map(vehicle => (
-                                <FeaturedVehicleCard
-                                    key={vehicle.id} 
-                                    vehicle={vehicle} 
-                                    onSelectVehicle={onSelectVehicle} 
-                                    onToggleCompare={onToggleCompare} 
-                                    comparisonList={comparisonList} 
-                                    onToggleWishlist={onToggleWishlist} 
-                                    wishlist={wishlist} 
-                                    onViewSellerProfile={onViewSellerProfile}
-                                    onQuickView={setQuickViewVehicle}
-                                />
+                        <div className="text-center mb-16 animate-fadeInUp">
+                            <h2 className="text-4xl md:text-5xl font-bold mb-4 premium-text-gradient">
+                                Recommended For You
+                            </h2>
+                            <p className="text-xl text-gray-600 max-w-2xl mx-auto">
+                                Handpicked vehicles based on your preferences and market trends
+                            </p>
+                        </div>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
+                            {recommendations.map((vehicle, index) => (
+                                <div 
+                                    key={vehicle.id}
+                                    className="animate-fadeInUp"
+                                    style={{animationDelay: `${index * 0.1}s`}}
+                                >
+                                    <FeaturedVehicleCard
+                                        vehicle={vehicle} 
+                                        onSelectVehicle={onSelectVehicle} 
+                                        onToggleCompare={onToggleCompare} 
+                                        comparisonList={comparisonList} 
+                                        onToggleWishlist={onToggleWishlist} 
+                                        wishlist={wishlist} 
+                                        onViewSellerProfile={onViewSellerProfile}
+                                        onQuickView={setQuickViewVehicle}
+                                    />
+                                </div>
                             ))}
                         </div>
                     </div>
+                    
+                    {/* Background decorative elements */}
+                    <div className="absolute top-0 right-0 w-96 h-96 bg-gradient-to-br from-blue-100 to-purple-100 rounded-full opacity-20 animate-float"></div>
+                    <div className="absolute bottom-0 left-0 w-64 h-64 bg-gradient-to-tr from-purple-100 to-pink-100 rounded-full opacity-20 animate-float" style={{animationDelay: '2s'}}></div>
                 </section>
             )}
 

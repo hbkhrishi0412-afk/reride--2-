@@ -89,7 +89,7 @@ const Header: React.FC<HeaderProps> = ({
   
   return (
     <>
-    <header className="bg-white shadow-sm sticky top-0 z-50" id="main-header">
+    <header className="bg-white shadow-sm sticky top-0 z-50 backdrop-blur-lg bg-opacity-95" id="main-header">
       {/* Top Bar - CarAndBike style */}
       <div className="carandbike-top-bar">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex justify-between items-center h-8">
@@ -153,7 +153,7 @@ const Header: React.FC<HeaderProps> = ({
             </div>
 
             <div className="hidden md:flex items-center space-x-4">
-                <button onClick={() => handleNavigate(ViewEnum.SELLER_LOGIN)} className="carandbike-button">Sell Your Car</button>
+                <button onClick={() => handleNavigate(ViewEnum.SELLER_LOGIN)} className="premium-button">Sell Your Car</button>
                 
                 <button onClick={onOpenCommandPalette} className={`p-2 rounded-full ${mainNavLinkClasses}`} aria-label="Search"><svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg></button>
                 
