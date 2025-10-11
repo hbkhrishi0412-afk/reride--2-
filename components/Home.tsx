@@ -58,7 +58,7 @@ const FeaturedVehicleCard: React.FC<Pick<HomeProps, 'onSelectVehicle' | 'onToggl
     return (
       <div 
         onClick={() => onSelectVehicle(vehicle)}
-        className="bg-white border border-gray-200 rounded-lg overflow-hidden group cursor-pointer transition-all duration-300 hover:border-blue-500 hover:shadow-lg hover:-translate-y-1"
+        className="carandbike-card group cursor-pointer"
       >
         <div className="relative overflow-hidden">
           <img className="w-full h-48 sm:h-56 object-cover group-hover:scale-105 transition-transform duration-500 ease-in-out" src={vehicle.images[0]} alt={`${vehicle.make} ${vehicle.model}`} loading="lazy" />
@@ -82,33 +82,35 @@ const FeaturedVehicleCard: React.FC<Pick<HomeProps, 'onSelectVehicle' | 'onToggl
         </div>
         <div className="p-4 flex-grow flex flex-col">
           <div className="flex justify-between items-start mb-2">
-              <h3 className="text-lg font-bold text-gray-900">{vehicle.make} {vehicle.model}</h3>
-              <span className="text-sm font-semibold text-gray-500 bg-gray-100 px-2 py-1 rounded">{vehicle.year}</span>
+              <h3 className="text-lg font-bold" style={{color: 'var(--carandbike-dark-gray)'}}>{vehicle.make} {vehicle.model}</h3>
+              <span className="text-sm font-semibold px-2 py-1 rounded" style={{color: 'var(--carandbike-light-gray)', backgroundColor: 'var(--carandbike-off-white)'}}>{vehicle.year}</span>
           </div>
-           <p className="text-sm text-gray-500 mb-2">{vehicle.variant || ''}</p>
-          <div className="mb-3 text-sm text-gray-500 truncate">
-             By: <button onClick={handleSellerClick} className="font-semibold hover:underline focus:outline-none text-blue-600">{vehicle.sellerName}</button>
+           <p className="text-sm mb-2" style={{color: 'var(--carandbike-light-gray)'}}>{vehicle.variant || ''}</p>
+          <div className="mb-3 text-sm truncate" style={{color: 'var(--carandbike-light-gray)'}}>
+             By: <button onClick={handleSellerClick} className="font-semibold hover:underline focus:outline-none" style={{color: 'var(--carandbike-primary-blue)'}}>{vehicle.sellerName}</button>
           </div>
           
-          <div className="mt-3 pt-3 border-t border-gray-200 grid grid-cols-3 gap-2 text-center text-sm text-gray-600">
+          <div className="mt-3 pt-3 grid grid-cols-3 gap-2 text-center text-sm" style={{borderTop: '1px solid var(--carandbike-border)', color: 'var(--carandbike-medium-gray)'}}>
              <span>{vehicle.mileage.toLocaleString('en-IN')} kms</span>
              <span>{vehicle.fuelType}</span>
              <span>{vehicle.transmission}</span>
           </div>
   
           <div className="mt-4 flex justify-between items-center">
-               <p className="text-xl font-bold text-gray-900">₹{vehicle.price.toLocaleString('en-IN')}</p>
+               <p className="text-xl font-bold" style={{color: 'var(--carandbike-dark-gray)'}}>₹{vehicle.price.toLocaleString('en-IN')}</p>
                <label 
                 onClick={handleCompareClick} 
                 title={isCompareDisabled ? "Comparison limit reached (max 4)" : "Add to compare"}
-                className={`flex items-center text-sm font-medium px-3 py-2 rounded-md transition-colors text-gray-600 ${isCompareDisabled ? 'opacity-60 cursor-not-allowed' : 'cursor-pointer hover:bg-gray-100'}`}
+                className={`flex items-center text-sm font-medium px-3 py-2 rounded-md transition-colors ${isCompareDisabled ? 'opacity-60 cursor-not-allowed' : 'cursor-pointer hover:bg-gray-100'}`}
+                style={{color: 'var(--carandbike-medium-gray)'}}
               >
                 <input 
                   type="checkbox" 
                   checked={isSelectedForCompare}
                   readOnly
                   disabled={isCompareDisabled}
-                  className="form-checkbox h-4 w-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 disabled:opacity-50"
+                  className="form-checkbox h-4 w-4 rounded focus:ring-blue-500 disabled:opacity-50"
+                  style={{color: 'var(--carandbike-primary-blue)', backgroundColor: 'var(--carandbike-off-white)', borderColor: 'var(--carandbike-border)'}}
                 />
                 <span className="ml-2">Compare</span>
               </label>
@@ -171,35 +173,35 @@ const Home: React.FC<HomeProps> = ({ onSearch, onSelectCategory, featuredVehicle
 
     return (
         <>
-            {/* Hero Section */}
-            <section className="bg-gradient-to-r from-blue-600 to-blue-800 text-white py-20">
+            {/* Hero Section - CarAndBike style */}
+            <section className="carandbike-hero">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="text-center">
                         <h1 className="text-4xl md:text-6xl font-bold mb-6">
-                            The Future of Motion
+                            Find Your Desired Vehicle
                         </h1>
-                        <p className="text-xl md:text-2xl mb-8 text-blue-100">
-                            Discover a curated collection of premium vehicles, powered by cutting-edge AI for a seamless journey
+                        <p className="text-xl md:text-2xl mb-8" style={{color: 'rgba(255, 255, 255, 0.9)'}}>
+                            BY BRAND • BY BUDGET
                         </p>
                         
-                        {/* Search Bar */}
+                        {/* Search Bar - CarAndBike style */}
                         <div className="max-w-4xl mx-auto">
-                            <div className="bg-white rounded-lg p-2 shadow-lg">
+                            <div className="carandbike-search">
                                 <div className="flex flex-col md:flex-row gap-2">
                                     <div className="flex-1">
                                         <input
                                             type="text"
-                                            placeholder="e.g., 'SUV under ₹15 lakhs with sunroof'"
+                                            placeholder="Any specific type of car in mind"
                                             value={aiSearchQuery}
                                             onChange={(e) => setAiSearchQuery(e.target.value)}
                                             onKeyDown={(e) => { if (e.key === 'Enter') handleAiSearch(); }}
-                                            className="w-full px-4 py-3 text-gray-900 placeholder-gray-500 border-0 focus:outline-none"
+                                            className="w-full px-4 py-3 text-gray-900 placeholder-gray-500 border-0 focus:outline-none rounded-md"
                                         />
                                     </div>
                                     <button 
                                         onClick={handleAiSearch} 
                                         disabled={isAiSearching}
-                                        className="bg-orange-500 text-white px-8 py-3 rounded-md font-medium hover:bg-orange-600 transition-colors disabled:bg-gray-400"
+                                        className="carandbike-button-orange"
                                     >
                                         {isAiSearching ? '...' : 'Search'}
                                     </button>

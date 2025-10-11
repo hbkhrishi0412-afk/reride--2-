@@ -89,33 +89,33 @@ const Header: React.FC<HeaderProps> = ({
   
   return (
     <>
-    <header className="bg-white shadow-sm border-b border-gray-200 sticky top-0 z-50" id="main-header">
-      {/* Top Bar */}
-      <div className="bg-gray-50 text-gray-600 text-xs">
+    <header className="bg-white shadow-sm sticky top-0 z-50" id="main-header">
+      {/* Top Bar - CarAndBike style */}
+      <div className="carandbike-top-bar">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex justify-between items-center h-8">
-              <div className="flex items-center gap-x-4">
-                  <a href="#" onClick={(e) => { e.preventDefault(); handleNavigate(ViewEnum.SUPPORT) }} className="hover:text-gray-900">Support</a>
-                  <a href="#" onClick={(e) => { e.preventDefault(); handleNavigate(ViewEnum.FAQ) }} className="hover:text-gray-900">FAQ</a>
+              <div className="flex items-center gap-x-6">
+                  <a href="#" onClick={(e) => { e.preventDefault(); handleNavigate(ViewEnum.SUPPORT) }} className="hover:text-white transition-colors">Support</a>
+                  <a href="#" onClick={(e) => { e.preventDefault(); handleNavigate(ViewEnum.FAQ) }} className="hover:text-white transition-colors">FAQ</a>
               </div>
               <div className="flex items-center gap-x-4">
-                  <button onClick={() => setIsLocationModalOpen(true)} className="flex items-center gap-1 hover:text-gray-900">
+                  <button onClick={() => setIsLocationModalOpen(true)} className="flex items-center gap-1 hover:text-white transition-colors">
                     <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" /></svg> 
                     {userLocation}
                   </button>
               </div>
           </div>
       </div>
-      {/* Main Bar */}
-      <div className="bg-white">
+      {/* Main Navigation Bar - CarAndBike style */}
+      <div className="carandbike-main-nav">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="flex justify-between items-center h-16">
             <div className="flex items-center space-x-8">
-                <button onClick={() => handleNavigate(ViewEnum.HOME)} className="text-2xl font-bold text-gray-900 hover:text-blue-600 transition-colors">
+                <button onClick={() => handleNavigate(ViewEnum.HOME)} className="text-2xl font-bold" style={{color: 'var(--carandbike-dark-gray)'}}>
                 ReRide
                 </button>
                 <nav className="hidden md:flex items-center space-x-6">
                 <div className="relative" ref={newCarsMenuRef} onMouseLeave={() => setIsNewCarsMenuOpen(false)}>
-                    <button onMouseEnter={() => setIsNewCarsMenuOpen(true)} className="text-gray-700 hover:text-blue-600 px-3 py-2 text-sm font-medium flex items-center">
+                    <button onMouseEnter={() => setIsNewCarsMenuOpen(true)} className="carandbike-nav-link flex items-center">
                         New Cars
                         <svg className="ml-1 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
@@ -146,14 +146,14 @@ const Header: React.FC<HeaderProps> = ({
                         </div>
                     )}
                 </div>
-                <button onClick={() => handleNavigate(ViewEnum.USED_CARS)} className="text-gray-700 hover:text-blue-600 px-3 py-2 text-sm font-medium">Used Cars</button>
-                <button onClick={() => handleNavigate(ViewEnum.DEALER_PROFILES)} className="text-gray-700 hover:text-blue-600 px-3 py-2 text-sm font-medium">Dealers</button>
-                <button onClick={() => handleNavigate(ViewEnum.PRICING)} className="text-gray-700 hover:text-blue-600 px-3 py-2 text-sm font-medium">Pricing</button>
+                <button onClick={() => handleNavigate(ViewEnum.USED_CARS)} className="carandbike-nav-link">Used Cars</button>
+                <button onClick={() => handleNavigate(ViewEnum.DEALER_PROFILES)} className="carandbike-nav-link">Dealers</button>
+                <button onClick={() => handleNavigate(ViewEnum.PRICING)} className="carandbike-nav-link">Pricing</button>
                 </nav>
             </div>
 
             <div className="hidden md:flex items-center space-x-4">
-                <button onClick={() => handleNavigate(ViewEnum.SELLER_LOGIN)} className="bg-blue-600 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-blue-700 transition-colors">Sell Your Car</button>
+                <button onClick={() => handleNavigate(ViewEnum.SELLER_LOGIN)} className="carandbike-button">Sell Your Car</button>
                 
                 <button onClick={onOpenCommandPalette} className={`p-2 rounded-full ${mainNavLinkClasses}`} aria-label="Search"><svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg></button>
                 

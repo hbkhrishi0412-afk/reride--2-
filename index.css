@@ -148,25 +148,114 @@ button:disabled {
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-/* CarAndBike-inspired styles */
+/* CarAndBike exact color scheme from website analysis */
+:root {
+  --carandbike-primary-blue: #1e40af;
+  --carandbike-dark-blue: #1e3a8a;
+  --carandbike-orange: #f97316;
+  --carandbike-orange-hover: #ea580c;
+  --carandbike-dark-gray: #1f2937;
+  --carandbike-medium-gray: #374151;
+  --carandbike-light-gray: #6b7280;
+  --carandbike-lighter-gray: #9ca3af;
+  --carandbike-white: #ffffff;
+  --carandbike-off-white: #f9fafb;
+  --carandbike-purple: #8b5cf6;
+  --carandbike-border: #e5e7eb;
+  --carandbike-shadow: rgba(0, 0, 0, 0.1);
+}
+
+/* CarAndBike exact styling */
 .carandbike-card {
-  @apply bg-white border border-gray-200 rounded-lg overflow-hidden transition-all duration-300 hover:border-blue-500 hover:shadow-lg hover:-translate-y-1;
+  background-color: var(--carandbike-white);
+  border: 1px solid var(--carandbike-border);
+  border-radius: 8px;
+  overflow: hidden;
+  transition: all 0.3s ease;
+  box-shadow: 0 1px 3px var(--carandbike-shadow);
+}
+
+.carandbike-card:hover {
+  border-color: var(--carandbike-primary-blue);
+  box-shadow: 0 4px 12px var(--carandbike-shadow);
+  transform: translateY(-2px);
 }
 
 .carandbike-button {
-  @apply bg-blue-600 text-white px-4 py-2 rounded-md font-medium hover:bg-blue-700 transition-colors;
+  background-color: var(--carandbike-primary-blue);
+  color: var(--carandbike-white);
+  padding: 12px 24px;
+  border-radius: 6px;
+  font-weight: 500;
+  border: none;
+  cursor: pointer;
+  transition: all 0.3s ease;
 }
 
-.carandbike-button-secondary {
-  @apply bg-orange-500 text-white px-4 py-2 rounded-md font-medium hover:bg-orange-600 transition-colors;
+.carandbike-button:hover {
+  background-color: var(--carandbike-dark-blue);
+}
+
+.carandbike-button-orange {
+  background-color: var(--carandbike-orange);
+  color: var(--carandbike-white);
+  padding: 12px 24px;
+  border-radius: 6px;
+  font-weight: 500;
+  border: none;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.carandbike-button-orange:hover {
+  background-color: var(--carandbike-orange-hover);
 }
 
 .carandbike-search {
-  @apply bg-white rounded-lg p-2 shadow-lg;
+  background-color: var(--carandbike-white);
+  border: 1px solid var(--carandbike-border);
+  border-radius: 8px;
+  padding: 8px;
+  box-shadow: 0 2px 8px var(--carandbike-shadow);
 }
 
 .carandbike-hero {
-  @apply bg-gradient-to-r from-blue-600 to-blue-800 text-white py-20;
+  background-color: var(--carandbike-primary-blue);
+  color: var(--carandbike-white);
+  padding: 80px 0;
+}
+
+.carandbike-filter-sidebar {
+  background-color: var(--carandbike-dark-blue);
+  color: var(--carandbike-white);
+  padding: 24px;
+  border-radius: 8px;
+}
+
+.carandbike-top-bar {
+  background-color: var(--carandbike-dark-gray);
+  color: var(--carandbike-lighter-gray);
+  padding: 8px 0;
+  font-size: 14px;
+}
+
+.carandbike-main-nav {
+  background-color: var(--carandbike-white);
+  border-bottom: 1px solid var(--carandbike-border);
+  padding: 16px 0;
+}
+
+.carandbike-nav-link {
+  color: var(--carandbike-medium-gray);
+  font-weight: 500;
+  padding: 8px 16px;
+  border-radius: 4px;
+  transition: all 0.3s ease;
+}
+
+.carandbike-nav-link:hover {
+  color: var(--carandbike-primary-blue);
+  background-color: var(--carandbike-off-white);
 }
 
 /* Enhanced vehicle card styles */
