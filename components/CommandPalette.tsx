@@ -134,7 +134,7 @@ const CommandPalette: React.FC<CommandPaletteProps> = ({ isOpen, onClose, onNavi
                       <button
                         onClick={command.action}
                         onMouseEnter={() => setActiveIndex(globalIndex)}
-                        className={`w-full text-left flex items-center gap-3 px-3 py-2.5 rounded-md ${activeIndex === globalIndex ? 'bg-brand-blue text-white' : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700'}`}
+                        className={`w-full text-left flex items-center gap-3 px-3 py-2.5 rounded-md ${activeIndex === globalIndex ? 'text-white' : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700'}`} style={activeIndex === globalIndex ? { background: 'var(--gradient-primary)' } : undefined}
                       >
                         <span className={activeIndex === globalIndex ? 'text-white' : 'text-gray-500 dark:text-gray-400'}>{command.icon}</span>
                         <span>{command.title}</span>

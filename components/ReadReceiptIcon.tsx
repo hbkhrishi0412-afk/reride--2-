@@ -75,7 +75,7 @@ export const OfferModal: React.FC<{
                         {error && <p className="text-sm text-red-500 mt-2">{error}</p>}
                     </div>
                     <div className="bg-brand-gray-50 dark:bg-brand-gray-darker px-6 py-4 flex justify-end rounded-b-xl">
-                        <button type="submit" className="px-6 py-2 bg-brand-blue text-white font-bold rounded-lg hover:bg-brand-blue-dark transition-colors">Submit Offer</button>
+                        <button type="submit" className="px-6 py-2 btn-brand-primary text-white font-bold rounded-lg transition-colors">Submit Offer</button>
                     </div>
                 </form>
             </div>

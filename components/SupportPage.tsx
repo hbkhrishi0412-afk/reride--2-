@@ -67,7 +67,7 @@ const SupportPage: React.FC<SupportPageProps> = ({ currentUser, onSubmitTicket }
           <div>
             <button
               type="submit"
-              className="w-full bg-brand-blue text-white font-bold py-3 px-6 rounded-lg text-lg hover:bg-brand-blue-dark transition-colors"
+              className="w-full btn-brand-primary text-white font-bold py-3 px-6 rounded-lg text-lg transition-colors"
             >
               Submit Ticket
             </button>

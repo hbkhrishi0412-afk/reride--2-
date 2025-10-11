@@ -56,7 +56,7 @@ const ForgotPassword: React.FC<ForgotPasswordProps> = ({ onResetRequest, onBack 
             <div>
               <button
                 type="submit"
-                className="group relative w-full flex justify-center py-3 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-brand-blue hover:bg-brand-blue-dark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-brand-blue-light transition-colors"
+                className="group relative w-full flex justify-center py-3 px-4 border border-transparent text-sm font-medium rounded-md text-white btn-brand-primary focus:outline-none focus:ring-2 focus:ring-offset-2 transition-colors"
               >
                 Send Reset Link
               </button>
@@ -65,7 +65,7 @@ const ForgotPassword: React.FC<ForgotPasswordProps> = ({ onResetRequest, onBack 
       )}
 
       <div className="text-sm text-center">
-        <button onClick={onBack} className="font-medium text-brand-blue hover:text-brand-blue-dark">
+        <button onClick={onBack} className="font-medium transition-colors" style={{ color: 'var(--brand-deep-red)' }} onMouseEnter={(e) => e.currentTarget.style.color = 'var(--brand-orange)'} onMouseLeave={(e) => e.currentTarget.style.color = 'var(--brand-deep-red)'}>
           &larr; Back to Login
         </button>
       </div>

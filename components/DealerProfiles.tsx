@@ -27,7 +27,7 @@ const DealerCard: React.FC<{ seller: User; onViewProfile: (sellerEmail: string) 
             <span className="text-xs text-brand-gray-500 dark:text-brand-gray-400">({seller.ratingCount || 0} reviews)</span>
         </div>
         <p className="text-sm text-brand-gray-600 dark:text-brand-gray-400 mt-3 flex-grow line-clamp-3">{seller.bio}</p>
-        <button className="mt-4 w-full bg-brand-blue text-white font-bold py-2 px-4 rounded-lg hover:bg-brand-blue-dark transition-colors">
+        <button className="mt-4 w-full btn-brand-primary text-white font-bold py-2 px-4 rounded-lg transition-colors">
             View Profile & Listings
         </button>
     </div>

@@ -44,7 +44,7 @@ const VehicleTile: React.FC<VehicleTileProps> = ({ vehicle, onSelect, onToggleCo
         </div>
         
         <div className="mt-1 text-xs text-brand-gray-500 dark:text-brand-gray-500 truncate">
-           By: <button onClick={handleSellerClick} className="font-semibold hover:underline focus:outline-none text-brand-blue dark:text-brand-blue-light">{vehicle.sellerName}</button>
+           By: <button onClick={handleSellerClick} className="font-semibold hover:underline focus:outline-none transition-colors" style={{ color: 'var(--brand-deep-red)' }} onMouseEnter={(e) => e.currentTarget.style.color = 'var(--brand-orange)'} onMouseLeave={(e) => e.currentTarget.style.color = 'var(--brand-deep-red)'}>{vehicle.sellerName}</button>
         </div>
         
         <div className="mt-2 flex-grow grid grid-cols-2 sm:grid-cols-3 gap-x-4 gap-y-1 text-xs text-brand-gray-600 dark:text-brand-gray-400">
@@ -57,7 +57,7 @@ const VehicleTile: React.FC<VehicleTileProps> = ({ vehicle, onSelect, onToggleCo
         </div>
 
         <div className="mt-auto pt-2 flex justify-between items-end">
-             <p className="text-lg sm:text-xl font-extrabold text-brand-blue dark:text-brand-blue-light">₹{vehicle.price.toLocaleString('en-IN')}</p>
+             <p className="text-lg sm:text-xl font-extrabold" style={{ color: 'var(--brand-deep-red)' }}>₹{vehicle.price.toLocaleString('en-IN')}</p>
              <div className="flex items-center gap-2">
                 <button
                   onClick={handleWishlistClick}
@@ -71,10 +71,10 @@ const VehicleTile: React.FC<VehicleTileProps> = ({ vehicle, onSelect, onToggleCo
                 <button
                   onClick={handleCompareClick}
                   disabled={isCompareDisabled}
-                  className={`p-2 rounded-full hover:bg-brand-gray-200 dark:hover:bg-brand-gray-700 transition-colors ${isSelectedForCompare ? 'bg-brand-blue/20' : ''} ${isCompareDisabled ? 'opacity-50 cursor-not-allowed' : ''}`}
+                  className={`p-2 rounded-full hover:bg-brand-gray-200 dark:hover:bg-brand-gray-700 transition-colors ${isCompareDisabled ? 'opacity-50 cursor-not-allowed' : ''}`} style={isSelectedForCompare ? { backgroundColor: 'var(--brand-deep-red-light)' } : undefined}
                   aria-label={isSelectedForCompare ? "Remove from comparison" : "Add to comparison"}
                 >
-                  <svg xmlns="http://www.w3.org/2000/svg" className={`h-5 w-5 ${isSelectedForCompare ? 'text-brand-blue' : 'text-brand-gray-400'}`} fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" /></svg>
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" style={{ color: isSelectedForCompare ? 'var(--brand-deep-red)' : undefined }}><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" /></svg>
                 </button>
             </div>
         </div>

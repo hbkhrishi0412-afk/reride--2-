@@ -92,7 +92,7 @@ const CreateUserModal: React.FC<{
                     </div>
                     <div className="bg-gray-50 dark:bg-brand-gray-darker px-6 py-3 flex justify-end gap-4 rounded-b-lg">
                         <button type="button" onClick={onClose} className="px-4 py-2 bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300">Cancel</button>
-                        <button type="submit" className="px-4 py-2 bg-brand-blue text-white rounded-md hover:bg-brand-blue-dark">Create User</button>
+                        <button type="submit" className="px-4 py-2 btn-brand-primary text-white rounded-md">Create User</button>
                     </div>
                 </form>
             </div>
@@ -121,7 +121,7 @@ const UserManagement: React.FC<UserManagementProps> = ({ users, currentUser, onT
         <div className="space-y-6 animate-fade-in">
             <div className="flex justify-between items-center">
                 <div>
-                     <button onClick={() => onNavigate(ViewEnum.ADMIN_PANEL)} className="text-sm text-brand-blue hover:underline mb-2">&larr; Back to Admin Dashboard</button>
+                     <button onClick={() => onNavigate(ViewEnum.ADMIN_PANEL)} className="text-sm hover:underline mb-2 transition-colors" style={{ color: 'var(--brand-deep-red)' }} onMouseEnter={(e) => e.currentTarget.style.color = 'var(--brand-orange)'} onMouseLeave={(e) => e.currentTarget.style.color = 'var(--brand-deep-red)'}>&larr; Back to Admin Dashboard</button>
                      <h1 className="text-3xl font-extrabold text-gray-900 dark:text-gray-100">User Management</h1>
                 </div>
                 <button onClick={() => setIsCreateModalOpen(true)} className="bg-green-500 text-white font-bold py-2 px-4 rounded-lg hover:bg-green-600 transition-colors">
