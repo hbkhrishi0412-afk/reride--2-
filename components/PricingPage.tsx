@@ -27,7 +27,7 @@ const PricingPage: React.FC<PricingPageProps> = ({ currentUser, onSelectPlan }) 
                     {plans.map((plan) => (
                         <div
                             key={plan.id}
-                            className={`bg-white dark:bg-brand-gray-800 rounded-2xl shadow-soft-lg p-8 flex flex-col transition-transform duration-300 ${plan.isMostPopular ? 'transform lg:scale-105 border-2 border-brand-blue shadow-glow' : ''}`}
+                            className={`bg-white dark:bg-brand-gray-800 rounded-2xl shadow-soft-lg p-8 flex flex-col transition-transform duration-300 ${plan.isMostPopular ? 'transform lg:scale-105 border-2 shadow-glow' : ''}`} style={plan.isMostPopular ? { borderColor: 'var(--brand-deep-red)' } : undefined}
                         >
                             {plan.isMostPopular && (
                                 <div className="absolute top-0 -translate-y-1/2 left-1/2 -translate-x-1/2">

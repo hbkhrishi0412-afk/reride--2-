@@ -157,7 +157,7 @@ const Comparison: React.FC<ComparisonProps> = ({ vehicles, onBack: onBackToHome,
                     }
 
                     const isBest = typeof value === 'number' && isBestValue(key, value);
-                    const cellClass = highlightDiffs && hasDifference ? 'dark:bg-brand-blue/10' : '';
+                    const cellClass = highlightDiffs && hasDifference ? '' : '';
                     const cellStyle = highlightDiffs && hasDifference ? { backgroundColor: 'var(--brand-rose-pink-light)' } : undefined;
                     return (
                       <td key={`${vehicle.id}-${String(key)}`} className={`p-4 text-center dark:text-brand-gray-200 transition-colors ${cellClass} ${isBest ? 'bg-green-50 dark:bg-green-900/20' : ''}`}>
@@ -197,7 +197,7 @@ const Comparison: React.FC<ComparisonProps> = ({ vehicles, onBack: onBackToHome,
                  <tr key={feature} className="border-b border-brand-gray-200 dark:border-brand-gray-700">
                      <td className="font-semibold text-brand-gray-600 dark:text-brand-gray-300 p-4 sticky left-0 bg-white dark:bg-brand-gray-800 z-10">{feature}</td>
                      {vehicles.map(vehicle => (
-                        <td key={`${vehicle.id}-${feature}`} className={`p-4 transition-colors ${highlightDiffs && hasDifference ? 'dark:bg-brand-blue/10' : ''}`} style={highlightDiffs && hasDifference ? { backgroundColor: 'var(--brand-rose-pink-light)' } : undefined}>
+                        <td key={`${vehicle.id}-${feature}`} className="p-4 transition-colors" style={highlightDiffs && hasDifference ? { backgroundColor: 'var(--brand-rose-pink-light)' } : undefined}>
                             {vehicle.features.includes(feature) ? <CheckIcon /> : <XIcon />}
                         </td>
                      ))}

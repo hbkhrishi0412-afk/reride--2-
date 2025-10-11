@@ -1047,10 +1047,10 @@ const AdminPanel: React.FC<AdminPanelProps> = (props) => {
         <li>
             <button
                 onClick={() => setActiveView(view)}
-                className={`w-full text-left px-4 py-2.5 rounded-lg transition-colors flex justify-between items-center ${activeView === view ? 'bg-brand-blue text-white shadow-md' : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700'}`}
+                className={`w-full text-left px-4 py-2.5 rounded-lg transition-colors flex justify-between items-center ${activeView === view ? 'text-white shadow-md' : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700'}`} style={activeView === view ? { background: 'var(--gradient-primary)' } : undefined}
             >
                 <span className="font-semibold">{label}</span>
-                {count !== undefined && count > 0 && <span className={`text-xs font-bold rounded-full px-2 py-0.5 ${activeView === view ? 'bg-white text-brand-blue' : 'bg-red-500 text-white'}`}>{count}</span>}
+                {count !== undefined && count > 0 && <span className={`text-xs font-bold rounded-full px-2 py-0.5 ${activeView === view ? 'bg-white' : 'bg-red-500 text-white'}`} style={activeView === view ? { color: 'var(--brand-deep-red)' } : undefined}>{count}</span>}
             </button>
         </li>
     );

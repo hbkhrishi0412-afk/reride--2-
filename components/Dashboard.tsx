@@ -772,7 +772,7 @@ const ProfileInput: React.FC<{ label: string; name: string; value: string; onCha
             id={name}
             value={value}
             onChange={onChange}
-            className="mt-1 block w-full p-3 border border-gray-300 dark:border-gray-600 rounded-lg shadow-sm focus:ring-brand-blue focus:border-brand-blue sm:text-sm bg-white dark:bg-brand-gray-darker dark:text-gray-200"
+            className="mt-1 block w-full p-3 border border-gray-300 dark:border-gray-600 rounded-lg shadow-sm sm:text-sm bg-white dark:bg-brand-gray-darker dark:text-gray-200" onFocus={(e) => { e.currentTarget.style.borderColor = 'var(--brand-deep-red)'; e.currentTarget.style.boxShadow = '0 0 0 2px var(--brand-deep-red-light)'; }} onBlur={(e) => { e.currentTarget.style.borderColor = ''; e.currentTarget.style.boxShadow = ''; }}
         />
     </div>
 );
@@ -786,7 +786,7 @@ const ProfileTextarea: React.FC<{ label: string; name: string; value: string; on
             rows={4}
             value={value}
             onChange={onChange}
-            className="mt-1 block w-full p-3 border border-gray-300 dark:border-gray-600 rounded-lg shadow-sm focus:ring-brand-blue focus:border-brand-blue sm:text-sm bg-white dark:bg-brand-gray-darker dark:text-gray-200"
+            className="mt-1 block w-full p-3 border border-gray-300 dark:border-gray-600 rounded-lg shadow-sm sm:text-sm bg-white dark:bg-brand-gray-darker dark:text-gray-200" onFocus={(e) => { e.currentTarget.style.borderColor = 'var(--brand-deep-red)'; e.currentTarget.style.boxShadow = '0 0 0 2px var(--brand-deep-red-light)'; }} onBlur={(e) => { e.currentTarget.style.borderColor = ''; e.currentTarget.style.boxShadow = ''; }}
             placeholder={placeholder}
         />
     </div>
