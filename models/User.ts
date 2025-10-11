@@ -1,7 +1,7 @@
 
-import { Schema, model, models } from 'mongoose';
+import mongoose from 'mongoose';
 
-const userSchema = new Schema({
+const userSchema = new mongoose.Schema({
   email: {
     type: String,
     required: [true, 'Email is required.'],
@@ -62,7 +62,7 @@ const userSchema = new Schema({
   timestamps: true // Adds createdAt and updatedAt managed by Mongoose
 });
 
-// The `models.User` check prevents Mongoose from recompiling the model during hot-reloads in development
-const User = models.User || model('User', userSchema);
+// The `mongoose.models.User` check prevents Mongoose from recompiling the model during hot-reloads in development
+const User = mongoose.models.User || mongoose.model('User', userSchema);
 
 export default User;

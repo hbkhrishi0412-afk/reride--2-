@@ -1,9 +1,9 @@
 // User model for MongoDB
 // This file doesn't export a default handler, so it won't become an API route
 
-import { Schema, model, models } from 'mongoose';
+import mongoose from 'mongoose';
 
-const userSchema = new Schema({
+const userSchema = new mongoose.Schema({
   email: {
     type: String,
     required: [true, 'Email is required.'],
@@ -64,7 +64,7 @@ const userSchema = new Schema({
   timestamps: true
 });
 
-const User = models.User || model('User', userSchema);
+const User = mongoose.models.User || mongoose.model('User', userSchema);
 
 export default User;
 
