@@ -17,17 +17,32 @@ root.render(
   </React.StrictMode>
 );
 
-// Register service worker for caching and offline support
+// Service worker disabled to prevent caching issues
+// Uncomment when caching strategy is fully tested
+/*
 if ('serviceWorker' in navigator && import.meta.env.PROD) {
   window.addEventListener('load', () => {
     navigator.serviceWorker
       .register('/sw.js')
       .then((registration) => {
         console.log('SW registered:', registration);
+        // Force update
+        registration.update();
       })
       .catch((error) => {
         console.log('SW registration failed:', error);
       });
+  });
+}
+*/
+
+// Unregister any existing service workers to clear cache
+if ('serviceWorker' in navigator && import.meta.env.PROD) {
+  navigator.serviceWorker.getRegistrations().then(function(registrations) {
+    for(let registration of registrations) {
+      registration.unregister();
+      console.log('Unregistered old service worker');
+    }
   });
 }
 

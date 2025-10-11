@@ -1,97 +1,46 @@
-// Service Worker for caching and offline support
-// Updated version to force cache refresh for new theme
-const CACHE_NAME = 'reride-cache-v3-new-theme';
-const urlsToCache = [
-  '/',
-  '/index.html',
-  '/favicon.svg'
-];
+// Service Worker - Disabled to prevent caching issues
+// This ensures users always get the latest version
 
-// Install event - cache critical resources
+const CACHE_NAME = 'reride-cache-v10-spinny-fresh';
+
+// Install event - Skip caching, just activate immediately
 self.addEventListener('install', (event) => {
-  // Force the waiting service worker to become the active service worker
+  // Force immediate activation
   self.skipWaiting();
-  event.waitUntil(
-    caches.open(CACHE_NAME)
-      .then((cache) => {
-        console.log('Opened cache with new theme');
-        return cache.addAll(urlsToCache);
-      })
-  );
+  console.log('Service Worker: Installing (no caching)');
 });
 
-// Fetch event - Network first for CSS/JS to ensure fresh theme
-self.addEventListener('fetch', (event) => {
-  const url = new URL(event.request.url);
-  
-  // Network-first strategy for CSS and JS files
-  if (url.pathname.endsWith('.css') || url.pathname.endsWith('.js')) {
-    event.respondWith(
-      fetch(event.request)
-        .then((response) => {
-          // Clone and cache the fresh response
-          const responseToCache = response.clone();
-          caches.open(CACHE_NAME)
-            .then((cache) => {
-              cache.put(event.request, responseToCache);
-            });
-          return response;
-        })
-        .catch(() => {
-          // Fallback to cache if network fails
-          return caches.match(event.request);
-        })
-    );
-    return;
-  }
-
-  // Cache-first for other resources
-  event.respondWith(
-    caches.match(event.request)
-      .then((response) => {
-        if (response) {
-          return response;
-        }
-        return fetch(event.request).then(
-          (response) => {
-            if (!response || response.status !== 200 || response.type !== 'basic') {
-              return response;
-            }
-            const responseToCache = response.clone();
-            caches.open(CACHE_NAME)
-              .then((cache) => {
-                cache.put(event.request, responseToCache);
-              });
-            return response;
-          }
-        );
-      })
-  );
-});
-
-// Activate event - clean up old caches and take control immediately
+// Activate event - Delete ALL old caches
 self.addEventListener('activate', (event) => {
-  const cacheWhitelist = [CACHE_NAME];
-
   event.waitUntil(
     Promise.all([
-      // Delete old caches
+      // Delete ALL caches to force fresh content
       caches.keys().then((cacheNames) => {
         return Promise.all(
           cacheNames.map((cacheName) => {
-            if (cacheWhitelist.indexOf(cacheName) === -1) {
-              console.log('Deleting old cache:', cacheName);
-              return caches.delete(cacheName);
-            }
+            console.log('Deleting cache:', cacheName);
+            return caches.delete(cacheName);
           })
         );
       }),
-      // Take control of all clients immediately
+      // Take control immediately
       self.clients.claim()
     ])
   );
-  
-  console.log('New theme service worker activated');
+  console.log('Service Worker: Activated - All caches cleared');
 });
 
-
+// Fetch event - ALWAYS fetch from network (no caching)
+self.addEventListener('fetch', (event) => {
+  event.respondWith(
+    fetch(event.request, {
+      cache: 'no-store'
+    }).catch((error) => {
+      console.error('Fetch failed:', error);
+      return new Response('Network error', {
+        status: 503,
+        statusText: 'Service Unavailable'
+      });
+    })
+  );
+});
