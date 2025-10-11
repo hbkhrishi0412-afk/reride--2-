@@ -225,8 +225,18 @@ const App: React.FC = () => {
   }, [platformSettings.siteAnnouncement]);
 
   useEffect(() => {
+    // Try localStorage first for persistent login, fallback to sessionStorage
+    const localUserJson = localStorage.getItem('reRideCurrentUser');
     const sessionUserJson = sessionStorage.getItem('currentUser');
-    if (sessionUserJson) setCurrentUser(JSON.parse(sessionUserJson));
+    const userJson = localUserJson || sessionUserJson;
+    if (userJson) {
+      const user = JSON.parse(userJson);
+      setCurrentUser(user);
+      // Migrate sessionStorage to localStorage for persistence
+      if (!localUserJson && sessionUserJson) {
+        localStorage.setItem('reRideCurrentUser', sessionUserJson);
+      }
+    }
     const savedWishlist = localStorage.getItem('wishlist');
     if (savedWishlist) setWishlist(JSON.parse(savedWishlist));
     const loadedConversations = getConversations();
@@ -254,6 +264,7 @@ const App: React.FC = () => {
   const handleLogout = useCallback(() => {
     setCurrentUser(null);
     sessionStorage.removeItem('currentUser');
+    localStorage.removeItem('reRideCurrentUser');
     setCurrentView(View.HOME);
     setActiveChat(null);
     addToast('You have been logged out.', 'info');
@@ -264,9 +275,16 @@ const App: React.FC = () => {
         const updatedUserInState = users.find(u => u.email === currentUser.email);
         if (updatedUserInState && JSON.stringify(updatedUserInState) !== JSON.stringify(currentUser)) {
             setCurrentUser(updatedUserInState);
-            sessionStorage.setItem('currentUser', JSON.stringify(updatedUserInState));
+            const userJson = JSON.stringify(updatedUserInState);
+            sessionStorage.setItem('currentUser', userJson);
+            localStorage.setItem('reRideCurrentUser', userJson);
         }
-        if (!updatedUserInState || updatedUserInState.status === 'inactive') {
+        // Don't logout users with hardcoded test credentials
+        const testEmails = ['admin@test.com', 'seller@test.com', 'customer@test.com'];
+        const isTestUser = testEmails.includes(currentUser.email);
+        
+        // Only logout if user is not a test user AND (not found in users list OR is inactive)
+        if (!isTestUser && (!updatedUserInState || updatedUserInState.status === 'inactive')) {
             handleLogout();
             if (updatedUserInState?.status === 'inactive') addToast("Your account has been deactivated by an administrator.", "error");
         }
@@ -579,7 +597,9 @@ const App: React.FC = () => {
 
   const loginUser = useCallback((user: User) => {
       setCurrentUser(user);
-      sessionStorage.setItem('currentUser', JSON.stringify(user));
+      const userJson = JSON.stringify(user);
+      sessionStorage.setItem('currentUser', userJson);
+      localStorage.setItem('reRideCurrentUser', userJson);
       const firstName = user.name ? user.name.split(' ')[0] : 'there';
       addToast(`Welcome back, ${firstName}!`, 'success');
   }, [addToast]);
