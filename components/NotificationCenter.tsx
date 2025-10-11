@@ -26,7 +26,7 @@ const NotificationIcon: React.FC<{ type: Notification['targetType'] }> = ({ type
     const baseClass = "h-6 w-6";
     switch(type) {
         case 'conversation':
-            return <svg xmlns="http://www.w3.org/2000/svg" className={`${baseClass} text-blue-500`} fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" /></svg>;
+            return <svg xmlns="http://www.w3.org/2000/svg" className={baseClass} style={{ color: 'var(--brand-rose-pink)' }} fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" /></svg>;
         case 'price_drop':
              return <svg xmlns="http://www.w3.org/2000/svg" className={`${baseClass} text-green-500`} fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" /></svg>;
         case 'insurance_expiry':
@@ -42,7 +42,7 @@ const NotificationItem: React.FC<{ notification: Notification; onClick: () => vo
     return (
         <li className="border-b border-brand-gray-200 dark:border-brand-gray-700 last:border-b-0">
             <button onClick={onClick} className="w-full text-left p-3 hover:bg-brand-gray-100 dark:hover:bg-brand-gray-700 transition-colors flex items-start gap-3">
-                {!notification.isRead && <div className="w-2 h-2 bg-blue-500 rounded-full mt-2 flex-shrink-0"></div>}
+                {!notification.isRead && <div className="w-2 h-2 rounded-full mt-2 flex-shrink-0" style={{ backgroundColor: 'var(--brand-deep-red)' }}></div>}
                 <div className={`flex-shrink-0 ${notification.isRead ? 'ml-4' : ''}`}>
                     <NotificationIcon type={notification.targetType} />
                 </div>

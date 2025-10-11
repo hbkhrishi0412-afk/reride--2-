@@ -102,7 +102,7 @@ const PlanStatusCard: React.FC<{
                     <span>Active Listings:</span>
                     <span className="font-semibold">{activeListingsCount} / {plan.listingLimit === 'unlimited' ? '∞' : plan.listingLimit}</span>
                 </div>
-                <div className="w-full bg-blue-400/50 rounded-full h-2 mb-2">
+                <div className="w-full rounded-full h-2 mb-2" style={{ background: 'var(--brand-rose-pink-light)' }}>
                     <div
                         className="bg-yellow-300 h-2 rounded-full transition-all duration-500"
                         style={{ width: `${Math.min(usagePercentage, 100)}%` }}
@@ -741,7 +741,7 @@ const InquiriesView: React.FC<{
             {sortedConversations.length > 0 ? sortedConversations.map(conv => (
               <div key={conv.id} onClick={() => handleSelectConversation(conv)} className="p-4 rounded-lg cursor-pointer hover:bg-brand-gray-light dark:hover:bg-brand-gray-darker border-b dark:border-gray-700 flex items-center justify-between">
                 <div className="flex items-center gap-3">
-                    {!conv.isReadBySeller && <div className="w-3 h-3 bg-blue-500 rounded-full flex-shrink-0"></div>}
+                    {!conv.isReadBySeller && <div className="w-3 h-3 rounded-full flex-shrink-0" style={{ backgroundColor: 'var(--brand-deep-red)' }}></div>}
                     <div>
                       <p className="font-bold text-gray-800 dark:text-gray-100">{conv.customerName} - <span className="font-normal text-gray-600 dark:text-gray-300">{conv.vehicleName}</span></p>
                       <p className="text-sm text-gray-500 dark:text-gray-400 truncate max-w-md">{conv.messages[conv.messages.length - 1].text}</p>

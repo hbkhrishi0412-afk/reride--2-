@@ -57,7 +57,7 @@ const PricingGuidance: React.FC<PricingGuidanceProps> = ({ vehicleDetails, allVe
             </button>
             {error && <div className="mt-2 p-3 bg-red-50 dark:bg-red-900/20 text-red-700 dark:text-red-300 rounded-lg">{error}</div>}
             {result && (
-                <div className="mt-2 p-3 bg-blue-50 dark:bg-blue-900/20 text-blue-800 dark:text-blue-300 rounded-lg animate-fade-in">
+                <div className="mt-2 p-3 rounded-lg animate-fade-in" style={{ backgroundColor: 'var(--brand-rose-pink-light)', color: 'var(--brand-blackcurrant)' }}>
                     <p className="font-bold">Suggested Range: {formatCurrency(result.min)} - {formatCurrency(result.max)}</p>
                     <p className="text-xs italic mt-1">"{result.summary}"</p>
                 </div>

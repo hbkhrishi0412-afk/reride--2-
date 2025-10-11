@@ -334,7 +334,7 @@ const Home: React.FC<HomeProps> = ({ onSearch, onSelectCategory, featuredVehicle
                 
                 {/* Background decorative elements */}
                 <div className="absolute top-0 left-0 w-full h-full pointer-events-none">
-                    <div className="absolute top-20 left-20 w-32 h-32 bg-blue-100 rounded-full opacity-20 animate-float"></div>
+                    <div className="absolute top-20 left-20 w-32 h-32 rounded-full opacity-20 animate-float" style={{ background: 'var(--brand-rose-pink-light)' }}></div>
                     <div className="absolute bottom-20 right-20 w-24 h-24 bg-purple-100 rounded-full opacity-20 animate-float" style={{animationDelay: '1s'}}></div>
                 </div>
             </section>
