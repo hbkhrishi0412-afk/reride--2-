@@ -1,8 +1,8 @@
 
 import type { VercelRequest, VercelResponse } from '@vercel/node';
-import connectToDatabase from './lib-db';
-import User from './lib-user';
-import Vehicle from './lib-vehicle';
+import connectToDatabase from './lib-db.js';
+import User from './lib-user.js';
+import Vehicle from './lib-vehicle.js';
 import { MOCK_USERS, MOCK_VEHICLES } from '../constants';
 
 export default async function handler(
