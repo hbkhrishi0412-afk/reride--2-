@@ -18,15 +18,15 @@ const DealerCard: React.FC<{ seller: User; onViewProfile: (sellerEmail: string) 
             alt={`${seller.dealershipName || seller.name}'s logo`}
             className="w-24 h-24 rounded-full object-cover border-4 border-brand-gray-200 dark:border-brand-gray-200 mb-4"
         />
-        <h3 className="font-bold text-xl text-brand-text-dark dark:text-brand-text-dark">{seller.dealershipName || seller.name}</h3>
+        <h3 className="font-bold text-xl text-spinny-text-dark dark:text-spinny-text-dark">{seller.dealershipName || seller.name}</h3>
         <div className="my-2">
              <BadgeDisplay badges={seller.badges || []} />
         </div>
         <div className="flex items-center gap-2 mt-1">
             <StarRating rating={seller.averageRating || 0} readOnly size="sm" />
-            <span className="text-xs text-brand-text dark:text-brand-text">({seller.ratingCount || 0} reviews)</span>
+            <span className="text-xs text-spinny-text dark:text-spinny-text">({seller.ratingCount || 0} reviews)</span>
         </div>
-        <p className="text-sm text-brand-gray-600 dark:text-brand-text mt-3 flex-grow line-clamp-3">{seller.bio}</p>
+        <p className="text-sm text-brand-gray-600 dark:text-spinny-text mt-3 flex-grow line-clamp-3">{seller.bio}</p>
         <button className="mt-4 w-full btn-brand-primary text-white font-bold py-2 px-4 rounded-lg transition-colors">
             View Profile & Listings
         </button>
@@ -37,7 +37,7 @@ const DealerCard: React.FC<{ seller: User; onViewProfile: (sellerEmail: string) 
 const DealerProfiles: React.FC<DealerProfilesProps> = ({ sellers, onViewProfile }) => {
   return (
     <div className="dealers container mx-auto px-4 py-8 animate-fade-in">
-      <h1 className="text-4xl font-extrabold text-brand-text-dark dark:text-brand-text-dark mb-8 text-center">
+      <h1 className="text-4xl font-extrabold text-spinny-text-dark dark:text-spinny-text-dark mb-8 text-center">
         Certified Dealer Profiles
       </h1>
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
@@ -46,7 +46,7 @@ const DealerProfiles: React.FC<DealerProfilesProps> = ({ sellers, onViewProfile 
           ))}
           {sellers.length === 0 && (
             <div className="col-span-full text-center py-16">
-              <p className="text-lg text-brand-gray-600 dark:text-brand-text">No certified dealers found at the moment.</p>
+              <p className="text-lg text-brand-gray-600 dark:text-spinny-text">No certified dealers found at the moment.</p>
             </div>
           )}
       </div>

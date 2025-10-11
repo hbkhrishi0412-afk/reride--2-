@@ -33,21 +33,21 @@ const VehicleTile: React.FC<VehicleTileProps> = ({ vehicle, onSelect, onToggleCo
   return (
     <div 
       onClick={() => onSelect(vehicle)}
-      className="bg-white rounded-xl shadow-soft overflow-hidden transform hover:-translate-y-1 hover:shadow-soft-lg transition-all duration-300 flex cursor-pointer group hover:ring-2 ring-offset-2 dark:ring-offset-brand-gray-dark" style={{ ['--ring-color' as any]: 'var(--brand-turquoise)' }} onMouseEnter={(e) => e.currentTarget.style.outline = '2px solid var(--brand-turquoise)'} onMouseLeave={(e) => e.currentTarget.style.outline = ''}
+      className="bg-white rounded-xl shadow-soft overflow-hidden transform hover:-translate-y-1 hover:shadow-soft-lg transition-all duration-300 flex cursor-pointer group hover:ring-2 ring-offset-2 dark:ring-offset-brand-gray-dark" style={{ ['--ring-color' as any]: 'var(--spinny-orange)' }} onMouseEnter={(e) => e.currentTarget.style.outline = '2px solid var(--spinny-orange)'} onMouseLeave={(e) => e.currentTarget.style.outline = ''}
     >
       <img className="w-32 sm:w-48 h-full object-cover flex-shrink-0" src={vehicle.images[0]} alt={`${vehicle.make} ${vehicle.model}`} />
       
       <div className="p-4 flex flex-col flex-grow">
         <div className="flex justify-between items-start">
-            <h3 className="text-base sm:text-lg font-bold text-brand-text-dark dark:text-brand-text-dark">{vehicle.make} {vehicle.model} {vehicle.variant || ''}</h3>
-            <span className="text-sm font-semibold text-brand-text dark:text-brand-text bg-brand-gray-100 dark:bg-brand-gray-700 px-2 py-0.5 rounded flex-shrink-0 ml-2">{vehicle.year}</span>
+            <h3 className="text-base sm:text-lg font-bold text-spinny-text-dark dark:text-spinny-text-dark">{vehicle.make} {vehicle.model} {vehicle.variant || ''}</h3>
+            <span className="text-sm font-semibold text-spinny-text dark:text-spinny-text bg-spinny-off-white dark:bg-brand-gray-700 px-2 py-0.5 rounded flex-shrink-0 ml-2">{vehicle.year}</span>
         </div>
         
-        <div className="mt-1 text-xs text-brand-text dark:text-brand-text truncate">
-           By: <button onClick={handleSellerClick} className="font-semibold hover:underline focus:outline-none transition-colors" style={{ color: 'var(--brand-turquoise)' }} onMouseEnter={(e) => e.currentTarget.style.color = 'var(--brand-mint)'} onMouseLeave={(e) => e.currentTarget.style.color = 'var(--brand-turquoise)'}>{vehicle.sellerName}</button>
+        <div className="mt-1 text-xs text-spinny-text dark:text-spinny-text truncate">
+           By: <button onClick={handleSellerClick} className="font-semibold hover:underline focus:outline-none transition-colors" style={{ color: 'var(--spinny-orange)' }} onMouseEnter={(e) => e.currentTarget.style.color = 'var(--spinny-blue)'} onMouseLeave={(e) => e.currentTarget.style.color = 'var(--spinny-orange)'}>{vehicle.sellerName}</button>
         </div>
         
-        <div className="mt-2 flex-grow grid grid-cols-2 sm:grid-cols-3 gap-x-4 gap-y-1 text-xs text-brand-gray-600 dark:text-brand-text">
+        <div className="mt-2 flex-grow grid grid-cols-2 sm:grid-cols-3 gap-x-4 gap-y-1 text-xs text-brand-gray-600 dark:text-spinny-text">
             <span>{`${vehicle.mileage.toLocaleString('en-IN')} kms`}</span>
             <span>{vehicle.fuelType}</span>
             <span>{vehicle.transmission}</span>
@@ -57,24 +57,24 @@ const VehicleTile: React.FC<VehicleTileProps> = ({ vehicle, onSelect, onToggleCo
         </div>
 
         <div className="mt-auto pt-2 flex justify-between items-end">
-             <p className="text-lg sm:text-xl font-extrabold" style={{ color: 'var(--brand-turquoise)' }}>₹{vehicle.price.toLocaleString('en-IN')}</p>
+             <p className="text-lg sm:text-xl font-extrabold" style={{ color: 'var(--spinny-orange)' }}>₹{vehicle.price.toLocaleString('en-IN')}</p>
              <div className="flex items-center gap-2">
                 <button
                   onClick={handleWishlistClick}
-                  className="p-2 rounded-full hover:bg-brand-gray-200 dark:hover:bg-brand-gray-700 transition-colors"
+                  className="p-2 rounded-full hover:bg-spinny-light-gray dark:hover:bg-brand-gray-700 transition-colors"
                   aria-label={isInWishlist ? "Remove from wishlist" : "Add to wishlist"}
                 >
-                  <svg xmlns="http://www.w3.org/2000/svg" className={`h-5 w-5 transition-colors ${isInWishlist ? 'text-brand-turquoise' : 'text-brand-gray-400'}`} viewBox="0 0 20 20" fill="currentColor">
+                  <svg xmlns="http://www.w3.org/2000/svg" className={`h-5 w-5 transition-colors ${isInWishlist ? 'text-spinny-orange' : 'text-brand-gray-400'}`} viewBox="0 0 20 20" fill="currentColor">
                       <path fillRule="evenodd" d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z" clipRule="evenodd" />
                   </svg>
                 </button>
                 <button
                   onClick={handleCompareClick}
                   disabled={isCompareDisabled}
-                  className={`p-2 rounded-full hover:bg-brand-gray-200 dark:hover:bg-brand-gray-700 transition-colors ${isCompareDisabled ? 'opacity-50 cursor-not-allowed' : ''}`} style={isSelectedForCompare ? { backgroundColor: 'var(--brand-turquoise-light)' } : undefined}
+                  className={`p-2 rounded-full hover:bg-spinny-light-gray dark:hover:bg-brand-gray-700 transition-colors ${isCompareDisabled ? 'opacity-50 cursor-not-allowed' : ''}`} style={isSelectedForCompare ? { backgroundColor: 'var(--spinny-orange-light)' } : undefined}
                   aria-label={isSelectedForCompare ? "Remove from comparison" : "Add to comparison"}
                 >
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" style={{ color: isSelectedForCompare ? 'var(--brand-turquoise)' : undefined }}><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" /></svg>
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" style={{ color: isSelectedForCompare ? 'var(--spinny-orange)' : undefined }}><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" /></svg>
                 </button>
             </div>
         </div>

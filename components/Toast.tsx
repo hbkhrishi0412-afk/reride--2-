@@ -25,8 +25,8 @@ const ICONS = {
 };
 
 const BG_COLORS = {
-    success: 'bg-brand-turquoise-light0',
-    error: 'bg-brand-turquoise-light0',
+    success: 'bg-spinny-orange-light0',
+    error: 'bg-spinny-orange-light0',
     info: 'bg-gradient-primary',
 };
 
@@ -55,7 +55,7 @@ const Toast: React.FC<ToastProps> = ({ toast, onRemove }) => {
             <div className="ml-3 text-sm font-medium">{toast.message}</div>
             <button
                 type="button"
-                className="ml-auto -mx-1.5 -my-1.5 p-1.5 inline-flex h-8 w-8 rounded-lg hover:bg-brand-white/20 focus:ring-2 focus:ring-white/50"
+                className="ml-auto -mx-1.5 -my-1.5 p-1.5 inline-flex h-8 w-8 rounded-lg hover:bg-spinny-white/20 focus:ring-2 focus:ring-white/50"
                 onClick={handleClose}
                 aria-label="Close"
             >

@@ -42,24 +42,24 @@ const EditUserModal: React.FC<EditUserModalProps> = ({ user, onClose, onSave }) 
                 <form onSubmit={handleSubmit}>
                     <div className="p-6">
                         <div className="flex justify-between items-center mb-4">
-                           <h2 className="text-xl font-bold text-brand-text-dark dark:text-brand-text-dark">Edit User: {user.name}</h2>
-                           <button type="button" onClick={onClose} className="text-brand-text-dark dark:text-brand-text-dark text-2xl hover:text-brand-text-dark dark:hover:text-brand-text-dark">&times;</button>
+                           <h2 className="text-xl font-bold text-spinny-text-dark dark:text-spinny-text-dark">Edit User: {user.name}</h2>
+                           <button type="button" onClick={onClose} className="text-spinny-text-dark dark:text-spinny-text-dark text-2xl hover:text-spinny-text-dark dark:hover:text-spinny-text-dark">&times;</button>
                         </div>
                         <div className="space-y-4">
                              <div>
-                                <label className="block text-sm font-medium text-brand-text-dark dark:text-brand-text-dark">Email (Cannot be changed)</label>
-                                <input type="email" value={user.email} disabled className="mt-1 block w-full p-2 border rounded-md bg-brand-white dark:bg-brand-white" />
+                                <label className="block text-sm font-medium text-spinny-text-dark dark:text-spinny-text-dark">Email (Cannot be changed)</label>
+                                <input type="email" value={user.email} disabled className="mt-1 block w-full p-2 border rounded-md bg-spinny-white dark:bg-white" />
                             </div>
                             <div>
-                                <label className="block text-sm font-medium text-brand-text-dark dark:text-brand-text-dark">Full Name</label>
+                                <label className="block text-sm font-medium text-spinny-text-dark dark:text-spinny-text-dark">Full Name</label>
                                 <input type="text" name="name" value={formData.name} onChange={handleChange} required className="mt-1 block w-full p-2 border rounded-md" />
                             </div>
                              <div>
-                                <label className="block text-sm font-medium text-brand-text-dark dark:text-brand-text-dark">Mobile Number</label>
+                                <label className="block text-sm font-medium text-spinny-text-dark dark:text-spinny-text-dark">Mobile Number</label>
                                 <input type="tel" name="mobile" value={formData.mobile} onChange={handleChange} required className="mt-1 block w-full p-2 border rounded-md" />
                             </div>
                             <div>
-                                <label className="block text-sm font-medium text-brand-text-dark dark:text-brand-text-dark">Role</label>
+                                <label className="block text-sm font-medium text-spinny-text-dark dark:text-spinny-text-dark">Role</label>
                                 <select name="role" value={formData.role} onChange={handleChange} className="mt-1 block w-full p-2 border rounded-md">
                                     <option value="customer">Customer</option>
                                     <option value="seller">Seller</option>
@@ -69,7 +69,7 @@ const EditUserModal: React.FC<EditUserModalProps> = ({ user, onClose, onSave }) 
                         </div>
                     </div>
                     <div className="bg-white px-6 py-3 flex justify-end gap-4 rounded-b-lg">
-                        <button type="button" onClick={onClose} className="px-4 py-2 bg-brand-white-dark text-brand-text-dark rounded-md hover:bg-brand-white">Cancel</button>
+                        <button type="button" onClick={onClose} className="px-4 py-2 bg-spinny-white-dark text-spinny-text-dark rounded-md hover:bg-spinny-white">Cancel</button>
                         <button type="submit" className="px-4 py-2 btn-brand-primary text-white rounded-md">Save Changes</button>
                     </div>
                 </form>

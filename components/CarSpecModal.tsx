@@ -9,7 +9,7 @@ interface CarSpecModalProps {
 
 const SpecSection: React.FC<{ title: string, children: React.ReactNode }> = ({ title, children }) => (
     <div>
-        <h3 className="text-lg font-bold text-brand-text-dark dark:text-brand-text-dark mb-2 border-b border-brand-gray-200 dark:border-brand-gray-200 pb-1">
+        <h3 className="text-lg font-bold text-spinny-text-dark dark:text-spinny-text-dark mb-2 border-b border-brand-gray-200 dark:border-brand-gray-200 pb-1">
             {title}
         </h3>
         {children}
@@ -17,18 +17,18 @@ const SpecSection: React.FC<{ title: string, children: React.ReactNode }> = ({ t
 );
 
 const SpecDetail: React.FC<{ label: string, value: string | number | undefined }> = ({ label, value }) => (
-    <div className="flex justify-between py-1.5 px-2 rounded hover:bg-brand-gray-100 dark:hover:bg-brand-gray-700">
-        <dt className="text-sm text-brand-gray-600 dark:text-brand-text">{label}</dt>
-        <dd className="text-sm font-semibold text-brand-gray-900 dark:text-brand-gray-200 text-right">{value || '-'}</dd>
+    <div className="flex justify-between py-1.5 px-2 rounded hover:bg-spinny-off-white dark:hover:bg-brand-gray-700">
+        <dt className="text-sm text-brand-gray-600 dark:text-spinny-text">{label}</dt>
+        <dd className="text-sm font-semibold text-spinny-text-dark dark:text-brand-gray-200 text-right">{value || '-'}</dd>
     </div>
 );
 
 const FeatureList: React.FC<{ features: string[] }> = ({ features }) => {
     if (features.length === 0) {
-        return <p className="text-sm text-brand-text italic">No features listed for this category.</p>;
+        return <p className="text-sm text-spinny-text italic">No features listed for this category.</p>;
     }
     return (
-        <ul className="list-disc list-inside space-y-1 text-sm text-brand-text-dark dark:text-brand-text-dark">
+        <ul className="list-disc list-inside space-y-1 text-sm text-spinny-text-dark dark:text-spinny-text-dark">
             {features.map(feature => <li key={feature}>{feature}</li>)}
         </ul>
     );
@@ -62,12 +62,12 @@ const CarSpecModal: React.FC<CarSpecModalProps> = ({ car, variant, onClose }) =>
                 {/* Header */}
                 <div className="p-4 border-b border-brand-gray-200 dark:border-brand-gray-200 flex justify-between items-center flex-shrink-0">
                     <div>
-                        <h2 className="text-2xl font-bold text-brand-gray-900 dark:text-brand-text-dark">
+                        <h2 className="text-2xl font-bold text-spinny-text-dark dark:text-spinny-text-dark">
                             {car.brand_name} {car.model_name}
                         </h2>
-                        <p className="text-md text-brand-gray-600 dark:text-brand-text-dark">{variant.variant_name}</p>
+                        <p className="text-md text-brand-gray-600 dark:text-spinny-text-dark">{variant.variant_name}</p>
                     </div>
-                    <button onClick={onClose} className="text-brand-gray-400 hover:text-brand-text-dark dark:hover:text-white text-3xl">&times;</button>
+                    <button onClick={onClose} className="text-brand-gray-400 hover:text-spinny-text-dark dark:hover:text-white text-3xl">&times;</button>
                 </div>
 
                 {/* Body */}

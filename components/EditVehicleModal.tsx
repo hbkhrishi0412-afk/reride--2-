@@ -103,8 +103,8 @@ const EditVehicleModal: React.FC<EditVehicleModalProps> = ({ vehicle, onClose, o
 
     const FormInput = ({ label, name, type = 'text', value, required = false }: { label: string, name: keyof Vehicle | string, type?: string, value: any, required?: boolean }) => (
         <div>
-            <label className="block text-sm font-medium text-brand-text-dark dark:text-brand-text-dark">{label}</label>
-            <input type={type} name={name as string} value={value} onChange={handleChange} required={required} className="mt-1 block w-full p-2 border border-brand-mint dark:border-brand-gray-300 rounded-md bg-white dark:text-brand-text-dark" />
+            <label className="block text-sm font-medium text-spinny-text-dark dark:text-spinny-text-dark">{label}</label>
+            <input type={type} name={name as string} value={value} onChange={handleChange} required={required} className="mt-1 block w-full p-2 border border-spinny-blue dark:border-brand-gray-300 rounded-md bg-white dark:text-spinny-text-dark" />
         </div>
     );
 
@@ -114,12 +114,12 @@ const EditVehicleModal: React.FC<EditVehicleModalProps> = ({ vehicle, onClose, o
                 <form onSubmit={handleSubmit} className="flex flex-col h-full">
                     <div className="p-6 overflow-y-auto">
                         <div className="flex justify-between items-center mb-6 sticky top-0 bg-white py-2 -mt-6">
-                           <h2 className="text-xl font-bold text-brand-text-dark dark:text-brand-text-dark">Edit Vehicle: {vehicle.year} {vehicle.make} {vehicle.model}</h2>
-                           <button type="button" onClick={onClose} className="text-brand-text-dark dark:text-brand-text-dark text-2xl hover:text-brand-text-dark dark:hover:text-brand-text-dark">&times;</button>
+                           <h2 className="text-xl font-bold text-spinny-text-dark dark:text-spinny-text-dark">Edit Vehicle: {vehicle.year} {vehicle.make} {vehicle.model}</h2>
+                           <button type="button" onClick={onClose} className="text-spinny-text-dark dark:text-spinny-text-dark text-2xl hover:text-spinny-text-dark dark:hover:text-spinny-text-dark">&times;</button>
                         </div>
                         <div className="space-y-6">
                             <fieldset>
-                                <legend className="text-lg font-semibold text-brand-text-dark dark:text-brand-text-dark mb-4">Core Details</legend>
+                                <legend className="text-lg font-semibold text-spinny-text-dark dark:text-spinny-text-dark mb-4">Core Details</legend>
                                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                                     <FormInput label="Make" name="make" value={formData.make} required />
                                     <FormInput label="Model" name="model" value={formData.model} required />
@@ -133,12 +133,12 @@ const EditVehicleModal: React.FC<EditVehicleModalProps> = ({ vehicle, onClose, o
                                 </div>
                             </fieldset>
                              <fieldset>
-                                <legend className="text-lg font-semibold text-brand-text-dark dark:text-brand-text-dark mb-4">Insurance</legend>
+                                <legend className="text-lg font-semibold text-spinny-text-dark dark:text-spinny-text-dark mb-4">Insurance</legend>
                                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                     <FormInput label="Insurance Validity" name="insuranceValidity" value={formData.insuranceValidity} />
                                     <div>
-                                        <label className="block text-sm font-medium text-brand-text-dark dark:text-brand-text-dark">Insurance Type</label>
-                                        <select name="insuranceType" value={formData.insuranceType} onChange={handleChange} className="mt-1 block w-full p-2 border border-brand-mint dark:border-brand-gray-300 rounded-md bg-white dark:text-brand-text-dark">
+                                        <label className="block text-sm font-medium text-spinny-text-dark dark:text-spinny-text-dark">Insurance Type</label>
+                                        <select name="insuranceType" value={formData.insuranceType} onChange={handleChange} className="mt-1 block w-full p-2 border border-spinny-blue dark:border-brand-gray-300 rounded-md bg-white dark:text-spinny-text-dark">
                                             <option>Third Party</option>
                                             <option>Comprehensive</option>
                                             <option>Expired</option>
@@ -147,7 +147,7 @@ const EditVehicleModal: React.FC<EditVehicleModalProps> = ({ vehicle, onClose, o
                                 </div>
                             </fieldset>
                             <fieldset>
-                                <legend className="text-lg font-semibold text-brand-text-dark dark:text-brand-text-dark mb-4">Specifications</legend>
+                                <legend className="text-lg font-semibold text-spinny-text-dark dark:text-spinny-text-dark mb-4">Specifications</legend>
                                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                     <FormInput label="Engine" name="engine" value={formData.engine} />
                                     <FormInput label="Transmission" name="transmission" value={formData.transmission} />
@@ -159,46 +159,46 @@ const EditVehicleModal: React.FC<EditVehicleModalProps> = ({ vehicle, onClose, o
                                 </div>
                             </fieldset>
                              <fieldset>
-                                <legend className="text-lg font-semibold text-brand-text-dark dark:text-brand-text-dark mb-4">Quality Report</legend>
+                                <legend className="text-lg font-semibold text-spinny-text-dark dark:text-spinny-text-dark mb-4">Quality Report</legend>
                                 <div>
-                                    <label className="block text-sm font-medium text-brand-text-dark dark:text-brand-text-dark">Summary</label>
-                                    <textarea name="summary" value={formData.qualityReport?.summary} onChange={handleQualityReportChange} rows={3} className="block w-full p-2 border border-brand-mint dark:border-brand-gray-300 rounded-md bg-white dark:text-brand-text-dark" />
+                                    <label className="block text-sm font-medium text-spinny-text-dark dark:text-spinny-text-dark">Summary</label>
+                                    <textarea name="summary" value={formData.qualityReport?.summary} onChange={handleQualityReportChange} rows={3} className="block w-full p-2 border border-spinny-blue dark:border-brand-gray-300 rounded-md bg-white dark:text-spinny-text-dark" />
                                 </div>
                                  <div className="mt-4">
-                                    <label className="block text-sm font-medium text-brand-text-dark dark:text-brand-text-dark mb-1">Fixes Done</label>
+                                    <label className="block text-sm font-medium text-spinny-text-dark dark:text-spinny-text-dark mb-1">Fixes Done</label>
                                     <div className="flex gap-2">
-                                        <input type="text" value={fixInput} onChange={(e) => setFixInput(e.target.value)} onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); handleAddFix(); } }} placeholder="e.g., New tires" className="flex-grow p-2 border border-brand-mint dark:border-brand-gray-300 rounded-lg bg-white dark:text-brand-text-dark" />
-                                        <button type="button" onClick={handleAddFix} className="bg-brand-white-dark dark:bg-brand-white font-bold py-2 px-4 rounded-lg">Add Fix</button>
+                                        <input type="text" value={fixInput} onChange={(e) => setFixInput(e.target.value)} onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); handleAddFix(); } }} placeholder="e.g., New tires" className="flex-grow p-2 border border-spinny-blue dark:border-brand-gray-300 rounded-lg bg-white dark:text-spinny-text-dark" />
+                                        <button type="button" onClick={handleAddFix} className="bg-spinny-white-dark dark:bg-white font-bold py-2 px-4 rounded-lg">Add Fix</button>
                                     </div>
-                                    <div className="mt-2 flex flex-wrap gap-2">{formData.qualityReport?.fixesDone.map(fix => ( <span key={fix} className="bg-brand-turquoise-light text-brand-turquoise text-sm font-semibold px-3 py-1 rounded-full flex items-center gap-2">{fix}<button type="button" onClick={() => handleRemoveFix(fix)}>&times;</button></span> ))}</div>
+                                    <div className="mt-2 flex flex-wrap gap-2">{formData.qualityReport?.fixesDone.map(fix => ( <span key={fix} className="bg-spinny-orange-light text-spinny-orange text-sm font-semibold px-3 py-1 rounded-full flex items-center gap-2">{fix}<button type="button" onClick={() => handleRemoveFix(fix)}>&times;</button></span> ))}</div>
                                 </div>
                             </fieldset>
                             <fieldset>
-                                <legend className="text-lg font-semibold text-brand-text-dark dark:text-brand-text-dark mb-4">Description</legend>
-                                <textarea name="description" value={formData.description} onChange={handleChange} rows={4} className="block w-full p-2 border border-brand-mint dark:border-brand-gray-300 rounded-md bg-white dark:text-brand-text-dark" />
+                                <legend className="text-lg font-semibold text-spinny-text-dark dark:text-spinny-text-dark mb-4">Description</legend>
+                                <textarea name="description" value={formData.description} onChange={handleChange} rows={4} className="block w-full p-2 border border-spinny-blue dark:border-brand-gray-300 rounded-md bg-white dark:text-spinny-text-dark" />
                             </fieldset>
                             
                             <fieldset>
-                                <legend className="text-lg font-semibold text-brand-text-dark dark:text-brand-text-dark mb-4">Media & Features</legend>
+                                <legend className="text-lg font-semibold text-spinny-text-dark dark:text-spinny-text-dark mb-4">Media & Features</legend>
                                 <div>
-                                    <label className="block text-sm font-medium text-brand-text-dark dark:text-brand-text-dark">Images</label>
-                                    <div className="mt-1 p-5 border-2 border-brand-mint dark:border-brand-gray-300 border-dashed rounded-md text-center">
-                                        <label htmlFor="file-upload" className="cursor-pointer font-medium transition-colors" style={{ color: 'var(--brand-turquoise)' }} onMouseEnter={(e) => e.currentTarget.style.color = 'var(--brand-mint)'} onMouseLeave={(e) => e.currentTarget.style.color = 'var(--brand-turquoise)'}><span>Upload files</span><input id="file-upload" name="file-upload" type="file" className="sr-only" multiple accept="image/*" onChange={handleImageUpload} /></label>
+                                    <label className="block text-sm font-medium text-spinny-text-dark dark:text-spinny-text-dark">Images</label>
+                                    <div className="mt-1 p-5 border-2 border-spinny-blue dark:border-brand-gray-300 border-dashed rounded-md text-center">
+                                        <label htmlFor="file-upload" className="cursor-pointer font-medium transition-colors" style={{ color: 'var(--spinny-orange)' }} onMouseEnter={(e) => e.currentTarget.style.color = 'var(--spinny-blue)'} onMouseLeave={(e) => e.currentTarget.style.color = 'var(--spinny-orange)'}><span>Upload files</span><input id="file-upload" name="file-upload" type="file" className="sr-only" multiple accept="image/*" onChange={handleImageUpload} /></label>
                                     </div>
                                     <div className="mt-2 grid grid-cols-4 sm:grid-cols-6 gap-2">
                                         {formData.images.map((url, index) => (
                                             <div key={index} className="relative group">
                                                 <img src={url} className="w-full h-20 object-cover rounded-md" alt="Vehicle thumbnail" />
-                                                <button type="button" onClick={() => handleRemoveImageUrl(url)} className="absolute top-0 right-0 bg-brand-turquoise-light0 text-white rounded-full h-5 w-5 flex items-center justify-center text-xs opacity-0 group-hover:opacity-100">&times;</button>
+                                                <button type="button" onClick={() => handleRemoveImageUrl(url)} className="absolute top-0 right-0 bg-spinny-orange-light0 text-white rounded-full h-5 w-5 flex items-center justify-center text-xs opacity-0 group-hover:opacity-100">&times;</button>
                                             </div>
                                         ))}
                                     </div>
                                 </div>
                                 <div className="mt-4">
-                                    <label className="block text-sm font-medium text-brand-text-dark dark:text-brand-text-dark mb-1">Key Features</label>
+                                    <label className="block text-sm font-medium text-spinny-text-dark dark:text-spinny-text-dark mb-1">Key Features</label>
                                     <div className="flex gap-2">
-                                        <input type="text" value={featureInput} onChange={(e) => setFeatureInput(e.target.value)} onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); handleAddFeature(); } }} placeholder="e.g., Sunroof" className="flex-grow p-2 border border-brand-mint dark:border-brand-gray-300 rounded-lg bg-white dark:text-brand-text-dark" />
-                                        <button type="button" onClick={handleAddFeature} className="bg-brand-white-dark dark:bg-brand-white font-bold py-2 px-4 rounded-lg">Add</button>
+                                        <input type="text" value={featureInput} onChange={(e) => setFeatureInput(e.target.value)} onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); handleAddFeature(); } }} placeholder="e.g., Sunroof" className="flex-grow p-2 border border-spinny-blue dark:border-brand-gray-300 rounded-lg bg-white dark:text-spinny-text-dark" />
+                                        <button type="button" onClick={handleAddFeature} className="bg-spinny-white-dark dark:bg-white font-bold py-2 px-4 rounded-lg">Add</button>
                                     </div>
                                     <div className="mt-2 flex flex-wrap gap-2">{formData.features.map(feature => ( <span key={feature} className="brand-badge-orange text-sm font-semibold px-3 py-1 rounded-full flex items-center gap-2">{feature}<button type="button" onClick={() => handleRemoveFeature(feature)}>&times;</button></span> ))}</div>
                                 </div>
@@ -206,7 +206,7 @@ const EditVehicleModal: React.FC<EditVehicleModalProps> = ({ vehicle, onClose, o
                         </div>
                     </div>
                     <div className="bg-white px-6 py-3 flex justify-end gap-4 rounded-b-lg mt-auto">
-                        <button type="button" onClick={onClose} className="px-4 py-2 bg-brand-white-dark text-brand-text-dark rounded-md hover:bg-brand-white">Cancel</button>
+                        <button type="button" onClick={onClose} className="px-4 py-2 bg-spinny-white-dark text-spinny-text-dark rounded-md hover:bg-spinny-white">Cancel</button>
                         <button type="submit" className="px-4 py-2 btn-brand-primary text-white rounded-md">Save Changes</button>
                     </div>
                 </form>

@@ -8,8 +8,8 @@ interface LoginPortalProps {
 const LoginPortal: React.FC<LoginPortalProps> = ({ onNavigate }) => {
   return (
     <div className="w-full max-w-md space-y-8 bg-white p-10 rounded-xl shadow-soft-xl text-center">
-      <h2 className="text-3xl font-extrabold text-brand-gray-900 dark:text-brand-text-dark">Welcome to ReRide</h2>
-      <p className="mt-2 text-brand-gray-600 dark:text-brand-text">Please select your role to continue.</p>
+      <h2 className="text-3xl font-extrabold text-spinny-text-dark dark:text-spinny-text-dark">Welcome to ReRide</h2>
+      <p className="mt-2 text-brand-gray-600 dark:text-spinny-text">Please select your role to continue.</p>
       <div className="mt-8 space-y-4">
         <button
           onClick={() => onNavigate(View.CUSTOMER_LOGIN)}
@@ -27,7 +27,7 @@ const LoginPortal: React.FC<LoginPortalProps> = ({ onNavigate }) => {
       <div className="text-sm mt-6">
           <button
               onClick={() => onNavigate(View.USED_CARS)}
-              className="font-medium transition-colors" style={{ color: 'var(--brand-turquoise)' }} onMouseEnter={(e) => e.currentTarget.style.color = 'var(--brand-mint)'} onMouseLeave={(e) => e.currentTarget.style.color = 'var(--brand-turquoise)'}
+              className="font-medium transition-colors" style={{ color: 'var(--spinny-orange)' }} onMouseEnter={(e) => e.currentTarget.style.color = 'var(--spinny-blue)'} onMouseLeave={(e) => e.currentTarget.style.color = 'var(--spinny-orange)'}
           >
               Or continue as a guest &rarr;
           </button>
@@ -36,7 +36,7 @@ const LoginPortal: React.FC<LoginPortalProps> = ({ onNavigate }) => {
            <div className="text-sm">
               <button
                   onClick={() => onNavigate(View.ADMIN_LOGIN)}
-                  className="font-medium text-brand-text dark:text-brand-text transition-colors" onMouseEnter={(e) => e.currentTarget.style.color = 'var(--brand-turquoise)'} onMouseLeave={(e) => e.currentTarget.style.color = ''}
+                  className="font-medium text-spinny-text dark:text-spinny-text transition-colors" onMouseEnter={(e) => e.currentTarget.style.color = 'var(--spinny-orange)'} onMouseLeave={(e) => e.currentTarget.style.color = ''}
               >
                   Administrator Login
               </button>

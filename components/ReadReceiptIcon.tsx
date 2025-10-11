@@ -9,7 +9,7 @@ const ReadReceiptIcon: React.FC<ReadReceiptIconProps> = ({ isRead }) => {
     if (isRead) {
         // Double check for "Read"
         return (
-            <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4 inline-block ml-1" viewBox="0 0 24 24" fill="none" style={{ color: 'var(--brand-mint)' }}>
+            <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4 inline-block ml-1" viewBox="0 0 24 24" fill="none" style={{ color: 'var(--spinny-blue)' }}>
                 <path d="M1.5 12.5L5.5 16.5L11.5 10.5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
                 <path d="M8.5 12.5L12.5 16.5L22.5 6.5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
             </svg>
@@ -56,12 +56,12 @@ export const OfferModal: React.FC<{
                 <form onSubmit={handleSubmit}>
                     <div className="p-6">
                         <div className="flex justify-between items-start mb-4">
-                            <h2 className="text-xl font-bold text-brand-gray-900 dark:text-brand-text-dark">{title}</h2>
+                            <h2 className="text-xl font-bold text-spinny-text-dark dark:text-spinny-text-dark">{title}</h2>
                             <button type="button" onClick={onClose} className="text-brand-gray-400 text-2xl">&times;</button>
                         </div>
-                        {listingPrice && <p className="text-sm text-brand-text dark:text-brand-text mb-4">Listing Price: {formatCurrency(listingPrice)}</p>}
+                        {listingPrice && <p className="text-sm text-spinny-text dark:text-spinny-text mb-4">Listing Price: {formatCurrency(listingPrice)}</p>}
                         <div>
-                            <label htmlFor="offer-price" className="block text-sm font-medium mb-1 text-brand-text-dark dark:text-brand-text-dark">Your Offer Amount (₹)</label>
+                            <label htmlFor="offer-price" className="block text-sm font-medium mb-1 text-spinny-text-dark dark:text-spinny-text-dark">Your Offer Amount (₹)</label>
                             <input
                                 type="number"
                                 id="offer-price"
@@ -69,10 +69,10 @@ export const OfferModal: React.FC<{
                                 onChange={e => setPrice(e.target.value)}
                                 autoFocus
                                 required
-                                className="w-full p-3 border border-brand-gray-300 dark:border-brand-gray-300 rounded-lg bg-brand-white dark:bg-brand-gray-700 text-lg focus:outline-none" onFocus={(e) => { e.currentTarget.style.borderColor = 'var(--brand-turquoise)'; e.currentTarget.style.boxShadow = '0 0 0 2px var(--brand-turquoise-light)'; }} onBlur={(e) => { e.currentTarget.style.borderColor = ''; e.currentTarget.style.boxShadow = ''; }}
+                                className="w-full p-3 border border-brand-gray-300 dark:border-brand-gray-300 rounded-lg bg-spinny-white dark:bg-brand-gray-700 text-lg focus:outline-none" onFocus={(e) => { e.currentTarget.style.borderColor = 'var(--spinny-orange)'; e.currentTarget.style.boxShadow = '0 0 0 2px var(--spinny-orange-light)'; }} onBlur={(e) => { e.currentTarget.style.borderColor = ''; e.currentTarget.style.boxShadow = ''; }}
                             />
                         </div>
-                        {error && <p className="text-sm text-brand-turquoise mt-2">{error}</p>}
+                        {error && <p className="text-sm text-spinny-orange mt-2">{error}</p>}
                     </div>
                     <div className="bg-white dark:bg-white px-6 py-4 flex justify-end rounded-b-xl">
                         <button type="submit" className="px-6 py-2 btn-brand-primary text-white font-bold rounded-lg transition-colors">Submit Offer</button>
@@ -96,11 +96,11 @@ export const OfferMessage: React.FC<{
     const showActions = isRecipient && status === 'pending';
     
     const statusInfo = {
-        pending: { text: "Pending", color: "bg-brand-mint-light text-brand-text-dark dark:bg-brand-mint/50 dark:text-brand-text-dark border-brand-mint" },
-        accepted: { text: "Accepted", color: "bg-brand-turquoise-light text-brand-turquoise dark:bg-brand-turquoise/50 dark:text-brand-turquoise border-brand-turquoise" },
-        rejected: { text: "Rejected", color: "bg-brand-turquoise-light text-brand-turquoise dark:bg-brand-turquoise/50 dark:text-brand-turquoise border-brand-turquoise" },
-        countered: { text: "Countered", color: "bg-brand-white-dark text-brand-text-dark dark:bg-brand-white dark:text-brand-text-dark border-gray-500" },
-        confirmed: { text: "Confirmed", color: "bg-brand-turquoise-light text-brand-turquoise dark:bg-brand-turquoise/50 dark:text-brand-turquoise border-brand-turquoise" },
+        pending: { text: "Pending", color: "bg-spinny-blue-light text-spinny-text-dark dark:bg-spinny-blue/50 dark:text-spinny-text-dark border-spinny-blue" },
+        accepted: { text: "Accepted", color: "bg-spinny-orange-light text-spinny-orange dark:bg-spinny-orange/50 dark:text-spinny-orange border-spinny-orange" },
+        rejected: { text: "Rejected", color: "bg-spinny-orange-light text-spinny-orange dark:bg-spinny-orange/50 dark:text-spinny-orange border-spinny-orange" },
+        countered: { text: "Countered", color: "bg-spinny-white-dark text-spinny-text-dark dark:bg-white dark:text-spinny-text-dark border-gray-500" },
+        confirmed: { text: "Confirmed", color: "bg-spinny-orange-light text-spinny-orange dark:bg-spinny-orange/50 dark:text-spinny-orange border-spinny-orange" },
     };
 
     const handleCounterSubmit = (price: number) => {
@@ -110,13 +110,13 @@ export const OfferMessage: React.FC<{
     
     return (
         <>
-            <div className={`p-3 border-l-4 rounded-r-lg bg-brand-gray-100 dark:bg-brand-gray-700/50 ${statusInfo[status || 'pending'].color.split(' ')[2]}`}>
+            <div className={`p-3 border-l-4 rounded-r-lg bg-spinny-off-white dark:bg-brand-gray-700/50 ${statusInfo[status || 'pending'].color.split(' ')[2]}`}>
                 <div className="flex justify-between items-start">
                     <div>
-                        <p className="font-semibold text-brand-text-dark dark:text-brand-text-dark">{msg.sender === 'user' ? 'Offer Made' : 'Counter-Offer'}</p>
-                        <p className="text-xl font-bold text-brand-gray-900 dark:text-brand-gray-50">{formatCurrency(offerPrice || 0)}</p>
+                        <p className="font-semibold text-spinny-text-dark dark:text-spinny-text-dark">{msg.sender === 'user' ? 'Offer Made' : 'Counter-Offer'}</p>
+                        <p className="text-xl font-bold text-spinny-text-dark dark:text-brand-gray-50">{formatCurrency(offerPrice || 0)}</p>
                         {counterPrice && (
-                            <p className="text-xs text-brand-text dark:text-brand-text line-through">
+                            <p className="text-xs text-spinny-text dark:text-spinny-text line-through">
                                 Original: {formatCurrency(counterPrice)}
                             </p>
                         )}
@@ -127,10 +127,10 @@ export const OfferMessage: React.FC<{
                 </div>
                 {showActions && (
                     <div className="mt-3 pt-3 border-t border-brand-gray-200 dark:border-brand-gray-300 flex gap-2">
-                        <button onClick={() => onRespond(msg.id, 'accepted')} className="flex-1 text-sm bg-brand-turquoise-light0 text-white font-bold py-1.5 px-3 rounded-md hover:bg-brand-turquoise transition-colors">Accept</button>
-                        <button onClick={() => onRespond(msg.id, 'rejected')} className="flex-1 text-sm bg-brand-turquoise-light0 text-white font-bold py-1.5 px-3 rounded-md hover:bg-brand-turquoise transition-colors">Reject</button>
+                        <button onClick={() => onRespond(msg.id, 'accepted')} className="flex-1 text-sm bg-spinny-orange-light0 text-white font-bold py-1.5 px-3 rounded-md hover:bg-spinny-orange transition-colors">Accept</button>
+                        <button onClick={() => onRespond(msg.id, 'rejected')} className="flex-1 text-sm bg-spinny-orange-light0 text-white font-bold py-1.5 px-3 rounded-md hover:bg-spinny-orange transition-colors">Reject</button>
                         {currentUserRole === 'seller' && (
-                            <button onClick={() => setIsCounterModalOpen(true)} className="flex-1 text-sm bg-brand-white text-white font-bold py-1.5 px-3 rounded-md hover:bg-brand-white transition-colors">Counter</button>
+                            <button onClick={() => setIsCounterModalOpen(true)} className="flex-1 text-sm bg-spinny-white text-white font-bold py-1.5 px-3 rounded-md hover:bg-spinny-white transition-colors">Counter</button>
                         )}
                     </div>
                 )}

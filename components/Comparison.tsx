@@ -59,11 +59,11 @@ const specLabels: Record<keyof Vehicle, string> = {
 };
 
 const CheckIcon: React.FC = () => (
-    <svg className="w-6 h-6 text-brand-turquoise mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path></svg>
+    <svg className="w-6 h-6 text-spinny-orange mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path></svg>
 );
 
 const XIcon: React.FC = () => (
-    <svg className="w-6 h-6 text-brand-turquoise mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+    <svg className="w-6 h-6 text-spinny-orange mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12"></path></svg>
 );
 
 
@@ -73,9 +73,9 @@ const Comparison: React.FC<ComparisonProps> = ({ vehicles, onBack: onBackToHome,
   if (vehicles.length === 0) {
     return (
       <div className="text-center py-20 bg-white rounded-xl shadow-soft-lg">
-        <h2 className="text-2xl font-bold text-brand-text-dark dark:text-brand-text-dark">Vehicle Comparison</h2>
-        <p className="mt-4 text-brand-gray-600 dark:text-brand-text-dark">You haven't selected any vehicles to compare yet.</p>
-        <p className="text-brand-text dark:text-brand-text">Go to the listings to add up to 4 vehicles.</p>
+        <h2 className="text-2xl font-bold text-spinny-text-dark dark:text-spinny-text-dark">Vehicle Comparison</h2>
+        <p className="mt-4 text-brand-gray-600 dark:text-spinny-text-dark">You haven't selected any vehicles to compare yet.</p>
+        <p className="text-spinny-text dark:text-spinny-text">Go to the listings to add up to 4 vehicles.</p>
         <button onClick={onBackToHome} className="mt-6 btn-brand-primary text-white font-bold py-2 px-6 rounded-lg transition-colors">
           &larr; Back to Listings
         </button>
@@ -117,15 +117,15 @@ const Comparison: React.FC<ComparisonProps> = ({ vehicles, onBack: onBackToHome,
     <div className="bg-white p-6 rounded-xl shadow-soft-lg animate-fade-in">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
         <div>
-            <h1 className="text-3xl font-extrabold text-brand-gray-900 dark:text-brand-text-dark">Compare Vehicles</h1>
-            <button onClick={onBackToHome} className="text-sm font-medium hover:underline mt-1 transition-colors" style={{ color: 'var(--brand-turquoise)' }} onMouseEnter={(e) => e.currentTarget.style.color = 'var(--brand-mint)'} onMouseLeave={(e) => e.currentTarget.style.color = 'var(--brand-turquoise)'}>
+            <h1 className="text-3xl font-extrabold text-spinny-text-dark dark:text-spinny-text-dark">Compare Vehicles</h1>
+            <button onClick={onBackToHome} className="text-sm font-medium hover:underline mt-1 transition-colors" style={{ color: 'var(--spinny-orange)' }} onMouseEnter={(e) => e.currentTarget.style.color = 'var(--spinny-blue)'} onMouseLeave={(e) => e.currentTarget.style.color = 'var(--spinny-orange)'}>
                 &larr; Back to Listings
             </button>
         </div>
-        <div className="flex items-center space-x-3 bg-brand-gray-100 dark:bg-brand-gray-700 p-2 rounded-lg">
-          <label htmlFor="highlight-toggle" className="text-sm font-medium text-brand-text-dark dark:text-brand-gray-200">Highlight Differences</label>
-          <button onClick={() => setHighlightDiffs(!highlightDiffs)} id="highlight-toggle" className={`${highlightDiffs ? '' : 'bg-brand-gray-300 dark:bg-brand-gray-600'} relative inline-flex items-center h-6 rounded-full w-11 transition-colors`} style={highlightDiffs ? { background: 'var(--brand-turquoise)' } : undefined}>
-              <span className={`${highlightDiffs ? 'translate-x-6' : 'translate-x-1'} inline-block w-4 h-4 transform bg-brand-white rounded-full transition-transform`} />
+        <div className="flex items-center space-x-3 bg-spinny-off-white dark:bg-brand-gray-700 p-2 rounded-lg">
+          <label htmlFor="highlight-toggle" className="text-sm font-medium text-spinny-text-dark dark:text-brand-gray-200">Highlight Differences</label>
+          <button onClick={() => setHighlightDiffs(!highlightDiffs)} id="highlight-toggle" className={`${highlightDiffs ? '' : 'bg-brand-gray-300 dark:bg-brand-gray-600'} relative inline-flex items-center h-6 rounded-full w-11 transition-colors`} style={highlightDiffs ? { background: 'var(--spinny-orange)' } : undefined}>
+              <span className={`${highlightDiffs ? 'translate-x-6' : 'translate-x-1'} inline-block w-4 h-4 transform bg-spinny-white rounded-full transition-transform`} />
           </button>
         </div>
       </div>
@@ -134,12 +134,12 @@ const Comparison: React.FC<ComparisonProps> = ({ vehicles, onBack: onBackToHome,
         <table className="w-full border-collapse">
           <thead>
             <tr className="border-b-2 border-brand-gray-300 dark:border-brand-gray-300">
-              <th className="text-left font-bold text-lg text-brand-text-dark p-4 sticky left-0 bg-white z-10">Feature</th>
+              <th className="text-left font-bold text-lg text-spinny-text-dark p-4 sticky left-0 bg-white z-10">Feature</th>
               {vehicles.map(vehicle => (
                 <th key={vehicle.id} className="p-4 min-w-[220px]">
                   <img src={vehicle.images[0]} alt={`${vehicle.make} ${vehicle.model}`} className="w-full h-40 object-cover rounded-lg mb-2" />
-                  <h3 className="font-bold text-lg dark:text-brand-text-dark">{vehicle.year} {vehicle.make} {vehicle.model} {vehicle.variant || ''}</h3>
-                  <button onClick={() => onToggleCompare(vehicle.id)} className="mt-2 text-sm text-brand-turquoise hover:text-brand-turquoise">Remove</button>
+                  <h3 className="font-bold text-lg dark:text-spinny-text-dark">{vehicle.year} {vehicle.make} {vehicle.model} {vehicle.variant || ''}</h3>
+                  <button onClick={() => onToggleCompare(vehicle.id)} className="mt-2 text-sm text-spinny-orange hover:text-spinny-orange">Remove</button>
                 </th>
               ))}
             </tr>
@@ -149,7 +149,7 @@ const Comparison: React.FC<ComparisonProps> = ({ vehicles, onBack: onBackToHome,
               const hasDifference = areValuesDifferent(key);
               return (
                 <tr key={String(key)} className="border-b border-brand-gray-200 dark:border-brand-gray-200">
-                  <td className="font-semibold text-brand-gray-600 dark:text-brand-text-dark p-4 sticky left-0 bg-white z-10">{specLabels[key]}</td>
+                  <td className="font-semibold text-brand-gray-600 dark:text-spinny-text-dark p-4 sticky left-0 bg-white z-10">{specLabels[key]}</td>
                   {vehicles.map(vehicle => {
                     let value = vehicle[key];
                     if (key === 'city') {
@@ -158,10 +158,10 @@ const Comparison: React.FC<ComparisonProps> = ({ vehicles, onBack: onBackToHome,
 
                     const isBest = typeof value === 'number' && isBestValue(key, value);
                     const cellClass = highlightDiffs && hasDifference ? '' : '';
-                    const cellStyle = highlightDiffs && hasDifference ? { backgroundColor: 'var(--brand-mint-light)' } : undefined;
+                    const cellStyle = highlightDiffs && hasDifference ? { backgroundColor: 'var(--spinny-blue-light)' } : undefined;
                     return (
-                      <td key={`${vehicle.id}-${String(key)}`} className={`p-4 text-center dark:text-brand-gray-200 transition-colors ${cellClass} ${isBest ? 'bg-brand-turquoise-light dark:bg-brand-turquoise/20' : ''}`}>
-                         <span className={`inline-flex items-center gap-2 ${isBest ? 'font-bold text-brand-turquoise dark:text-brand-turquoise' : ''}`}>
+                      <td key={`${vehicle.id}-${String(key)}`} className={`p-4 text-center dark:text-brand-gray-200 transition-colors ${cellClass} ${isBest ? 'bg-spinny-orange-light dark:bg-spinny-orange/20' : ''}`}>
+                         <span className={`inline-flex items-center gap-2 ${isBest ? 'font-bold text-spinny-orange dark:text-spinny-orange' : ''}`}>
                             {(() => {
                                 if (value === undefined || value === null) return '-';
                                 if (key === 'averageRating' || key === 'sellerAverageRating') {
@@ -177,7 +177,7 @@ const Comparison: React.FC<ComparisonProps> = ({ vehicles, onBack: onBackToHome,
                                 }
                                 return String(value);
                             })()}
-                            {isBest && <span className="text-xs font-semibold bg-brand-turquoise text-brand-turquoise px-2 py-0.5 rounded-full">Best</span>}
+                            {isBest && <span className="text-xs font-semibold bg-spinny-orange text-spinny-orange px-2 py-0.5 rounded-full">Best</span>}
                          </span>
                       </td>
                     )
@@ -188,16 +188,16 @@ const Comparison: React.FC<ComparisonProps> = ({ vehicles, onBack: onBackToHome,
             <tr className="h-4"></tr>
             <tr>
               <td colSpan={vehicles.length + 1} className="pt-6 pb-2">
-                 <h2 className="text-2xl font-bold text-brand-text-dark dark:text-brand-text-dark border-b-2 border-brand-gray-300 dark:border-brand-gray-300 pb-2">Features</h2>
+                 <h2 className="text-2xl font-bold text-spinny-text-dark dark:text-spinny-text-dark border-b-2 border-brand-gray-300 dark:border-brand-gray-300 pb-2">Features</h2>
               </td>
             </tr>
             {allFeatures.map((feature) => {
               const hasDifference = areValuesDifferent('features');
               return (
                  <tr key={feature} className="border-b border-brand-gray-200 dark:border-brand-gray-200">
-                     <td className="font-semibold text-brand-gray-600 dark:text-brand-text-dark p-4 sticky left-0 bg-white z-10">{feature}</td>
+                     <td className="font-semibold text-brand-gray-600 dark:text-spinny-text-dark p-4 sticky left-0 bg-white z-10">{feature}</td>
                      {vehicles.map(vehicle => (
-                        <td key={`${vehicle.id}-${feature}`} className="p-4 transition-colors" style={highlightDiffs && hasDifference ? { backgroundColor: 'var(--brand-mint-light)' } : undefined}>
+                        <td key={`${vehicle.id}-${feature}`} className="p-4 transition-colors" style={highlightDiffs && hasDifference ? { backgroundColor: 'var(--spinny-blue-light)' } : undefined}>
                             {vehicle.features.includes(feature) ? <CheckIcon /> : <XIcon />}
                         </td>
                      ))}

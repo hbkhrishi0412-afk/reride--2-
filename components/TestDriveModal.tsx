@@ -31,15 +31,15 @@ const TestDriveModal: React.FC<TestDriveModalProps> = ({ onClose, onSubmit }) =>
         <form onSubmit={handleSubmit}>
           <div className="p-6">
             <div className="flex justify-between items-center mb-4">
-              <h2 className="text-2xl font-bold text-brand-gray-900 dark:text-brand-text-dark">Book a Test Drive</h2>
-              <button type="button" onClick={onClose} className="text-brand-gray-400 hover:text-brand-text-dark dark:hover:text-white text-3xl">&times;</button>
+              <h2 className="text-2xl font-bold text-spinny-text-dark dark:text-spinny-text-dark">Book a Test Drive</h2>
+              <button type="button" onClick={onClose} className="text-brand-gray-400 hover:text-spinny-text-dark dark:hover:text-white text-3xl">&times;</button>
             </div>
-            <p className="text-brand-gray-600 dark:text-brand-text mb-6">
+            <p className="text-brand-gray-600 dark:text-spinny-text mb-6">
               Select your preferred date and time. The seller will confirm your request via chat.
             </p>
             <div className="space-y-4">
               <div>
-                <label htmlFor="test-drive-date" className="block text-sm font-medium text-brand-text-dark dark:text-brand-text-dark">Preferred Date</label>
+                <label htmlFor="test-drive-date" className="block text-sm font-medium text-spinny-text-dark dark:text-spinny-text-dark">Preferred Date</label>
                 <input
                   type="date"
                   id="test-drive-date"
@@ -47,24 +47,24 @@ const TestDriveModal: React.FC<TestDriveModalProps> = ({ onClose, onSubmit }) =>
                   onChange={(e) => setDate(e.target.value)}
                   min={getTodayString()}
                   required
-                  className="mt-1 w-full p-3 border border-brand-gray-300 dark:border-brand-gray-300 rounded-lg bg-brand-white dark:bg-brand-gray-700" onFocus={(e) => { e.currentTarget.style.borderColor = 'var(--brand-turquoise)'; e.currentTarget.style.boxShadow = '0 0 0 2px var(--brand-turquoise-light)'; }} onBlur={(e) => { e.currentTarget.style.borderColor = ''; e.currentTarget.style.boxShadow = ''; }}
+                  className="mt-1 w-full p-3 border border-brand-gray-300 dark:border-brand-gray-300 rounded-lg bg-spinny-white dark:bg-brand-gray-700" onFocus={(e) => { e.currentTarget.style.borderColor = 'var(--spinny-orange)'; e.currentTarget.style.boxShadow = '0 0 0 2px var(--spinny-orange-light)'; }} onBlur={(e) => { e.currentTarget.style.borderColor = ''; e.currentTarget.style.boxShadow = ''; }}
                 />
               </div>
               <div>
-                <label htmlFor="test-drive-time" className="block text-sm font-medium text-brand-text-dark dark:text-brand-text-dark">Preferred Time</label>
+                <label htmlFor="test-drive-time" className="block text-sm font-medium text-spinny-text-dark dark:text-spinny-text-dark">Preferred Time</label>
                 <input
                   type="time"
                   id="test-drive-time"
                   value={time}
                   onChange={(e) => setTime(e.target.value)}
                   required
-                  className="mt-1 w-full p-3 border border-brand-gray-300 dark:border-brand-gray-300 rounded-lg bg-brand-white dark:bg-brand-gray-700" onFocus={(e) => { e.currentTarget.style.borderColor = 'var(--brand-turquoise)'; e.currentTarget.style.boxShadow = '0 0 0 2px var(--brand-turquoise-light)'; }} onBlur={(e) => { e.currentTarget.style.borderColor = ''; e.currentTarget.style.boxShadow = ''; }}
+                  className="mt-1 w-full p-3 border border-brand-gray-300 dark:border-brand-gray-300 rounded-lg bg-spinny-white dark:bg-brand-gray-700" onFocus={(e) => { e.currentTarget.style.borderColor = 'var(--spinny-orange)'; e.currentTarget.style.boxShadow = '0 0 0 2px var(--spinny-orange-light)'; }} onBlur={(e) => { e.currentTarget.style.borderColor = ''; e.currentTarget.style.boxShadow = ''; }}
                 />
               </div>
-              {error && <p className="text-sm text-brand-turquoise">{error}</p>}
+              {error && <p className="text-sm text-spinny-orange">{error}</p>}
             </div>
           </div>
-          <div className="bg-white dark:bg-brand-gray-900/50 px-6 py-4 flex justify-end rounded-b-xl">
+          <div className="bg-white dark:bg-white/50 px-6 py-4 flex justify-end rounded-b-xl">
             <button
               type="submit"
               className="px-6 py-2 btn-brand-primary text-white font-bold rounded-lg transition-colors"

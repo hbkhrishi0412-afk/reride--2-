@@ -21,7 +21,7 @@ const EMOJIS = ['😀', '😂', '👍', '❤️', '🙏', '😊', '🔥', '🎉'
 
 const TypingIndicator: React.FC<{ name: string }> = ({ name }) => (
     <div className="flex items-start">
-        <div className="rounded-xl px-4 py-3 max-w-lg bg-brand-gray-200 dark:bg-brand-gray-700 text-brand-text-dark dark:text-brand-gray-200 flex items-center space-x-2">
+        <div className="rounded-xl px-4 py-3 max-w-lg bg-spinny-light-gray dark:bg-brand-gray-700 text-spinny-text-dark dark:text-brand-gray-200 flex items-center space-x-2">
             <span className="text-sm font-medium">{name} is typing</span>
             <div className="w-1.5 h-1.5 bg-white0 rounded-full animate-bounce [animation-delay:-0.3s]"></div>
             <div className="w-1.5 h-1.5 bg-white0 rounded-full animate-bounce [animation-delay:-0.15s]"></div>
@@ -112,7 +112,7 @@ export const ChatWidget: React.FC<ChatWidgetProps> = memo(({ conversation, curre
             >
                 <span>{conversation.vehicleName}</span>
                 <div className="flex items-center gap-2">
-                    <button onClick={handleClose} className="p-1 hover:bg-brand-white/20 rounded-full">&times;</button>
+                    <button onClick={handleClose} className="p-1 hover:bg-spinny-white/20 rounded-full">&times;</button>
                 </div>
             </button>
         </div>
@@ -125,30 +125,30 @@ export const ChatWidget: React.FC<ChatWidgetProps> = memo(({ conversation, curre
         {/* Header */}
         <div className="p-3 border-b border-brand-gray-200 dark:border-brand-gray-200 flex justify-between items-center bg-white dark:bg-white rounded-t-lg">
             <div onClick={() => setIsMinimized(true)} className="cursor-pointer flex-grow">
-                <h3 className="text-sm font-bold text-brand-text-dark dark:text-brand-text-dark truncate">{conversation.vehicleName}</h3>
-                <p className="text-xs text-brand-text dark:text-brand-text">Chat with {otherUserName}</p>
+                <h3 className="text-sm font-bold text-spinny-text-dark dark:text-spinny-text-dark truncate">{conversation.vehicleName}</h3>
+                <p className="text-xs text-spinny-text dark:text-spinny-text">Chat with {otherUserName}</p>
             </div>
             <div className="flex items-center gap-2">
-                <button onClick={handleFlagClick} disabled={conversation.isFlagged} className="disabled:opacity-50 p-1 text-brand-text hover:bg-black/10 dark:hover:bg-brand-white/10 rounded-full" aria-label="Report conversation" title={conversation.isFlagged ? "This conversation has been reported" : "Report conversation"}>
-                    <svg xmlns="http://www.w3.org/2000/svg" className={`h-5 w-5 ${conversation.isFlagged ? 'text-brand-text-dark' : ''}`} viewBox="0 0 20 20" fill="currentColor"><path fillRule="evenodd" d="M3 6a3 3 0 013-3h10a1 1 0 01.8 1.6L14.25 8l2.55 3.4A1 1 0 0116 13H6a1 1 0 01-1-1V6z" clipRule="evenodd" /></svg>
+                <button onClick={handleFlagClick} disabled={conversation.isFlagged} className="disabled:opacity-50 p-1 text-spinny-text hover:bg-black/10 dark:hover:bg-spinny-white/10 rounded-full" aria-label="Report conversation" title={conversation.isFlagged ? "This conversation has been reported" : "Report conversation"}>
+                    <svg xmlns="http://www.w3.org/2000/svg" className={`h-5 w-5 ${conversation.isFlagged ? 'text-spinny-text-dark' : ''}`} viewBox="0 0 20 20" fill="currentColor"><path fillRule="evenodd" d="M3 6a3 3 0 013-3h10a1 1 0 01.8 1.6L14.25 8l2.55 3.4A1 1 0 0116 13H6a1 1 0 01-1-1V6z" clipRule="evenodd" /></svg>
                 </button>
-                <button onClick={(e) => { e.stopPropagation(); setIsMinimized(true); }} className="p-1 text-brand-text hover:bg-black/10 dark:hover:bg-brand-white/10 rounded-full" aria-label="Minimize chat">
+                <button onClick={(e) => { e.stopPropagation(); setIsMinimized(true); }} className="p-1 text-spinny-text hover:bg-black/10 dark:hover:bg-spinny-white/10 rounded-full" aria-label="Minimize chat">
                     <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" /></svg>
                 </button>
-                <button onClick={(e) => { e.stopPropagation(); handleClose(); }} className="p-1 text-brand-text hover:bg-black/10 dark:hover:bg-brand-white/10 rounded-full" aria-label="Close chat">
+                <button onClick={(e) => { e.stopPropagation(); handleClose(); }} className="p-1 text-spinny-text hover:bg-black/10 dark:hover:bg-spinny-white/10 rounded-full" aria-label="Close chat">
                     <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
                 </button>
             </div>
         </div>
 
         {/* Messages */}
-        <div className="flex-grow p-4 overflow-y-auto bg-brand-gray-100 dark:bg-white space-y-4">
+        <div className="flex-grow p-4 overflow-y-auto bg-spinny-off-white dark:bg-white space-y-4">
             {conversation.messages.map((msg) => (
                 <div key={msg.id} className={`flex flex-col ${msg.sender === senderType ? 'items-end' : 'items-start'}`}>
-                    {msg.sender === 'system' && <div className="text-center text-xs text-brand-text dark:text-brand-text italic py-2 w-full">{msg.text}</div>}
+                    {msg.sender === 'system' && <div className="text-center text-xs text-spinny-text dark:text-spinny-text italic py-2 w-full">{msg.text}</div>}
                     {msg.sender !== 'system' && (
                         <>
-                            <div className={`px-4 py-3 max-w-xs ${ msg.sender === senderType ? 'text-white rounded-l-xl rounded-t-xl' : 'bg-brand-white dark:bg-brand-gray-700 text-brand-text-dark dark:text-brand-gray-200 rounded-r-xl rounded-t-xl'}`} style={msg.sender === senderType ? { background: 'var(--gradient-primary)' } : undefined}>
+                            <div className={`px-4 py-3 max-w-xs ${ msg.sender === senderType ? 'text-white rounded-l-xl rounded-t-xl' : 'bg-spinny-white dark:bg-brand-gray-700 text-spinny-text-dark dark:text-brand-gray-200 rounded-r-xl rounded-t-xl'}`} style={msg.sender === senderType ? { background: 'var(--gradient-primary)' } : undefined}>
                                 {msg.type === 'offer' ? <OfferMessage msg={msg} currentUserRole={currentUserRole} listingPrice={conversation.vehiclePrice} onRespond={(messageId, response, counterPrice) => onOfferResponse(conversation.id, messageId, response, counterPrice)} /> : <p className="text-sm break-words">{msg.text}</p>}
                             </div>
                             <div className="text-xs text-brand-gray-400 mt-1 px-1 flex items-center">
@@ -166,24 +166,24 @@ export const ChatWidget: React.FC<ChatWidgetProps> = memo(({ conversation, curre
         {/* Input */}
         <div className="p-3 border-t border-brand-gray-200 dark:border-brand-gray-200 bg-white relative">
             {showEmojiPicker && (
-                <div ref={emojiPickerRef} className="absolute bottom-full mb-2 w-full bg-brand-white dark:bg-brand-gray-700 rounded-lg shadow-lg p-2 grid grid-cols-6 gap-2">
+                <div ref={emojiPickerRef} className="absolute bottom-full mb-2 w-full bg-spinny-white dark:bg-brand-gray-700 rounded-lg shadow-lg p-2 grid grid-cols-6 gap-2">
                     {EMOJIS.map(emoji => (
-                        <button key={emoji} onClick={() => handleEmojiClick(emoji)} className="text-2xl hover:bg-brand-gray-200 dark:hover:bg-brand-gray-600 rounded-md p-1">
+                        <button key={emoji} onClick={() => handleEmojiClick(emoji)} className="text-2xl hover:bg-spinny-light-gray dark:hover:bg-brand-gray-600 rounded-md p-1">
                             {emoji}
                         </button>
                     ))}
                 </div>
             )}
             <form onSubmit={handleSendMessage} className="flex gap-2 items-center">
-                <button type="button" onClick={() => setShowEmojiPicker(prev => !prev)} className="p-2 text-brand-text transition-colors" aria-label="Add emoji" onMouseEnter={(e) => e.currentTarget.style.color = 'var(--brand-turquoise)'} onMouseLeave={(e) => e.currentTarget.style.color = ''}>
+                <button type="button" onClick={() => setShowEmojiPicker(prev => !prev)} className="p-2 text-spinny-text transition-colors" aria-label="Add emoji" onMouseEnter={(e) => e.currentTarget.style.color = 'var(--spinny-orange)'} onMouseLeave={(e) => e.currentTarget.style.color = ''}>
                     <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14.828 14.828a4 4 0 01-5.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
                 </button>
                 {currentUserRole === 'customer' ? (
-                     <button type="button" onClick={() => setIsOfferModalOpen(true)} className="p-2 text-brand-text hover:text-brand-turquoise" aria-label="Make an offer">
+                     <button type="button" onClick={() => setIsOfferModalOpen(true)} className="p-2 text-spinny-text hover:text-spinny-orange" aria-label="Make an offer">
                         <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" viewBox="0 0 20 20" fill="currentColor"><path d="M8.433 7.418c.155-.103.346-.196.567-.267v1.698a2.5 2.5 0 00-1.134 0V7.151c.22.07.412.164.567.267zM11.567 7.418c.155-.103.346-.196.567-.267v1.698a2.5 2.5 0 01-1.134 0V7.151c.22.07.412.164.567.267z" /><path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-13a1 1 0 10-2 0v.092a4.5 4.5 0 00-1.876.662C6.168 6.23 5.5 7.085 5.5 8.003v.486c0 .918.668 1.773 1.624 2.214.509.232.957.488 1.376.786V12.5a.5.5 0 01.5.5h1a.5.5 0 01.5-.5v-1.214c.419-.298.867-.554 1.376-.786C14.332 10.26 15 9.405 15 8.489v-.486c0-.918-.668-1.773-1.624-2.214A4.5 4.5 0 0011 5.092V5z" clipRule="evenodd" /></svg>
                     </button>
                 ) : ( onMakeOffer && 
-                     <button type="button" onClick={onMakeOffer} className="p-2 text-brand-text hover:text-brand-turquoise" aria-label="Make an offer">
+                     <button type="button" onClick={onMakeOffer} className="p-2 text-spinny-text hover:text-spinny-orange" aria-label="Make an offer">
                         <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" viewBox="0 0 20 20" fill="currentColor"><path d="M8.433 7.418c.155-.103.346-.196.567-.267v1.698a2.5 2.5 0 00-1.134 0V7.151c.22.07.412.164.567.267zM11.567 7.418c.155-.103.346-.196.567-.267v1.698a2.5 2.5 0 01-1.134 0V7.151c.22.07.412.164.567.267z" /><path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-13a1 1 0 10-2 0v.092a4.5 4.5 0 00-1.876.662C6.168 6.23 5.5 7.085 5.5 8.003v.486c0 .918.668 1.773 1.624 2.214.509.232.957.488 1.376.786V12.5a.5.5 0 01.5.5h1a.5.5 0 01.5-.5v-1.214c.419-.298.867-.554 1.376-.786C14.332 10.26 15 9.405 15 8.489v-.486c0-.918-.668-1.773-1.624-2.214A4.5 4.5 0 0011 5.092V5z" clipRule="evenodd" /></svg>
                     </button>
                 )}
@@ -192,9 +192,9 @@ export const ChatWidget: React.FC<ChatWidgetProps> = memo(({ conversation, curre
                     value={inputText}
                     onChange={handleInputChange}
                     placeholder="Type a message..."
-                    className="flex-grow bg-brand-gray-100 dark:bg-brand-gray-700 rounded-full px-4 py-2 focus:outline-none" onFocus={(e) => { e.currentTarget.style.borderColor = 'var(--brand-turquoise)'; e.currentTarget.style.boxShadow = '0 0 0 2px var(--brand-turquoise-light)'; }} onBlur={(e) => { e.currentTarget.style.borderColor = ''; e.currentTarget.style.boxShadow = ''; }}
+                    className="flex-grow bg-spinny-off-white dark:bg-brand-gray-700 rounded-full px-4 py-2 focus:outline-none" onFocus={(e) => { e.currentTarget.style.borderColor = 'var(--spinny-orange)'; e.currentTarget.style.boxShadow = '0 0 0 2px var(--spinny-orange-light)'; }} onBlur={(e) => { e.currentTarget.style.borderColor = ''; e.currentTarget.style.boxShadow = ''; }}
                 />
-                <button type="submit" className="p-2 transition-colors" aria-label="Send message" style={{ color: 'var(--brand-turquoise)' }} onMouseEnter={(e) => e.currentTarget.style.color = 'var(--brand-mint)'} onMouseLeave={(e) => e.currentTarget.style.color = 'var(--brand-turquoise)'}>
+                <button type="submit" className="p-2 transition-colors" aria-label="Send message" style={{ color: 'var(--spinny-orange)' }} onMouseEnter={(e) => e.currentTarget.style.color = 'var(--spinny-blue)'} onMouseLeave={(e) => e.currentTarget.style.color = 'var(--spinny-orange)'}>
                     <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" /></svg>
                 </button>
             </form>
