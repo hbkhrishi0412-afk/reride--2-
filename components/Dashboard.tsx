@@ -75,7 +75,7 @@ const FormInput: React.FC<{ label: string; name: keyof Vehicle | 'summary'; type
 
 const StatCard: React.FC<{ title: string; value: string | number; icon: React.ReactNode }> = memo(({ title, value, icon }) => (
   <div className="bg-white dark:bg-brand-gray-dark p-6 rounded-lg shadow-md flex items-center">
-    <div className="bg-brand-blue-lightest p-3 rounded-full mr-4">{icon}</div>
+    <div className="p-3 rounded-full mr-4" style={{ background: 'var(--brand-rose-pink-light)' }}>{icon}</div>
     <div>
       <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400">{title}</h3>
       <p className="text-2xl font-bold text-gray-900 dark:text-gray-100">{value}</p>
@@ -568,11 +568,11 @@ const VehicleForm: React.FC<VehicleFormProps> = memo(({ editingVehicle, onAddVeh
                      <div>
                         <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Images</label>
                         <div className="mt-1">
-                            <label htmlFor="file-upload" className={`relative cursor-pointer bg-white dark:bg-brand-gray-darker rounded-lg border-2 border-gray-300 dark:border-gray-600 border-dashed hover:border-brand-blue dark:hover:border-brand-blue-light transition-colors duration-200 flex flex-col items-center justify-center text-center p-6 ${isUploading ? 'opacity-50 cursor-not-allowed' : ''}`}>
+                            <label htmlFor="file-upload" className={`relative cursor-pointer bg-white dark:bg-brand-gray-darker rounded-lg border-2 border-gray-300 dark:border-gray-600 border-dashed transition-colors duration-200 flex flex-col items-center justify-center text-center p-6 ${isUploading ? 'opacity-50 cursor-not-allowed' : ''}`} style={{ borderColor: isUploading ? '' : undefined }} onMouseEnter={(e) => !isUploading && (e.currentTarget.style.borderColor = 'var(--brand-deep-red)')} onMouseLeave={(e) => !isUploading && (e.currentTarget.style.borderColor = '')}>
                                 <svg xmlns="http://www.w3.org/2000/svg" className="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
                                 </svg>
-                                <span className="mt-2 block text-sm font-semibold text-brand-blue">
+                                <span className="mt-2 block text-sm font-semibold" style={{ color: 'var(--brand-deep-red)' }}>
                                     {isUploading ? 'Uploading...' : 'Upload images'}
                                 </span>
                                 <input id="file-upload" type="file" className="sr-only" multiple accept="image/png, image/jpeg" onChange={(e) => handleFileUpload(e, 'image')} disabled={isUploading} />
@@ -597,7 +597,7 @@ const VehicleForm: React.FC<VehicleFormProps> = memo(({ editingVehicle, onAddVeh
                                 <option>Service Record</option>
                                 <option>Other</option>
                             </select>
-                            <label htmlFor="doc-upload" className={`cursor-pointer font-semibold text-white py-2 px-4 rounded-lg transition-colors ${isUploading ? 'bg-gray-400' : 'bg-brand-blue hover:bg-brand-blue-dark'}`}>
+                            <label htmlFor="doc-upload" className={`cursor-pointer font-semibold text-white py-2 px-4 rounded-lg transition-colors ${isUploading ? 'bg-gray-400' : 'btn-brand-primary'}`} style={!isUploading ? { background: 'var(--gradient-primary)', cursor: 'pointer' } : undefined}>
                                 {isUploading ? '...' : 'Upload'}
                                 <input id="doc-upload" type="file" className="sr-only" accept=".pdf,.png,.jpg,.jpeg" onChange={(e) => handleFileUpload(e, 'document')} disabled={isUploading} />
                             </label>
@@ -617,7 +617,7 @@ const VehicleForm: React.FC<VehicleFormProps> = memo(({ editingVehicle, onAddVeh
                             <input type="text" value={featureInput} onChange={(e) => setFeatureInput(e.target.value)} onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); handleAddFeature(); } }} placeholder="e.g., Sunroof" className="flex-grow p-3 border border-brand-gray dark:border-gray-600 rounded-lg" />
                             <button type="button" onClick={handleAddFeature} className="bg-gray-200 dark:bg-gray-600 font-bold py-2 px-4 rounded-lg">Add</button>
                         </div>
-                        <div className="mt-2 flex flex-wrap gap-2">{formData.features.map(feature => ( <span key={feature} className="bg-brand-blue-light text-white text-sm font-semibold px-3 py-1 rounded-full flex items-center gap-2">{feature}<button type="button" onClick={() => handleRemoveFeature(feature)}>&times;</button></span> ))}</div>
+                        <div className="mt-2 flex flex-wrap gap-2">{formData.features.map(feature => ( <span key={feature} className="brand-badge-orange text-sm font-semibold px-3 py-1 rounded-full flex items-center gap-2">{feature}<button type="button" onClick={() => handleRemoveFeature(feature)}>&times;</button></span> ))}</div>
                     </div>
                      <div>
                         <div className="flex justify-between items-center mb-1">
@@ -657,7 +657,7 @@ const VehicleForm: React.FC<VehicleFormProps> = memo(({ editingVehicle, onAddVeh
             </FormFieldset>
 
             <div className="pt-4 flex flex-col sm:flex-row items-center gap-4">
-                <button type="submit" className="w-full sm:w-auto flex-grow bg-brand-blue text-white font-bold py-3 px-6 rounded-lg text-lg hover:bg-brand-blue-dark"> {editingVehicle ? 'Update Vehicle' : 'List My Vehicle'} </button>
+                <button type="submit" className="w-full sm:w-auto flex-grow btn-brand-primary font-bold py-3 px-6 rounded-lg text-lg"> {editingVehicle ? 'Update Vehicle' : 'List My Vehicle'} </button>
                 <button type="button" onClick={onCancel} className="w-full sm:w-auto bg-gray-500 text-white font-bold py-3 px-6 rounded-lg text-lg hover:bg-gray-600">Cancel</button>
             </div>
           </form>
@@ -682,8 +682,8 @@ const VehicleForm: React.FC<VehicleFormProps> = memo(({ editingVehicle, onAddVeh
                                         <div className="space-y-2">
                                             {features.map(feature => (
                                                 <label key={feature} className="flex items-center space-x-3 cursor-pointer group">
-                                                    <input type="checkbox" checked={formData.features.includes(feature)} onChange={() => handleSuggestedFeatureToggle(feature)} className="h-4 w-4 text-brand-blue rounded border-gray-300 dark:border-gray-500 focus:ring-brand-blue-light bg-transparent" />
-                                                    <span className="text-sm text-gray-800 dark:text-gray-300 group-hover:text-brand-blue dark:group-hover:text-brand-blue-light">{feature}</span>
+                                                    <input type="checkbox" checked={formData.features.includes(feature)} onChange={() => handleSuggestedFeatureToggle(feature)} className="h-4 w-4 rounded border-gray-300 dark:border-gray-500 bg-transparent" style={{ accentColor: 'var(--brand-deep-red)' }} />
+                                                    <span className="text-sm text-gray-800 dark:text-gray-300 transition-colors" onMouseEnter={(e) => e.currentTarget.style.color = 'var(--brand-deep-red)'} onMouseLeave={(e) => e.currentTarget.style.color = ''}>{feature}</span>
                                                 </label>
                                             ))}
                                         </div>
@@ -842,7 +842,7 @@ const SellerProfileForm: React.FC<{ seller: User; onUpdateProfile: (details: any
                 <div className="flex items-center gap-6">
                     <img src={formData.logoUrl || 'https://via.placeholder.com/100'} alt="Logo" className="w-24 h-24 rounded-full object-cover bg-gray-200" />
                     <div>
-                        <label htmlFor="logo-upload" className="cursor-pointer font-medium text-brand-blue hover:text-brand-blue-dark">
+                        <label htmlFor="logo-upload" className="cursor-pointer font-medium transition-colors" style={{ color: 'var(--brand-deep-red)' }} onMouseEnter={(e) => e.currentTarget.style.color = 'var(--brand-orange)'} onMouseLeave={(e) => e.currentTarget.style.color = 'var(--brand-deep-red)'}>
                             <span>Upload New Logo</span>
                             <input id="logo-upload" name="logo-upload" type="file" className="sr-only" accept="image/*" onChange={handleLogoUpload} />
                         </label>
@@ -863,7 +863,7 @@ const SellerProfileForm: React.FC<{ seller: User; onUpdateProfile: (details: any
                     placeholder="Tell customers about your dealership..."
                 />
                 <div>
-                    <button type="submit" className="bg-brand-blue text-white font-bold py-3 px-6 rounded-lg hover:bg-brand-blue-dark">Save Profile</button>
+                    <button type="submit" className="btn-brand-primary text-white font-bold py-3 px-6 rounded-lg">Save Profile</button>
                 </div>
             </form>
 
@@ -872,15 +872,15 @@ const SellerProfileForm: React.FC<{ seller: User; onUpdateProfile: (details: any
                 <div className="flex flex-col sm:flex-row items-center gap-6 p-4 bg-gray-50 dark:bg-brand-gray-darker rounded-lg">
                     <div className="text-center">
                         <img src={qrCodeUrl} alt="Seller Profile QR Code" className="w-36 h-36 rounded-lg border dark:border-gray-600" />
-                         <a href={qrCodeUrl} download={`qr-code-${seller.email}.png`} className="mt-2 inline-block text-sm text-brand-blue hover:underline">
+                         <a href={qrCodeUrl} download={`qr-code-${seller.email}.png`} className="mt-2 inline-block text-sm hover:underline transition-colors" style={{ color: 'var(--brand-deep-red)' }} onMouseEnter={(e) => e.currentTarget.style.color = 'var(--brand-orange)'} onMouseLeave={(e) => e.currentTarget.style.color = 'var(--brand-deep-red)'}>
                             Download QR Code
                         </a>
                     </div>
                     <div>
                         <p className="text-sm text-gray-600 dark:text-gray-300 mb-3">Share this QR code or link with customers. When they scan or click it, they'll be taken directly to your profile page with all your listings.</p>
                         <div className="mt-2 p-2 bg-gray-200 dark:bg-gray-800 rounded-md flex items-center justify-between gap-2">
-                           <a href={profileUrl} target="_blank" rel="noopener noreferrer" className="text-sm text-blue-600 dark:text-blue-400 font-mono truncate hover:underline">{profileUrl}</a>
-                           <button onClick={handleCopy} className="text-sm font-semibold px-3 py-1 bg-brand-blue text-white rounded-md hover:bg-brand-blue-dark transition-colors whitespace-nowrap">
+                           <a href={profileUrl} target="_blank" rel="noopener noreferrer" className="text-sm font-mono truncate hover:underline transition-colors" style={{ color: 'var(--brand-deep-red)' }} onMouseEnter={(e) => e.currentTarget.style.color = 'var(--brand-orange)'} onMouseLeave={(e) => e.currentTarget.style.color = 'var(--brand-deep-red)'}>{profileUrl}</a>
+                           <button onClick={handleCopy} className="text-sm font-semibold px-3 py-1 text-white rounded-md transition-colors whitespace-nowrap btn-brand-primary">
                                {copySuccess || 'Copy Link'}
                            </button>
                         </div>
@@ -907,7 +907,7 @@ const ReportsView: React.FC<{
                         <p className="mt-2 text-sm italic text-gray-700 dark:text-gray-200">Reason: "{v.flagReason || 'No reason provided.'}"</p>
                         <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">An administrator will review this report. You can edit the listing to correct any issues or delete it if it's no longer valid.</p>
                         <div className="mt-3 space-x-4">
-                            <button onClick={() => onEditVehicle(v)} className="text-brand-blue font-semibold text-sm hover:underline">Edit Listing</button>
+                            <button onClick={() => onEditVehicle(v)} className="font-semibold text-sm hover:underline transition-colors" style={{ color: 'var(--brand-deep-red)' }} onMouseEnter={(e) => e.currentTarget.style.color = 'var(--brand-orange)'} onMouseLeave={(e) => e.currentTarget.style.color = 'var(--brand-deep-red)'}> Edit Listing</button>
                             <button onClick={() => onDeleteVehicle(v.id)} className="text-red-500 font-semibold text-sm hover:underline">Delete Listing</button>
                         </div>
                     </div>
@@ -1114,7 +1114,7 @@ const Dashboard: React.FC<DashboardProps> = ({ seller, sellerVehicles, reportedV
               <h2 className="text-2xl font-bold text-gray-800 dark:text-gray-100">Active Listings</h2>
               <div className="flex gap-2">
                 <button onClick={() => setIsBulkUploadOpen(true)} className="bg-green-600 text-white font-bold py-2 px-4 rounded-lg hover:bg-green-700">Bulk Upload</button>
-                <button onClick={handleAddNewClick} className="bg-brand-blue text-white font-bold py-2 px-4 rounded-lg hover:bg-brand-blue-dark">List New Vehicle</button>
+                <button onClick={handleAddNewClick} className="btn-brand-primary text-white font-bold py-2 px-4 rounded-lg">List New Vehicle</button>
               </div>
             </div>
             {activeListings.length > 0 ? (
@@ -1132,7 +1132,7 @@ const Dashboard: React.FC<DashboardProps> = ({ seller, sellerVehicles, reportedV
                           )}
                           {getCertificationButton(v)}
                           <button onClick={() => onMarkAsSold(v.id)} className="text-green-600 hover:text-green-800">Sold</button>
-                          <button onClick={() => handleEditClick(v)} className="text-brand-blue hover:text-brand-blue-dark">Edit</button>
+                          <button onClick={() => handleEditClick(v)} className="transition-colors" style={{ color: 'var(--brand-deep-red)' }} onMouseEnter={(e) => e.currentTarget.style.color = 'var(--brand-orange)'} onMouseLeave={(e) => e.currentTarget.style.color = 'var(--brand-deep-red)'}>Edit</button>
                           <button onClick={() => onDeleteVehicle(v.id)} className="text-red-600 hover:text-red-800">Delete</button>
                         </td>
                       </tr>
@@ -1150,7 +1150,7 @@ const Dashboard: React.FC<DashboardProps> = ({ seller, sellerVehicles, reportedV
                     <div className="mt-6">
                         <button
                             onClick={handleAddNewClick}
-                            className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-brand-blue hover:bg-brand-blue-dark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-brand-blue-light"
+                            className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white btn-brand-primary focus:outline-none focus:ring-2 focus:ring-offset-2" style={{ boxShadow: 'var(--shadow-red)' }}
                         >
                             List Your First Vehicle
                         </button>
@@ -1212,7 +1212,7 @@ const Dashboard: React.FC<DashboardProps> = ({ seller, sellerVehicles, reportedV
   }
 
   const NavItem: React.FC<{ view: DashboardView, children: React.ReactNode, count?: number }> = ({ view, children, count }) => (
-    <button onClick={() => handleNavigate(view)} className={`flex justify-between items-center w-full text-left px-4 py-3 rounded-lg transition-colors ${activeView === view ? 'bg-brand-blue text-white' : 'hover:bg-brand-gray-light dark:hover:bg-brand-gray-darker'}`}>
+    <button onClick={() => handleNavigate(view)} className={`flex justify-between items-center w-full text-left px-4 py-3 rounded-lg transition-colors ${activeView === view ? 'text-white' : 'hover:bg-brand-gray-light dark:hover:bg-brand-gray-darker'}`} style={activeView === view ? { background: 'var(--gradient-primary)' } : undefined}>
       <span>{children}</span>
       {count && count > 0 && <span className="bg-red-500 text-white text-xs font-bold rounded-full px-2 py-0.5">{count}</span>}
     </button>
