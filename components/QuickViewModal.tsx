@@ -79,7 +79,7 @@ const QuickViewModal: React.FC<QuickViewModalProps> = ({ vehicle, onClose, onSel
           <div>
             <h2 className="text-3xl font-bold text-brand-gray-900 dark:text-brand-gray-100">{vehicle.year} {vehicle.make} {vehicle.model}</h2>
             <p className="text-brand-gray-500 dark:text-brand-gray-400">{vehicle.variant || ''}</p>
-            <p className="text-3xl font-extrabold text-brand-blue dark:text-brand-blue-light my-4">₹{vehicle.price.toLocaleString('en-IN')}</p>
+            <p className="text-3xl font-extrabold my-4" style={{ color: 'var(--brand-deep-red)' }}>₹{vehicle.price.toLocaleString('en-IN')}</p>
           </div>
 
           <div className="space-y-2 my-4">
@@ -91,7 +91,7 @@ const QuickViewModal: React.FC<QuickViewModalProps> = ({ vehicle, onClose, onSel
           </div>
 
           <div className="mt-auto pt-6 space-y-3">
-             <button onClick={handleFullDetailsClick} className="w-full bg-brand-blue text-white font-bold py-3 px-6 rounded-lg text-lg hover:bg-brand-blue-dark transition-all transform hover:scale-105">
+             <button onClick={handleFullDetailsClick} className="w-full btn-brand-primary text-white font-bold py-3 px-6 rounded-lg text-lg transition-all transform hover:scale-105">
                 View Full Details
             </button>
             <div className="flex gap-3">

@@ -67,7 +67,7 @@ const TestDriveModal: React.FC<TestDriveModalProps> = ({ onClose, onSubmit }) =>
           <div className="bg-brand-gray-50 dark:bg-brand-gray-900/50 px-6 py-4 flex justify-end rounded-b-xl">
             <button
               type="submit"
-              className="px-6 py-2 bg-brand-blue text-white font-bold rounded-lg hover:bg-brand-blue-dark transition-colors"
+              className="px-6 py-2 btn-brand-primary text-white font-bold rounded-lg transition-colors"
             >
               Send Request
             </button>

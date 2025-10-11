@@ -203,11 +203,11 @@ const LocationModal: React.FC<LocationModalProps> = ({ isOpen, onClose, currentL
                     <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">Prices and availability may vary based on your location.</p>
                     {currentLocation && (
                         <div className="mt-3 flex items-center gap-2 text-sm">
-                            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-brand-blue" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" style={{ color: 'var(--brand-orange)' }}>
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
                             </svg>
-                            <span className="text-gray-600 dark:text-gray-300">Current: <strong className="text-brand-blue">{currentLocation}</strong></span>
+                            <span className="text-gray-600 dark:text-gray-300">Current: <strong style={{ color: 'var(--brand-deep-red)' }}>{currentLocation}</strong></span>
                         </div>
                     )}
                 </div>
@@ -215,7 +215,7 @@ const LocationModal: React.FC<LocationModalProps> = ({ isOpen, onClose, currentL
                     <button
                         onClick={handleDetectLocation}
                         disabled={isDetecting}
-                        className="w-full flex items-center justify-center gap-2 bg-brand-blue-lightest text-brand-blue-dark font-bold py-3 px-4 rounded-lg hover:bg-brand-blue-light transition-colors disabled:opacity-70 disabled:cursor-wait"
+                        className="w-full flex items-center justify-center gap-2 font-bold py-3 px-4 rounded-lg transition-colors disabled:opacity-70 disabled:cursor-wait" style={{ background: 'var(--brand-rose-pink-light)', color: 'var(--brand-blackcurrant)' }} onMouseEnter={(e) => !isDetecting && (e.currentTarget.style.background = 'var(--brand-rose-pink)')} onMouseLeave={(e) => !isDetecting && (e.currentTarget.style.background = 'var(--brand-rose-pink-light)')}
                     >
                         {isDetecting ? (
                             <>
@@ -257,7 +257,7 @@ const LocationModal: React.FC<LocationModalProps> = ({ isOpen, onClose, currentL
                 </div>
                 <div className="bg-gray-50 dark:bg-brand-gray-darker px-6 py-4 flex justify-end gap-4 rounded-b-xl">
                     <button onClick={onClose} className="px-4 py-2 bg-gray-200 dark:bg-gray-600 text-gray-800 dark:text-gray-200 rounded-md hover:bg-gray-300 dark:hover:bg-gray-500">Cancel</button>
-                    <button onClick={handleManualSelect} disabled={!selectedCity} className="px-4 py-2 bg-brand-blue text-white rounded-md hover:bg-brand-blue-dark disabled:opacity-50">Set Location</button>
+                    <button onClick={handleManualSelect} disabled={!selectedCity} className="px-4 py-2 btn-brand-primary text-white rounded-md disabled:opacity-50">Set Location</button>
                 </div>
             </div>
         </div>
