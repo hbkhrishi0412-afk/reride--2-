@@ -76,7 +76,7 @@ const Pagination: React.FC<{ currentPage: number; totalPages: number; onPageChan
     <nav className="flex justify-center items-center space-x-2 mt-8">
       <button onClick={() => onPageChange(currentPage - 1)} disabled={currentPage === 1} className="px-4 py-2 rounded-md bg-white dark:bg-brand-gray-700 disabled:opacity-50">Prev</button>
       {pageNumbers.map(number => (
-        <button key={number} onClick={() => onPageChange(number)} className={`px-4 py-2 rounded-md ${currentPage === number ? 'bg-brand-blue text-white' : 'bg-white dark:bg-brand-gray-700'}`}>{number}</button>
+        <button key={number} onClick={() => onPageChange(number)} className={`px-4 py-2 rounded-md ${currentPage === number ? 'text-white' : 'bg-white dark:bg-brand-gray-700'}`} style={currentPage === number ? { background: 'var(--brand-deep-red)' } : undefined}>{number}</button>
       ))}
       <button onClick={() => onPageChange(currentPage + 1)} disabled={currentPage === totalPages} className="px-4 py-2 rounded-md bg-white dark:bg-brand-gray-700 disabled:opacity-50">Next</button>
     </nav>
@@ -423,7 +423,7 @@ const VehicleList: React.FC<VehicleListProps> = ({ vehicles, onSelectVehicle, is
     );
   }
 
-  const formElementClass = "block w-full p-3 border border-brand-gray-300 dark:border-brand-gray-600 rounded-lg focus:ring-2 focus:ring-brand-blue focus:border-brand-blue focus:outline-none transition bg-brand-gray-50 dark:bg-brand-gray-800 dark:text-gray-200 disabled:bg-brand-gray-200 dark:disabled:bg-brand-gray-700 disabled:cursor-not-allowed";
+  const formElementClass = "block w-full p-3 border border-brand-gray-300 dark:border-brand-gray-600 rounded-lg focus:outline-none transition bg-brand-gray-50 dark:bg-brand-gray-800 dark:text-gray-200 disabled:bg-brand-gray-200 dark:disabled:bg-brand-gray-700 disabled:cursor-not-allowed";
 
   const renderFilterControls = (isMobile: boolean) => {
     const state = isMobile ? tempFilters : { categoryFilter, makeFilter, modelFilter, priceRange, mileageRange, fuelTypeFilter, yearFilter, colorFilter, stateFilter, selectedFeatures, featureSearch };
@@ -534,7 +534,7 @@ const VehicleList: React.FC<VehicleListProps> = ({ vehicles, onSelectVehicle, is
                 </div>
                 <div className="relative h-8 flex items-center">
                     <div className="relative w-full h-1.5 bg-brand-gray-200 dark:bg-brand-gray-600 rounded-full">
-                        <div className="absolute h-1.5 bg-brand-blue rounded-full" style={{ left: `${((state.priceRange.min - MIN_PRICE) / (MAX_PRICE - MIN_PRICE)) * 100}%`, right: `${100 - ((state.priceRange.max - MIN_PRICE) / (MAX_PRICE - MIN_PRICE)) * 100}%` }}></div>
+                        <div className="absolute h-1.5 rounded-full" style={{ left: `${((state.priceRange.min - MIN_PRICE) / (MAX_PRICE - MIN_PRICE)) * 100}%`, right: `${100 - ((state.priceRange.max - MIN_PRICE) / (MAX_PRICE - MIN_PRICE)) * 100}%`, background: 'var(--gradient-warm)' }}></div>
                     </div>
                     <input name="min" type="range" min={MIN_PRICE} max={MAX_PRICE} step="10000" value={state.priceRange.min} onChange={(e) => handleRangeChange(e, 'price')} className="absolute w-full h-1.5 bg-transparent appearance-none z-20 slider-thumb" />
                     <input name="max" type="range" min={MIN_PRICE} max={MAX_PRICE} step="10000" value={state.priceRange.max} onChange={(e) => handleRangeChange(e, 'price')} className="absolute w-full h-1.5 bg-transparent appearance-none z-30 slider-thumb" />
@@ -548,7 +548,7 @@ const VehicleList: React.FC<VehicleListProps> = ({ vehicles, onSelectVehicle, is
                 </div>
                 <div className="relative h-8 flex items-center">
                     <div className="relative w-full h-1.5 bg-brand-gray-200 dark:bg-brand-gray-600 rounded-full">
-                        <div className="absolute h-1.5 bg-brand-blue rounded-full" style={{ left: `${((state.mileageRange.min - MIN_MILEAGE) / (MAX_MILEAGE - MIN_MILEAGE)) * 100}%`, right: `${100 - ((state.mileageRange.max - MIN_MILEAGE) / (MAX_MILEAGE - MIN_MILEAGE)) * 100}%` }}></div>
+                        <div className="absolute h-1.5 rounded-full" style={{ left: `${((state.mileageRange.min - MIN_MILEAGE) / (MAX_MILEAGE - MIN_MILEAGE)) * 100}%`, right: `${100 - ((state.mileageRange.max - MIN_MILEAGE) / (MAX_MILEAGE - MIN_MILEAGE)) * 100}%`, background: 'var(--gradient-warm)' }}></div>
                     </div>
                     <input name="min" type="range" min={MIN_MILEAGE} max={MAX_MILEAGE} step="1000" value={state.mileageRange.min} onChange={(e) => handleRangeChange(e, 'mileage')} className="absolute w-full h-1.5 bg-transparent appearance-none z-20 slider-thumb" />
                     <input name="max" type="range" min={MIN_MILEAGE} max={MAX_MILEAGE} step="1000" value={state.mileageRange.max} onChange={(e) => handleRangeChange(e, 'mileage')} className="absolute w-full h-1.5 bg-transparent appearance-none z-30 slider-thumb" />

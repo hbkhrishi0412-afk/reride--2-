@@ -115,11 +115,11 @@ const Login: React.FC<LoginProps> = ({ onLogin, onRegister, onNavigate, onForgot
         {isLogin && (
           <div className="flex items-center justify-between">
             <div className="flex items-center">
-              <input id="remember-me" name="remember-me" type="checkbox" checked={rememberMe} onChange={(e) => setRememberMe(e.target.checked)} className="h-4 w-4 text-brand-blue focus:ring-brand-blue-light border-brand-gray-300 rounded" />
+              <input id="remember-me" name="remember-me" type="checkbox" checked={rememberMe} onChange={(e) => setRememberMe(e.target.checked)} className="h-4 w-4 border-brand-gray-300 rounded" style={{ accentColor: 'var(--brand-deep-red)' }} />
               <label htmlFor="remember-me" className="ml-2 block text-sm text-brand-gray-900 dark:text-brand-gray-300">Remember me</label>
             </div>
             <div className="text-sm">
-              <button type="button" onClick={onForgotPassword} className="font-medium text-brand-blue hover:text-brand-blue-dark">Forgot your password?</button>
+              <button type="button" onClick={onForgotPassword} className="font-medium transition-colors" style={{ color: 'var(--brand-deep-red)' }} onMouseEnter={(e) => e.currentTarget.style.color = 'var(--brand-orange)'} onMouseLeave={(e) => e.currentTarget.style.color = 'var(--brand-deep-red)'}>Forgot your password?</button>
             </div>
           </div>
         )}
@@ -127,18 +127,18 @@ const Login: React.FC<LoginProps> = ({ onLogin, onRegister, onNavigate, onForgot
         {error && <p className="text-red-500 text-sm text-center">{error}</p>}
 
         <div>
-          <button type="submit" disabled={isLoading} className="group relative w-full flex justify-center py-3 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-brand-blue hover:bg-brand-blue-dark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-brand-blue-light transition-colors disabled:opacity-50">
+          <button type="submit" disabled={isLoading} className="btn-brand-primary group relative w-full flex justify-center py-3 px-4 border border-transparent text-sm font-medium rounded-md text-white focus:outline-none focus:ring-2 focus:ring-offset-2 transition-colors disabled:opacity-50">
             {isLoading ? 'Processing...' : (isLogin ? 'Sign in' : 'Create Account')}
           </button>
         </div>
       </form>
       <div className="text-sm text-center">
-          <button onClick={toggleMode} className="font-medium text-brand-blue hover:text-brand-blue-dark">
+          <button onClick={toggleMode} className="font-medium transition-colors" style={{ color: 'var(--brand-deep-red)' }} onMouseEnter={(e) => e.currentTarget.style.color = 'var(--brand-orange)'} onMouseLeave={(e) => e.currentTarget.style.color = 'var(--brand-deep-red)'}>
               {isLogin ? "Don't have a seller account? Register" : "Already have a seller account? Sign in"}
           </button>
       </div>
        <div className="text-center">
-          <button onClick={() => onNavigate(View.LOGIN_PORTAL)} className="font-medium text-brand-blue hover:text-brand-blue-dark">
+          <button onClick={() => onNavigate(View.LOGIN_PORTAL)} className="font-medium transition-colors" style={{ color: 'var(--brand-deep-red)' }} onMouseEnter={(e) => e.currentTarget.style.color = 'var(--brand-orange)'} onMouseLeave={(e) => e.currentTarget.style.color = 'var(--brand-deep-red)'}>
               &larr; Back to Role Selection
           </button>
       </div>

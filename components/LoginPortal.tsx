@@ -13,13 +13,13 @@ const LoginPortal: React.FC<LoginPortalProps> = ({ onNavigate }) => {
       <div className="mt-8 space-y-4">
         <button
           onClick={() => onNavigate(View.CUSTOMER_LOGIN)}
-          className="group relative w-full flex justify-center py-3 px-4 border border-transparent text-lg font-medium rounded-md text-white bg-brand-blue hover:bg-brand-blue-dark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-brand-blue-light transition-transform transform hover:scale-105"
+          className="btn-brand-primary group relative w-full flex justify-center py-3 px-4 border border-transparent text-lg font-medium rounded-md text-white focus:outline-none focus:ring-2 focus:ring-offset-2 transition-transform transform hover:scale-105"
         >
           I am a Customer
         </button>
         <button
           onClick={() => onNavigate(View.SELLER_LOGIN)}
-          className="group relative w-full flex justify-center py-3 px-4 border border-transparent text-lg font-medium rounded-md text-brand-blue-dark dark:text-white bg-brand-gray-200 dark:bg-brand-gray-700 hover:bg-brand-gray-300 dark:hover:bg-brand-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-brand-gray-500 transition-transform transform hover:scale-105"
+          className="btn-brand-secondary group relative w-full flex justify-center py-3 px-4 text-lg font-medium rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 transition-transform transform hover:scale-105"
         >
           I am a Seller
         </button>
@@ -27,7 +27,7 @@ const LoginPortal: React.FC<LoginPortalProps> = ({ onNavigate }) => {
       <div className="text-sm mt-6">
           <button
               onClick={() => onNavigate(View.USED_CARS)}
-              className="font-medium text-brand-blue hover:text-brand-blue-dark"
+              className="font-medium transition-colors" style={{ color: 'var(--brand-deep-red)' }} onMouseEnter={(e) => e.currentTarget.style.color = 'var(--brand-orange)'} onMouseLeave={(e) => e.currentTarget.style.color = 'var(--brand-deep-red)'}
           >
               Or continue as a guest &rarr;
           </button>
@@ -36,7 +36,7 @@ const LoginPortal: React.FC<LoginPortalProps> = ({ onNavigate }) => {
            <div className="text-sm">
               <button
                   onClick={() => onNavigate(View.ADMIN_LOGIN)}
-                  className="font-medium text-brand-gray-500 hover:text-brand-blue-dark dark:text-brand-gray-400 dark:hover:text-brand-blue-light"
+                  className="font-medium text-brand-gray-500 dark:text-brand-gray-400 transition-colors" onMouseEnter={(e) => e.currentTarget.style.color = 'var(--brand-deep-red)'} onMouseLeave={(e) => e.currentTarget.style.color = ''}
               >
                   Administrator Login
               </button>
