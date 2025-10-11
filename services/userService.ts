@@ -151,16 +151,40 @@ const authApi = async (body: any): Promise<any> => {
 
 
 // --- Environment Detection ---
-const isDevelopment = import.meta.env.DEV || window.location.hostname === 'localhost';
+const isDevelopment = import.meta.env.DEV || window.location.hostname === 'localhost' || window.location.hostname.includes('localhost');
 
 // --- Exported Environment-Aware Service Functions ---
 
 export const getUsers = isDevelopment ? getUsersLocal : getUsersApi;
 export const updateUser = isDevelopment ? updateUserLocal : updateUserApi;
 export const deleteUser = isDevelopment ? deleteUserLocal : deleteUserApi;
-export const login = isDevelopment 
-  ? (credentials: any): Promise<{ success: boolean, user?: User, reason?: string }> => loginLocal(credentials)
-  : (credentials: any): Promise<{ success: boolean, user?: User, reason?: string }> => authApi({ action: 'login', ...credentials });
-export const register = isDevelopment 
-  ? (credentials: any): Promise<{ success: boolean, user?: User, reason?: string }> => registerLocal(credentials)
-  : (credentials: any): Promise<{ success: boolean, user?: User, reason?: string }> => authApi({ action: 'register', ...credentials });
+export const login = async (credentials: any): Promise<{ success: boolean, user?: User, reason?: string }> => {
+  // Always try API first for production, with fallback to local
+  if (!isDevelopment) {
+    try {
+      return await authApi({ action: 'login', ...credentials });
+    } catch (error) {
+      console.warn('API login failed, falling back to local storage:', error);
+      // Fallback to local storage if API fails
+      return await loginLocal(credentials);
+    }
+  } else {
+    // Development mode - use local storage
+    return await loginLocal(credentials);
+  }
+};
+export const register = async (credentials: any): Promise<{ success: boolean, user?: User, reason?: string }> => {
+  // Always try API first for production, with fallback to local
+  if (!isDevelopment) {
+    try {
+      return await authApi({ action: 'register', ...credentials });
+    } catch (error) {
+      console.warn('API register failed, falling back to local storage:', error);
+      // Fallback to local storage if API fails
+      return await registerLocal(credentials);
+    }
+  } else {
+    // Development mode - use local storage
+    return await registerLocal(credentials);
+  }
+};
