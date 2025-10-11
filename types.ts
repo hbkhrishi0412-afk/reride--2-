@@ -128,6 +128,9 @@ export interface User {
   createdAt: string; // ISO String
   avatarUrl?: string;
   isVerified?: boolean;
+  // Authentication fields
+  firebaseUid?: string;
+  authProvider?: 'email' | 'google' | 'phone';
   // Seller-specific profile info
   dealershipName?: string;
   bio?: string;

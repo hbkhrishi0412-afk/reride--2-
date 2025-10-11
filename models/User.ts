@@ -18,11 +18,22 @@ const userSchema = new mongoose.Schema({
   },
   password: {
     type: String,
-    required: [true, 'Password is required.']
+    required: false // Not required for OAuth/OTP users
   },
   mobile: {
     type: String,
-    required: [true, 'Mobile number is required.']
+    required: false // Not required for Google OAuth users
+  },
+  firebaseUid: {
+    type: String,
+    unique: true,
+    sparse: true, // Allows null values while maintaining uniqueness
+    index: true
+  },
+  authProvider: {
+    type: String,
+    enum: ['email', 'google', 'phone'],
+    default: 'email'
   },
   role: {
     type: String,

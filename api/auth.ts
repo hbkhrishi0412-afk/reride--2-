@@ -14,7 +14,7 @@ export default async function handler(
   try {
     // Try to connect to database
     await connectToDatabase();
-    const { action, email, password, role, name, mobile } = req.body;
+    const { action, email, password, role, name, mobile, firebaseUid, authProvider, avatarUrl } = req.body;
 
     if (action === 'login') {
         if (!email || !password) {
@@ -53,6 +53,7 @@ export default async function handler(
             mobile,
             role,
             status: 'active',
+            authProvider: 'email',
             avatarUrl: `https://i.pravatar.cc/150?u=${email}`,
             subscriptionPlan: role === 'seller' ? 'free' : undefined,
             featuredCredits: role === 'seller' ? 0 : undefined,
@@ -61,6 +62,45 @@ export default async function handler(
 
         const newUser = await User.create(newUserDoc);
 
+        const { password: _, ...userWithoutPassword } = newUser.toObject();
+        return res.status(201).json({ success: true, user: userWithoutPassword });
+
+    } else if (action === 'oauth-login') {
+        // Handle Google/Phone OAuth login
+        if (!firebaseUid || !role) {
+            return res.status(400).json({ success: false, reason: 'Firebase UID and role are required.' });
+        }
+
+        // Check if user exists by Firebase UID
+        let user = await User.findOne({ firebaseUid }).lean() as any;
+
+        if (user) {
+            // User exists, check if active
+            if (user.status === 'inactive') {
+                return res.status(403).json({ success: false, reason: 'Your account has been deactivated.' });
+            }
+            
+            const { password: _, ...userWithoutPassword } = user;
+            return res.status(200).json({ success: true, user: userWithoutPassword });
+        }
+
+        // User doesn't exist, create new account
+        const newUserDoc = {
+            firebaseUid,
+            email: email || '',
+            name: name || 'User',
+            mobile: mobile || '',
+            role,
+            authProvider: authProvider || 'google',
+            status: 'active',
+            avatarUrl: avatarUrl || `https://i.pravatar.cc/150?u=${firebaseUid}`,
+            isVerified: true, // OAuth users are pre-verified
+            subscriptionPlan: role === 'seller' ? 'free' : undefined,
+            featuredCredits: role === 'seller' ? 0 : undefined,
+            usedCertifications: role === 'seller' ? 0 : undefined,
+        };
+
+        const newUser = await User.create(newUserDoc);
         const { password: _, ...userWithoutPassword } = newUser.toObject();
         return res.status(201).json({ success: true, user: userWithoutPassword });
 
