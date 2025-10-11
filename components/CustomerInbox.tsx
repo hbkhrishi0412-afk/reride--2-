@@ -131,7 +131,7 @@ const CustomerInbox: React.FC<CustomerInboxProps> = ({ conversations, onSendMess
   const getSellerName = (sellerId: string) => {
     return users.find(u => u.email === sellerId)?.name || 'Seller';
   }
-  const formInputClass = "flex-grow p-3 border border-brand-gray-300 dark:border-brand-gray-600 rounded-lg focus:ring-2 focus:ring-brand-blue focus:border-brand-blue focus:outline-none transition bg-white dark:bg-brand-gray-800 dark:text-gray-200";
+  const formInputClass = "flex-grow p-3 border border-brand-gray-300 dark:border-brand-gray-600 rounded-lg focus:outline-none transition bg-white dark:bg-brand-gray-800 dark:text-gray-200";
 
   return (
     <>

@@ -192,7 +192,7 @@ export const ChatWidget: React.FC<ChatWidgetProps> = memo(({ conversation, curre
                     value={inputText}
                     onChange={handleInputChange}
                     placeholder="Type a message..."
-                    className="flex-grow bg-brand-gray-100 dark:bg-brand-gray-700 rounded-full px-4 py-2 focus:outline-none focus:ring-2 focus:ring-brand-blue"
+                    className="flex-grow bg-brand-gray-100 dark:bg-brand-gray-700 rounded-full px-4 py-2 focus:outline-none" onFocus={(e) => { e.currentTarget.style.borderColor = 'var(--brand-deep-red)'; e.currentTarget.style.boxShadow = '0 0 0 2px var(--brand-deep-red-light)'; }} onBlur={(e) => { e.currentTarget.style.borderColor = ''; e.currentTarget.style.boxShadow = ''; }}
                 />
                 <button type="submit" className="p-2 transition-colors" aria-label="Send message" style={{ color: 'var(--brand-deep-red)' }} onMouseEnter={(e) => e.currentTarget.style.color = 'var(--brand-orange)'} onMouseLeave={(e) => e.currentTarget.style.color = 'var(--brand-deep-red)'}>
                     <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" /></svg>

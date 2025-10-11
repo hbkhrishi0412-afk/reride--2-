@@ -382,7 +382,7 @@ const AuditLogView: React.FC<{ auditLog: AuditLogEntry[] }> = ({ auditLog }) => 
       placeholder="Search logs..."
       value={searchTerm}
       onChange={(e) => setSearchTerm(e.target.value)}
-      className="flex-grow p-2 border border-brand-gray dark:border-gray-600 rounded-lg bg-white dark:bg-brand-gray-darker dark:text-gray-200 focus:ring-2 focus:ring-brand-blue-light focus:outline-none transition w-full sm:w-64"
+      className="flex-grow p-2 border border-brand-gray dark:border-gray-600 rounded-lg bg-white dark:bg-brand-gray-darker dark:text-gray-200 focus:outline-none transition w-full sm:w-64" onFocus={(e) => { e.currentTarget.style.borderColor = 'var(--brand-deep-red)'; e.currentTarget.style.boxShadow = '0 0 0 3px var(--brand-deep-red-light)'; }} onBlur={(e) => { e.currentTarget.style.borderColor = ''; e.currentTarget.style.boxShadow = ''; }}
     />
   );
 
@@ -977,13 +977,13 @@ const AdminPanel: React.FC<AdminPanelProps> = (props) => {
                                                         type="checkbox" 
                                                         checked={user.isVerified || false} 
                                                         onChange={() => onToggleVerifiedStatus(user.email)}
-                                                        className="h-4 w-4 text-brand-blue focus:ring-brand-blue border-gray-300 rounded"
+                                                        className="h-4 w-4 border-gray-300 rounded" style={{ accentColor: 'var(--brand-deep-red)' }}
                                                         title={user.isVerified ? "Un-verify seller" : "Verify seller"}
                                                     />
                                                 )}
                                             </td>
                                             <td className="px-6 py-4 whitespace-nowrap text-sm font-medium space-x-3">
-                                                <button onClick={() => setEditingUser(user)} className="text-brand-blue hover:text-brand-blue-dark">Edit</button>
+                                                <button onClick={() => setEditingUser(user)} className="transition-colors" style={{ color: 'var(--brand-deep-red)' }} onMouseEnter={(e) => e.currentTarget.style.color = 'var(--brand-orange)'} onMouseLeave={(e) => e.currentTarget.style.color = 'var(--brand-deep-red)'}>Edit</button>
                                                 <button onClick={() => onToggleUserStatus(user.email)} disabled={isCurrentUser} className={`${user.status === 'active' ? 'text-yellow-600 hover:text-yellow-900' : 'text-green-600 hover:text-green-900'} disabled:opacity-50 disabled:cursor-not-allowed`}>{user.status === 'active' ? 'Deactivate' : 'Activate'}</button>
                                                 <button onClick={() => onDeleteUser(user.email)} disabled={isCurrentUser} className="text-red-600 hover:text-red-900 disabled:opacity-50 disabled:cursor-not-allowed">Delete</button>
                                             </td>
@@ -1013,7 +1013,7 @@ const AdminPanel: React.FC<AdminPanelProps> = (props) => {
                                         <td className="px-6 py-4"><span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${v.status === 'published' ? 'bg-green-100 text-green-800' : 'bg-gray-200 text-gray-800'}`}>{v.status}</span></td>
                                         <td className="px-6 py-4">{v.isFeatured ? 'Yes' : 'No'}</td>
                                         <td className="px-6 py-4 whitespace-nowrap text-sm font-medium space-x-3">
-                                            <button onClick={() => setEditingVehicle(v)} className="text-brand-blue hover:text-brand-blue-dark">Edit</button>
+                                            <button onClick={() => setEditingVehicle(v)} className="transition-colors" style={{ color: 'var(--brand-deep-red)' }} onMouseEnter={(e) => e.currentTarget.style.color = 'var(--brand-orange)'} onMouseLeave={(e) => e.currentTarget.style.color = 'var(--brand-deep-red)'}>Edit</button>
                                             <button onClick={() => onToggleVehicleStatus(v.id)} className="text-yellow-600 hover:text-yellow-900">{v.status === 'published' ? 'Unpublish' : 'Publish'}</button>
                                             <button onClick={() => onToggleVehicleFeature(v.id)} className="text-purple-600 hover:text-purple-900">{v.isFeatured ? 'Un-feature' : 'Feature'}</button>
                                             <button onClick={() => onDeleteVehicle(v.id)} className="text-red-600 hover:text-red-900">Delete</button>

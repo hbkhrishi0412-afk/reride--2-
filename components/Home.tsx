@@ -399,7 +399,7 @@ const Home: React.FC<HomeProps> = ({ onSearch, onSelectCategory, featuredVehicle
                         ))}
                     </div>
                      <div className="text-center mt-12">
-                        <button onClick={() => onSearch('')} className="bg-brand-blue text-white font-bold py-3 px-8 rounded-full text-lg hover:bg-brand-blue-dark transition-all transform hover:scale-105">
+                        <button onClick={() => onSearch('')} className="btn-brand-primary text-white font-bold py-3 px-8 rounded-full text-lg transition-all transform hover:scale-105">
                             View All Vehicles
                         </button>
                     </div>
@@ -412,7 +412,7 @@ const Home: React.FC<HomeProps> = ({ onSearch, onSelectCategory, featuredVehicle
                     <div className="container mx-auto px-4 scroll-animate">
                         <div className="flex justify-between items-center mb-12">
                             <h2 className="text-4xl font-bold text-brand-gray-900 dark:text-white text-left">Recently Viewed Vehicles</h2>
-                            <button onClick={() => onNavigate(ViewEnum.WISHLIST)} className="bg-brand-blue text-white font-bold py-2 px-6 rounded-full hover:bg-brand-blue-dark transition-colors whitespace-nowrap">
+                            <button onClick={() => onNavigate(ViewEnum.WISHLIST)} className="btn-brand-primary text-white font-bold py-2 px-6 rounded-full transition-colors whitespace-nowrap">
                                 View All
                             </button>
                         </div>
@@ -441,7 +441,7 @@ const Home: React.FC<HomeProps> = ({ onSearch, onSelectCategory, featuredVehicle
                 <div className="container mx-auto px-4 py-20 text-center scroll-animate">
                     <h2 className="text-4xl font-bold mb-4 text-brand-gray-900 dark:text-white">Are You a Seller?</h2>
                     <p className="max-w-2xl mx-auto mb-8 text-brand-gray-600 dark:text-brand-gray-300">Join the most advanced vehicle marketplace today. Reach thousands of buyers and use our AI tools to sell faster.</p>
-                     <button onClick={() => onNavigate(ViewEnum.SELLER_LOGIN)} className="bg-white dark:bg-brand-gray-100 text-brand-blue font-bold py-3 px-8 rounded-full text-lg hover:bg-brand-gray-200 dark:hover:bg-white dark:text-brand-blue-darker transition-all transform hover:scale-105">
+                     <button onClick={() => onNavigate(ViewEnum.SELLER_LOGIN)} className="btn-brand-secondary font-bold py-3 px-8 rounded-full text-lg transition-all transform hover:scale-105">
                         Start Selling Now
                     </button>
                 </div>
