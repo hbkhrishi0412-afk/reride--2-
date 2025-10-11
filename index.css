@@ -992,3 +992,48 @@ button:disabled {
   background-color: white !important;
 }
 
+/* Apply to all child elements as well */
+.filters *,
+.intelligent-search *,
+.seller-dashboard-login *,
+.new-cars *,
+.dealers *,
+.support * {
+  color: black !important;
+  background-color: white !important;
+}
+
+/* Ensure buttons and inputs remain styled properly */
+.filters button,
+.intelligent-search button,
+.seller-dashboard-login button,
+.new-cars button,
+.dealers button,
+.support button {
+  background-color: #EF3B33 !important;
+  color: white !important;
+}
+
+.filters input,
+.intelligent-search input,
+.seller-dashboard-login input,
+.new-cars input,
+.dealers input,
+.support input,
+.filters select,
+.intelligent-search select,
+.seller-dashboard-login select,
+.new-cars select,
+.dealers select,
+.support select,
+.filters textarea,
+.intelligent-search textarea,
+.seller-dashboard-login textarea,
+.new-cars textarea,
+.dealers textarea,
+.support textarea {
+  color: black !important;
+  background-color: white !important;
+  border-color: #ccc !important;
+}
+
