@@ -1,5 +1,9 @@
 /* ReRide - Global Styles */
 
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
 /* Reset and Base Styles */
 * {
   margin: 0;
@@ -156,9 +160,9 @@ button:disabled {
   --brand-deep-red-light: rgba(142, 13, 60, 0.1);
   --brand-deep-red-dark: #6A0A2D;
   
-  --brand-blackcurrant: #1D1842;
-  --brand-blackcurrant-light: #2D2652;
-  --brand-blackcurrant-dark: #0D0821;
+  --brand-blackcurrant: #2D2652;
+  --brand-blackcurrant-light: #4A3F7A;
+  --brand-blackcurrant-dark: #1D1842;
   
   --brand-orange: #EF3B33;
   --brand-orange-hover: #FF4D44;
@@ -177,7 +181,7 @@ button:disabled {
   --brand-gray: #E9ECEF;
   --brand-medium-gray: #6C757D;
   --brand-dark-gray: #343A40;
-  --brand-text-dark: #1D1842;
+  --brand-text-dark: #2C3E50;
   --brand-text-gray: #495057;
   
   /* Legacy Spinny variable mappings for compatibility */
@@ -190,8 +194,8 @@ button:disabled {
   --spinny-light-gray: #F8F9FA;
   --spinny-gray: #E9ECEF;
   --spinny-medium-gray: #6C757D;
-  --spinny-dark-gray: #1D1842;
-  --spinny-text-dark: #1D1842;
+  --spinny-dark-gray: #2C3E50;
+  --spinny-text-dark: #2C3E50;
   --spinny-text-gray: #495057;
   
   /* Accent Colors */
@@ -200,11 +204,11 @@ button:disabled {
   --spinny-warning: #EF3B33;
   --spinny-error: #DC3545;
   
-  /* Gradients */
-  --gradient-primary: linear-gradient(135deg, #8E0D3C 0%, #1D1842 100%);
+  /* Gradients - Updated for better visibility */
+  --gradient-primary: linear-gradient(135deg, #8E0D3C 0%, #4A3F7A 100%);
   --gradient-warm: linear-gradient(135deg, #EF3B33 0%, #8E0D3C 100%);
   --gradient-soft: linear-gradient(135deg, #FDA1A2 0%, #EF3B33 100%);
-  --gradient-dark: linear-gradient(135deg, #1D1842 0%, #0D0821 100%);
+  --gradient-dark: linear-gradient(135deg, #2D2652 0%, #1D1842 100%);
   
   /* Shadows */
   --spinny-shadow-sm: 0 2px 8px rgba(29, 24, 66, 0.1);
