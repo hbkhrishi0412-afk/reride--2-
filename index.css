@@ -987,7 +987,8 @@ button:disabled {
 .seller-dashboard-login,
 .new-cars,
 .dealers,
-.support {
+.support,
+.used-cars-page {
   color: black !important;
   background-color: white !important;
 }
@@ -998,9 +999,28 @@ button:disabled {
 .seller-dashboard-login *,
 .new-cars *,
 .dealers *,
-.support * {
+.support *,
+.used-cars-page * {
   color: black !important;
   background-color: white !important;
+}
+
+/* Specific rules for text elements to ensure black text */
+.filters h1, .filters h2, .filters h3, .filters h4, .filters h5, .filters h6,
+.intelligent-search h1, .intelligent-search h2, .intelligent-search h3, .intelligent-search h4, .intelligent-search h5, .intelligent-search h6,
+.seller-dashboard-login h1, .seller-dashboard-login h2, .seller-dashboard-login h3, .seller-dashboard-login h4, .seller-dashboard-login h5, .seller-dashboard-login h6,
+.new-cars h1, .new-cars h2, .new-cars h3, .new-cars h4, .new-cars h5, .new-cars h6,
+.dealers h1, .dealers h2, .dealers h3, .dealers h4, .dealers h5, .dealers h6,
+.support h1, .support h2, .support h3, .support h4, .support h5, .support h6,
+.used-cars-page h1, .used-cars-page h2, .used-cars-page h3, .used-cars-page h4, .used-cars-page h5, .used-cars-page h6,
+.filters p, .filters span, .filters label, .filters div, .filters a,
+.intelligent-search p, .intelligent-search span, .intelligent-search label, .intelligent-search div, .intelligent-search a,
+.seller-dashboard-login p, .seller-dashboard-login span, .seller-dashboard-login label, .seller-dashboard-login div, .seller-dashboard-login a,
+.new-cars p, .new-cars span, .new-cars label, .new-cars div, .new-cars a,
+.dealers p, .dealers span, .dealers label, .dealers div, .dealers a,
+.support p, .support span, .support label, .support div, .support a,
+.used-cars-page p, .used-cars-page span, .used-cars-page label, .used-cars-page div, .used-cars-page a {
+  color: black !important;
 }
 
 /* Ensure buttons and inputs remain styled properly */
@@ -1009,7 +1029,8 @@ button:disabled {
 .seller-dashboard-login button,
 .new-cars button,
 .dealers button,
-.support button {
+.support button,
+.used-cars-page button {
   background-color: #EF3B33 !important;
   color: white !important;
 }
@@ -1020,18 +1041,21 @@ button:disabled {
 .new-cars input,
 .dealers input,
 .support input,
+.used-cars-page input,
 .filters select,
 .intelligent-search select,
 .seller-dashboard-login select,
 .new-cars select,
 .dealers select,
 .support select,
+.used-cars-page select,
 .filters textarea,
 .intelligent-search textarea,
 .seller-dashboard-login textarea,
 .new-cars textarea,
 .dealers textarea,
-.support textarea {
+.support textarea,
+.used-cars-page textarea {
   color: black !important;
   background-color: white !important;
   border-color: #ccc !important;
