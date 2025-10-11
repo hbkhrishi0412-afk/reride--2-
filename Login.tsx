@@ -74,12 +74,12 @@ const Login: React.FC<LoginProps> = ({ onLogin, onRegister, onNavigate, onForgot
   }
 
   const isLogin = mode === 'login';
-  const formInputClass = "appearance-none relative block w-full px-4 py-3 border border-brand-gray-300 dark:border-brand-gray-600 placeholder-brand-gray-500 text-brand-gray-900 dark:text-brand-gray-200 bg-spinny-white dark:bg-white focus:outline-none focus:ring-spinny-orange focus:border-spinny-orange focus:z-10 sm:text-sm";
+  const formInputClass = "appearance-none relative block w-full px-4 py-3 border border-gray-300 placeholder-gray-500 text-spinny-text-dark bg-white focus:outline-none focus:ring-2 focus:ring-spinny-orange focus:border-spinny-orange focus:z-10 sm:text-sm";
 
   return (
     <div className="seller-dashboard-login w-full max-w-md space-y-8 bg-spinny-white dark:bg-white p-10 rounded-xl shadow-soft-xl">
       <div>
-        <h2 className="mt-6 text-center text-3xl font-extrabold text-brand-gray-900 dark:text-brand-gray-100">
+        <h2 className="mt-6 text-center text-3xl font-extrabold text-spinny-text-dark">
           {isLogin ? 'Seller Dashboard Login' : 'Create a Seller Account'}
         </h2>
       </div>
