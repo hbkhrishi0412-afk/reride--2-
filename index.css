@@ -148,135 +148,248 @@ button:disabled {
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-/* Premium Design System */
+/* Spinny-Inspired Design System */
 :root {
-  --carandbike-primary-blue: #1e40af;
-  --carandbike-dark-blue: #1e3a8a;
-  --carandbike-orange: #f97316;
-  --carandbike-orange-hover: #ea580c;
-  --carandbike-dark-gray: #1f2937;
-  --carandbike-medium-gray: #374151;
-  --carandbike-light-gray: #6b7280;
-  --carandbike-lighter-gray: #9ca3af;
-  --carandbike-white: #ffffff;
-  --carandbike-off-white: #f9fafb;
-  --carandbike-purple: #8b5cf6;
-  --carandbike-border: #e5e7eb;
-  --carandbike-shadow: rgba(0, 0, 0, 0.1);
+  /* Spinny Primary Colors */
+  --spinny-orange: #FF6F00;
+  --spinny-orange-hover: #FF8C00;
+  --spinny-orange-light: #FFE0B2;
+  --spinny-orange-dark: #E65100;
   
-  /* Premium colors */
-  --premium-gold: #fbbf24;
-  --premium-silver: #e5e7eb;
-  --premium-gradient-start: #667eea;
-  --premium-gradient-end: #764ba2;
-  --premium-gradient-orange: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-  --premium-gradient-blue: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  --premium-gradient-dark: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
-  --premium-shadow-soft: 0 10px 40px rgba(0, 0, 0, 0.1);
-  --premium-shadow-medium: 0 20px 60px rgba(0, 0, 0, 0.15);
-  --premium-shadow-strong: 0 30px 80px rgba(0, 0, 0, 0.2);
-  --glass-bg: rgba(255, 255, 255, 0.1);
-  --glass-border: rgba(255, 255, 255, 0.2);
+  /* Neutral Colors */
+  --spinny-white: #FFFFFF;
+  --spinny-off-white: #FAFAFA;
+  --spinny-light-gray: #F5F5F5;
+  --spinny-gray: #E0E0E0;
+  --spinny-medium-gray: #9E9E9E;
+  --spinny-dark-gray: #424242;
+  --spinny-text-dark: #2C2C2C;
+  --spinny-text-gray: #616161;
+  
+  /* Accent Colors */
+  --spinny-success: #4CAF50;
+  --spinny-info: #2196F3;
+  --spinny-warning: #FFC107;
+  --spinny-error: #F44336;
+  
+  /* Shadows */
+  --spinny-shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.08);
+  --spinny-shadow-md: 0 4px 12px rgba(0, 0, 0, 0.12);
+  --spinny-shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.15);
+  
+  /* Border Radius */
+  --spinny-radius-sm: 8px;
+  --spinny-radius-md: 12px;
+  --spinny-radius-lg: 16px;
 }
 
-/* Premium Components */
-.premium-card {
-  background: linear-gradient(145deg, #ffffff 0%, #f8fafc 100%);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  border-radius: 20px;
-  box-shadow: var(--premium-shadow-soft);
-  backdrop-filter: blur(10px);
-  transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-  position: relative;
-  overflow: hidden;
+/* Spinny Component Styles */
+
+/* Header */
+.spinny-header {
+  background: var(--spinny-white);
+  box-shadow: var(--spinny-shadow-sm);
+  border-bottom: 1px solid var(--spinny-gray);
 }
 
-.premium-card::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: -100%;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
-  transition: left 0.5s;
+.spinny-header-top {
+  background: var(--spinny-off-white);
+  padding: 8px 0;
+  font-size: 13px;
+  color: var(--spinny-text-gray);
 }
 
-.premium-card:hover::before {
-  left: 100%;
-}
-
-.premium-card:hover {
-  transform: translateY(-10px) scale(1.02);
-  box-shadow: var(--premium-shadow-strong);
-  border-color: rgba(102, 126, 234, 0.3);
-}
-
-.premium-hero {
-  background: var(--premium-gradient-blue);
-  position: relative;
-  overflow: hidden;
-}
-
-.premium-hero::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grain" width="100" height="100" patternUnits="userSpaceOnUse"><circle cx="50" cy="50" r="1" fill="white" opacity="0.1"/></pattern></defs><rect width="100" height="100" fill="url(%23grain)"/></svg>');
-  animation: float 6s ease-in-out infinite;
-}
-
-.glass-morphism {
-  background: var(--glass-bg);
-  backdrop-filter: blur(20px);
-  border: 1px solid var(--glass-border);
-  border-radius: 16px;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
-}
-
-.premium-button {
-  background: var(--premium-gradient-orange);
-  color: white;
-  padding: 16px 32px;
-  border-radius: 12px;
+/* Buttons */
+.spinny-button-primary {
+  background: var(--spinny-orange);
+  color: var(--spinny-white);
+  padding: 12px 24px;
+  border-radius: var(--spinny-radius-sm);
   font-weight: 600;
   border: none;
   cursor: pointer;
-  transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-  position: relative;
+  transition: all 0.3s ease;
+  box-shadow: var(--spinny-shadow-sm);
+}
+
+.spinny-button-primary:hover {
+  background: var(--spinny-orange-hover);
+  box-shadow: var(--spinny-shadow-md);
+  transform: translateY(-2px);
+}
+
+.spinny-button-primary:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.spinny-button-secondary {
+  background: var(--spinny-white);
+  color: var(--spinny-orange);
+  border: 2px solid var(--spinny-orange);
+  padding: 12px 24px;
+  border-radius: var(--spinny-radius-sm);
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.spinny-button-secondary:hover {
+  background: var(--spinny-orange-light);
+}
+
+/* Cards */
+.spinny-card {
+  background: var(--spinny-white);
+  border-radius: var(--spinny-radius-md);
+  box-shadow: var(--spinny-shadow-sm);
   overflow: hidden;
-  box-shadow: 0 4px 20px rgba(240, 147, 251, 0.4);
+  transition: all 0.3s ease;
+  border: 1px solid var(--spinny-gray);
 }
 
-.premium-button::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: -100%;
+.spinny-card:hover {
+  box-shadow: var(--spinny-shadow-lg);
+  transform: translateY(-4px);
+  border-color: var(--spinny-orange-light);
+}
+
+/* Badges */
+.spinny-badge {
+  background: var(--spinny-orange);
+  color: var(--spinny-white);
+  padding: 4px 12px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 600;
+  display: inline-block;
+}
+
+.spinny-badge-success {
+  background: var(--spinny-success);
+}
+
+.spinny-badge-info {
+  background: var(--spinny-info);
+}
+
+/* Search Bar */
+.spinny-search {
+  background: var(--spinny-white);
+  border: 2px solid var(--spinny-gray);
+  border-radius: var(--spinny-radius-md);
+  padding: 12px 20px;
+  font-size: 16px;
+  transition: all 0.3s ease;
   width: 100%;
-  height: 100%;
-  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
-  transition: left 0.5s;
 }
 
-.premium-button:hover::before {
-  left: 100%;
+.spinny-search:focus {
+  outline: none;
+  border-color: var(--spinny-orange);
+  box-shadow: 0 0 0 3px var(--spinny-orange-light);
 }
 
-.premium-button:hover {
-  transform: translateY(-2px) scale(1.05);
-  box-shadow: 0 8px 30px rgba(240, 147, 251, 0.6);
+/* Hero Section */
+.spinny-hero {
+  background: linear-gradient(135deg, var(--spinny-orange) 0%, var(--spinny-orange-dark) 100%);
+  padding: 80px 0;
+  color: var(--spinny-white);
 }
 
-.premium-text-gradient {
-  background: var(--premium-gradient-blue);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+/* Vehicle Card */
+.spinny-vehicle-card {
+  background: var(--spinny-white);
+  border-radius: var(--spinny-radius-md);
+  box-shadow: var(--spinny-shadow-sm);
+  overflow: hidden;
+  transition: all 0.3s ease;
+  border: 1px solid var(--spinny-gray);
+}
+
+.spinny-vehicle-card:hover {
+  box-shadow: var(--spinny-shadow-lg);
+  transform: translateY(-4px);
+}
+
+.spinny-price {
+  color: var(--spinny-orange);
+  font-size: 24px;
   font-weight: 700;
+}
+
+.spinny-verified {
+  background: var(--spinny-success);
+  color: var(--spinny-white);
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+/* Trust Indicators */
+.spinny-trust-badge {
+  background: var(--spinny-light-gray);
+  padding: 12px 20px;
+  border-radius: var(--spinny-radius-sm);
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  color: var(--spinny-text-dark);
+  font-weight: 500;
+  transition: all 0.3s ease;
+}
+
+.spinny-trust-badge:hover {
+  background: var(--spinny-gray);
+  transform: scale(1.05);
+}
+
+/* Navigation Links */
+.spinny-nav-link {
+  color: var(--spinny-text-dark);
+  text-decoration: none;
+  padding: 8px 16px;
+  border-radius: var(--spinny-radius-sm);
+  transition: all 0.3s ease;
+  font-weight: 500;
+  font-size: 15px;
+}
+
+.spinny-nav-link:hover {
+  background: var(--spinny-light-gray);
+  color: var(--spinny-orange);
+}
+
+.spinny-nav-link.active {
+  background: var(--spinny-orange-light);
+  color: var(--spinny-orange);
+}
+
+/* Feature Pills */
+.spinny-feature-pill {
+  background: var(--spinny-off-white);
+  border: 1px solid var(--spinny-gray);
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 13px;
+  color: var(--spinny-text-gray);
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+/* Section Headers */
+.spinny-section-header {
+  font-size: 32px;
+  font-weight: 700;
+  color: var(--spinny-text-dark);
+  margin-bottom: 24px;
 }
 
 /* CarAndBike exact styling */
