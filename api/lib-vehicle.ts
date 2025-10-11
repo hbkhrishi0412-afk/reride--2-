@@ -5,10 +5,12 @@ import { Schema, model, models } from 'mongoose';
 
 // VehicleCategory enum inline to avoid external dependency
 export enum VehicleCategory {
-  TWO_WHEELER = 'two-wheeler',
-  THREE_WHEELER = 'three-wheeler',
-  FOUR_WHEELER = 'four-wheeler',
-  COMMERCIAL = 'commercial'
+  FOUR_WHEELER = 'Four Wheeler',
+  TWO_WHEELER = 'Two Wheeler',
+  THREE_WHEELER = 'Three Wheeler',
+  FARM = 'Farm Vehicle',
+  COMMERCIAL = 'Commercial Vehicle',
+  CONSTRUCTION = 'Construction Vehicle',
 }
 
 const vehicleSchema = new Schema({
