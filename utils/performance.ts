@@ -26,18 +26,26 @@ export const measurePerformance = <T extends (...args: any[]) => any>(
 
 /**
  * Reports Web Vitals metrics
+ * Note: web-vitals package is optional. Install with: npm install web-vitals
  */
 export const reportWebVitals = (onPerfEntry?: (metric: any) => void) => {
   if (onPerfEntry && onPerfEntry instanceof Function) {
-    import('web-vitals').then(({ getCLS, getFID, getFCP, getLCP, getTTFB }) => {
-      getCLS(onPerfEntry);
-      getFID(onPerfEntry);
-      getFCP(onPerfEntry);
-      getLCP(onPerfEntry);
-      getTTFB(onPerfEntry);
-    }).catch(() => {
-      // web-vitals not available
-    });
+    // Optional: Install web-vitals package for detailed metrics
+    // For now, we'll use the built-in Performance API
+    if (typeof window !== 'undefined' && 'performance' in window) {
+      // Use PerformanceObserver for basic metrics
+      try {
+        const observer = new PerformanceObserver((list) => {
+          for (const entry of list.getEntries()) {
+            onPerfEntry(entry);
+          }
+        });
+        
+        observer.observe({ entryTypes: ['navigation', 'paint', 'largest-contentful-paint'] });
+      } catch (error) {
+        console.log('PerformanceObserver not available');
+      }
+    }
   }
 };
 

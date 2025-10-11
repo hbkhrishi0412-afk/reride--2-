@@ -10,20 +10,21 @@ export default defineConfig({
     rollupOptions: {
       output: {
         // Manual chunk splitting for better caching
-        manualChunks: {
-          'react-vendor': ['react', 'react-dom'],
-          'router': ['react-router-dom'],
-          'utils': ['./services/geminiService', './services/userService', './services/vehicleService']
+        manualChunks: (id) => {
+          if (id.includes('node_modules')) {
+            if (id.includes('react') || id.includes('react-dom')) {
+              return 'react-vendor';
+            }
+            return 'vendor';
+          }
         }
       }
     },
-    // Enable minification
-    minify: 'terser',
-    terserOptions: {
-      compress: {
-        drop_console: true, // Remove console.logs in production
-        drop_debugger: true
-      }
+    // Enable minification with esbuild (faster and built-in)
+    minify: 'esbuild',
+    // Drop console and debugger in production
+    esbuild: {
+      drop: ['console', 'debugger']
     },
     // Optimize CSS
     cssMinify: true,
