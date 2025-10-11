@@ -25,12 +25,25 @@ const handleResponse = async (response: Response) => {
 // --- Local Development (localStorage) Functions ---
 
 export const getVehiclesLocal = async (): Promise<Vehicle[]> => {
-    let vehiclesJson = localStorage.getItem('reRideVehicles');
-    if (!vehiclesJson) {
-        localStorage.setItem('reRideVehicles', JSON.stringify(MOCK_VEHICLES));
-        vehiclesJson = JSON.stringify(MOCK_VEHICLES);
+    try {
+        console.log('getVehiclesLocal: Starting...');
+        let vehiclesJson = localStorage.getItem('reRideVehicles');
+        if (!vehiclesJson) {
+            console.log('getVehiclesLocal: No cached data, using MOCK_VEHICLES');
+            localStorage.setItem('reRideVehicles', JSON.stringify(MOCK_VEHICLES));
+            vehiclesJson = JSON.stringify(MOCK_VEHICLES);
+        } else {
+            console.log('getVehiclesLocal: Using cached data');
+        }
+        const vehicles = JSON.parse(vehiclesJson);
+        console.log('getVehiclesLocal: Successfully loaded', vehicles.length, 'vehicles');
+        return vehicles;
+    } catch (error) {
+        console.error('getVehiclesLocal: Error loading vehicles:', error);
+        // Return MOCK_VEHICLES as fallback
+        console.log('getVehiclesLocal: Returning MOCK_VEHICLES as fallback');
+        return MOCK_VEHICLES;
     }
-    return JSON.parse(vehiclesJson);
 };
 
 const addVehicleLocal = async (vehicleData: Vehicle): Promise<Vehicle> => {
@@ -96,18 +109,29 @@ const isDevelopment = import.meta.env.DEV || window.location.hostname === 'local
 // --- Exported Environment-Aware Service Functions ---
 
 export const getVehicles = async (): Promise<Vehicle[]> => {
-  // Always try API first for production, with fallback to local
-  if (!isDevelopment) {
-    try {
-      return await getVehiclesApi();
-    } catch (error) {
-      console.warn('API getVehicles failed, falling back to local storage:', error);
-      // Fallback to local storage if API fails
+  try {
+    console.log('getVehicles: Starting, isDevelopment:', isDevelopment);
+    // Always try API first for production, with fallback to local
+    if (!isDevelopment) {
+      try {
+        console.log('getVehicles: Trying API...');
+        const result = await getVehiclesApi();
+        console.log('getVehicles: API success, loaded', result.length, 'vehicles');
+        return result;
+      } catch (error) {
+        console.warn('getVehicles: API failed, falling back to local storage:', error);
+        // Fallback to local storage if API fails
+        return await getVehiclesLocal();
+      }
+    } else {
+      // Development mode - use local storage
+      console.log('getVehicles: Development mode, using local storage');
       return await getVehiclesLocal();
     }
-  } else {
-    // Development mode - use local storage
-    return await getVehiclesLocal();
+  } catch (error) {
+    console.error('getVehicles: Critical error, returning empty array:', error);
+    // Last resort fallback
+    return MOCK_VEHICLES;
   }
 };
 export const addVehicle = async (vehicleData: Vehicle): Promise<Vehicle> => {

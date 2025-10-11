@@ -25,14 +25,26 @@ const handleResponse = async (response: Response) => {
 // --- Local Development (localStorage) Functions ---
 
 export const getUsersLocal = async (): Promise<User[]> => {
-    let usersJson = localStorage.getItem('reRideUsers');
-    if (!usersJson) {
-        console.log('🔧 Development mode: Populating local storage with mock data...');
-        localStorage.setItem('reRideUsers', JSON.stringify(MOCK_USERS));
-        usersJson = JSON.stringify(MOCK_USERS);
-        console.log(`✅ Populated local storage with ${MOCK_USERS.length} users`);
+    try {
+        console.log('getUsersLocal: Starting...');
+        let usersJson = localStorage.getItem('reRideUsers');
+        if (!usersJson) {
+            console.log('getUsersLocal: No cached data, using MOCK_USERS');
+            localStorage.setItem('reRideUsers', JSON.stringify(MOCK_USERS));
+            usersJson = JSON.stringify(MOCK_USERS);
+            console.log(`✅ Populated local storage with ${MOCK_USERS.length} users`);
+        } else {
+            console.log('getUsersLocal: Using cached data');
+        }
+        const users = JSON.parse(usersJson);
+        console.log('getUsersLocal: Successfully loaded', users.length, 'users');
+        return users;
+    } catch (error) {
+        console.error('getUsersLocal: Error loading users:', error);
+        // Return MOCK_USERS as fallback
+        console.log('getUsersLocal: Returning MOCK_USERS as fallback');
+        return MOCK_USERS;
     }
-    return JSON.parse(usersJson);
 };
 
 const updateUserLocal = async (userData: Partial<User> & { email: string }): Promise<User> => {
@@ -155,7 +167,32 @@ const isDevelopment = import.meta.env.DEV || window.location.hostname === 'local
 
 // --- Exported Environment-Aware Service Functions ---
 
-export const getUsers = isDevelopment ? getUsersLocal : getUsersApi;
+export const getUsers = async (): Promise<User[]> => {
+  try {
+    console.log('getUsers: Starting, isDevelopment:', isDevelopment);
+    // Always try API first for production, with fallback to local
+    if (!isDevelopment) {
+      try {
+        console.log('getUsers: Trying API...');
+        const result = await getUsersApi();
+        console.log('getUsers: API success, loaded', result.length, 'users');
+        return result;
+      } catch (error) {
+        console.warn('getUsers: API failed, falling back to local storage:', error);
+        // Fallback to local storage if API fails
+        return await getUsersLocal();
+      }
+    } else {
+      // Development mode - use local storage
+      console.log('getUsers: Development mode, using local storage');
+      return await getUsersLocal();
+    }
+  } catch (error) {
+    console.error('getUsers: Critical error, returning MOCK_USERS:', error);
+    // Last resort fallback
+    return MOCK_USERS;
+  }
+};
 export const updateUser = isDevelopment ? updateUserLocal : updateUserApi;
 export const deleteUser = isDevelopment ? deleteUserLocal : deleteUserApi;
 export const login = async (credentials: any): Promise<{ success: boolean, user?: User, reason?: string }> => {
