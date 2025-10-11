@@ -1,0 +1,46 @@
+# AUTOMATED THEME REPLACEMENT PATTERNS
+
+## Use Find & Replace in VS Code (Regex Mode)
+
+### Pattern 1: Blue Background Classes
+Find: `className="([^"]*?)bg-brand-blue([^"]*?)"`
+Replace: `className="$1$2" style={{ backgroundColor: 'var(--brand-deep-red)' }}`
+
+### Pattern 2: Blue Text Classes  
+Find: `className="([^"]*?)text-brand-blue([^"]*?)"`
+Replace: `className="$1$2" style={{ color: 'var(--brand-deep-red)' }}`
+
+### Pattern 3: Blue Border Classes
+Find: `className="([^"]*?)border-brand-blue([^"]*?)"`
+Replace: `className="$1$2" style={{ borderColor: 'var(--brand-deep-red)' }}`
+
+### Pattern 4: text-blue-600
+Find: `text-blue-600`
+Replace: Use inline style: `style={{ color: 'var(--brand-deep-red)' }}`
+
+### Pattern 5: bg-blue-600
+Find: `bg-blue-600`
+Replace: Use inline style: `style={{ background: 'var(--gradient-primary)' }}`
+
+### Pattern 6: hover:bg-blue-
+Find: `hover:bg-blue-`
+Replace: Add onMouseEnter/Leave handlers with `var(--brand-deep-red-hover)`
+
+## Quick VS Code Multi-File Replace Steps:
+1. Press Ctrl+Shift+F (Find in Files)
+2. Enable Regex mode (.*) button
+3. Set "files to include": components/**/*.tsx
+4. Use patterns above
+5. Review each match before replacing
+6. Repeat for each pattern
+
+## Manual Verification Checklist:
+- [ ] All buttons use branded colors
+- [ ] All primary CTAs use deep red or gradients
+- [ ] All icons use orange or rose pink
+- [ ] All hover states transition to brand colors
+- [ ] All borders use rose pink light
+- [ ] All shadows use brand shadows
+
+This will update the remaining ~40 references across 28 files!
+
