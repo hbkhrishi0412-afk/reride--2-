@@ -159,7 +159,7 @@ const CustomerInbox: React.FC<CustomerInboxProps> = ({ conversations, onSendMess
                                       >
                                           <div className="flex justify-between items-center mb-1">
                                               <p className="font-bold text-brand-gray-800 dark:text-brand-gray-100 truncate">{conv.vehicleName}</p>
-                                              {!conv.isReadByCustomer && <div className="w-2.5 h-2.5 bg-blue-500 rounded-full flex-shrink-0 ml-2"></div>}
+                                              {!conv.isReadByCustomer && <div className="w-2.5 h-2.5 rounded-full flex-shrink-0 ml-2" style={{ backgroundColor: 'var(--brand-deep-red)' }}></div>}
                                           </div>
                                           <p className="text-sm text-brand-gray-600 dark:text-brand-gray-300">With {getSellerName(conv.sellerId)}</p>
                                           <p className="text-xs text-brand-gray-500 dark:text-brand-gray-400 truncate mt-1">

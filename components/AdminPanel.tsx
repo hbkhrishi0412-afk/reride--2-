@@ -646,7 +646,7 @@ const SupportTicketsView: React.FC<{
     
     const statusColor = (status: SupportTicket['status']) => {
         switch (status) {
-            case 'Open': return 'bg-blue-100 text-blue-800 dark:bg-blue-900/50 dark:text-blue-300';
+            case 'Open': return 'text-white' + ' ' + 'dark:text-white';
             case 'In Progress': return 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/50 dark:text-yellow-300';
             case 'Closed': return 'bg-gray-200 text-gray-800 dark:bg-gray-700 dark:text-gray-300';
         }
@@ -669,7 +669,7 @@ const SupportTicketsView: React.FC<{
                 <ul className="overflow-y-auto mt-2 flex-grow">
                     {filteredTickets.map(ticket => (
                         <li key={ticket.id}>
-                            <button onClick={() => setSelectedTicket(ticket)} className={`w-full text-left p-3 rounded-md hover:bg-gray-100 dark:hover:bg-gray-700 ${selectedTicket?.id === ticket.id ? 'bg-blue-50 dark:bg-blue-900/30' : ''}`}>
+                            <button onClick={() => setSelectedTicket(ticket)} className={`w-full text-left p-3 rounded-md hover:bg-gray-100 dark:hover:bg-gray-700 ${selectedTicket?.id === ticket.id ? '' : ''}`} style={selectedTicket?.id === ticket.id ? { backgroundColor: 'var(--brand-rose-pink-light)' } : undefined}>
                                 <div className="flex justify-between items-start">
                                     <p className="font-semibold text-sm truncate pr-2 text-gray-800 dark:text-gray-100">{ticket.subject}</p>
                                     <span className={`text-xs font-bold px-2 py-0.5 rounded-full whitespace-nowrap ${statusColor(ticket.status)}`}>{ticket.status}</span>
@@ -699,7 +699,7 @@ const SupportTicketsView: React.FC<{
                             </div>
                             {/* Replies */}
                             {selectedTicket.replies.map((reply, index) => (
-                                <div key={index} className={`p-3 rounded-lg ${reply.author === currentUser.email ? 'bg-blue-100 dark:bg-blue-900/50' : 'bg-gray-100 dark:bg-gray-700/50'}`}>
+                                <div key={index} className={`p-3 rounded-lg ${reply.author === currentUser.email ? '' : 'bg-gray-100 dark:bg-gray-700/50'}`} style={reply.author === currentUser.email ? { backgroundColor: 'var(--brand-rose-pink-light)' } : undefined}>
                                     <p className="text-sm font-semibold text-gray-800 dark:text-gray-200">{reply.author === currentUser.email ? 'You' : reply.author}</p>
                                     <p className="text-xs text-gray-500 dark:text-gray-400 mb-2">{new Date(reply.timestamp).toLocaleString()}</p>
                                     <p className="text-sm text-gray-700 dark:text-gray-300 whitespace-pre-wrap">{reply.message}</p>
@@ -717,7 +717,7 @@ const SupportTicketsView: React.FC<{
                                 />
                                 <div className="mt-2 flex justify-between items-center">
                                     <div>
-                                        <button type="button" onClick={() => handleStatusChange('Open')} className="text-xs font-semibold text-blue-600 mr-3">Set to Open</button>
+                                        <button type="button" onClick={() => handleStatusChange('Open')} className="text-xs font-semibold mr-3 transition-colors" style={{ color: 'var(--brand-deep-red)' }} onMouseEnter={(e) => e.currentTarget.style.color = 'var(--brand-orange)'} onMouseLeave={(e) => e.currentTarget.style.color = 'var(--brand-deep-red)'}>Set to Open</button>
                                         <button type="button" onClick={() => handleStatusChange('In Progress')} className="text-xs font-semibold text-yellow-600 mr-3">Set to In Progress</button>
                                         <button type="button" onClick={() => handleStatusChange('Closed')} className="text-xs font-semibold text-gray-600">Close Ticket</button>
                                     </div>
@@ -808,7 +808,7 @@ const FAQEditorView: React.FC<{
                             <td>{item.question}</td>
                             <td>{item.category}</td>
                             <td>
-                                <button onClick={() => startEditing(item)} className="text-blue-500 mr-2">Edit</button>
+                                <button onClick={() => startEditing(item)} className="mr-2 transition-colors" style={{ color: 'var(--brand-deep-red)' }} onMouseEnter={(e) => e.currentTarget.style.color = 'var(--brand-orange)'} onMouseLeave={(e) => e.currentTarget.style.color = 'var(--brand-deep-red)'}>Edit</button>
                                 <button onClick={() => onDelete(item.id)} className="text-red-500">Delete</button>
                             </td>
                         </tr>
@@ -969,7 +969,7 @@ const AdminPanel: React.FC<AdminPanelProps> = (props) => {
                                         <tr key={user.email}>
                                             <td className="px-6 py-4 whitespace-nowrap">{user.name}</td>
                                             <td className="px-6 py-4 whitespace-nowrap text-sm"><p>{user.email}</p><p className="text-gray-500">{user.mobile}</p></td>
-                                            <td className="px-6 py-4 whitespace-nowrap"><span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${user.role === 'admin' ? 'bg-red-100 text-red-800' : user.role === 'seller' ? 'bg-blue-100 text-blue-800' : 'bg-green-100 text-green-800'}`}>{user.role}</span></td>
+                                            <td className="px-6 py-4 whitespace-nowrap"><span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${user.role === 'admin' ? 'bg-red-100 text-red-800' : user.role === 'seller' ? 'brand-badge-orange' : 'bg-green-100 text-green-800'}`}>{user.role}</span></td>
                                             <td className="px-6 py-4 whitespace-nowrap"><span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${user.status === 'active' ? 'bg-green-100 text-green-800' : 'bg-gray-200 text-gray-800'}`}>{user.status}</span></td>
                                             <td className="px-6 py-4 whitespace-nowrap text-center">
                                                 {user.role === 'seller' && (
