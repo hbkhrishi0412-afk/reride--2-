@@ -12,7 +12,7 @@ const Footer: React.FC<FooterProps> = ({ onNavigate }) => {
   };
   
   return (
-    <footer style={{ background: 'var(--gradient-dark)', borderTop: '1px solid var(--brand-slate-light)' }}>
+    <footer style={{ background: 'var(--gradient-dark)', borderTop: '1px solid var(--brand-blackcurrant-light)' }}>
       <div className="container mx-auto px-4 py-8 text-center">
         <div className="mb-4">
           <h3 className="text-2xl font-bold" style={{ 
@@ -22,13 +22,13 @@ const Footer: React.FC<FooterProps> = ({ onNavigate }) => {
             backgroundClip: 'text'
           }}>ReRide</h3>
         </div>
-        <p style={{ color: 'var(--brand-cream)' }}>&copy; {new Date().getFullYear()} ReRide. All rights reserved.</p>
-        <p className="text-sm mt-1" style={{ color: 'var(--brand-gold)' }}>The premier AI-driven marketplace for your next vehicle.</p>
+        <p style={{ color: 'var(--brand-white)' }}>&copy; {new Date().getFullYear()} ReRide. All rights reserved.</p>
+        <p className="text-sm mt-1" style={{ color: 'var(--brand-orange)' }}>The premier AI-driven marketplace for your next vehicle.</p>
         <div className="mt-4 flex flex-wrap justify-center items-center gap-x-4 gap-y-2 text-sm">
-          <a href="#" className="transition-colors" style={{ color: 'var(--brand-gold)' }} onMouseEnter={(e) => e.currentTarget.style.color = 'var(--brand-gold)'} onMouseLeave={(e) => e.currentTarget.style.color = 'var(--brand-gold)'}>Privacy Policy</a>
-          <a href="#" className="transition-colors" style={{ color: 'var(--brand-gold)' }} onMouseEnter={(e) => e.currentTarget.style.color = 'var(--brand-gold)'} onMouseLeave={(e) => e.currentTarget.style.color = 'var(--brand-gold)'}>Terms of Service</a>
-          <a href="#" onClick={(e) => handleNav(e, View.SUPPORT)} className="transition-colors" style={{ color: 'var(--brand-gold)' }} onMouseEnter={(e) => e.currentTarget.style.color = 'var(--brand-gold)'} onMouseLeave={(e) => e.currentTarget.style.color = 'var(--brand-gold)'}>Contact Support</a>
-          <a href="#" onClick={(e) => handleNav(e, View.FAQ)} className="transition-colors" style={{ color: 'var(--brand-gold)' }} onMouseEnter={(e) => e.currentTarget.style.color = 'var(--brand-gold)'} onMouseLeave={(e) => e.currentTarget.style.color = 'var(--brand-gold)'}>FAQ</a>
+          <a href="#" className="transition-colors" style={{ color: 'var(--brand-orange)' }} onMouseEnter={(e) => e.currentTarget.style.color = 'var(--brand-orange)'} onMouseLeave={(e) => e.currentTarget.style.color = 'var(--brand-orange)'}>Privacy Policy</a>
+          <a href="#" className="transition-colors" style={{ color: 'var(--brand-orange)' }} onMouseEnter={(e) => e.currentTarget.style.color = 'var(--brand-orange)'} onMouseLeave={(e) => e.currentTarget.style.color = 'var(--brand-orange)'}>Terms of Service</a>
+          <a href="#" onClick={(e) => handleNav(e, View.SUPPORT)} className="transition-colors" style={{ color: 'var(--brand-orange)' }} onMouseEnter={(e) => e.currentTarget.style.color = 'var(--brand-orange)'} onMouseLeave={(e) => e.currentTarget.style.color = 'var(--brand-orange)'}>Contact Support</a>
+          <a href="#" onClick={(e) => handleNav(e, View.FAQ)} className="transition-colors" style={{ color: 'var(--brand-orange)' }} onMouseEnter={(e) => e.currentTarget.style.color = 'var(--brand-orange)'} onMouseLeave={(e) => e.currentTarget.style.color = 'var(--brand-orange)'}>FAQ</a>
         </div>
       </div>
     </footer>

@@ -56,7 +56,7 @@ const CarSpecModal: React.FC<CarSpecModalProps> = ({ car, variant, onClose }) =>
             onClick={onClose}
         >
             <div 
-                className="bg-brand-cream dark:bg-brand-gray-800 rounded-xl shadow-2xl w-full max-w-4xl max-h-[90vh] flex flex-col overflow-hidden"
+                className="bg-brand-white dark:bg-brand-gray-800 rounded-xl shadow-2xl w-full max-w-4xl max-h-[90vh] flex flex-col overflow-hidden"
                 onClick={(e) => e.stopPropagation()}
             >
                 {/* Header */}
@@ -67,7 +67,7 @@ const CarSpecModal: React.FC<CarSpecModalProps> = ({ car, variant, onClose }) =>
                         </h2>
                         <p className="text-md text-brand-gray-600 dark:text-brand-gray-300">{variant.variant_name}</p>
                     </div>
-                    <button onClick={onClose} className="text-brand-gray-400 hover:text-brand-gray-800 dark:hover:text-brand-cream text-3xl">&times;</button>
+                    <button onClick={onClose} className="text-brand-gray-400 hover:text-brand-gray-800 dark:hover:text-brand-white text-3xl">&times;</button>
                 </div>
 
                 {/* Body */}

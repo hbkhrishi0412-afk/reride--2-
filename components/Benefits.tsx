@@ -25,7 +25,7 @@ const benefits = [
 
 const BenefitItem: React.FC<{ icon: string; title: string; }> = ({ icon, title }) => (
     <div className="flex flex-col items-center text-center gap-2">
-         <div className="w-16 h-16 rounded-full bg-brand-gray-100 dark:bg-brand-gray-700 flex items-center justify-center" style={{ color: 'var(--brand-gold)' }}>
+         <div className="w-16 h-16 rounded-full bg-brand-gray-100 dark:bg-brand-gray-700 flex items-center justify-center" style={{ color: 'var(--brand-orange)' }}>
             <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d={icon} />
             </svg>
@@ -36,7 +36,7 @@ const BenefitItem: React.FC<{ icon: string; title: string; }> = ({ icon, title }
 
 const Benefits: React.FC = () => {
   return (
-    <div className="p-6 bg-brand-cream dark:bg-brand-gray-800 rounded-xl shadow-soft">
+    <div className="p-6 bg-brand-white dark:bg-brand-gray-800 rounded-xl shadow-soft">
         <h3 className="text-xl font-semibold text-brand-gray-800 dark:text-brand-gray-100 mb-6 text-center">Benefits & Add-ons</h3>
         <div className="grid grid-cols-3 sm:grid-cols-5 gap-4">
             {benefits.map(benefit => (

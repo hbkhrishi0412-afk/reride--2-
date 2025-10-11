@@ -16,8 +16,8 @@ body {
     'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  background-color: var(--brand-cream);
-  color: var(--brand-slate);
+  background-color: var(--brand-off-white);
+  color: var(--brand-text-dark);
 }
 
 code {
@@ -149,47 +149,78 @@ button:disabled {
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-/* ONLY 4 Colors - User Palette */
+/* Inside the Head - Bold Color Scheme */
 :root {
-  /* Primary Brand Colors */
-  --brand-cream: #FAF8F1;
-  --brand-cream-hover: #FCFAF6;
-  --brand-cream-light: rgba(250, 248, 241, 0.5);
-  --brand-cream-dark: #F5F3EB;
+  /* Primary Brand Colors - User-Focused Professional Palette */
+  --brand-deep-red: #8E0D3C;
+  --brand-deep-red-hover: #B01048;
+  --brand-deep-red-light: rgba(142, 13, 60, 0.1);
+  --brand-deep-red-dark: #6A0A2D;
   
-  --brand-gold: #FAEAB1;
-  --brand-gold-hover: #FBF0C8;
-  --brand-gold-light: rgba(250, 234, 177, 0.3);
-  --brand-gold-dark: #F5DF8D;
+  --brand-blackcurrant: #2D2652;
+  --brand-blackcurrant-light: #4A3F7A;
+  --brand-blackcurrant-dark: #1D1842;
   
-  --brand-teal: #34656D;
-  --brand-teal-hover: #4A7C85;
-  --brand-teal-light: rgba(52, 101, 109, 0.1);
-  --brand-teal-dark: #2A5159;
+  --brand-orange: #EF3B33;
+  --brand-orange-hover: #FF4D44;
+  --brand-orange-light: rgba(239, 59, 51, 0.1);
+  --brand-orange-dark: #D42F27;
   
-  --brand-slate: #334443;
-  --brand-slate-hover: #4A5E5C;
-  --brand-slate-light: rgba(51, 68, 67, 0.1);
-  --brand-slate-dark: #1F2928;
+  --brand-rose-pink: #FDA1A2;
+  --brand-rose-pink-hover: #FEB5B6;
+  --brand-rose-pink-light: rgba(253, 161, 162, 0.2);
+  --brand-rose-pink-dark: #FC8D8E;
   
-  /* Gradients */
-  --gradient-primary: linear-gradient(135deg, #34656D 0%, #4A7C85 100%);
-  --gradient-warm: linear-gradient(135deg, #FAEAB1 0%, #34656D 100%);
-  --gradient-soft: linear-gradient(135deg, #FAF8F1 0%, #FAEAB1 100%);
-  --gradient-dark: linear-gradient(135deg, #334443 0%, #1F2928 100%);
+  /* Neutral Colors - Clear and Accessible */
+  --brand-white: #FFFFFF;
+  --brand-off-white: #FFF8F9;
+  --brand-light-gray: #F8F9FA;
+  --brand-gray: #E9ECEF;
+  --brand-medium-gray: #6C757D;
+  --brand-dark-gray: #343A40;
+  --brand-text-dark: #2C3E50;
+  --brand-text-gray: #495057;
   
-  /* Shadows */
-  --shadow-sm: 0 2px 8px rgba(51, 68, 67, 0.08);
-  --shadow-md: 0 4px 16px rgba(51, 68, 67, 0.12);
-  --shadow-lg: 0 8px 32px rgba(51, 68, 67, 0.16);
-  --shadow-teal: 0 4px 20px rgba(52, 101, 109, 0.25);
-  --shadow-gold: 0 4px 20px rgba(250, 234, 177, 0.4);
-  --shadow-slate: 0 4px 20px rgba(51, 68, 67, 0.2);
+  /* Legacy Spinny variable mappings - Professional UX Palette */
+  --spinny-orange: #EF3B33;
+  --spinny-orange-hover: #FF4D44;
+  --spinny-orange-light: rgba(239, 59, 51, 0.1);
+  --spinny-orange-dark: #D42F27;
+  --spinny-white: #FFFFFF;
+  --spinny-off-white: #FFF8F9;
+  --spinny-light-gray: #F8F9FA;
+  --spinny-gray: #E9ECEF;
+  --spinny-medium-gray: #6C757D;
+  --spinny-dark-gray: #343A40;
+  --spinny-text-dark: #2C3E50;
+  --spinny-text-gray: #495057;
+  
+  /* Accent Colors - Clear User Feedback */
+  --spinny-success: #28A745;
+  --spinny-info: #17A2B8;
+  --spinny-warning: #FFC107;
+  --spinny-error: #DC3545;
+  
+  /* Gradients - Professional and Accessible */
+  --gradient-primary: linear-gradient(135deg, #8E0D3C 0%, #4A3F7A 100%);
+  --gradient-warm: linear-gradient(135deg, #EF3B33 0%, #8E0D3C 100%);
+  --gradient-soft: linear-gradient(135deg, #FDA1A2 0%, #EF3B33 100%);
+  --gradient-dark: linear-gradient(135deg, #2D2652 0%, #1D1842 100%);
+  
+  /* Shadows - Subtle and Professional */
+  --spinny-shadow-sm: 0 2px 8px rgba(29, 24, 66, 0.08);
+  --spinny-shadow-md: 0 4px 16px rgba(29, 24, 66, 0.12);
+  --spinny-shadow-lg: 0 8px 32px rgba(29, 24, 66, 0.16);
+  --shadow-red: 0 4px 20px rgba(142, 13, 60, 0.3);
+  --shadow-orange: 0 4px 20px rgba(239, 59, 51, 0.3);
+  --shadow-pink: 0 4px 20px rgba(253, 161, 162, 0.3);
+  --shadow-soft: 0 2px 8px rgba(29, 24, 66, 0.1);
+  --shadow-soft-lg: 0 8px 32px rgba(29, 24, 66, 0.2);
   
   /* Border Radius */
-  --radius-sm: 8px;
-  --radius-md: 12px;
-  --radius-lg: 16px;
+  --spinny-radius-sm: 8px;
+  --spinny-radius-md: 12px;
+  --spinny-radius-lg: 16px;
 }
 
 /* Brand Component Styles */

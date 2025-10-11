@@ -49,7 +49,7 @@ const FAQPage: React.FC<FAQPageProps> = ({ faqItems }) => {
           placeholder="Search questions..."
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
-          className="w-full p-4 border border-brand-gray-300 dark:border-brand-gray-600 rounded-xl focus:outline-none bg-brand-cream dark:bg-brand-gray-700 text-lg" onFocus={(e) => { e.currentTarget.style.borderColor = 'var(--brand-teal)'; e.currentTarget.style.boxShadow = '0 0 0 2px var(--brand-teal-light)'; }} onBlur={(e) => { e.currentTarget.style.borderColor = ''; e.currentTarget.style.boxShadow = ''; }}
+          className="w-full p-4 border border-brand-gray-300 dark:border-brand-gray-600 rounded-xl focus:outline-none bg-brand-white dark:bg-brand-gray-700 text-lg" onFocus={(e) => { e.currentTarget.style.borderColor = 'var(--brand-deep-red)'; e.currentTarget.style.boxShadow = '0 0 0 2px var(--brand-deep-red-light)'; }} onBlur={(e) => { e.currentTarget.style.borderColor = ''; e.currentTarget.style.boxShadow = ''; }}
         />
       </div>
 

@@ -19,7 +19,7 @@ const ProfileInput: React.FC<{ label: string; name: string; value: string; onCha
       value={value}
       onChange={onChange}
       disabled={disabled}
-      className="mt-1 block w-full p-3 border border-brand-gray-300 dark:border-brand-gray-600 rounded-lg shadow-sm sm:text-sm bg-brand-cream dark:bg-brand-gray-800 disabled:bg-brand-gray-100 dark:disabled:bg-brand-gray-700" onFocus={(e) => !disabled && (e.currentTarget.style.boxShadow = '0 0 0 2px var(--brand-teal-light)')} onBlur={(e) => e.currentTarget.style.boxShadow = ''}
+      className="mt-1 block w-full p-3 border border-brand-gray-300 dark:border-brand-gray-600 rounded-lg shadow-sm sm:text-sm bg-brand-white dark:bg-brand-gray-800 disabled:bg-brand-gray-100 dark:disabled:bg-brand-gray-700" onFocus={(e) => !disabled && (e.currentTarget.style.boxShadow = '0 0 0 2px var(--brand-deep-red-light)')} onBlur={(e) => e.currentTarget.style.boxShadow = ''}
     />
   </div>
 );
@@ -111,7 +111,7 @@ const Profile: React.FC<ProfileProps> = ({ currentUser, onUpdateProfile, onUpdat
       <h1 className="text-3xl font-extrabold text-brand-gray-900 dark:text-brand-gray-100">My Profile</h1>
       
       {/* Account Details Card */}
-      <div className="bg-brand-cream dark:bg-brand-gray-800 shadow-soft-lg rounded-xl overflow-hidden">
+      <div className="bg-brand-white dark:bg-brand-gray-800 shadow-soft-lg rounded-xl overflow-hidden">
         <div className="p-6">
           <h2 className="text-2xl font-bold text-brand-gray-800 dark:text-brand-gray-100 mb-4">Account Details</h2>
           <form onSubmit={handleProfileSave}>
@@ -123,7 +123,7 @@ const Profile: React.FC<ProfileProps> = ({ currentUser, onUpdateProfile, onUpdat
                   className="w-32 h-32 rounded-full object-cover border-4 border-brand-gray-200 dark:border-brand-gray-700"
                 />
                 {isEditing && (
-                  <label htmlFor="avatar-upload" className="absolute bottom-0 right-0 text-brand-cream rounded-full p-2 cursor-pointer transition-colors" style={{ background: 'var(--brand-teal)' }} onMouseEnter={(e) => e.currentTarget.style.background = 'var(--brand-gold)'} onMouseLeave={(e) => e.currentTarget.style.background = 'var(--brand-teal)'}>
+                  <label htmlFor="avatar-upload" className="absolute bottom-0 right-0 text-brand-white rounded-full p-2 cursor-pointer transition-colors" style={{ background: 'var(--brand-deep-red)' }} onMouseEnter={(e) => e.currentTarget.style.background = 'var(--brand-orange)'} onMouseLeave={(e) => e.currentTarget.style.background = 'var(--brand-deep-red)'}>
                     <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z" /></svg>
                     <input id="avatar-upload" type="file" className="sr-only" accept="image/*" onChange={handleAvatarUpload} />
                   </label>
@@ -154,7 +154,7 @@ const Profile: React.FC<ProfileProps> = ({ currentUser, onUpdateProfile, onUpdat
             <div className="mt-6 flex gap-4">
               {isEditing ? (
                 <>
-                  <button type="submit" className="px-6 py-2 btn-brand-primary text-brand-cream font-semibold rounded-md transition-colors">
+                  <button type="submit" className="px-6 py-2 btn-brand-primary text-brand-white font-semibold rounded-md transition-colors">
                     Save Changes
                   </button>
                   <button type="button" onClick={handleEditToggle} className="px-6 py-2 bg-brand-gray-200 dark:bg-brand-gray-600 text-brand-gray-800 dark:text-brand-gray-200 font-semibold rounded-md hover:bg-brand-gray-300 dark:hover:bg-brand-gray-500 transition-colors">
@@ -162,7 +162,7 @@ const Profile: React.FC<ProfileProps> = ({ currentUser, onUpdateProfile, onUpdat
                   </button>
                 </>
               ) : (
-                <button type="button" onClick={handleEditToggle} className="px-6 py-2 btn-brand-gold text-brand-cream font-semibold rounded-md transition-colors">
+                <button type="button" onClick={handleEditToggle} className="px-6 py-2 btn-brand-orange text-brand-white font-semibold rounded-md transition-colors">
                   Edit Profile
                 </button>
               )}
@@ -172,7 +172,7 @@ const Profile: React.FC<ProfileProps> = ({ currentUser, onUpdateProfile, onUpdat
       </div>
 
       {/* Change Password Card */}
-      <div className="bg-brand-cream dark:bg-brand-gray-800 shadow-soft-lg rounded-xl overflow-hidden">
+      <div className="bg-brand-white dark:bg-brand-gray-800 shadow-soft-lg rounded-xl overflow-hidden">
         <div className="p-6">
           <h2 className="text-2xl font-bold text-brand-gray-800 dark:text-brand-gray-100 mb-4">Change Password</h2>
           <form onSubmit={handlePasswordSave}>
@@ -198,10 +198,10 @@ const Profile: React.FC<ProfileProps> = ({ currentUser, onUpdateProfile, onUpdat
                 value={passwordData.confirm}
                 onChange={handlePasswordChange}
               />
-              {passwordError && <p className="text-sm text-brand-teal">{passwordError}</p>}
+              {passwordError && <p className="text-sm text-brand-deep-red">{passwordError}</p>}
             </div>
             <div className="mt-6">
-              <button type="submit" className="px-6 py-2 bg-brand-teal-light0 text-brand-cream font-semibold rounded-md hover:bg-brand-teal transition-colors disabled:opacity-50" disabled={!passwordData.current || !passwordData.new || !passwordData.confirm}>
+              <button type="submit" className="px-6 py-2 bg-brand-deep-red-light0 text-brand-white font-semibold rounded-md hover:bg-brand-deep-red transition-colors disabled:opacity-50" disabled={!passwordData.current || !passwordData.new || !passwordData.confirm}>
                 Update Password
               </button>
             </div>

@@ -8,25 +8,25 @@ interface ToastProps {
 
 const ICONS = {
     success: (
-        <svg className="w-6 h-6 text-brand-cream" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <svg className="w-6 h-6 text-brand-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
         </svg>
     ),
     error: (
-        <svg className="w-6 h-6 text-brand-cream" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <svg className="w-6 h-6 text-brand-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
         </svg>
     ),
     info: (
-        <svg className="w-6 h-6 text-brand-cream" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <svg className="w-6 h-6 text-brand-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
         </svg>
     ),
 };
 
 const BG_COLORS = {
-    success: 'bg-brand-teal-light0',
-    error: 'bg-brand-teal-light0',
+    success: 'bg-brand-deep-red-light0',
+    error: 'bg-brand-deep-red-light0',
     info: 'bg-gradient-primary',
 };
 
@@ -49,13 +49,13 @@ const Toast: React.FC<ToastProps> = ({ toast, onRemove }) => {
     return (
         <div 
             role="alert"
-            className={`flex items-center p-4 mb-4 text-brand-cream rounded-lg shadow-lg ${BG_COLORS[toast.type]} ${isExiting ? 'animate-toast-out' : 'animate-toast-in'}`}
+            className={`flex items-center p-4 mb-4 text-brand-white rounded-lg shadow-lg ${BG_COLORS[toast.type]} ${isExiting ? 'animate-toast-out' : 'animate-toast-in'}`}
         >
             <div className="flex-shrink-0">{ICONS[toast.type]}</div>
             <div className="ml-3 text-sm font-medium">{toast.message}</div>
             <button
                 type="button"
-                className="ml-auto -mx-1.5 -my-1.5 p-1.5 inline-flex h-8 w-8 rounded-lg hover:bg-brand-cream/20 focus:ring-2 focus:ring-white/50"
+                className="ml-auto -mx-1.5 -my-1.5 p-1.5 inline-flex h-8 w-8 rounded-lg hover:bg-brand-white/20 focus:ring-2 focus:ring-white/50"
                 onClick={handleClose}
                 aria-label="Close"
             >

@@ -28,14 +28,14 @@ const TypingIndicator: React.FC<{ name: string }> = ({ name }) => (
 const TestDriveRequestMessage: React.FC<{ msg: ChatMessage }> = ({ msg }) => {
     const { date, time, status } = msg.payload || {};
     const statusInfo = {
-        pending: { text: "Pending", color: "bg-brand-gold-light text-brand-slate dark:bg-brand-gold/50 dark:text-brand-slate" },
-        confirmed: { text: "Confirmed", color: "bg-brand-teal-light text-brand-teal dark:bg-brand-teal/50 dark:text-brand-teal" },
-        rejected: { text: "Declined", color: "bg-brand-teal-light text-brand-teal dark:bg-brand-teal/50 dark:text-brand-teal" },
-        countered: { text: "Countered", color: "bg-brand-cream-dark text-brand-slate dark:bg-brand-cream dark:text-brand-slate" },
-        accepted: { text: "Accepted", color: "bg-brand-teal-light text-brand-teal dark:bg-brand-teal/50 dark:text-brand-teal" },
+        pending: { text: "Pending", color: "bg-brand-orange-light text-brand-blackcurrant dark:bg-brand-orange/50 dark:text-brand-blackcurrant" },
+        confirmed: { text: "Confirmed", color: "bg-brand-deep-red-light text-brand-deep-red dark:bg-brand-deep-red/50 dark:text-brand-deep-red" },
+        rejected: { text: "Declined", color: "bg-brand-deep-red-light text-brand-deep-red dark:bg-brand-deep-red/50 dark:text-brand-deep-red" },
+        countered: { text: "Countered", color: "bg-brand-white-dark text-brand-blackcurrant dark:bg-brand-white dark:text-brand-blackcurrant" },
+        accepted: { text: "Accepted", color: "bg-brand-deep-red-light text-brand-deep-red dark:bg-brand-deep-red/50 dark:text-brand-deep-red" },
     };
     return (
-        <div className={`p-3 border-l-4 rounded-lg bg-brand-gray-100 dark:bg-brand-gray-700/50 ${status === 'pending' ? 'border-brand-gold' : status === 'confirmed' ? 'border-brand-teal' : 'border-brand-teal'}`}>
+        <div className={`p-3 border-l-4 rounded-lg bg-brand-gray-100 dark:bg-brand-gray-700/50 ${status === 'pending' ? 'border-brand-orange' : status === 'confirmed' ? 'border-brand-deep-red' : 'border-brand-deep-red'}`}>
             <p className="font-semibold text-brand-gray-800 dark:text-brand-gray-100">Test Drive Request</p>
             <p className="text-sm text-brand-gray-600 dark:text-brand-gray-300">Date: {date}</p>
             <p className="text-sm text-brand-gray-600 dark:text-brand-gray-300">Time: {time}</p>
@@ -131,13 +131,13 @@ const CustomerInbox: React.FC<CustomerInboxProps> = ({ conversations, onSendMess
   const getSellerName = (sellerId: string) => {
     return users.find(u => u.email === sellerId)?.name || 'Seller';
   }
-  const formInputClass = "flex-grow p-3 border border-brand-gray-300 dark:border-brand-gray-600 rounded-lg focus:outline-none transition bg-brand-cream dark:bg-brand-gray-800 dark:text-brand-slate";
+  const formInputClass = "flex-grow p-3 border border-brand-gray-300 dark:border-brand-gray-600 rounded-lg focus:outline-none transition bg-brand-white dark:bg-brand-gray-800 dark:text-brand-blackcurrant";
 
   return (
     <>
       <div className="animate-fade-in container mx-auto py-8">
         <h1 className="text-3xl font-extrabold text-brand-gray-900 dark:text-brand-gray-100 mb-6 border-b border-brand-gray-200 dark:border-brand-gray-700 pb-4">My Inbox</h1>
-        <div className="grid grid-cols-1 md:grid-cols-[320px_1fr] gap-6 bg-brand-cream dark:bg-brand-gray-800 rounded-xl shadow-soft-lg h-[75vh]">
+        <div className="grid grid-cols-1 md:grid-cols-[320px_1fr] gap-6 bg-brand-white dark:bg-brand-gray-800 rounded-xl shadow-soft-lg h-[75vh]">
           {/* Conversation List */}
           <aside className="border-r border-brand-gray-200 dark:border-brand-gray-700 flex flex-col">
             <div className="p-4 border-b border-brand-gray-200 dark:border-brand-gray-700">
@@ -155,11 +155,11 @@ const CustomerInbox: React.FC<CustomerInboxProps> = ({ conversations, onSendMess
                                   <li key={conv.id}>
                                       <button
                                           onClick={() => handleSelectConversation(conv)}
-                                          className={`w-full text-left p-4 border-l-4 transition-colors ${selectedConv?.id === conv.id ? 'bg-brand-gray-100 dark:bg-brand-gray-900' : 'border-transparent hover:bg-brand-gray-100 dark:hover:bg-brand-gray-700'}`} style={selectedConv?.id === conv.id ? { borderColor: 'var(--brand-teal)' } : undefined}
+                                          className={`w-full text-left p-4 border-l-4 transition-colors ${selectedConv?.id === conv.id ? 'bg-brand-gray-100 dark:bg-brand-gray-900' : 'border-transparent hover:bg-brand-gray-100 dark:hover:bg-brand-gray-700'}`} style={selectedConv?.id === conv.id ? { borderColor: 'var(--brand-deep-red)' } : undefined}
                                       >
                                           <div className="flex justify-between items-center mb-1">
                                               <p className="font-bold text-brand-gray-800 dark:text-brand-gray-100 truncate">{conv.vehicleName}</p>
-                                              {!conv.isReadByCustomer && <div className="w-2.5 h-2.5 rounded-full flex-shrink-0 ml-2" style={{ backgroundColor: 'var(--brand-teal)' }}></div>}
+                                              {!conv.isReadByCustomer && <div className="w-2.5 h-2.5 rounded-full flex-shrink-0 ml-2" style={{ backgroundColor: 'var(--brand-deep-red)' }}></div>}
                                           </div>
                                           <p className="text-sm text-brand-gray-600 dark:text-brand-gray-300">With {getSellerName(conv.sellerId)}</p>
                                           <p className="text-xs text-brand-gray-500 dark:text-brand-gray-400 truncate mt-1">
@@ -193,10 +193,10 @@ const CustomerInbox: React.FC<CustomerInboxProps> = ({ conversations, onSendMess
                               <h3 className="font-bold text-lg text-brand-gray-800 dark:text-brand-gray-100">{selectedConv.vehicleName}</h3>
                               <p className="text-sm text-brand-gray-500 dark:text-brand-gray-400">Conversation with {getSellerName(selectedConv.sellerId)}</p>
                           </div>
-                          <button onClick={handleFlagClick} disabled={selectedConv.isFlagged} className="disabled:opacity-50 flex items-center gap-1 text-xs text-brand-gray-500 hover:text-brand-teal" title={selectedConv.isFlagged ? "This conversation has been reported" : "Report conversation"}>
+                          <button onClick={handleFlagClick} disabled={selectedConv.isFlagged} className="disabled:opacity-50 flex items-center gap-1 text-xs text-brand-gray-500 hover:text-brand-deep-red" title={selectedConv.isFlagged ? "This conversation has been reported" : "Report conversation"}>
                               {selectedConv.isFlagged ? (
                                   <>
-                                      <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-brand-slate" viewBox="0 0 20 20" fill="currentColor"><path fillRule="evenodd" d="M3 6a3 3 0 013-3h10a1 1 0 01.8 1.6L14.25 8l2.55 3.4A1 1 0 0116 13H6a1 1 0 01-1-1V6z" clipRule="evenodd" /></svg>
+                                      <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-brand-blackcurrant" viewBox="0 0 20 20" fill="currentColor"><path fillRule="evenodd" d="M3 6a3 3 0 013-3h10a1 1 0 01.8 1.6L14.25 8l2.55 3.4A1 1 0 0116 13H6a1 1 0 01-1-1V6z" clipRule="evenodd" /></svg>
                                       Reported
                                   </>
                               ) : (
@@ -210,11 +210,11 @@ const CustomerInbox: React.FC<CustomerInboxProps> = ({ conversations, onSendMess
                       <div className="flex-grow p-4 overflow-y-auto bg-brand-gray-50 dark:bg-brand-gray-darker space-y-4">
                           {selectedConv.messages.map(msg => (
                             <div key={msg.id} className={`flex flex-col animate-fade-in ${msg.sender === 'user' ? 'items-end' : 'items-start'}`}>
-                                  {msg.sender === 'seller' && <span className="text-xs font-bold text-brand-slate dark:text-brand-slate mb-1 ml-2">{getSellerName(selectedConv.sellerId)}</span>}
+                                  {msg.sender === 'seller' && <span className="text-xs font-bold text-brand-blackcurrant dark:text-brand-blackcurrant mb-1 ml-2">{getSellerName(selectedConv.sellerId)}</span>}
                                   {msg.sender === 'system' && <div className="text-center text-xs text-brand-gray-500 dark:text-brand-gray-400 italic py-2 w-full">{msg.text}</div>}
                                   {msg.sender !== 'system' && (
                                       <>
-                                          <div className={`px-4 py-3 max-w-lg ${ msg.sender === 'user' ? 'text-brand-cream rounded-l-xl rounded-t-xl' : 'bg-brand-gray-200 dark:bg-brand-gray-700 text-brand-gray-800 dark:text-brand-gray-200 rounded-r-xl rounded-t-xl'}`} style={msg.sender === 'user' ? { background: 'var(--gradient-primary)' } : undefined}>
+                                          <div className={`px-4 py-3 max-w-lg ${ msg.sender === 'user' ? 'text-brand-white rounded-l-xl rounded-t-xl' : 'bg-brand-gray-200 dark:bg-brand-gray-700 text-brand-gray-800 dark:text-brand-gray-200 rounded-r-xl rounded-t-xl'}`} style={msg.sender === 'user' ? { background: 'var(--gradient-primary)' } : undefined}>
                                               {msg.type === 'test_drive_request' ? <TestDriveRequestMessage msg={msg} /> : msg.type === 'offer' ? <OfferMessage msg={msg} currentUserRole="customer" listingPrice={selectedConv.vehiclePrice} onRespond={(messageId, response, counterPrice) => { if (selectedConv) { onOfferResponse(selectedConv.id, messageId, response, counterPrice); }}} /> : <p className="text-sm">{msg.text}</p>}
                                           </div>
                                           <div className="text-xs text-brand-gray-400 mt-1 px-1 flex items-center">
@@ -228,13 +228,13 @@ const CustomerInbox: React.FC<CustomerInboxProps> = ({ conversations, onSendMess
                           {typingStatus?.conversationId === selectedConv?.id && typingStatus?.userRole === 'seller' && <TypingIndicator name={getSellerName(selectedConv.sellerId)} />}
                           <div ref={chatEndRef} />
                       </div>
-                      <div className="p-4 border-t border-brand-gray-200 dark:border-brand-gray-700 bg-brand-cream dark:bg-brand-gray-800">
+                      <div className="p-4 border-t border-brand-gray-200 dark:border-brand-gray-700 bg-brand-white dark:bg-brand-gray-800">
                           <form onSubmit={handleSendReply} className="flex gap-2">
-                          <button type="button" onClick={() => setIsOfferModalOpen(true)} className="bg-brand-teal text-brand-cream font-bold p-3 rounded-lg hover:bg-brand-teal transition-colors" aria-label="Make an offer">
+                          <button type="button" onClick={() => setIsOfferModalOpen(true)} className="bg-brand-deep-red text-brand-white font-bold p-3 rounded-lg hover:bg-brand-deep-red transition-colors" aria-label="Make an offer">
                                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path d="M8.433 7.418c.155-.103.346-.196.567-.267v1.698a2.5 2.5 0 00-1.134 0V7.151c.22.07.412.164.567.267zM11.567 7.418c.155-.103.346-.196.567-.267v1.698a2.5 2.5 0 01-1.134 0V7.151c.22.07.412.164.567.267z" /><path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-13a1 1 0 10-2 0v.092a4.5 4.5 0 00-1.876.662C6.168 6.23 5.5 7.085 5.5 8.003v.486c0 .918.668 1.773 1.624 2.214.509.232.957.488 1.376.786V12.5a.5.5 0 01.5.5h1a.5.5 0 01.5-.5v-1.214c.419-.298.867-.554 1.376-.786C14.332 10.26 15 9.405 15 8.489v-.486c0-.918-.668-1.773-1.624-2.214A4.5 4.5 0 0011 5.092V5z" clipRule="evenodd" /></svg>
                            </button>
                           <input type="text" value={replyText} onChange={handleInputChange} placeholder="Type your message..." className={formInputClass} />
-                          <button type="submit" className="btn-brand-primary text-brand-cream font-bold py-2 px-6 rounded-lg">Send</button>
+                          <button type="submit" className="btn-brand-primary text-brand-white font-bold py-2 px-6 rounded-lg">Send</button>
                           </form>
                       </div>
                   </>

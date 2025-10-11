@@ -28,7 +28,7 @@ interface VehicleListProps {
 const ITEMS_PER_PAGE = 12;
 
 const VehicleCardSkeleton: React.FC = () => (
-    <div className="bg-brand-cream dark:bg-brand-gray-800 rounded-xl shadow-soft-lg overflow-hidden">
+    <div className="bg-brand-white dark:bg-brand-gray-800 rounded-xl shadow-soft-lg overflow-hidden">
       <div className="w-full h-40 sm:h-56 bg-brand-gray-200 dark:bg-brand-gray-700 animate-pulse"></div>
       <div className="p-3 sm:p-5">
         <div className="flex justify-between items-start">
@@ -74,11 +74,11 @@ const Pagination: React.FC<{ currentPage: number; totalPages: number; onPageChan
 
   return (
     <nav className="flex justify-center items-center space-x-2 mt-8">
-      <button onClick={() => onPageChange(currentPage - 1)} disabled={currentPage === 1} className="px-4 py-2 rounded-md bg-brand-cream dark:bg-brand-gray-700 disabled:opacity-50">Prev</button>
+      <button onClick={() => onPageChange(currentPage - 1)} disabled={currentPage === 1} className="px-4 py-2 rounded-md bg-brand-white dark:bg-brand-gray-700 disabled:opacity-50">Prev</button>
       {pageNumbers.map(number => (
-        <button key={number} onClick={() => onPageChange(number)} className={`px-4 py-2 rounded-md ${currentPage === number ? 'text-brand-cream' : 'bg-brand-cream dark:bg-brand-gray-700'}`} style={currentPage === number ? { background: 'var(--brand-teal)' } : undefined}>{number}</button>
+        <button key={number} onClick={() => onPageChange(number)} className={`px-4 py-2 rounded-md ${currentPage === number ? 'text-brand-white' : 'bg-brand-white dark:bg-brand-gray-700'}`} style={currentPage === number ? { background: 'var(--brand-deep-red)' } : undefined}>{number}</button>
       ))}
-      <button onClick={() => onPageChange(currentPage + 1)} disabled={currentPage === totalPages} className="px-4 py-2 rounded-md bg-brand-cream dark:bg-brand-gray-700 disabled:opacity-50">Next</button>
+      <button onClick={() => onPageChange(currentPage + 1)} disabled={currentPage === totalPages} className="px-4 py-2 rounded-md bg-brand-white dark:bg-brand-gray-700 disabled:opacity-50">Next</button>
     </nav>
   );
 };
@@ -412,7 +412,7 @@ const VehicleList: React.FC<VehicleListProps> = ({ vehicles, onSelectVehicle, is
               <VehicleCard key={vehicle.id} vehicle={vehicle} onSelect={onSelectVehicle} onToggleCompare={onToggleCompare} isSelectedForCompare={comparisonList.includes(vehicle.id)} onToggleWishlist={onToggleWishlist} isInWishlist={wishlist.includes(vehicle.id)} isCompareDisabled={!comparisonList.includes(vehicle.id) && comparisonList.length >= 4} onViewSellerProfile={onViewSellerProfile} onQuickView={setQuickViewVehicle} />
             ))
           ) : (
-            <div className="col-span-full text-center py-16 bg-brand-cream dark:bg-brand-gray-800 rounded-xl shadow-soft-lg">
+            <div className="col-span-full text-center py-16 bg-brand-white dark:bg-brand-gray-800 rounded-xl shadow-soft-lg">
               <h3 className="text-xl font-semibold text-brand-gray-700 dark:text-brand-gray-200">Your Wishlist is Empty</h3>
               <p className="text-brand-gray-500 dark:text-brand-gray-400 mt-2">Click the heart icon on any vehicle to save it here.</p>
             </div>
@@ -423,7 +423,7 @@ const VehicleList: React.FC<VehicleListProps> = ({ vehicles, onSelectVehicle, is
     );
   }
 
-  const formElementClass = "block w-full p-3 border border-brand-gray-300 dark:border-brand-gray-600 rounded-lg focus:outline-none transition bg-brand-gray-50 dark:bg-brand-gray-800 dark:text-brand-slate disabled:bg-brand-gray-200 dark:disabled:bg-brand-gray-700 disabled:cursor-not-allowed";
+  const formElementClass = "block w-full p-3 border border-brand-gray-300 dark:border-brand-gray-600 rounded-lg focus:outline-none transition bg-brand-gray-50 dark:bg-brand-gray-800 dark:text-brand-blackcurrant disabled:bg-brand-gray-200 dark:disabled:bg-brand-gray-700 disabled:cursor-not-allowed";
 
   const renderFilterControls = (isMobile: boolean) => {
     const state = isMobile ? tempFilters : { categoryFilter, makeFilter, modelFilter, priceRange, mileageRange, fuelTypeFilter, yearFilter, colorFilter, stateFilter, selectedFeatures, featureSearch };
@@ -586,16 +586,16 @@ const VehicleList: React.FC<VehicleListProps> = ({ vehicles, onSelectVehicle, is
                 <label htmlFor="features-filter-button" className="block text-sm font-medium text-brand-gray-700 dark:text-brand-gray-300 mb-1">Features</label>
                 <button id="features-filter-button" type="button" onClick={() => isMobile ? setIsMobileFeaturesOpen(p => !p) : setIsFeaturesOpen(p => !p)} className={`${formElementClass} flex justify-between items-center text-left min-h-[50px]`}>
                     <div className="flex flex-wrap gap-1 items-center">
-                        {state.selectedFeatures.length > 0 ? ( state.selectedFeatures.slice(0, 2).map(feature => ( <span key={feature} className="text-brand-cream text-xs font-semibold px-2 py-1 rounded-full flex items-center gap-1.5" style={{ background: 'var(--brand-teal)' }}>{feature} <button type="button" onClick={(e) => { e.stopPropagation(); handleFeatureToggleLocal(feature); }} className="bg-brand-cream/20 hover:bg-brand-cream/40 rounded-full h-4 w-4 flex items-center justify-center text-brand-cream" aria-label={`Remove ${feature}`}>&times;</button></span>)) ) : ( <span className="text-brand-gray-500 dark:text-brand-gray-400">Select features...</span> )}
+                        {state.selectedFeatures.length > 0 ? ( state.selectedFeatures.slice(0, 2).map(feature => ( <span key={feature} className="text-brand-white text-xs font-semibold px-2 py-1 rounded-full flex items-center gap-1.5" style={{ background: 'var(--brand-deep-red)' }}>{feature} <button type="button" onClick={(e) => { e.stopPropagation(); handleFeatureToggleLocal(feature); }} className="bg-brand-white/20 hover:bg-brand-white/40 rounded-full h-4 w-4 flex items-center justify-center text-brand-white" aria-label={`Remove ${feature}`}>&times;</button></span>)) ) : ( <span className="text-brand-gray-500 dark:text-brand-gray-400">Select features...</span> )}
                         {state.selectedFeatures.length > 2 && ( <span className="text-xs font-semibold text-brand-gray-500 dark:text-brand-gray-400">+{state.selectedFeatures.length - 2} more</span> )}
                     </div>
                     <svg className={`w-5 h-5 text-brand-gray-400 transition-transform flex-shrink-0 ${(isMobile ? isMobileFeaturesOpen : isFeaturesOpen) ? 'transform rotate-180' : ''}`} xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" /></svg>
                 </button>
                 {(isMobile ? isMobileFeaturesOpen : isFeaturesOpen) && (
-                    <div className="absolute top-full mt-2 w-full bg-brand-cream dark:bg-brand-gray-700 rounded-lg shadow-soft-xl border border-brand-gray-200 dark:border-brand-gray-600 z-20 overflow-hidden animate-fade-in">
-                        <div className="p-2"><input ref={featuresSearchInputRef} type="text" placeholder="Search features..." value={isMobile ? tempFilters.featureSearch : featureSearch} onChange={e => { isMobile ? setTempFilters(p => ({...p, featureSearch: e.target.value})) : setFeatureSearch(e.target.value) }} className="block w-full p-2 border border-brand-gray-300 dark:border-brand-gray-500 rounded-md bg-brand-cream dark:bg-brand-gray-800 text-sm focus:outline-none" onFocus={(e) => { e.currentTarget.style.borderColor = 'var(--brand-teal)'; e.currentTarget.style.boxShadow = '0 0 0 2px var(--brand-teal-light)'; }} onBlur={(e) => { e.currentTarget.style.borderColor = ''; e.currentTarget.style.boxShadow = ''; }} /></div>
+                    <div className="absolute top-full mt-2 w-full bg-brand-white dark:bg-brand-gray-700 rounded-lg shadow-soft-xl border border-brand-gray-200 dark:border-brand-gray-600 z-20 overflow-hidden animate-fade-in">
+                        <div className="p-2"><input ref={featuresSearchInputRef} type="text" placeholder="Search features..." value={isMobile ? tempFilters.featureSearch : featureSearch} onChange={e => { isMobile ? setTempFilters(p => ({...p, featureSearch: e.target.value})) : setFeatureSearch(e.target.value) }} className="block w-full p-2 border border-brand-gray-300 dark:border-brand-gray-500 rounded-md bg-brand-white dark:bg-brand-gray-800 text-sm focus:outline-none" onFocus={(e) => { e.currentTarget.style.borderColor = 'var(--brand-deep-red)'; e.currentTarget.style.boxShadow = '0 0 0 2px var(--brand-deep-red-light)'; }} onBlur={(e) => { e.currentTarget.style.borderColor = ''; e.currentTarget.style.boxShadow = ''; }} /></div>
                         <div className="max-h-48 overflow-y-auto">
-                            {(isMobile ? tempFilteredFeatures : filteredFeatures).map(feature => ( <label key={feature} className="flex items-center space-x-3 cursor-pointer group p-3 transition-colors hover:bg-brand-gray-100 dark:hover:bg-brand-gray-600"><input type="checkbox" checked={state.selectedFeatures.includes(feature)} onChange={() => handleFeatureToggleLocal(feature)} className="h-4 w-4 rounded border-brand-gray-300 dark:border-brand-gray-500 bg-transparent" style={{ accentColor: 'var(--brand-teal)' }} /><span className="text-sm text-brand-gray-800 dark:text-brand-gray-200">{feature}</span></label> ))}
+                            {(isMobile ? tempFilteredFeatures : filteredFeatures).map(feature => ( <label key={feature} className="flex items-center space-x-3 cursor-pointer group p-3 transition-colors hover:bg-brand-gray-100 dark:hover:bg-brand-gray-600"><input type="checkbox" checked={state.selectedFeatures.includes(feature)} onChange={() => handleFeatureToggleLocal(feature)} className="h-4 w-4 rounded border-brand-gray-300 dark:border-brand-gray-500 bg-transparent" style={{ accentColor: 'var(--brand-deep-red)' }} /><span className="text-sm text-brand-gray-800 dark:text-brand-gray-200">{feature}</span></label> ))}
                             {(isMobile ? tempFilteredFeatures.length === 0 : filteredFeatures.length === 0) && ( <p className="p-3 text-sm text-center text-brand-gray-500 dark:text-brand-gray-400">No features found.</p> )}
                         </div>
                     </div>
@@ -610,7 +610,7 @@ const VehicleList: React.FC<VehicleListProps> = ({ vehicles, onSelectVehicle, is
     <>
       <div className="used-cars-page grid grid-cols-1 lg:grid-cols-[auto_1fr] gap-8 container mx-auto px-4 py-8">
         <aside className={`filters hidden lg:block lg:sticky top-24 self-start space-y-6 transition-all duration-300 ${isDesktopFilterVisible ? 'w-[300px] opacity-100' : 'w-0 opacity-0 -translate-x-full'}`}>
-            <div className={`bg-brand-cream dark:bg-brand-gray-800 p-6 rounded-xl shadow-soft-lg ${isDesktopFilterVisible ? 'block' : 'hidden'}`}>
+            <div className={`bg-brand-white dark:bg-brand-gray-800 p-6 rounded-xl shadow-soft-lg ${isDesktopFilterVisible ? 'block' : 'hidden'}`}>
               <h2 className="text-xl font-bold text-brand-gray-800 dark:text-brand-gray-100 mb-4">Filters</h2>
               {renderFilterControls(false)}
             </div>
@@ -618,39 +618,39 @@ const VehicleList: React.FC<VehicleListProps> = ({ vehicles, onSelectVehicle, is
 
         <main className="space-y-6">
           <h1 className="text-4xl font-extrabold text-brand-gray-800 dark:text-brand-gray-100">Browse Vehicles</h1>
-          <div className="intelligent-search bg-brand-cream dark:bg-brand-gray-800 p-4 rounded-xl shadow-soft-lg">
+          <div className="intelligent-search bg-brand-white dark:bg-brand-gray-800 p-4 rounded-xl shadow-soft-lg">
               <label htmlFor="ai-search" className="text-lg font-bold text-brand-gray-800 dark:text-brand-gray-100">✨ Intelligent Search</label>
               <p className="text-sm text-brand-gray-500 dark:text-brand-gray-400 mb-2">Describe what you're looking for, e.g., "a white Tata Nexon under ₹15 lakhs with a sunroof"</p>
               <div className="relative" ref={aiSearchRef}>
                   <div className="flex gap-2">
                       <input type="text" id="ai-search" placeholder="Let our AI find your perfect vehicle..." value={aiSearchQuery} onChange={handleAiQueryChange} onFocus={() => setShowSuggestions(suggestions.length > 0)} onKeyDown={(e) => { if (e.key === 'Enter') handleAiSearch(); }} autoComplete="off" className={formElementClass} />
-                      <button onClick={() => handleAiSearch()} disabled={isAiSearching} className="btn-brand-primary text-brand-cream font-bold py-2 px-6 rounded-lg transition-colors disabled:bg-brand-gray-400 disabled:cursor-wait">{isAiSearching ? '...' : 'Search'}</button>
+                      <button onClick={() => handleAiSearch()} disabled={isAiSearching} className="btn-brand-primary text-brand-white font-bold py-2 px-6 rounded-lg transition-colors disabled:bg-brand-gray-400 disabled:cursor-wait">{isAiSearching ? '...' : 'Search'}</button>
                   </div>
                   {showSuggestions && suggestions.length > 0 && (
-                      <div className="absolute top-full mt-2 w-full bg-brand-cream dark:bg-brand-gray-700 rounded-lg shadow-soft-xl border border-brand-gray-200 dark:border-brand-gray-600 z-10 overflow-hidden"><ul className="divide-y divide-brand-gray-100 dark:divide-brand-gray-600">{suggestions.map((suggestion, index) => ( <li key={index}><button onClick={() => handleSuggestionClick(suggestion)} className="w-full text-left px-4 py-2 text-brand-gray-800 dark:text-brand-gray-200 hover:bg-brand-gray-100 dark:hover:bg-brand-gray-600 transition-colors">{suggestion}</button></li>))}</ul></div>
+                      <div className="absolute top-full mt-2 w-full bg-brand-white dark:bg-brand-gray-700 rounded-lg shadow-soft-xl border border-brand-gray-200 dark:border-brand-gray-600 z-10 overflow-hidden"><ul className="divide-y divide-brand-gray-100 dark:divide-brand-gray-600">{suggestions.map((suggestion, index) => ( <li key={index}><button onClick={() => handleSuggestionClick(suggestion)} className="w-full text-left px-4 py-2 text-brand-gray-800 dark:text-brand-gray-200 hover:bg-brand-gray-100 dark:hover:bg-brand-gray-600 transition-colors">{suggestion}</button></li>))}</ul></div>
                   )}
               </div>
           </div>
 
           <div className="flex flex-col sm:flex-row justify-between items-center gap-4">
               <div className='flex items-center gap-2'>
-                <button onClick={() => setIsDesktopFilterVisible(prev => !prev)} className="hidden lg:block p-2 rounded-md bg-brand-cream dark:bg-brand-gray-700 hover:bg-brand-gray-100 dark:hover:bg-brand-gray-600 transition-colors">
+                <button onClick={() => setIsDesktopFilterVisible(prev => !prev)} className="hidden lg:block p-2 rounded-md bg-brand-white dark:bg-brand-gray-700 hover:bg-brand-gray-100 dark:hover:bg-brand-gray-600 transition-colors">
                   <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fillRule="evenodd" d="M3 3a1 1 0 011-1h12a1 1 0 011 1v3a1 1 0 01-.293.707L12 11.414V15a1 1 0 01-.293.707l-2 2A1 1 0 018 17v-5.586L3.293 6.707A1 1 0 013 6V3z" clipRule="evenodd" /></svg>
                 </button>
-                <button onClick={handleOpenFilterModal} className="lg:hidden relative p-2 rounded-md bg-brand-cream dark:bg-brand-gray-700 hover:bg-brand-gray-100 dark:hover:bg-brand-gray-600 transition-colors">
+                <button onClick={handleOpenFilterModal} className="lg:hidden relative p-2 rounded-md bg-brand-white dark:bg-brand-gray-700 hover:bg-brand-gray-100 dark:hover:bg-brand-gray-600 transition-colors">
                     <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fillRule="evenodd" d="M3 3a1 1 0 011-1h12a1 1 0 011 1v3a1 1 0 01-.293.707L12 11.414V15a1 1 0 01-.293.707l-2 2A1 1 0 018 17v-5.586L3.293 6.707A1 1 0 013 6V3z" clipRule="evenodd" /></svg>
                     {activeFilterCount > 0 && (
-                        <span className="absolute -top-1 -right-1 inline-flex items-center justify-center px-1.5 py-0.5 text-xs font-bold leading-none text-brand-teal bg-brand-teal rounded-full">{activeFilterCount}</span>
+                        <span className="absolute -top-1 -right-1 inline-flex items-center justify-center px-1.5 py-0.5 text-xs font-bold leading-none text-brand-deep-red bg-brand-deep-red rounded-full">{activeFilterCount}</span>
                     )}
                 </button>
                 <p className="text-sm text-brand-gray-600 dark:text-brand-gray-400">Showing <span className="font-bold">{paginatedVehicles.length}</span> of <span className="font-bold">{processedVehicles.length}</span> results</p>
               </div>
               <div className="flex items-center gap-4">
                 <div className="flex items-center p-1 bg-brand-gray-100 dark:bg-brand-gray-700 rounded-lg">
-                  <button title="Grid View" onClick={() => setViewMode('grid')} className={`p-2 rounded-md transition-colors ${viewMode === 'grid' ? 'bg-brand-cream dark:bg-brand-gray-800 shadow' : 'text-brand-gray-500 hover:text-brand-gray-800 dark:hover:text-brand-gray-200'}`} style={viewMode === 'grid' ? { color: 'var(--brand-teal)' } : undefined}>
+                  <button title="Grid View" onClick={() => setViewMode('grid')} className={`p-2 rounded-md transition-colors ${viewMode === 'grid' ? 'bg-brand-white dark:bg-brand-gray-800 shadow' : 'text-brand-gray-500 hover:text-brand-gray-800 dark:hover:text-brand-gray-200'}`} style={viewMode === 'grid' ? { color: 'var(--brand-deep-red)' } : undefined}>
                     <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path d="M5 3a2 2 0 00-2 2v2a2 2 0 002 2h2a2 2 0 002-2V5a2 2 0 00-2-2H5zM5 11a2 2 0 00-2 2v2a2 2 0 002 2h2a2 2 0 002-2v-2a2 2 0 00-2-2H5zM11 5a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V5zM11 13a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" /></svg>
                   </button>
-                  <button title="List View" onClick={() => setViewMode('tile')} className={`p-2 rounded-md transition-colors ${viewMode === 'tile' ? 'bg-brand-cream dark:bg-brand-gray-800 shadow' : 'text-brand-gray-500 hover:text-brand-gray-800 dark:hover:text-brand-gray-200'}`} style={viewMode === 'tile' ? { color: 'var(--brand-teal)' } : undefined}>
+                  <button title="List View" onClick={() => setViewMode('tile')} className={`p-2 rounded-md transition-colors ${viewMode === 'tile' ? 'bg-brand-white dark:bg-brand-gray-800 shadow' : 'text-brand-gray-500 hover:text-brand-gray-800 dark:hover:text-brand-gray-200'}`} style={viewMode === 'tile' ? { color: 'var(--brand-deep-red)' } : undefined}>
                     <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path d="M2 4a1 1 0 011-1h14a1 1 0 110 2H3a1 1 0 01-1-1zM2 9a1 1 0 011-1h14a1 1 0 110 2H3a1 1 0 01-1-1zM2 14a1 1 0 011-1h14a1 1 0 110 2H3a1 1 0 01-1-1z" /></svg>
                   </button>
                 </div>
@@ -693,7 +693,7 @@ const VehicleList: React.FC<VehicleListProps> = ({ vehicles, onSelectVehicle, is
                 )
               ))
             ) : (
-              <div className="col-span-full text-center py-16 bg-brand-cream dark:bg-brand-gray-800 rounded-xl shadow-soft-lg">
+              <div className="col-span-full text-center py-16 bg-brand-white dark:bg-brand-gray-800 rounded-xl shadow-soft-lg">
                 <h3 className="text-xl font-semibold text-brand-gray-700 dark:text-brand-gray-200">No Vehicles Found</h3>
                 <p className="text-brand-gray-500 dark:text-brand-gray-400 mt-2">Try adjusting your filters or using the AI search to find your perfect vehicle.</p>
               </div>
@@ -706,7 +706,7 @@ const VehicleList: React.FC<VehicleListProps> = ({ vehicles, onSelectVehicle, is
       {/* Mobile Filter Modal */}
       {isFilterModalOpen && (
         <div className="lg:hidden fixed inset-0 bg-black bg-opacity-60 z-50 animate-fade-in" onClick={handleCloseFilterModal}>
-            <div className="bg-brand-cream dark:bg-brand-gray-800 rounded-t-2xl h-[90vh] flex flex-col absolute bottom-0 left-0 right-0 animate-slide-in-up" onClick={e => e.stopPropagation()}>
+            <div className="bg-brand-white dark:bg-brand-gray-800 rounded-t-2xl h-[90vh] flex flex-col absolute bottom-0 left-0 right-0 animate-slide-in-up" onClick={e => e.stopPropagation()}>
                 <div className="p-4 border-b border-brand-gray-200 dark:border-brand-gray-700 flex justify-between items-center flex-shrink-0">
                     <h2 className="text-xl font-bold text-brand-gray-800 dark:text-brand-gray-100">Filters</h2>
                     <button onClick={handleCloseFilterModal} className="p-2 -mr-2 text-brand-gray-500 text-2xl">&times;</button>
@@ -714,18 +714,18 @@ const VehicleList: React.FC<VehicleListProps> = ({ vehicles, onSelectVehicle, is
                 <div className="overflow-y-auto p-6 flex-grow">
                     {renderFilterControls(true)}
                 </div>
-                <div className="p-4 border-t border-brand-gray-200 dark:border-brand-gray-700 flex gap-4 bg-brand-cream dark:bg-brand-gray-800 flex-shrink-0">
+                <div className="p-4 border-t border-brand-gray-200 dark:border-brand-gray-700 flex gap-4 bg-brand-white dark:bg-brand-gray-800 flex-shrink-0">
                     <button onClick={handleResetTempFilters} className="w-full bg-brand-gray-200 dark:bg-brand-gray-700 text-brand-gray-800 dark:text-brand-gray-200 font-bold py-3 px-4 rounded-lg hover:bg-brand-gray-300 dark:hover:bg-brand-gray-600 transition-colors">Reset</button>
-                    <button onClick={handleApplyFilters} className="w-full btn-brand-primary text-brand-cream font-bold py-3 px-4 rounded-lg transition-colors">Apply Filters</button>
+                    <button onClick={handleApplyFilters} className="w-full btn-brand-primary text-brand-white font-bold py-3 px-4 rounded-lg transition-colors">Apply Filters</button>
                 </div>
                  <style>{`
                   .slider-thumb { -webkit-appearance: none; appearance: none; background-color: transparent; pointer-events: none; }
-                  .slider-thumb::-webkit-slider-thumb { -webkit-appearance: none; appearance: none; width: 20px; height: 20px; background-color: var(--brand-teal); border: 3px solid var(--brand-cream); box-shadow: 0 0 0 1px var(--brand-slate-light); border-radius: 50%; cursor: pointer; pointer-events: auto; transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out; }
-                  html.dark .slider-thumb::-webkit-slider-thumb { border-color: var(--brand-slate-dark); box-shadow: 0 0 0 1px var(--brand-slate); }
-                  .slider-thumb:hover::-webkit-slider-thumb, .slider-thumb:focus::-webkit-slider-thumb { transform: scale(1.15); box-shadow: 0 0 0 4px var(--brand-teal-light); }
-                  .slider-thumb::-moz-range-thumb { width: 20px; height: 20px; background-color: var(--brand-teal); border: 3px solid var(--brand-cream); box-shadow: 0 0 0 1px var(--brand-slate-light); border-radius: 50%; cursor: pointer; pointer-events: auto; transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out; }
-                  html.dark .slider-thumb::-moz-range-thumb { border-color: var(--brand-slate-dark); box-shadow: 0 0 0 1px var(--brand-slate); }
-                  .slider-thumb:hover::-moz-range-thumb, .slider-thumb:focus::-moz-range-thumb { transform: scale(1.15); box-shadow: 0 0 0 4px var(--brand-teal-light); }
+                  .slider-thumb::-webkit-slider-thumb { -webkit-appearance: none; appearance: none; width: 20px; height: 20px; background-color: var(--brand-deep-red); border: 3px solid var(--brand-white); box-shadow: 0 0 0 1px var(--brand-blackcurrant-light); border-radius: 50%; cursor: pointer; pointer-events: auto; transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out; }
+                  html.dark .slider-thumb::-webkit-slider-thumb { border-color: var(--brand-blackcurrant-dark); box-shadow: 0 0 0 1px var(--brand-blackcurrant); }
+                  .slider-thumb:hover::-webkit-slider-thumb, .slider-thumb:focus::-webkit-slider-thumb { transform: scale(1.15); box-shadow: 0 0 0 4px var(--brand-deep-red-light); }
+                  .slider-thumb::-moz-range-thumb { width: 20px; height: 20px; background-color: var(--brand-deep-red); border: 3px solid var(--brand-white); box-shadow: 0 0 0 1px var(--brand-blackcurrant-light); border-radius: 50%; cursor: pointer; pointer-events: auto; transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out; }
+                  html.dark .slider-thumb::-moz-range-thumb { border-color: var(--brand-blackcurrant-dark); box-shadow: 0 0 0 1px var(--brand-blackcurrant); }
+                  .slider-thumb:hover::-moz-range-thumb, .slider-thumb:focus::-moz-range-thumb { transform: scale(1.15); box-shadow: 0 0 0 4px var(--brand-deep-red-light); }
                 `}</style>
             </div>
         </div>
