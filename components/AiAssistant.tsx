@@ -38,7 +38,7 @@ const SuggestionCard: React.FC<{ suggestion: Suggestion; onClick: () => void }> 
             </div>
             <button
                 onClick={onClick}
-                className="self-center bg-brand-blue text-white font-bold py-1.5 px-4 rounded-md text-sm hover:bg-brand-blue-dark transition-colors"
+                className="self-center btn-brand-primary text-white font-bold py-1.5 px-4 rounded-md text-sm transition-colors"
             >
                 View
             </button>

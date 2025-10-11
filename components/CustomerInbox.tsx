@@ -214,7 +214,7 @@ const CustomerInbox: React.FC<CustomerInboxProps> = ({ conversations, onSendMess
                                   {msg.sender === 'system' && <div className="text-center text-xs text-brand-gray-500 dark:text-brand-gray-400 italic py-2 w-full">{msg.text}</div>}
                                   {msg.sender !== 'system' && (
                                       <>
-                                          <div className={`px-4 py-3 max-w-lg ${ msg.sender === 'user' ? 'bg-brand-blue text-white rounded-l-xl rounded-t-xl' : 'bg-brand-gray-200 dark:bg-brand-gray-700 text-brand-gray-800 dark:text-brand-gray-200 rounded-r-xl rounded-t-xl'}`}>
+                                          <div className={`px-4 py-3 max-w-lg ${ msg.sender === 'user' ? 'text-white rounded-l-xl rounded-t-xl' : 'bg-brand-gray-200 dark:bg-brand-gray-700 text-brand-gray-800 dark:text-brand-gray-200 rounded-r-xl rounded-t-xl'}`} style={msg.sender === 'user' ? { background: 'var(--gradient-primary)' } : undefined}>
                                               {msg.type === 'test_drive_request' ? <TestDriveRequestMessage msg={msg} /> : msg.type === 'offer' ? <OfferMessage msg={msg} currentUserRole="customer" listingPrice={selectedConv.vehiclePrice} onRespond={(messageId, response, counterPrice) => { if (selectedConv) { onOfferResponse(selectedConv.id, messageId, response, counterPrice); }}} /> : <p className="text-sm">{msg.text}</p>}
                                           </div>
                                           <div className="text-xs text-brand-gray-400 mt-1 px-1 flex items-center">
@@ -234,7 +234,7 @@ const CustomerInbox: React.FC<CustomerInboxProps> = ({ conversations, onSendMess
                                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path d="M8.433 7.418c.155-.103.346-.196.567-.267v1.698a2.5 2.5 0 00-1.134 0V7.151c.22.07.412.164.567.267zM11.567 7.418c.155-.103.346-.196.567-.267v1.698a2.5 2.5 0 01-1.134 0V7.151c.22.07.412.164.567.267z" /><path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-13a1 1 0 10-2 0v.092a4.5 4.5 0 00-1.876.662C6.168 6.23 5.5 7.085 5.5 8.003v.486c0 .918.668 1.773 1.624 2.214.509.232.957.488 1.376.786V12.5a.5.5 0 01.5.5h1a.5.5 0 01.5-.5v-1.214c.419-.298.867-.554 1.376-.786C14.332 10.26 15 9.405 15 8.489v-.486c0-.918-.668-1.773-1.624-2.214A4.5 4.5 0 0011 5.092V5z" clipRule="evenodd" /></svg>
                            </button>
                           <input type="text" value={replyText} onChange={handleInputChange} placeholder="Type your message..." className={formInputClass} />
-                          <button type="submit" className="bg-brand-blue text-white font-bold py-2 px-6 rounded-lg hover:bg-brand-blue-dark">Send</button>
+                          <button type="submit" className="btn-brand-primary text-white font-bold py-2 px-6 rounded-lg">Send</button>
                           </form>
                       </div>
                   </>

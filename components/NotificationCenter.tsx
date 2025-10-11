@@ -68,7 +68,7 @@ const NotificationCenter: React.FC<NotificationCenterProps> = ({ notifications, 
             <header className="p-3 border-b dark:border-brand-gray-700 flex justify-between items-center">
                 <h3 className="font-bold text-lg text-brand-gray-900 dark:text-white">Notifications</h3>
                 {unreadCount > 0 && (
-                    <button onClick={onMarkAllAsRead} className="text-sm font-semibold text-brand-blue hover:underline">
+                    <button onClick={onMarkAllAsRead} className="text-sm font-semibold hover:underline transition-colors" style={{ color: 'var(--brand-deep-red)' }} onMouseEnter={(e) => e.currentTarget.style.color = 'var(--brand-orange)'} onMouseLeave={(e) => e.currentTarget.style.color = 'var(--brand-deep-red)'}>
                         Mark all as read
                     </button>
                 )}
@@ -92,7 +92,7 @@ const NotificationCenter: React.FC<NotificationCenterProps> = ({ notifications, 
             
             <footer className="p-2 border-t dark:border-brand-gray-700 text-center">
                 {/* This could eventually link to a full notifications page */}
-                <button className="text-sm font-semibold text-brand-blue hover:underline w-full p-1 rounded">
+                <button className="text-sm font-semibold hover:underline w-full p-1 rounded transition-colors" style={{ color: 'var(--brand-deep-red)' }} onMouseEnter={(e) => e.currentTarget.style.color = 'var(--brand-orange)'} onMouseLeave={(e) => e.currentTarget.style.color = 'var(--brand-deep-red)'}>
                     View All
                 </button>
             </footer>

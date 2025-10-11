@@ -74,7 +74,7 @@ const SocialShareButtons: React.FC<SocialShareButtonsProps> = ({ vehicle }) => {
         <div className="mt-6 pt-6 border-t border-brand-gray-200 dark:border-brand-gray-700">
             <h4 className="text-sm font-semibold text-center text-brand-gray-600 dark:text-brand-gray-400 mb-3">Share this listing</h4>
             <div className="flex justify-center items-center gap-3">
-                <button onClick={() => handleShare('facebook')} aria-label="Share on Facebook" className="p-2 rounded-full bg-blue-600 text-white hover:bg-blue-700 transition-colors">{ICONS.facebook}</button>
+                <button onClick={() => handleShare('facebook')} aria-label="Share on Facebook" className="p-2 rounded-full text-white transition-colors" style={{ background: 'var(--brand-deep-red)' }} onMouseEnter={(e) => e.currentTarget.style.background = 'var(--brand-deep-red-hover)'} onMouseLeave={(e) => e.currentTarget.style.background = 'var(--brand-deep-red)'}>{ICONS.facebook}</button>
                 <button onClick={() => handleShare('twitter')} aria-label="Share on Twitter" className="p-2 rounded-full bg-sky-500 text-white hover:bg-sky-600 transition-colors">{ICONS.twitter}</button>
                 <button onClick={() => handleShare('whatsapp')} aria-label="Share on WhatsApp" className="p-2 rounded-full bg-green-500 text-white hover:bg-green-600 transition-colors">{ICONS.whatsapp}</button>
                 <button 
@@ -118,7 +118,7 @@ const CollapsibleSection: React.FC<{ title: string; children: React.ReactNode; d
 
 const KeySpec: React.FC<{ label: string; value: string | number; icon?: React.ReactNode }> = memo(({ label, value, icon }) => (
     <div className="flex flex-col gap-1 p-4 bg-brand-gray-100 dark:bg-brand-gray-800 rounded-lg text-center">
-        {icon && <div className="text-brand-blue mx-auto mb-1">{icon}</div>}
+        {icon && <div className="mx-auto mb-1" style={{ color: 'var(--brand-orange)' }}>{icon}</div>}
         <span className="text-sm font-medium text-brand-gray-600 dark:text-brand-gray-400">{label}</span>
         <span className="font-bold text-brand-gray-900 dark:text-brand-gray-100">{value}</span>
     </div>
@@ -271,8 +271,8 @@ export const VehicleDetail: React.FC<VehicleDetailProps> = ({ vehicle, onBack: o
                   <div className="lg:col-span-2 space-y-4">
                     {vehicle.videoUrl && (
                       <div className="flex space-x-2 border-b-2 border-brand-gray-200 dark:border-brand-gray-700">
-                        <button onClick={() => setActiveMediaTab('images')} className={`py-2 px-4 font-semibold ${activeMediaTab === 'images' ? 'border-b-2 border-brand-blue text-brand-blue' : 'text-brand-gray-500'}`}>Images</button>
-                        <button onClick={() => setActiveMediaTab('video')} className={`py-2 px-4 font-semibold ${activeMediaTab === 'video' ? 'border-b-2 border-brand-blue text-brand-blue' : 'text-brand-gray-500'}`}>Video</button>
+                        <button onClick={() => setActiveMediaTab('images')} className={`py-2 px-4 font-semibold ${activeMediaTab === 'images' ? 'border-b-2' : 'text-brand-gray-500'}`} style={activeMediaTab === 'images' ? { borderColor: 'var(--brand-deep-red)', color: 'var(--brand-deep-red)' } : undefined}>Images</button>
+                        <button onClick={() => setActiveMediaTab('video')} className={`py-2 px-4 font-semibold ${activeMediaTab === 'video' ? 'border-b-2' : 'text-brand-gray-500'}`} style={activeMediaTab === 'video' ? { borderColor: 'var(--brand-deep-red)', color: 'var(--brand-deep-red)' } : undefined}>Video</button>
                       </div>
                     )}
                     {activeMediaTab === 'images' ? (
@@ -304,8 +304,8 @@ export const VehicleDetail: React.FC<VehicleDetailProps> = ({ vehicle, onBack: o
                   {/* Right Column: Price and Actions */}
                   <div className="space-y-6 self-start lg:sticky top-24">
                       <div className="p-6 bg-white dark:bg-brand-gray-800 rounded-xl shadow-soft-lg space-y-4">
-                           <p className="text-4xl font-extrabold text-brand-blue dark:text-brand-blue-light">₹{vehicle.price.toLocaleString('en-IN')}</p>
-                           <button onClick={() => onStartChat(vehicle)} className="w-full bg-brand-blue text-white font-bold py-3 px-6 rounded-lg text-lg hover:bg-brand-blue-dark transition-all transform hover:scale-105">
+                           <p className="text-4xl font-extrabold" style={{ color: 'var(--brand-deep-red)' }}>₹{vehicle.price.toLocaleString('en-IN')}</p>
+                           <button onClick={() => onStartChat(vehicle)} className="w-full btn-brand-primary text-white font-bold py-3 px-6 rounded-lg text-lg transition-all transform hover:scale-105">
                                 Chat with Seller
                             </button>
                             <div className="flex gap-4">
@@ -340,7 +340,7 @@ export const VehicleDetail: React.FC<VehicleDetailProps> = ({ vehicle, onBack: o
                                     <BadgeDisplay badges={seller.badges || []} size="sm" />
                                 </div>
                             </div>
-                            <button onClick={() => onViewSellerProfile(seller.email)} className="mt-4 w-full text-center text-sm font-bold text-brand-blue hover:underline">View Seller Profile</button>
+                            <button onClick={() => onViewSellerProfile(seller.email)} className="mt-4 w-full text-center text-sm font-bold hover:underline transition-colors" style={{ color: 'var(--brand-deep-red)' }} onMouseEnter={(e) => e.currentTarget.style.color = 'var(--brand-orange)'} onMouseLeave={(e) => e.currentTarget.style.color = 'var(--brand-deep-red)'}>View Seller Profile</button>
                             {canRate && <div className="mt-4 pt-4 border-t dark:border-gray-700">
                                 <p className="text-sm font-medium text-center text-brand-gray-600 dark:text-brand-gray-400 mb-2">Rate your experience with this seller</p>
                                 <div className="flex justify-center">
@@ -420,7 +420,7 @@ export const VehicleDetail: React.FC<VehicleDetailProps> = ({ vehicle, onBack: o
                                         </div>
                                     </div>
                                 ) : (
-                                    <button onClick={handleGenerateProsCons} className="text-sm font-bold text-brand-blue hover:underline">Generate Pros & Cons</button>
+                                    <button onClick={handleGenerateProsCons} className="text-sm font-bold hover:underline transition-colors" style={{ color: 'var(--brand-deep-red)' }} onMouseEnter={(e) => e.currentTarget.style.color = 'var(--brand-orange)'} onMouseLeave={(e) => e.currentTarget.style.color = 'var(--brand-deep-red)'}>Generate Pros & Cons</button>
                                 )}
                             </div>
                         </div>

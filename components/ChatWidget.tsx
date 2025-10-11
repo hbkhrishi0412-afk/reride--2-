@@ -108,7 +108,7 @@ export const ChatWidget: React.FC<ChatWidgetProps> = memo(({ conversation, curre
         <div className="fixed bottom-0 right-4 md:right-8 z-50">
             <button
                 onClick={() => setIsMinimized(false)}
-                className="w-80 h-12 bg-brand-blue text-white rounded-t-lg shadow-2xl flex items-center justify-between px-4 font-bold animate-slide-in-up"
+                className="w-80 h-12 text-white rounded-t-lg shadow-2xl flex items-center justify-between px-4 font-bold animate-slide-in-up" style={{ background: 'var(--gradient-primary)' }}
             >
                 <span>{conversation.vehicleName}</span>
                 <div className="flex items-center gap-2">
@@ -148,7 +148,7 @@ export const ChatWidget: React.FC<ChatWidgetProps> = memo(({ conversation, curre
                     {msg.sender === 'system' && <div className="text-center text-xs text-brand-gray-500 dark:text-brand-gray-400 italic py-2 w-full">{msg.text}</div>}
                     {msg.sender !== 'system' && (
                         <>
-                            <div className={`px-4 py-3 max-w-xs ${ msg.sender === senderType ? 'bg-brand-blue text-white rounded-l-xl rounded-t-xl' : 'bg-white dark:bg-brand-gray-700 text-brand-gray-800 dark:text-brand-gray-200 rounded-r-xl rounded-t-xl'}`}>
+                            <div className={`px-4 py-3 max-w-xs ${ msg.sender === senderType ? 'text-white rounded-l-xl rounded-t-xl' : 'bg-white dark:bg-brand-gray-700 text-brand-gray-800 dark:text-brand-gray-200 rounded-r-xl rounded-t-xl'}`} style={msg.sender === senderType ? { background: 'var(--gradient-primary)' } : undefined}>
                                 {msg.type === 'offer' ? <OfferMessage msg={msg} currentUserRole={currentUserRole} listingPrice={conversation.vehiclePrice} onRespond={(messageId, response, counterPrice) => onOfferResponse(conversation.id, messageId, response, counterPrice)} /> : <p className="text-sm break-words">{msg.text}</p>}
                             </div>
                             <div className="text-xs text-brand-gray-400 mt-1 px-1 flex items-center">
@@ -175,7 +175,7 @@ export const ChatWidget: React.FC<ChatWidgetProps> = memo(({ conversation, curre
                 </div>
             )}
             <form onSubmit={handleSendMessage} className="flex gap-2 items-center">
-                <button type="button" onClick={() => setShowEmojiPicker(prev => !prev)} className="p-2 text-brand-gray-500 hover:text-brand-blue" aria-label="Add emoji">
+                <button type="button" onClick={() => setShowEmojiPicker(prev => !prev)} className="p-2 text-brand-gray-500 transition-colors" aria-label="Add emoji" onMouseEnter={(e) => e.currentTarget.style.color = 'var(--brand-deep-red)'} onMouseLeave={(e) => e.currentTarget.style.color = ''}>
                     <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14.828 14.828a4 4 0 01-5.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
                 </button>
                 {currentUserRole === 'customer' ? (
@@ -194,7 +194,7 @@ export const ChatWidget: React.FC<ChatWidgetProps> = memo(({ conversation, curre
                     placeholder="Type a message..."
                     className="flex-grow bg-brand-gray-100 dark:bg-brand-gray-700 rounded-full px-4 py-2 focus:outline-none focus:ring-2 focus:ring-brand-blue"
                 />
-                <button type="submit" className="p-2 text-brand-blue" aria-label="Send message">
+                <button type="submit" className="p-2 transition-colors" aria-label="Send message" style={{ color: 'var(--brand-deep-red)' }} onMouseEnter={(e) => e.currentTarget.style.color = 'var(--brand-orange)'} onMouseLeave={(e) => e.currentTarget.style.color = 'var(--brand-deep-red)'}>
                     <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" /></svg>
                 </button>
             </form>

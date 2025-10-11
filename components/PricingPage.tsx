@@ -31,7 +31,7 @@ const PricingPage: React.FC<PricingPageProps> = ({ currentUser, onSelectPlan }) 
                         >
                             {plan.isMostPopular && (
                                 <div className="absolute top-0 -translate-y-1/2 left-1/2 -translate-x-1/2">
-                                    <span className="bg-brand-blue text-white text-xs font-bold px-4 py-1 rounded-full uppercase">
+                                    <span className="text-white text-xs font-bold px-4 py-1 rounded-full uppercase" style={{ background: 'var(--brand-deep-red)' }}>
                                         Most Popular
                                     </span>
                                 </div>
@@ -63,8 +63,8 @@ const PricingPage: React.FC<PricingPageProps> = ({ currentUser, onSelectPlan }) 
                                     ${currentPlanId === plan.id
                                         ? 'bg-brand-gray-200 dark:bg-brand-gray-700 text-brand-gray-500'
                                         : plan.isMostPopular
-                                            ? 'bg-brand-blue text-white hover:bg-brand-blue-dark'
-                                            : 'bg-brand-blue-lightest text-brand-blue-dark dark:bg-brand-blue-darker dark:text-white hover:bg-brand-blue-light'
+                                            ? 'btn-brand-primary text-white'
+                                            : 'btn-brand-soft text-white'
                                     }`}
                             >
                                 {currentPlanId === plan.id ? 'Current Plan' : 'Choose Plan'}
