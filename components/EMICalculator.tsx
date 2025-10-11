@@ -89,7 +89,7 @@ const EMICalculator: React.FC<EMICalculatorProps> = ({ price }) => {
             </div>
             <div className="mt-6 pt-4 border-t border-brand-gray-200 dark:border-brand-gray-700 text-center">
                  <p className="text-sm text-brand-gray-600 dark:text-brand-gray-400">Your EMI starts at</p>
-                 <p className="text-3xl font-extrabold text-brand-blue dark:text-brand-blue-light">{formatCurrency(emi)}/month</p>
+                 <p className="text-3xl font-extrabold" style={{ color: 'var(--brand-deep-red)' }}>{formatCurrency(emi)}/month</p>
                  <p className="text-xs text-brand-gray-400 mt-2">This is an estimate. Final EMI may vary.</p>
             </div>
         </div>

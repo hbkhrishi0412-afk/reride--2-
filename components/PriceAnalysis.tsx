@@ -87,7 +87,7 @@ const PriceAnalysis: React.FC<PriceAnalysisProps> = ({ vehicle, similarVehicles 
                     "{analysis.summary}"
                 </p>
             </div>
-            <button onClick={handleAnalyzePrice} className="text-xs font-bold text-brand-blue hover:underline">Re-analyze</button>
+            <button onClick={handleAnalyzePrice} className="text-xs font-bold hover:underline transition-colors" style={{ color: 'var(--brand-deep-red)' }} onMouseEnter={(e) => e.currentTarget.style.color = 'var(--brand-orange)'} onMouseLeave={(e) => e.currentTarget.style.color = 'var(--brand-deep-red)'}>Re-analyze</button>
         </div>
       )}
     </div>
