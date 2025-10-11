@@ -58,61 +58,71 @@ const FeaturedVehicleCard: React.FC<Pick<HomeProps, 'onSelectVehicle' | 'onToggl
     return (
       <div 
         onClick={() => onSelectVehicle(vehicle)}
-        className="premium-card group cursor-pointer"
+        className="cb-vehicle-card group cursor-pointer"
       >
         <div className="relative overflow-hidden">
-          <img className="w-full h-48 sm:h-56 object-cover group-hover:scale-105 transition-transform duration-500 ease-in-out" src={vehicle.images[0]} alt={`${vehicle.make} ${vehicle.model}`} loading="lazy" />
-          <div className="absolute top-0 left-0 right-0 h-20 bg-gradient-to-b from-black/40 to-transparent"></div>
+          <img className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300" src={vehicle.images[0]} alt={`${vehicle.make} ${vehicle.model}`} loading="lazy" />
+          
+          {/* EV Badge for Electric Vehicles */}
+          {vehicle.fuelType.toLowerCase().includes('electric') && (
+            <div className="cb-ev-badge">EV</div>
+          )}
+          
+          {/* Wishlist Button */}
           <div className="absolute top-3 right-3">
               <button
                 onClick={handleWishlistClick}
-                className="p-2 rounded-full bg-black/30 backdrop-blur-sm text-white hover:bg-black/50 transition-colors"
-                aria-label={isInWishlist ? "Remove from wishlist" : "Add to wishlist"}
+                className={`p-2 rounded-full transition-all duration-300 ${
+                  isInWishlist 
+                    ? 'bg-red-500 text-white shadow-lg' 
+                    : 'bg-white/90 text-gray-600 hover:bg-white hover:text-red-500'
+                }`}
+                title={isInWishlist ? "Remove from wishlist" : "Add to wishlist"}
               >
-                <svg xmlns="http://www.w3.org/2000/svg" className={`h-5 w-5 ${isInWishlist ? 'text-pink-500' : 'text-white'}`} viewBox="0 0 20 20" fill="currentColor">
-                    <path fillRule="evenodd" d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z" clipRule="evenodd" />
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill={isInWishlist ? "currentColor" : "none"} viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 016.364 0L12 7.636l1.318-1.318a4.5 4.5 0 116.364 6.364L12 20.364l-7.682-7.682a4.5 4.5 0 010-6.364z" />
                 </svg>
               </button>
           </div>
-          <div className="absolute inset-0 bg-black/50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-              <button onClick={handleQuickViewClick} className="bg-white/90 dark:bg-black/80 text-brand-gray-800 dark:text-white font-bold py-2 px-6 rounded-full transform hover:scale-105 transition-transform backdrop-blur-sm">
-                  Quick View
-              </button>
+        </div>
+        
+        {/* Vehicle Details */}
+        <div className="p-4">
+          <h3 className="text-lg font-bold text-black mb-2">{vehicle.make} {vehicle.model}</h3>
+          
+          {/* Variants Link */}
+          <a href="#" onClick={(e) => { e.preventDefault(); }} className="cb-variants-link">
+            +2 Variants
+          </a>
+          
+          {/* Feature Badges */}
+          <div className="flex gap-2 mt-4 mb-4">
+            <div className="cb-feature-badge">
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 18.657A8 8 0 016.343 7.343S7 9 9 10c0-2 .5-5 2.986-7C14 5 16.09 5.777 17.656 7.343A7.975 7.975 0 0120 13a7.975 7.975 0 01-2.343 5.657z" />
+              </svg>
+              {vehicle.fuelType}
+            </div>
+            <div className="cb-feature-badge">
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+              </svg>
+              {vehicle.transmission}
+            </div>
+            <div className="cb-feature-badge">
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2H5a2 2 0 00-2-2z" />
+              </svg>
+              {vehicle.seatingCapacity || '5'} Seater
+            </div>
           </div>
         </div>
-        <div className="p-6 flex-grow flex flex-col bg-white">
-          <div className="flex justify-between items-start mb-3">
-              <h3 className="text-lg font-bold text-gray-900">{vehicle.make} {vehicle.model}</h3>
-              <span className="text-sm font-semibold px-3 py-1 rounded-full bg-gray-100 text-gray-600">{vehicle.year}</span>
-          </div>
-           <p className="text-sm mb-3 text-gray-500">{vehicle.variant || ''}</p>
-          <div className="mb-4 text-sm text-gray-500 truncate">
-             By: <button onClick={handleSellerClick} className="font-semibold hover:underline focus:outline-none text-blue-600">{vehicle.sellerName}</button>
-          </div>
-          
-          <div className="mt-3 pt-4 grid grid-cols-3 gap-2 text-center text-sm border-t border-gray-200 text-gray-600">
-             <span>{vehicle.mileage.toLocaleString('en-IN')} kms</span>
-             <span>{vehicle.fuelType}</span>
-             <span>{vehicle.transmission}</span>
-          </div>
-  
-          <div className="mt-6 flex justify-between items-center">
-               <p className="text-xl font-bold text-gray-900">₹{vehicle.price.toLocaleString('en-IN')}</p>
-               <label 
-                onClick={handleCompareClick} 
-                title={isCompareDisabled ? "Comparison limit reached (max 4)" : "Add to compare"}
-                className={`flex items-center text-sm font-medium px-4 py-2 rounded-lg transition-colors ${isCompareDisabled ? 'opacity-60 cursor-not-allowed bg-gray-100' : 'cursor-pointer hover:bg-blue-50 text-blue-600'}`}
-              >
-                <input 
-                  type="checkbox" 
-                  checked={isSelectedForCompare}
-                  readOnly
-                  disabled={isCompareDisabled}
-                  className="form-checkbox h-4 w-4 text-blue-600 rounded focus:ring-blue-500 disabled:opacity-50 mr-2"
-                />
-                <span>Compare</span>
-              </label>
-          </div>
+        
+        {/* Pricing Section */}
+        <div className="cb-price-section">
+          <div className="cb-price-range">* Ex-Showroom</div>
+          <div className="cb-price-amount">₹ {vehicle.price.toLocaleString('en-IN')}</div>
+          <div className="cb-emi-info">EMI starts at ₹ {(vehicle.price / 60).toLocaleString('en-IN')}</div>
         </div>
       </div>
     );
@@ -171,89 +181,31 @@ const Home: React.FC<HomeProps> = ({ onSearch, onSelectCategory, featuredVehicle
 
     return (
         <>
-            {/* Premium Hero Section */}
-            <section className="premium-hero relative min-h-screen flex items-center justify-center">
-                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-                    <div className="text-center animate-fadeInUp">
-                        <h1 className="text-4xl md:text-5xl font-bold mb-6 text-white">
-                            Find Your 
-                            <span className="block premium-text-gradient">
-                                Dream Vehicle
-                            </span>
-                        </h1>
-                        <p className="text-lg md:text-xl mb-8 text-white/90 max-w-3xl mx-auto leading-relaxed">
-                            Discover premium vehicles with AI-powered recommendations
-                            <span className="block text-base mt-2 text-white/70">
-                                BY BRAND • BY BUDGET • BY PREFERENCE
-                            </span>
-                        </p>
-                        
-                        {/* Premium Search Bar */}
-                        <div className="max-w-5xl mx-auto animate-fadeInUp" style={{animationDelay: '0.3s'}}>
-                            <div className="glass-morphism p-2">
-                                <div className="flex flex-col md:flex-row gap-3">
-                                    <div className="flex-1 relative">
-                                        <input
-                                            type="text"
-                                            placeholder="Search for your perfect vehicle..."
-                                            value={aiSearchQuery}
-                                            onChange={(e) => setAiSearchQuery(e.target.value)}
-                                            onKeyDown={(e) => { if (e.key === 'Enter') handleAiSearch(); }}
-                                            className="w-full px-6 py-4 text-gray-900 placeholder-gray-500 border-0 focus:outline-none rounded-xl bg-white/90 backdrop-blur-sm text-lg font-medium"
-                                        />
-                                        <div className="absolute right-4 top-1/2 transform -translate-y-1/2">
-                                            <svg className="w-6 h-6 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                                            </svg>
-                                        </div>
-                                    </div>
-                                    <button 
-                                        onClick={handleAiSearch} 
-                                        disabled={isAiSearching}
-                                        className="premium-button px-8 py-4 text-lg font-semibold"
-                                    >
-                                        {isAiSearching ? (
-                                            <div className="flex items-center gap-2">
-                                                <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                                                Searching...
-                                            </div>
-                                        ) : (
-                                            'Search Now'
-                                        )}
-                                    </button>
-                                </div>
+            {/* CarAndBike Style Main Content */}
+            <main className="bg-white">
+                {/* Main Heading */}
+                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+                    <h1 className="text-3xl font-bold text-black mb-8">Newly Launched Cars</h1>
+                    
+                    {/* Horizontal Scrollable Vehicle Grid */}
+                    <div className="flex gap-6 overflow-x-auto pb-4" style={{scrollbarWidth: 'thin'}}>
+                        {featuredVehicles.slice(0, 8).map((vehicle, index) => (
+                            <div key={vehicle.id} className="flex-shrink-0">
+                                <FeaturedVehicleCard
+                                    vehicle={vehicle} 
+                                    onSelectVehicle={onSelectVehicle} 
+                                    onToggleCompare={onToggleCompare} 
+                                    comparisonList={comparisonList} 
+                                    onToggleWishlist={onToggleWishlist} 
+                                    wishlist={wishlist} 
+                                    onViewSellerProfile={onViewSellerProfile}
+                                    onQuickView={setQuickViewVehicle}
+                                />
                             </div>
-                        </div>
-                        
-                        {/* Premium Stats */}
-                        <div className="mt-16 grid grid-cols-1 md:grid-cols-3 gap-8 animate-fadeInUp" style={{animationDelay: '0.6s'}}>
-                            <div className="glass-morphism p-6 text-center">
-                                <div className="text-3xl font-bold text-white mb-2">10K+</div>
-                                <div className="text-white/80">Premium Vehicles</div>
-                            </div>
-                            <div className="glass-morphism p-6 text-center">
-                                <div className="text-3xl font-bold text-white mb-2">50K+</div>
-                                <div className="text-white/80">Happy Customers</div>
-                            </div>
-                            <div className="glass-morphism p-6 text-center">
-                                <div className="text-3xl font-bold text-white mb-2">99%</div>
-                                <div className="text-white/80">Satisfaction Rate</div>
-                            </div>
-                        </div>
+                        ))}
                     </div>
                 </div>
-                
-                {/* Floating Elements */}
-                <div className="absolute top-20 left-10 animate-float" style={{animationDelay: '0s'}}>
-                    <div className="w-20 h-20 bg-white/10 rounded-full backdrop-blur-sm"></div>
-                </div>
-                <div className="absolute top-40 right-20 animate-float" style={{animationDelay: '1s'}}>
-                    <div className="w-16 h-16 bg-white/10 rounded-full backdrop-blur-sm"></div>
-                </div>
-                <div className="absolute bottom-20 left-20 animate-float" style={{animationDelay: '2s'}}>
-                    <div className="w-12 h-12 bg-white/10 rounded-full backdrop-blur-sm"></div>
-                </div>
-            </section>
+            </main>
             
             {/* Premium Category Section */}
             <section className="py-20 bg-gradient-to-br from-gray-50 to-white relative overflow-hidden">
