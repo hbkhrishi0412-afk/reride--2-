@@ -609,7 +609,7 @@ const VehicleList: React.FC<VehicleListProps> = ({ vehicles, onSelectVehicle, is
   return (
     <>
       <div className="grid grid-cols-1 lg:grid-cols-[auto_1fr] gap-8 container mx-auto px-4 py-8">
-        <aside className={`hidden lg:block lg:sticky top-24 self-start space-y-6 transition-all duration-300 ${isDesktopFilterVisible ? 'w-[300px] opacity-100' : 'w-0 opacity-0 -translate-x-full'}`}>
+        <aside className={`filters hidden lg:block lg:sticky top-24 self-start space-y-6 transition-all duration-300 ${isDesktopFilterVisible ? 'w-[300px] opacity-100' : 'w-0 opacity-0 -translate-x-full'}`}>
             <div className={`bg-white dark:bg-brand-gray-800 p-6 rounded-xl shadow-soft-lg ${isDesktopFilterVisible ? 'block' : 'hidden'}`}>
               <h2 className="text-xl font-bold text-brand-gray-800 dark:text-brand-gray-100 mb-4">Filters</h2>
               {renderFilterControls(false)}
@@ -618,7 +618,7 @@ const VehicleList: React.FC<VehicleListProps> = ({ vehicles, onSelectVehicle, is
 
         <main className="space-y-6">
           <h1 className="text-4xl font-extrabold text-brand-gray-800 dark:text-brand-gray-100">Browse Vehicles</h1>
-          <div className="bg-white dark:bg-brand-gray-800 p-4 rounded-xl shadow-soft-lg">
+          <div className="intelligent-search bg-white dark:bg-brand-gray-800 p-4 rounded-xl shadow-soft-lg">
               <label htmlFor="ai-search" className="text-lg font-bold text-brand-gray-800 dark:text-brand-gray-100">✨ Intelligent Search</label>
               <p className="text-sm text-brand-gray-500 dark:text-brand-gray-400 mb-2">Describe what you're looking for, e.g., "a white Tata Nexon under ₹15 lakhs with a sunroof"</p>
               <div className="relative" ref={aiSearchRef}>

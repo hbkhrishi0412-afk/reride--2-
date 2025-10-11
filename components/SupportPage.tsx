@@ -38,7 +38,7 @@ const SupportPage: React.FC<SupportPageProps> = ({ currentUser, onSubmitTicket }
   const formInputClass = "block w-full p-3 border border-brand-gray-300 dark:border-brand-gray-600 rounded-lg focus:outline-none transition bg-white dark:bg-brand-gray-800 dark:text-gray-200 disabled:bg-brand-gray-100 dark:disabled:bg-brand-gray-700";
 
   return (
-    <div className="animate-fade-in container mx-auto px-4 py-8 max-w-2xl">
+    <div className="support animate-fade-in container mx-auto px-4 py-8 max-w-2xl">
       <div className="bg-white dark:bg-brand-gray-800 p-8 rounded-xl shadow-soft-lg">
         <h1 className="text-3xl font-extrabold text-brand-gray-900 dark:text-brand-gray-100 mb-2">Contact Support</h1>
         <p className="text-brand-gray-600 dark:text-brand-gray-400 mb-6">

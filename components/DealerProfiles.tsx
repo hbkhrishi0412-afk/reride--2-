@@ -36,7 +36,7 @@ const DealerCard: React.FC<{ seller: User; onViewProfile: (sellerEmail: string) 
 
 const DealerProfiles: React.FC<DealerProfilesProps> = ({ sellers, onViewProfile }) => {
   return (
-    <div className="container mx-auto px-4 py-8 animate-fade-in">
+    <div className="dealers container mx-auto px-4 py-8 animate-fade-in">
       <h1 className="text-4xl font-extrabold text-brand-gray-800 dark:text-brand-gray-100 mb-8 text-center">
         Certified Dealer Profiles
       </h1>
