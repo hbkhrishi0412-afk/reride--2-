@@ -720,12 +720,12 @@ const VehicleList: React.FC<VehicleListProps> = ({ vehicles, onSelectVehicle, is
                 </div>
                  <style>{`
                   .slider-thumb { -webkit-appearance: none; appearance: none; background-color: transparent; pointer-events: none; }
-                  .slider-thumb::-webkit-slider-thumb { -webkit-appearance: none; appearance: none; width: 20px; height: 20px; background-color: hsl(var(--color-brand-blue-DEFAULT)); border: 3px solid white; box-shadow: 0 0 0 1px #9CA3AF; border-radius: 50%; cursor: pointer; pointer-events: auto; transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out; }
+                  .slider-thumb::-webkit-slider-thumb { -webkit-appearance: none; appearance: none; width: 20px; height: 20px; background-color: var(--brand-deep-red); border: 3px solid white; box-shadow: 0 0 0 1px #9CA3AF; border-radius: 50%; cursor: pointer; pointer-events: auto; transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out; }
                   html.dark .slider-thumb::-webkit-slider-thumb { border-color: #1F2937; box-shadow: 0 0 0 1px #4B5563; }
-                  .slider-thumb:hover::-webkit-slider-thumb, .slider-thumb:focus::-webkit-slider-thumb { transform: scale(1.15); box-shadow: 0 0 0 4px hsla(var(--color-brand-blue-DEFAULT) / 0.3); }
-                  .slider-thumb::-moz-range-thumb { width: 20px; height: 20px; background-color: hsl(var(--color-brand-blue-DEFAULT)); border: 3px solid white; box-shadow: 0 0 0 1px #9CA3AF; border-radius: 50%; cursor: pointer; pointer-events: auto; transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out; }
+                  .slider-thumb:hover::-webkit-slider-thumb, .slider-thumb:focus::-webkit-slider-thumb { transform: scale(1.15); box-shadow: 0 0 0 4px var(--brand-deep-red-light); }
+                  .slider-thumb::-moz-range-thumb { width: 20px; height: 20px; background-color: var(--brand-deep-red); border: 3px solid white; box-shadow: 0 0 0 1px #9CA3AF; border-radius: 50%; cursor: pointer; pointer-events: auto; transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out; }
                   html.dark .slider-thumb::-moz-range-thumb { border-color: #1F2937; box-shadow: 0 0 0 1px #4B5563; }
-                  .slider-thumb:hover::-moz-range-thumb, .slider-thumb:focus::-moz-range-thumb { transform: scale(1.15); box-shadow: 0 0 0 4px hsla(var(--color-brand-blue-DEFAULT) / 0.3); }
+                  .slider-thumb:hover::-moz-range-thumb, .slider-thumb:focus::-moz-range-thumb { transform: scale(1.15); box-shadow: 0 0 0 4px var(--brand-deep-red-light); }
                 `}</style>
             </div>
         </div>
