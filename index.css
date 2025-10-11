@@ -981,3 +981,14 @@ button:disabled {
   padding-top: 1rem;
 }
 
+/* Custom Element Styles - Black text on White background */
+.filters,
+.intelligent-search,
+.seller-dashboard-login,
+.new-cars,
+.dealers,
+.support {
+  color: black !important;
+  background-color: white !important;
+}
+
