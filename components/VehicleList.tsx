@@ -22,6 +22,7 @@ interface VehicleListProps {
   initialSearchQuery?: string;
   isWishlistMode?: boolean;
   onViewSellerProfile: (sellerEmail: string) => void;
+  userLocation?: string;
 }
 
 const ITEMS_PER_PAGE = 12;
@@ -82,7 +83,7 @@ const Pagination: React.FC<{ currentPage: number; totalPages: number; onPageChan
   );
 };
 
-const VehicleList: React.FC<VehicleListProps> = ({ vehicles, onSelectVehicle, isLoading, comparisonList, onToggleCompare, onClearCompare, wishlist, onToggleWishlist, categoryTitle, initialCategory = 'ALL', initialSearchQuery = '', isWishlistMode = false, onViewSellerProfile }) => {
+const VehicleList: React.FC<VehicleListProps> = ({ vehicles, onSelectVehicle, isLoading, comparisonList, onToggleCompare, onClearCompare, wishlist, onToggleWishlist, categoryTitle, initialCategory = 'ALL', initialSearchQuery = '', isWishlistMode = false, onViewSellerProfile, userLocation = '' }) => {
   const [aiSearchQuery, setAiSearchQuery] = useState(initialSearchQuery);
   const [isAiSearching, setIsAiSearching] = useState(false);
   const [suggestions, setSuggestions] = useState<string[]>([]);
@@ -95,7 +96,17 @@ const VehicleList: React.FC<VehicleListProps> = ({ vehicles, onSelectVehicle, is
   const [fuelTypeFilter, setFuelTypeFilter] = useState('');
   const [yearFilter, setYearFilter] = useState('0');
   const [colorFilter, setColorFilter] = useState('');
-  const [stateFilter, setStateFilter] = useState('');
+  const [stateFilter, setStateFilter] = useState(() => {
+    // Try to match user location with state codes
+    if (userLocation) {
+      const state = INDIAN_STATES.find(s => 
+        s.name.toLowerCase().includes(userLocation.toLowerCase()) || 
+        userLocation.toLowerCase().includes(s.name.toLowerCase())
+      );
+      return state?.code || '';
+    }
+    return '';
+  });
   const [selectedFeatures, setSelectedFeatures] = useState<string[]>([]);
   const [featureSearch, setFeatureSearch] = useState('');
   const [isFeaturesOpen, setIsFeaturesOpen] = useState(false);
@@ -117,7 +128,16 @@ const VehicleList: React.FC<VehicleListProps> = ({ vehicles, onSelectVehicle, is
     fuelTypeFilter: '',
     yearFilter: '0',
     colorFilter: '',
-    stateFilter: '',
+    stateFilter: (() => {
+      if (userLocation) {
+        const state = INDIAN_STATES.find(s => 
+          s.name.toLowerCase().includes(userLocation.toLowerCase()) || 
+          userLocation.toLowerCase().includes(s.name.toLowerCase())
+        );
+        return state?.code || '';
+      }
+      return '';
+    })(),
     selectedFeatures: [],
     featureSearch: ''
   });
@@ -192,6 +212,19 @@ const VehicleList: React.FC<VehicleListProps> = ({ vehicles, onSelectVehicle, is
   useEffect(() => {
     setCategoryFilter(initialCategory);
   }, [initialCategory]);
+
+  // Update state filter when user location changes
+  useEffect(() => {
+    if (userLocation) {
+      const state = INDIAN_STATES.find(s => 
+        s.name.toLowerCase().includes(userLocation.toLowerCase()) || 
+        userLocation.toLowerCase().includes(s.name.toLowerCase())
+      );
+      if (state) {
+        setStateFilter(state.code);
+      }
+    }
+  }, [userLocation]);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -403,20 +436,28 @@ const VehicleList: React.FC<VehicleListProps> = ({ vehicles, onSelectVehicle, is
             setTempFilters(prev => {
                 const currentRange = rangeType === 'price' ? prev.priceRange : prev.mileageRange;
                 const newRange = { ...currentRange, [name]: val };
-                if (newRange.min > newRange.max) {
-                     if (name === 'min') newRange.max = newRange.min;
-                     else newRange.min = newRange.max;
+                
+                // Ensure min doesn't exceed max and vice versa
+                if (name === 'min' && newRange.min > currentRange.max) {
+                    newRange.max = newRange.min;
+                } else if (name === 'max' && newRange.max < currentRange.min) {
+                    newRange.min = newRange.max;
                 }
+                
                 return rangeType === 'price' ? { ...prev, priceRange: newRange } : { ...prev, mileageRange: newRange };
             });
         } else {
             const setter = rangeType === 'price' ? setPriceRange : setMileageRange;
             setter(prev => {
                 const newRange = { ...prev, [name]: val };
-                if (newRange.min > newRange.max) {
-                     if (name === 'min') newRange.max = newRange.min;
-                     else newRange.min = newRange.max;
+                
+                // Ensure min doesn't exceed max and vice versa
+                if (name === 'min' && newRange.min > prev.max) {
+                    newRange.max = newRange.min;
+                } else if (name === 'max' && newRange.max < prev.min) {
+                    newRange.min = newRange.max;
                 }
+                
                 return newRange;
             });
         }
@@ -492,11 +533,11 @@ const VehicleList: React.FC<VehicleListProps> = ({ vehicles, onSelectVehicle, is
                     <span>₹{state.priceRange.max.toLocaleString('en-IN')}</span>
                 </div>
                 <div className="relative h-8 flex items-center">
-                    <input name="min" type="range" min={MIN_PRICE} max={MAX_PRICE} step="10000" value={state.priceRange.min} onChange={(e) => handleRangeChange(e, 'price')} className="absolute w-full h-1.5 bg-transparent appearance-none pointer-events-none z-10 slider-thumb" />
-                    <input name="max" type="range" min={MIN_PRICE} max={MAX_PRICE} step="10000" value={state.priceRange.max} onChange={(e) => handleRangeChange(e, 'price')} className="absolute w-full h-1.5 bg-transparent appearance-none pointer-events-none z-10 slider-thumb" />
                     <div className="relative w-full h-1.5 bg-brand-gray-200 dark:bg-brand-gray-600 rounded-full">
                         <div className="absolute h-1.5 bg-brand-blue rounded-full" style={{ left: `${((state.priceRange.min - MIN_PRICE) / (MAX_PRICE - MIN_PRICE)) * 100}%`, right: `${100 - ((state.priceRange.max - MIN_PRICE) / (MAX_PRICE - MIN_PRICE)) * 100}%` }}></div>
                     </div>
+                    <input name="min" type="range" min={MIN_PRICE} max={MAX_PRICE} step="10000" value={state.priceRange.min} onChange={(e) => handleRangeChange(e, 'price')} className="absolute w-full h-1.5 bg-transparent appearance-none z-20 slider-thumb" />
+                    <input name="max" type="range" min={MIN_PRICE} max={MAX_PRICE} step="10000" value={state.priceRange.max} onChange={(e) => handleRangeChange(e, 'price')} className="absolute w-full h-1.5 bg-transparent appearance-none z-30 slider-thumb" />
                 </div>
             </div>
              <div>
@@ -506,11 +547,11 @@ const VehicleList: React.FC<VehicleListProps> = ({ vehicles, onSelectVehicle, is
                     <span>{state.mileageRange.max.toLocaleString('en-IN')}</span>
                 </div>
                 <div className="relative h-8 flex items-center">
-                    <input name="min" type="range" min={MIN_MILEAGE} max={MAX_MILEAGE} step="1000" value={state.mileageRange.min} onChange={(e) => handleRangeChange(e, 'mileage')} className="absolute w-full h-1.5 bg-transparent appearance-none pointer-events-none z-10 slider-thumb" />
-                    <input name="max" type="range" min={MIN_MILEAGE} max={MAX_MILEAGE} step="1000" value={state.mileageRange.max} onChange={(e) => handleRangeChange(e, 'mileage')} className="absolute w-full h-1.5 bg-transparent appearance-none pointer-events-none z-10 slider-thumb" />
                     <div className="relative w-full h-1.5 bg-brand-gray-200 dark:bg-brand-gray-600 rounded-full">
                         <div className="absolute h-1.5 bg-brand-blue rounded-full" style={{ left: `${((state.mileageRange.min - MIN_MILEAGE) / (MAX_MILEAGE - MIN_MILEAGE)) * 100}%`, right: `${100 - ((state.mileageRange.max - MIN_MILEAGE) / (MAX_MILEAGE - MIN_MILEAGE)) * 100}%` }}></div>
                     </div>
+                    <input name="min" type="range" min={MIN_MILEAGE} max={MAX_MILEAGE} step="1000" value={state.mileageRange.min} onChange={(e) => handleRangeChange(e, 'mileage')} className="absolute w-full h-1.5 bg-transparent appearance-none z-20 slider-thumb" />
+                    <input name="max" type="range" min={MIN_MILEAGE} max={MAX_MILEAGE} step="1000" value={state.mileageRange.max} onChange={(e) => handleRangeChange(e, 'mileage')} className="absolute w-full h-1.5 bg-transparent appearance-none z-30 slider-thumb" />
                 </div>
             </div>
             <div>
