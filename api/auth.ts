@@ -12,6 +12,7 @@ export default async function handler(
   }
 
   try {
+    // Try to connect to database
     await connectToDatabase();
     const { action, email, password, role, name, mobile } = req.body;
 
@@ -20,7 +21,7 @@ export default async function handler(
             return res.status(400).json({ success: false, reason: 'Email and password are required.' });
         }
         // NOTE: In a real app, you would compare a hashed password.
-        const user = await User.findOne({ email, password }).lean();
+        const user = await User.findOne({ email, password }).lean() as any;
 
         if (!user) {
             return res.status(401).json({ success: false, reason: 'Invalid credentials.' });
@@ -68,6 +69,25 @@ export default async function handler(
     }
   } catch (error) {
     console.error('API Auth Error:', error);
+    
+    // Handle specific database connection errors
+    if (error instanceof Error && error.message.includes('MONGODB_URI')) {
+      return res.status(500).json({ 
+        success: false, 
+        reason: 'Database configuration error. Please check MONGODB_URI environment variable.',
+        details: 'The application is configured to use MongoDB but the connection string is not properly configured.'
+      });
+    }
+    
+    // Handle database connection failures
+    if (error instanceof Error && (error.message.includes('connect') || error.message.includes('timeout'))) {
+      return res.status(500).json({ 
+        success: false, 
+        reason: 'Database connection failed. Please ensure the database is running and accessible.',
+        details: 'Unable to connect to MongoDB database. Please check your database configuration and network connectivity.'
+      });
+    }
+    
     const message = error instanceof Error ? error.message : 'An unexpected server error occurred.';
     return res.status(500).json({ success: false, reason: message });
   }

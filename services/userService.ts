@@ -27,8 +27,10 @@ const handleResponse = async (response: Response) => {
 export const getUsersLocal = async (): Promise<User[]> => {
     let usersJson = localStorage.getItem('reRideUsers');
     if (!usersJson) {
+        console.log('🔧 Development mode: Populating local storage with mock data...');
         localStorage.setItem('reRideUsers', JSON.stringify(MOCK_USERS));
         usersJson = JSON.stringify(MOCK_USERS);
+        console.log(`✅ Populated local storage with ${MOCK_USERS.length} users`);
     }
     return JSON.parse(usersJson);
 };
@@ -115,16 +117,50 @@ const authApi = async (body: any): Promise<any> => {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(body),
     });
-    const result = await response.json();
-    if (!response.ok) throw new Error(result.reason || result.error || 'An API error occurred.');
-    return result;
+    
+    // Check if response is ok first
+    if (!response.ok) {
+        // Try to parse error response, but handle cases where response might be empty
+        let errorMessage = `HTTP ${response.status}: ${response.statusText}`;
+        try {
+            const contentType = response.headers.get('content-type');
+            if (contentType && contentType.includes('application/json')) {
+                const errorData = await response.json();
+                errorMessage = errorData.reason || errorData.error || errorMessage;
+            }
+        } catch (parseError) {
+            // If we can't parse the error response, use the default error message
+            console.warn('Could not parse error response:', parseError);
+        }
+        throw new Error(errorMessage);
+    }
+    
+    // Parse successful response
+    const contentType = response.headers.get('content-type');
+    if (!contentType || !contentType.includes('application/json')) {
+        throw new Error('Server returned non-JSON response');
+    }
+    
+    try {
+        const result = await response.json();
+        return result;
+    } catch (parseError) {
+        throw new Error('Failed to parse server response as JSON');
+    }
 };
 
 
+// --- Environment Detection ---
+const isDevelopment = import.meta.env.DEV || window.location.hostname === 'localhost';
+
 // --- Exported Environment-Aware Service Functions ---
 
-export const getUsers = getUsersApi;
-export const updateUser = updateUserApi;
-export const deleteUser = deleteUserApi;
-export const login = (credentials: any): Promise<{ success: boolean, user?: User, reason?: string }> => authApi({ action: 'login', ...credentials });
-export const register = (credentials: any): Promise<{ success: boolean, user?: User, reason?: string }> => authApi({ action: 'register', ...credentials });
+export const getUsers = isDevelopment ? getUsersLocal : getUsersApi;
+export const updateUser = isDevelopment ? updateUserLocal : updateUserApi;
+export const deleteUser = isDevelopment ? deleteUserLocal : deleteUserApi;
+export const login = isDevelopment 
+  ? (credentials: any): Promise<{ success: boolean, user?: User, reason?: string }> => loginLocal(credentials)
+  : (credentials: any): Promise<{ success: boolean, user?: User, reason?: string }> => authApi({ action: 'login', ...credentials });
+export const register = isDevelopment 
+  ? (credentials: any): Promise<{ success: boolean, user?: User, reason?: string }> => registerLocal(credentials)
+  : (credentials: any): Promise<{ success: boolean, user?: User, reason?: string }> => authApi({ action: 'register', ...credentials });

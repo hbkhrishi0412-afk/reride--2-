@@ -33,7 +33,22 @@ const AdminLogin: React.FC<AdminLoginProps> = ({ onLogin, onNavigate }) => {
             throw new Error(result.reason || 'Invalid admin credentials.');
         }
     } catch (err) {
-        setError(err instanceof Error ? err.message : 'Failed to authenticate.');
+        let errorMessage = 'Failed to authenticate.';
+        
+        if (err instanceof Error) {
+            errorMessage = err.message;
+            
+            // Provide more helpful error messages for common issues
+            if (err.message.includes('Database configuration error')) {
+                errorMessage = 'Database not configured. Please check DATABASE_SETUP.md for setup instructions.';
+            } else if (err.message.includes('Database connection failed')) {
+                errorMessage = 'Cannot connect to database. Please ensure the database is running and seeded with /api/seed';
+            } else if (err.message.includes('Failed to parse server response')) {
+                errorMessage = 'Server returned invalid response. Please check if the database is properly configured.';
+            }
+        }
+        
+        setError(errorMessage);
     } finally {
         setIsLoading(false);
     }
