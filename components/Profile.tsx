@@ -123,7 +123,7 @@ const Profile: React.FC<ProfileProps> = ({ currentUser, onUpdateProfile, onUpdat
                   className="w-32 h-32 rounded-full object-cover border-4 border-brand-gray-200 dark:border-brand-gray-700"
                 />
                 {isEditing && (
-                  <label htmlFor="avatar-upload" className="absolute bottom-0 right-0 bg-brand-blue text-white rounded-full p-2 cursor-pointer hover:bg-brand-blue-dark transition-colors">
+                  <label htmlFor="avatar-upload" className="absolute bottom-0 right-0 text-white rounded-full p-2 cursor-pointer transition-colors" style={{ background: 'var(--brand-deep-red)' }} onMouseEnter={(e) => e.currentTarget.style.background = 'var(--brand-orange)'} onMouseLeave={(e) => e.currentTarget.style.background = 'var(--brand-deep-red)'}>
                     <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z" /></svg>
                     <input id="avatar-upload" type="file" className="sr-only" accept="image/*" onChange={handleAvatarUpload} />
                   </label>
@@ -154,7 +154,7 @@ const Profile: React.FC<ProfileProps> = ({ currentUser, onUpdateProfile, onUpdat
             <div className="mt-6 flex gap-4">
               {isEditing ? (
                 <>
-                  <button type="submit" className="px-6 py-2 bg-brand-blue text-white font-semibold rounded-md hover:bg-brand-blue-dark transition-colors">
+                  <button type="submit" className="px-6 py-2 btn-brand-primary text-white font-semibold rounded-md transition-colors">
                     Save Changes
                   </button>
                   <button type="button" onClick={handleEditToggle} className="px-6 py-2 bg-brand-gray-200 dark:bg-brand-gray-600 text-brand-gray-800 dark:text-brand-gray-200 font-semibold rounded-md hover:bg-brand-gray-300 dark:hover:bg-brand-gray-500 transition-colors">
@@ -162,7 +162,7 @@ const Profile: React.FC<ProfileProps> = ({ currentUser, onUpdateProfile, onUpdat
                   </button>
                 </>
               ) : (
-                <button type="button" onClick={handleEditToggle} className="px-6 py-2 bg-brand-blue-light text-white font-semibold rounded-md hover:bg-brand-blue transition-colors">
+                <button type="button" onClick={handleEditToggle} className="px-6 py-2 btn-brand-orange text-white font-semibold rounded-md transition-colors">
                   Edit Profile
                 </button>
               )}

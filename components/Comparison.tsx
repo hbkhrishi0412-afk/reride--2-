@@ -76,7 +76,7 @@ const Comparison: React.FC<ComparisonProps> = ({ vehicles, onBack: onBackToHome,
         <h2 className="text-2xl font-bold text-brand-gray-800 dark:text-brand-gray-100">Vehicle Comparison</h2>
         <p className="mt-4 text-brand-gray-600 dark:text-brand-gray-300">You haven't selected any vehicles to compare yet.</p>
         <p className="text-brand-gray-500 dark:text-brand-gray-400">Go to the listings to add up to 4 vehicles.</p>
-        <button onClick={onBackToHome} className="mt-6 bg-brand-blue text-white font-bold py-2 px-6 rounded-lg hover:bg-brand-blue-dark transition-colors">
+        <button onClick={onBackToHome} className="mt-6 btn-brand-primary text-white font-bold py-2 px-6 rounded-lg transition-colors">
           &larr; Back to Listings
         </button>
       </div>
@@ -118,13 +118,13 @@ const Comparison: React.FC<ComparisonProps> = ({ vehicles, onBack: onBackToHome,
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
         <div>
             <h1 className="text-3xl font-extrabold text-brand-gray-900 dark:text-brand-gray-100">Compare Vehicles</h1>
-            <button onClick={onBackToHome} className="text-sm font-medium text-brand-blue hover:underline mt-1">
+            <button onClick={onBackToHome} className="text-sm font-medium hover:underline mt-1 transition-colors" style={{ color: 'var(--brand-deep-red)' }} onMouseEnter={(e) => e.currentTarget.style.color = 'var(--brand-orange)'} onMouseLeave={(e) => e.currentTarget.style.color = 'var(--brand-deep-red)'}>
                 &larr; Back to Listings
             </button>
         </div>
         <div className="flex items-center space-x-3 bg-brand-gray-100 dark:bg-brand-gray-700 p-2 rounded-lg">
           <label htmlFor="highlight-toggle" className="text-sm font-medium text-brand-gray-700 dark:text-brand-gray-200">Highlight Differences</label>
-          <button onClick={() => setHighlightDiffs(!highlightDiffs)} id="highlight-toggle" className={`${highlightDiffs ? 'bg-brand-blue' : 'bg-brand-gray-300 dark:bg-brand-gray-600'} relative inline-flex items-center h-6 rounded-full w-11 transition-colors`}>
+          <button onClick={() => setHighlightDiffs(!highlightDiffs)} id="highlight-toggle" className={`${highlightDiffs ? '' : 'bg-brand-gray-300 dark:bg-brand-gray-600'} relative inline-flex items-center h-6 rounded-full w-11 transition-colors`} style={highlightDiffs ? { background: 'var(--brand-deep-red)' } : undefined}>
               <span className={`${highlightDiffs ? 'translate-x-6' : 'translate-x-1'} inline-block w-4 h-4 transform bg-white rounded-full transition-transform`} />
           </button>
         </div>
@@ -157,7 +157,8 @@ const Comparison: React.FC<ComparisonProps> = ({ vehicles, onBack: onBackToHome,
                     }
 
                     const isBest = typeof value === 'number' && isBestValue(key, value);
-                    const cellClass = highlightDiffs && hasDifference ? 'bg-brand-blue-lightest/50 dark:bg-brand-blue/10' : '';
+                    const cellClass = highlightDiffs && hasDifference ? 'dark:bg-brand-blue/10' : '';
+                    const cellStyle = highlightDiffs && hasDifference ? { backgroundColor: 'var(--brand-rose-pink-light)' } : undefined;
                     return (
                       <td key={`${vehicle.id}-${String(key)}`} className={`p-4 text-center dark:text-brand-gray-200 transition-colors ${cellClass} ${isBest ? 'bg-green-50 dark:bg-green-900/20' : ''}`}>
                          <span className={`inline-flex items-center gap-2 ${isBest ? 'font-bold text-green-700 dark:text-green-300' : ''}`}>
@@ -196,7 +197,7 @@ const Comparison: React.FC<ComparisonProps> = ({ vehicles, onBack: onBackToHome,
                  <tr key={feature} className="border-b border-brand-gray-200 dark:border-brand-gray-700">
                      <td className="font-semibold text-brand-gray-600 dark:text-brand-gray-300 p-4 sticky left-0 bg-white dark:bg-brand-gray-800 z-10">{feature}</td>
                      {vehicles.map(vehicle => (
-                        <td key={`${vehicle.id}-${feature}`} className={`p-4 transition-colors ${highlightDiffs && hasDifference ? 'bg-brand-blue-lightest/50 dark:bg-brand-blue/10' : ''}`}>
+                        <td key={`${vehicle.id}-${feature}`} className={`p-4 transition-colors ${highlightDiffs && hasDifference ? 'dark:bg-brand-blue/10' : ''}`} style={highlightDiffs && hasDifference ? { backgroundColor: 'var(--brand-rose-pink-light)' } : undefined}>
                             {vehicle.features.includes(feature) ? <CheckIcon /> : <XIcon />}
                         </td>
                      ))}

@@ -156,9 +156,9 @@ export const VehicleDataBulkUploadModal: React.FC<BulkUploadModalProps> = ({ onC
                         <div className="space-y-4 text-center">
                             <h3 className="font-semibold">Step 1: Prepare Your CSV File</h3>
                             <p>Download our template, fill it with your vehicle data, and upload it here.</p>
-                            <button onClick={downloadTemplate} className="font-semibold text-brand-blue hover:underline">Download CSV Template</button>
+                            <button onClick={downloadTemplate} className="font-semibold hover:underline transition-colors" style={{ color: 'var(--brand-deep-red)' }} onMouseEnter={(e) => e.currentTarget.style.color = 'var(--brand-orange)'} onMouseLeave={(e) => e.currentTarget.style.color = 'var(--brand-deep-red)'}>Download CSV Template</button>
                             <div className="mt-4 p-6 border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg">
-                                <input type="file" accept=".csv" onChange={handleFileChange} className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-brand-blue-lightest file:text-brand-blue-dark hover:file:bg-brand-blue-light" />
+                                <input type="file" accept=".csv" onChange={handleFileChange} className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:text-white" style={{ ['--file-bg' as any]: 'var(--brand-deep-red)' }} />
                             </div>
                             {error && <p className="text-red-500 text-sm mt-2">{error}</p>}
                         </div>
@@ -181,7 +181,7 @@ export const VehicleDataBulkUploadModal: React.FC<BulkUploadModalProps> = ({ onC
 
                 <div className="bg-gray-50 dark:bg-brand-gray-darker px-6 py-3 flex justify-end gap-4 rounded-b-lg mt-auto">
                     <button onClick={onClose} className="px-4 py-2 bg-gray-200 dark:bg-gray-600 text-gray-800 dark:text-gray-200 rounded-md hover:bg-gray-300 dark:hover:bg-gray-500">Cancel</button>
-                    {step === 1 && <button onClick={handleParseAndValidate} disabled={!file} className="px-4 py-2 bg-brand-blue text-white rounded-md hover:bg-brand-blue-dark disabled:opacity-50">Next: Review</button>}
+                    {step === 1 && <button onClick={handleParseAndValidate} disabled={!file} className="px-4 py-2 btn-brand-primary text-white rounded-md disabled:opacity-50">Next: Review</button>}
                     {step === 2 && <button onClick={handleConfirm} disabled={!parsedData} className="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 disabled:opacity-50">Confirm & Overwrite</button>}
                 </div>
             </div>

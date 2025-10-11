@@ -52,7 +52,7 @@ const CarModelCard: React.FC<{ car: NewCarModel; isExpanded: boolean; onToggle: 
                     <SpecItem icon={<svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor"><path fillRule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clipRule="evenodd" /></svg>} text={`${car.key_specs.seating_capacity} Seater`} />
                 </div>
                 
-                <p className="text-lg font-semibold text-brand-blue dark:text-brand-blue-light mt-2">
+                <p className="text-lg font-semibold mt-2" style={{ color: 'var(--brand-deep-red)' }}>
                     Starts at {formatCurrency(Math.min(...car.variants.map(v => v.on_road_prices[selectedState] || Infinity)))}
                 </p>
             </div>
@@ -79,7 +79,7 @@ const CarModelCard: React.FC<{ car: NewCarModel; isExpanded: boolean; onToggle: 
                                     <td className="px-4 py-3 whitespace-nowrap text-sm font-medium text-brand-gray-900 dark:text-brand-gray-100">{variant.variant_name} ({variant.transmission})</td>
                                     <td className="px-4 py-3 whitespace-nowrap text-sm font-semibold text-brand-gray-800 dark:text-brand-gray-200">{formatCurrency(variant.on_road_prices[selectedState])}</td>
                                     <td className="px-4 py-3 whitespace-nowrap text-sm">
-                                        <button onClick={() => onViewSpecs(car, variant)} className="font-semibold text-brand-blue hover:underline">
+                                        <button onClick={() => onViewSpecs(car, variant)} className="font-semibold hover:underline transition-colors" style={{ color: 'var(--brand-deep-red)' }} onMouseEnter={(e) => e.currentTarget.style.color = 'var(--brand-orange)'} onMouseLeave={(e) => e.currentTarget.style.color = 'var(--brand-deep-red)'}>
                                             View Full Specs
                                         </button>
                                     </td>
@@ -286,7 +286,7 @@ const NewCars: React.FC = () => {
                         className="w-full p-4 border border-brand-gray-300 dark:border-brand-gray-600 rounded-xl focus:ring-2 focus:ring-brand-blue focus:outline-none bg-white dark:bg-brand-gray-700 text-brand-gray-800 dark:text-brand-gray-200 text-lg"
                     />
                     <div className="flex justify-between items-center">
-                        <button onClick={handleOpenFilterModal} className="lg:hidden flex items-center gap-2 font-semibold text-brand-blue bg-brand-blue-lightest dark:bg-brand-blue-darker px-4 py-2 rounded-lg">
+                        <button onClick={handleOpenFilterModal} className="lg:hidden flex items-center gap-2 font-semibold px-4 py-2 rounded-lg" style={{ color: 'var(--brand-deep-red)', background: 'var(--brand-rose-pink-light)' }} onMouseEnter={(e) => e.currentTarget.style.background = 'var(--brand-rose-pink)'} onMouseLeave={(e) => e.currentTarget.style.background = 'var(--brand-rose-pink-light)'}>
                            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fillRule="evenodd" d="M3 3a1 1 0 011-1h12a1 1 0 011 1v3a1 1 0 01-.293.707L12 11.414V15a1 1 0 01-.293.707l-2 2A1 1 0 018 17v-5.586L3.293 6.707A1 1 0 013 6V3z" clipRule="evenodd" /></svg>
                             Filters
                         </button>
@@ -334,7 +334,7 @@ const NewCars: React.FC = () => {
                     </div>
                     <div className="p-4 border-t border-brand-gray-200 dark:border-brand-gray-700 flex gap-4 bg-white dark:bg-brand-gray-800 flex-shrink-0">
                         <button onClick={handleResetTempFilters} className="w-full bg-brand-gray-200 dark:bg-brand-gray-700 text-brand-gray-800 dark:text-brand-gray-200 font-bold py-3 px-4 rounded-lg hover:bg-brand-gray-300 dark:hover:bg-brand-gray-600 transition-colors">Reset</button>
-                        <button onClick={handleApplyFilters} className="w-full bg-brand-blue text-white font-bold py-3 px-4 rounded-lg hover:bg-brand-blue-dark transition-colors">Apply Filters</button>
+                        <button onClick={handleApplyFilters} className="w-full btn-brand-primary text-white font-bold py-3 px-4 rounded-lg transition-colors">Apply Filters</button>
                     </div>
                 </div>
             </div>
