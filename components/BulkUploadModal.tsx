@@ -140,7 +140,7 @@ const BulkUploadModal: React.FC<BulkUploadModalProps> = ({ onClose, onAddMultipl
     return (
         <div className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50 p-4 animate-fade-in" onClick={onClose}>
             <div className="bg-white rounded-lg shadow-2xl w-full max-w-2xl max-h-[90vh] flex flex-col" onClick={e => e.stopPropagation()}>
-                <div className="p-6 border-b dark:border-brand-gray-200">
+                <div className="p-6 border-b dark:border-gray-200-200">
                     <h2 className="text-xl font-bold text-spinny-text-dark dark:text-spinny-text-dark">Bulk Upload Vehicles</h2>
                     <p className="text-sm text-spinny-text-dark dark:text-spinny-text-dark">Upload multiple listings at once using a CSV file.</p>
                 </div>
@@ -150,8 +150,8 @@ const BulkUploadModal: React.FC<BulkUploadModalProps> = ({ onClose, onAddMultipl
                         <div className="space-y-4 text-center">
                             <h3 className="font-semibold">Step 1: Prepare Your CSV File</h3>
                             <p>Download our template, fill it with your vehicle data, and upload it here.</p>
-                            <button onClick={downloadTemplate} className="font-semibold hover:underline transition-colors" style={{ color: 'var(--spinny-orange)' }} onMouseEnter={(e) => e.currentTarget.style.color = 'var(--spinny-blue)'} onMouseLeave={(e) => e.currentTarget.style.color = 'var(--spinny-orange)'}>Download CSV Template</button>
-                            <div className="mt-4 p-6 border-2 border-dashed border-spinny-blue dark:border-brand-gray-300 rounded-lg">
+                            <button onClick={downloadTemplate} className="font-semibold hover:underline transition-colors" style={{ color: '#FF6B35' }} onMouseEnter={(e) => e.currentTarget.style.color = 'var(--spinny-blue)'} onMouseLeave={(e) => e.currentTarget.style.color = 'var(--spinny-orange)'}>Download CSV Template</button>
+                            <div className="mt-4 p-6 border-2 border-dashed border-gray-200 dark:border-gray-200-300 rounded-lg">
                                 <input type="file" accept=".csv" onChange={handleFileChange} className="block w-full text-sm text-spinny-text-dark file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:text-white" style={{ ['--file-bg' as any]: 'var(--spinny-orange)', ['--file-hover-bg' as any]: 'var(--spinny-blue)' }} />
                             </div>
                         </div>
@@ -177,7 +177,7 @@ const BulkUploadModal: React.FC<BulkUploadModalProps> = ({ onClose, onAddMultipl
                 </div>
 
                 <div className="bg-white px-6 py-3 flex justify-end gap-4 rounded-b-lg">
-                    <button onClick={onClose} className="px-4 py-2 bg-spinny-white-dark text-spinny-text-dark rounded-md hover:bg-spinny-white">Cancel</button>
+                    <button onClick={onClose} className="px-4 py-2 bg-white-dark text-spinny-text-dark rounded-md hover:bg-white">Cancel</button>
                     {step === 1 && <button onClick={handleParseAndValidate} disabled={!file} className="px-4 py-2 btn-brand-primary text-white rounded-md disabled:opacity-50">Next: Review</button>}
                     {step === 2 && <button onClick={handleConfirm} className="px-4 py-2 bg-spinny-orange text-white rounded-md hover:bg-spinny-orange">Confirm & Upload</button>}
                 </div>

@@ -9,7 +9,7 @@ interface CarSpecModalProps {
 
 const SpecSection: React.FC<{ title: string, children: React.ReactNode }> = ({ title, children }) => (
     <div>
-        <h3 className="text-lg font-bold text-spinny-text-dark dark:text-spinny-text-dark mb-2 border-b border-brand-gray-200 dark:border-brand-gray-200 pb-1">
+        <h3 className="text-lg font-bold text-spinny-text-dark dark:text-spinny-text-dark mb-2 border-b border-gray-200-200 dark:border-gray-200-200 pb-1">
             {title}
         </h3>
         {children}
@@ -60,14 +60,14 @@ const CarSpecModal: React.FC<CarSpecModalProps> = ({ car, variant, onClose }) =>
                 onClick={(e) => e.stopPropagation()}
             >
                 {/* Header */}
-                <div className="p-4 border-b border-brand-gray-200 dark:border-brand-gray-200 flex justify-between items-center flex-shrink-0">
+                <div className="p-4 border-b border-gray-200-200 dark:border-gray-200-200 flex justify-between items-center flex-shrink-0">
                     <div>
                         <h2 className="text-2xl font-bold text-spinny-text-dark dark:text-spinny-text-dark">
                             {car.brand_name} {car.model_name}
                         </h2>
                         <p className="text-md text-brand-gray-600 dark:text-spinny-text-dark">{variant.variant_name}</p>
                     </div>
-                    <button onClick={onClose} className="text-brand-gray-400 hover:text-spinny-text-dark dark:hover:text-white text-3xl">&times;</button>
+                    <button onClick={onClose} className="text-gray-400 hover:text-spinny-text-dark dark:hover:text-white text-3xl">&times;</button>
                 </div>
 
                 {/* Body */}

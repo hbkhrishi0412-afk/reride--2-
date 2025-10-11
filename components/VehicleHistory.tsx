@@ -10,7 +10,7 @@ const TimelineIcon: React.FC<{ type: 'service' | 'accident' }> = ({ type }) => {
   const baseClasses = "w-10 h-10 rounded-full flex items-center justify-center ring-4 ring-white dark:ring-brand-gray-800";
   if (type === 'service') {
     return (
-      <div className={`${baseClasses}`} style={{ backgroundColor: 'var(--spinny-blue-light)', color: 'var(--spinny-orange)' }}>
+      <div className={`${baseClasses}`} style={{ backgroundColor: 'rgba(30, 136, 229, 0.1)', color: '#FF6B35' }}>
         <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
           <path d="M9 2a1 1 0 000 2h2a1 1 0 100-2H9z" />
           <path fillRule="evenodd" d="M4 5a2 2 0 012-2 3 3 0 003 3h2a3 3 0 003-3 2 2 0 012 2v11a2 2 0 01-2 2H6a2 2 0 01-2-2V5zm3 4a1 1 0 000 2h.01a1 1 0 100-2H7zm3 0a1 1 0 000 2h3a1 1 0 100-2h-3z" clipRule="evenodd" />
@@ -36,7 +36,7 @@ const VehicleHistory: React.FC<VehicleHistoryProps> = ({ serviceRecords, acciden
   if (combinedHistory.length === 0) {
     return (
       <div className="p-6 bg-white rounded-xl shadow-soft">
-        <h3 className="text-xl font-semibold text-spinny-text-dark dark:text-spinny-text-dark mb-4 border-b dark:border-brand-gray-200 pb-2">Vehicle History</h3>
+        <h3 className="text-xl font-semibold text-spinny-text-dark dark:text-spinny-text-dark mb-4 border-b dark:border-gray-200-200 pb-2">Vehicle History</h3>
         <p className="text-center text-spinny-text dark:text-spinny-text py-8">No service or accident history available for this vehicle.</p>
       </div>
     );
@@ -44,14 +44,14 @@ const VehicleHistory: React.FC<VehicleHistoryProps> = ({ serviceRecords, acciden
 
   return (
     <div className="p-6 bg-white rounded-xl shadow-soft">
-      <h3 className="text-xl font-semibold text-spinny-text-dark dark:text-spinny-text-dark mb-6 border-b dark:border-brand-gray-200 pb-2">Vehicle History</h3>
-      <ol className="relative border-l border-spinny-blue dark:border-brand-gray-200 ml-5">
+      <h3 className="text-xl font-semibold text-spinny-text-dark dark:text-spinny-text-dark mb-6 border-b dark:border-gray-200-200 pb-2">Vehicle History</h3>
+      <ol className="relative border-l border-gray-200 dark:border-gray-200-200 ml-5">
         {combinedHistory.map((item, index) => (
           <li key={index} className="mb-10 ml-8">
             <span className="absolute -left-5 flex items-center justify-center">
                 <TimelineIcon type={item.type} />
             </span>
-            <div className="p-4 bg-white dark:bg-white/50 border border-brand-gray-200 dark:border-brand-gray-200 rounded-lg shadow-sm">
+            <div className="p-4 bg-white dark:bg-white/50 border border-gray-200-200 dark:border-gray-200-200 rounded-lg shadow-sm">
                 <div className="flex justify-between items-center mb-2">
                     <time className="text-sm font-normal leading-none text-spinny-text-dark dark:text-spinny-text-dark">{new Date(item.date).toLocaleDateString('en-IN', { year: 'numeric', month: 'long', day: 'numeric' })}</time>
                     {item.type === 'accident' && <span className="bg-spinny-orange-light text-spinny-orange text-xs font-semibold px-2.5 py-0.5 rounded dark:bg-spinny-orange dark:text-spinny-orange">{item.severity}</span>}

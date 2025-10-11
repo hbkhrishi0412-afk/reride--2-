@@ -74,11 +74,11 @@ const CustomerLogin: React.FC<CustomerLoginProps> = ({ onLogin, onRegister, onNa
   };
 
   const isLogin = mode === 'login';
-  const formInputClass = "appearance-none relative block w-full px-4 py-3 border border-brand-gray-300 dark:border-brand-gray-600 placeholder-brand-gray-500 text-brand-gray-900 dark:text-brand-gray-200 bg-brand-white dark:bg-brand-gray-800 focus:outline-none focus:ring-brand-blue focus:border-brand-blue focus:z-10 sm:text-sm";
+  const formInputClass = "appearance-none relative block w-full px-4 py-3 border border-brand-gray-300 dark:border-brand-gray-600 placeholder-brand-gray-500 text-brand-gray-900 dark:text-brand-gray-200 bg-spinny-white dark:bg-white focus:outline-none focus:ring-spinny-orange focus:border-spinny-orange focus:z-10 sm:text-sm";
 
 
   return (
-    <div className="w-full max-w-md space-y-8 bg-brand-white dark:bg-brand-gray-800 p-10 rounded-xl shadow-soft-xl">
+    <div className="w-full max-w-md space-y-8 bg-spinny-white dark:bg-white p-10 rounded-xl shadow-soft-xl">
       <div>
         <h2 className="mt-6 text-center text-3xl font-extrabold text-brand-gray-900 dark:text-brand-gray-100">
           {isLogin ? 'Welcome Back!' : 'Create an Account'}
@@ -125,7 +125,7 @@ const CustomerLogin: React.FC<CustomerLoginProps> = ({ onLogin, onRegister, onNa
               <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute inset-y-0 right-0 px-3 flex items-center text-brand-gray-500 hover:text-brand-gray-700"
+                  className="absolute inset-y-0 right-0 px-3 flex items-center text-gray-500 hover:text-brand-gray-700"
                   aria-label={showPassword ? "Hide password" : "Show password"}
               >
                   {showPassword ? (
@@ -141,34 +141,34 @@ const CustomerLogin: React.FC<CustomerLoginProps> = ({ onLogin, onRegister, onNa
           <div className="flex items-center justify-between">
             <div className="flex items-center">
               <input id="remember-me" name="remember-me" type="checkbox" checked={rememberMe} onChange={(e) => setRememberMe(e.target.checked)}
-                className="h-4 w-4 text-brand-blue focus:ring-brand-blue-light border-brand-gray-300 rounded" />
+                className="h-4 w-4 text-spinny-orange focus:ring-spinny-orange-light border-brand-gray-300 rounded" />
               <label htmlFor="remember-me" className="ml-2 block text-sm text-brand-gray-900 dark:text-brand-gray-300">Remember me</label>
             </div>
             <div className="text-sm">
               <button
                 type="button"
                 onClick={onForgotPassword}
-                className="font-medium text-brand-blue hover:text-brand-blue-dark"
+                className="font-medium text-spinny-orange hover:text-spinny-orange-dark"
               >
                 Forgot your password?
               </button>
             </div>
           </div>
         )}
-        {error && <p className="text-brand-deep-red text-sm text-center">{error}</p>}
+        {error && <p className="text-spinny-orange text-sm text-center">{error}</p>}
         <div>
-          <button type="submit" disabled={isLoading} className="group relative w-full flex justify-center py-3 px-4 border border-transparent text-sm font-medium rounded-md text-brand-white bg-brand-blue hover:bg-brand-blue-dark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-brand-blue-light transition-colors disabled:opacity-50">
+          <button type="submit" disabled={isLoading} className="group relative w-full flex justify-center py-3 px-4 border border-transparent text-sm font-medium rounded-md text-spinny-white bg-spinny-orange hover:bg-spinny-orange-dark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-spinny-orange-light transition-colors disabled:opacity-50">
             {isLoading ? 'Processing...' : (isLogin ? 'Sign in' : 'Create Account')}
           </button>
         </div>
       </form>
       <div className="text-sm text-center">
-        <button onClick={toggleMode} className="font-medium text-brand-blue hover:text-brand-blue-dark">
+        <button onClick={toggleMode} className="font-medium text-spinny-orange hover:text-spinny-orange-dark">
           {isLogin ? "Don't have an account? Register" : "Already have an account? Sign in"}
         </button>
       </div>
       <div className="text-center">
-          <button onClick={() => onNavigate(View.LOGIN_PORTAL)} className="font-medium text-brand-blue hover:text-brand-blue-dark">&larr; Back to Role Selection</button>
+          <button onClick={() => onNavigate(View.LOGIN_PORTAL)} className="font-medium text-spinny-orange hover:text-spinny-orange-dark">&larr; Back to Role Selection</button>
       </div>
     </div>
   );

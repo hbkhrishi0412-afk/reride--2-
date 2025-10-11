@@ -71,10 +71,10 @@ const SocialShareButtons: React.FC<SocialShareButtonsProps> = ({ vehicle }) => {
     };
 
     return (
-        <div className="mt-6 pt-6 border-t border-brand-gray-200 dark:border-brand-gray-200">
+        <div className="mt-6 pt-6 border-t border-gray-200-200 dark:border-gray-200-200">
             <h4 className="text-sm font-semibold text-center text-brand-gray-600 dark:text-spinny-text mb-3">Share this listing</h4>
             <div className="flex justify-center items-center gap-3">
-                <button onClick={() => handleShare('facebook')} aria-label="Share on Facebook" className="p-2 rounded-full text-white transition-colors" style={{ background: 'var(--spinny-orange)' }} onMouseEnter={(e) => e.currentTarget.style.background = 'var(--spinny-orange-hover)'} onMouseLeave={(e) => e.currentTarget.style.background = 'var(--spinny-orange)'}>{ICONS.facebook}</button>
+                <button onClick={() => handleShare('facebook')} aria-label="Share on Facebook" className="p-2 rounded-full text-white transition-colors" style={{ background: '#FF6B35' }} onMouseEnter={(e) => e.currentTarget.style.background = 'var(--spinny-orange-hover)'} onMouseLeave={(e) => e.currentTarget.style.background = 'var(--spinny-orange)'}>{ICONS.facebook}</button>
                 <button onClick={() => handleShare('twitter')} aria-label="Share on Twitter" className="p-2 rounded-full bg-sky-500 text-white hover:bg-sky-600 transition-colors">{ICONS.twitter}</button>
                 <button onClick={() => handleShare('whatsapp')} aria-label="Share on WhatsApp" className="p-2 rounded-full bg-spinny-orange-light0 text-white hover:bg-spinny-orange transition-colors">{ICONS.whatsapp}</button>
                 <button 
@@ -106,7 +106,7 @@ const CollapsibleSection: React.FC<{ title: string; children: React.ReactNode; d
             </button>
             <div className={`grid transition-[grid-template-rows] duration-500 ease-in-out ${isOpen ? 'grid-rows-[1fr]' : 'grid-rows-[0fr]'}`}>
                 <div className="overflow-hidden">
-                    <div className="p-6 pt-0 border-t border-brand-gray-200 dark:border-brand-gray-200">
+                    <div className="p-6 pt-0 border-t border-gray-200-200 dark:border-gray-200-200">
                         {children}
                     </div>
                 </div>
@@ -118,14 +118,14 @@ const CollapsibleSection: React.FC<{ title: string; children: React.ReactNode; d
 
 const KeySpec: React.FC<{ label: string; value: string | number; icon?: React.ReactNode }> = memo(({ label, value, icon }) => (
     <div className="flex flex-col gap-1 p-4 bg-spinny-off-white dark:bg-white rounded-lg text-center">
-        {icon && <div className="mx-auto mb-1" style={{ color: 'var(--spinny-blue)' }}>{icon}</div>}
+        {icon && <div className="mx-auto mb-1" style={{ color: '#1E88E5' }}>{icon}</div>}
         <span className="text-sm font-medium text-brand-gray-600 dark:text-spinny-text">{label}</span>
         <span className="font-bold text-spinny-text-dark dark:text-spinny-text-dark">{value}</span>
     </div>
 ));
 
 const SpecDetail: React.FC<{ label: string; value: string | number | undefined }> = ({ label, value }) => (
-    <div className="flex justify-between py-2 border-b border-brand-gray-100 dark:border-brand-gray-200 last:border-b-0">
+    <div className="flex justify-between py-2 border-b border-gray-200-100 dark:border-gray-200-200 last:border-b-0">
         <dt className="text-sm text-brand-gray-600 dark:text-spinny-text">{label}</dt>
         <dd className="text-sm font-semibold text-spinny-text-dark dark:text-brand-gray-200 text-right">{value || '-'}</dd>
     </div>
@@ -135,7 +135,7 @@ const SpecDetail: React.FC<{ label: string; value: string | number | undefined }
 const DocumentChip: React.FC<{ doc: VehicleDocument }> = ({ doc }) => {
     return (
         <a href={doc.url} target="_blank" rel="noopener noreferrer" title={`View ${doc.fileName}`}
-           className="flex items-center gap-2 bg-spinny-white dark:bg-white text-spinny-text-dark dark:text-spinny-text-dark px-3 py-1.5 rounded-full text-sm font-medium hover:bg-spinny-white-dark dark:hover:bg-spinny-white transition-colors">
+           className="flex items-center gap-2 bg-white dark:bg-white text-spinny-text-dark dark:text-spinny-text-dark px-3 py-1.5 rounded-full text-sm font-medium hover:bg-white-dark dark:hover:bg-white transition-colors">
             <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
               <path fillRule="evenodd" d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2-2H6a2 2 0 01-2-2V4zm2 6a1 1 0 011-1h6a1 1 0 110 2H7a1 1 0 01-1-1zm1 3a1 1 0 100 2h6a1 1 0 100-2H7z" clipRule="evenodd" />
             </svg>
@@ -152,7 +152,7 @@ const CertifiedInspectionReport: React.FC<{ report: CertifiedInspection }> = ({ 
     };
     return (
         <div className="p-6">
-            <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center border-b dark:border-brand-gray-200 pb-4 mb-4">
+            <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center border-b dark:border-gray-200-200 pb-4 mb-4">
                 <svg xmlns="http://www.w3.org/2000/svg" className="h-12 w-12 text-spinny-orange flex-shrink-0" viewBox="0 0 20 20" fill="currentColor">
                     <path fillRule="evenodd" d="M6.267 3.455a3.066 3.066 0 001.745-.723 3.066 3.066 0 013.976 0 3.066 3.066 0 001.745.723 3.066 3.066 0 012.812 2.812c.051.643.304 1.254.723 1.745a3.066 3.066 0 010 3.976 3.066 3.066 0 00-.723 1.745 3.066 3.066 0 01-2.812 2.812 3.066 3.066 0 00-1.745.723 3.066 3.066 0 01-3.976 0 3.066 3.066 0 00-1.745-.723 3.066 3.066 0 01-2.812-2.812 3.066 3.066 0 00-.723-1.745 3.066 3.066 0 010-3.976 3.066 3.066 0 00.723-1.745 3.066 3.066 0 012.812-2.812zm7.44-1.22a.75.75 0 00-1.06 0L8.172 6.172a.75.75 0 00-1.06 1.06L8.94 9.332a.75.75 0 001.191.04l3.22-4.294a.75.75 0 00-.04-1.19z" clipRule="evenodd" />
                 </svg>
@@ -270,9 +270,9 @@ export const VehicleDetail: React.FC<VehicleDetailProps> = ({ vehicle, onBack: o
                   {/* Left Column: Media */}
                   <div className="lg:col-span-2 space-y-4">
                     {vehicle.videoUrl && (
-                      <div className="flex space-x-2 border-b-2 border-brand-gray-200 dark:border-brand-gray-200">
-                        <button onClick={() => setActiveMediaTab('images')} className={`py-2 px-4 font-semibold ${activeMediaTab === 'images' ? 'border-b-2' : 'text-spinny-text'}`} style={activeMediaTab === 'images' ? { borderColor: 'var(--spinny-orange)', color: 'var(--spinny-orange)' } : undefined}>Images</button>
-                        <button onClick={() => setActiveMediaTab('video')} className={`py-2 px-4 font-semibold ${activeMediaTab === 'video' ? 'border-b-2' : 'text-spinny-text'}`} style={activeMediaTab === 'video' ? { borderColor: 'var(--spinny-orange)', color: 'var(--spinny-orange)' } : undefined}>Video</button>
+                      <div className="flex space-x-2 border-b-2 border-gray-200-200 dark:border-gray-200-200">
+                        <button onClick={() => setActiveMediaTab('images')} className={`py-2 px-4 font-semibold ${activeMediaTab === 'images' ? 'border-b-2' : 'text-spinny-text'}`} style={activeMediaTab === 'images' ? { bordercolor: '#FF6B35', color: '#FF6B35' } : undefined}>Images</button>
+                        <button onClick={() => setActiveMediaTab('video')} className={`py-2 px-4 font-semibold ${activeMediaTab === 'video' ? 'border-b-2' : 'text-spinny-text'}`} style={activeMediaTab === 'video' ? { bordercolor: '#FF6B35', color: '#FF6B35' } : undefined}>Video</button>
                       </div>
                     )}
                     {activeMediaTab === 'images' ? (
@@ -289,7 +289,7 @@ export const VehicleDetail: React.FC<VehicleDetailProps> = ({ vehicle, onBack: o
                         {vehicle.images.length > 1 && (
                             <div className="flex space-x-2 overflow-x-auto pb-2 -mt-2">
                                 {vehicle.images.map((img, index) => (
-                                    <img key={index} src={img} alt={`Thumbnail ${index + 1}`} className={`cursor-pointer rounded-md border-2 h-20 w-28 object-cover flex-shrink-0 ${currentIndex === index ? '' : 'border-transparent'} transition`} style={currentIndex === index ? { borderColor: 'var(--spinny-orange)' } : undefined} onMouseEnter={(e) => currentIndex !== index && (e.currentTarget.style.borderColor = 'var(--spinny-blue)')} onMouseLeave={(e) => currentIndex !== index && (e.currentTarget.style.borderColor = '')} onClick={() => setCurrentIndex(index)} />
+                                    <img key={index} src={img} alt={`Thumbnail ${index + 1}`} className={`cursor-pointer rounded-md border-2 h-20 w-28 object-cover flex-shrink-0 ${currentIndex === index ? '' : 'border-transparent'} transition`} style={currentIndex === index ? { bordercolor: '#FF6B35' } : undefined} onMouseEnter={(e) => currentIndex !== index && (e.currentTarget.style.borderColor = 'var(--spinny-blue)')} onMouseLeave={(e) => currentIndex !== index && (e.currentTarget.style.borderColor = '')} onClick={() => setCurrentIndex(index)} />
                                 ))}
                             </div>
                         )}
@@ -304,7 +304,7 @@ export const VehicleDetail: React.FC<VehicleDetailProps> = ({ vehicle, onBack: o
                   {/* Right Column: Price and Actions */}
                   <div className="space-y-6 self-start lg:sticky top-24">
                       <div className="p-6 bg-white rounded-xl shadow-soft-lg space-y-4">
-                           <p className="text-4xl font-extrabold" style={{ color: 'var(--spinny-orange)' }}>₹{vehicle.price.toLocaleString('en-IN')}</p>
+                           <p className="text-4xl font-extrabold" style={{ color: '#FF6B35' }}>₹{vehicle.price.toLocaleString('en-IN')}</p>
                            <button onClick={() => onStartChat(vehicle)} className="w-full btn-brand-primary text-white font-bold py-3 px-6 rounded-lg text-lg transition-all transform hover:scale-105">
                                 Chat with Seller
                             </button>
@@ -340,8 +340,8 @@ export const VehicleDetail: React.FC<VehicleDetailProps> = ({ vehicle, onBack: o
                                     <BadgeDisplay badges={seller.badges || []} size="sm" />
                                 </div>
                             </div>
-                            <button onClick={() => onViewSellerProfile(seller.email)} className="mt-4 w-full text-center text-sm font-bold hover:underline transition-colors" style={{ color: 'var(--spinny-orange)' }} onMouseEnter={(e) => e.currentTarget.style.color = 'var(--spinny-blue)'} onMouseLeave={(e) => e.currentTarget.style.color = 'var(--spinny-orange)'}>View Seller Profile</button>
-                            {canRate && <div className="mt-4 pt-4 border-t dark:border-brand-gray-200">
+                            <button onClick={() => onViewSellerProfile(seller.email)} className="mt-4 w-full text-center text-sm font-bold hover:underline transition-colors" style={{ color: '#FF6B35' }} onMouseEnter={(e) => e.currentTarget.style.color = 'var(--spinny-blue)'} onMouseLeave={(e) => e.currentTarget.style.color = 'var(--spinny-orange)'}>View Seller Profile</button>
+                            {canRate && <div className="mt-4 pt-4 border-t dark:border-gray-200-200">
                                 <p className="text-sm font-medium text-center text-brand-gray-600 dark:text-spinny-text mb-2">Rate your experience with this seller</p>
                                 <div className="flex justify-center">
                                   <StarRating rating={0} onRate={handleRateSeller} />
@@ -407,7 +407,7 @@ export const VehicleDetail: React.FC<VehicleDetailProps> = ({ vehicle, onBack: o
                              <div>
                                 <h4 className="text-lg font-semibold text-spinny-text-dark dark:text-spinny-text-dark mb-4">AI Expert Analysis</h4>
                                 {isGeneratingProsCons ? (
-                                    <div className="flex items-center gap-2 text-spinny-text"><div className="w-5 h-5 border-2 border-dashed rounded-full animate-spin" style={{ borderColor: 'var(--spinny-orange)' }}></div> Generating...</div>
+                                    <div className="flex items-center gap-2 text-spinny-text"><div className="w-5 h-5 border-2 border-dashed rounded-full animate-spin" style={{ bordercolor: '#FF6B35' }}></div> Generating...</div>
                                 ) : prosAndCons ? (
                                     <div className="grid grid-cols-2 gap-4">
                                         <div>
@@ -420,7 +420,7 @@ export const VehicleDetail: React.FC<VehicleDetailProps> = ({ vehicle, onBack: o
                                         </div>
                                     </div>
                                 ) : (
-                                    <button onClick={handleGenerateProsCons} className="text-sm font-bold hover:underline transition-colors" style={{ color: 'var(--spinny-orange)' }} onMouseEnter={(e) => e.currentTarget.style.color = 'var(--spinny-blue)'} onMouseLeave={(e) => e.currentTarget.style.color = 'var(--spinny-orange)'}>Generate Pros & Cons</button>
+                                    <button onClick={handleGenerateProsCons} className="text-sm font-bold hover:underline transition-colors" style={{ color: '#FF6B35' }} onMouseEnter={(e) => e.currentTarget.style.color = 'var(--spinny-blue)'} onMouseLeave={(e) => e.currentTarget.style.color = 'var(--spinny-orange)'}>Generate Pros & Cons</button>
                                 )}
                             </div>
                         </div>

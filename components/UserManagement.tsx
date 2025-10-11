@@ -91,7 +91,7 @@ const CreateUserModal: React.FC<{
                         </div>
                     </div>
                     <div className="bg-white px-6 py-3 flex justify-end gap-4 rounded-b-lg">
-                        <button type="button" onClick={onClose} className="px-4 py-2 bg-spinny-white-dark text-spinny-text-dark rounded-md hover:bg-spinny-white">Cancel</button>
+                        <button type="button" onClick={onClose} className="px-4 py-2 bg-white-dark text-spinny-text-dark rounded-md hover:bg-white">Cancel</button>
                         <button type="submit" className="px-4 py-2 btn-brand-primary text-white rounded-md">Create User</button>
                     </div>
                 </form>
@@ -110,7 +110,7 @@ const UserManagement: React.FC<UserManagementProps> = ({ users, currentUser, onT
     }, [users, roleFilter]);
 
     const filterActions = (
-        <select value={roleFilter} onChange={(e) => setRoleFilter(e.target.value as RoleFilter)} className="p-2 border border-brand-gray dark:border-brand-gray-300 rounded-lg bg-white dark:text-spinny-text-dark">
+        <select value={roleFilter} onChange={(e) => setRoleFilter(e.target.value as RoleFilter)} className="p-2 border border-gray-200 dark:border-gray-200-300 rounded-lg bg-white dark:text-spinny-text-dark">
             <option value="all">All Users</option>
             <option value="customer">Customers</option>
             <option value="seller">Sellers</option>
@@ -121,7 +121,7 @@ const UserManagement: React.FC<UserManagementProps> = ({ users, currentUser, onT
         <div className="space-y-6 animate-fade-in">
             <div className="flex justify-between items-center">
                 <div>
-                     <button onClick={() => onNavigate(ViewEnum.ADMIN_PANEL)} className="text-sm hover:underline mb-2 transition-colors" style={{ color: 'var(--spinny-orange)' }} onMouseEnter={(e) => e.currentTarget.style.color = 'var(--spinny-blue)'} onMouseLeave={(e) => e.currentTarget.style.color = 'var(--spinny-orange)'}>&larr; Back to Admin Dashboard</button>
+                     <button onClick={() => onNavigate(ViewEnum.ADMIN_PANEL)} className="text-sm hover:underline mb-2 transition-colors" style={{ color: '#FF6B35' }} onMouseEnter={(e) => e.currentTarget.style.color = 'var(--spinny-blue)'} onMouseLeave={(e) => e.currentTarget.style.color = 'var(--spinny-orange)'}>&larr; Back to Admin Dashboard</button>
                      <h1 className="text-3xl font-extrabold text-spinny-text-dark dark:text-spinny-text-dark">User Management</h1>
                 </div>
                 <button onClick={() => setIsCreateModalOpen(true)} className="bg-spinny-orange-light0 text-white font-bold py-2 px-4 rounded-lg hover:bg-spinny-orange transition-colors">
@@ -136,7 +136,7 @@ const UserManagement: React.FC<UserManagementProps> = ({ users, currentUser, onT
                 </div>
                 <div className="overflow-x-auto">
                    <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
-                        <thead className="bg-spinny-white dark:bg-white">
+                        <thead className="bg-white dark:bg-white">
                             <tr>
                                 <th className="px-6 py-3 text-left text-xs font-medium uppercase">Name</th>
                                 <th className="px-6 py-3 text-left text-xs font-medium uppercase">Email</th>
@@ -153,7 +153,7 @@ const UserManagement: React.FC<UserManagementProps> = ({ users, currentUser, onT
                                         <td className="px-6 py-4">{user.name}</td>
                                         <td className="px-6 py-4">{user.email}</td>
                                         <td className="px-6 py-4"><span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${user.role === 'admin' ? 'bg-spinny-orange-light text-spinny-orange' : user.role === 'seller' ? 'brand-badge-orange' : 'bg-spinny-orange-light text-spinny-orange'}`}>{user.role}</span></td>
-                                        <td className="px-6 py-4"><span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${user.status === 'active' ? 'bg-spinny-orange-light text-spinny-orange' : 'bg-spinny-white-dark text-spinny-text-dark'}`}>{user.status}</span></td>
+                                        <td className="px-6 py-4"><span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${user.status === 'active' ? 'bg-spinny-orange-light text-spinny-orange' : 'bg-white-dark text-spinny-text-dark'}`}>{user.status}</span></td>
                                         <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                                             <button 
                                                 onClick={() => onToggleUserStatus(user.email)} 

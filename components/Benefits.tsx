@@ -25,7 +25,7 @@ const benefits = [
 
 const BenefitItem: React.FC<{ icon: string; title: string; }> = ({ icon, title }) => (
     <div className="flex flex-col items-center text-center gap-2">
-         <div className="w-16 h-16 rounded-full bg-spinny-off-white dark:bg-brand-gray-700 flex items-center justify-center" style={{ color: 'var(--spinny-blue)' }}>
+         <div className="w-16 h-16 rounded-full bg-spinny-off-white dark:bg-brand-gray-700 flex items-center justify-center" style={{ color: '#1E88E5' }}>
             <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d={icon} />
             </svg>

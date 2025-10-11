@@ -48,7 +48,7 @@ const EditUserModal: React.FC<EditUserModalProps> = ({ user, onClose, onSave }) 
                         <div className="space-y-4">
                              <div>
                                 <label className="block text-sm font-medium text-spinny-text-dark dark:text-spinny-text-dark">Email (Cannot be changed)</label>
-                                <input type="email" value={user.email} disabled className="mt-1 block w-full p-2 border rounded-md bg-spinny-white dark:bg-white" />
+                                <input type="email" value={user.email} disabled className="mt-1 block w-full p-2 border rounded-md bg-white dark:bg-white" />
                             </div>
                             <div>
                                 <label className="block text-sm font-medium text-spinny-text-dark dark:text-spinny-text-dark">Full Name</label>
@@ -69,7 +69,7 @@ const EditUserModal: React.FC<EditUserModalProps> = ({ user, onClose, onSave }) 
                         </div>
                     </div>
                     <div className="bg-white px-6 py-3 flex justify-end gap-4 rounded-b-lg">
-                        <button type="button" onClick={onClose} className="px-4 py-2 bg-spinny-white-dark text-spinny-text-dark rounded-md hover:bg-spinny-white">Cancel</button>
+                        <button type="button" onClick={onClose} className="px-4 py-2 bg-white-dark text-spinny-text-dark rounded-md hover:bg-white">Cancel</button>
                         <button type="submit" className="px-4 py-2 btn-brand-primary text-white rounded-md">Save Changes</button>
                     </div>
                 </form>

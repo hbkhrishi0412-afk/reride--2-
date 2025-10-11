@@ -74,11 +74,11 @@ const Pagination: React.FC<{ currentPage: number; totalPages: number; onPageChan
 
   return (
     <nav className="flex justify-center items-center space-x-2 mt-8">
-      <button onClick={() => onPageChange(currentPage - 1)} disabled={currentPage === 1} className="px-4 py-2 rounded-md bg-spinny-white dark:bg-brand-gray-700 disabled:opacity-50">Prev</button>
+      <button onClick={() => onPageChange(currentPage - 1)} disabled={currentPage === 1} className="px-4 py-2 rounded-md bg-white dark:bg-brand-gray-700 disabled:opacity-50">Prev</button>
       {pageNumbers.map(number => (
-        <button key={number} onClick={() => onPageChange(number)} className={`px-4 py-2 rounded-md ${currentPage === number ? 'text-white' : 'bg-spinny-white dark:bg-brand-gray-700'}`} style={currentPage === number ? { background: 'var(--spinny-orange)' } : undefined}>{number}</button>
+        <button key={number} onClick={() => onPageChange(number)} className={`px-4 py-2 rounded-md ${currentPage === number ? 'text-white' : 'bg-white dark:bg-brand-gray-700'}`} style={currentPage === number ? { background: '#FF6B35' } : undefined}>{number}</button>
       ))}
-      <button onClick={() => onPageChange(currentPage + 1)} disabled={currentPage === totalPages} className="px-4 py-2 rounded-md bg-spinny-white dark:bg-brand-gray-700 disabled:opacity-50">Next</button>
+      <button onClick={() => onPageChange(currentPage + 1)} disabled={currentPage === totalPages} className="px-4 py-2 rounded-md bg-white dark:bg-brand-gray-700 disabled:opacity-50">Next</button>
     </nav>
   );
 };
@@ -403,7 +403,7 @@ const VehicleList: React.FC<VehicleListProps> = ({ vehicles, onSelectVehicle, is
   if (isWishlistMode) {
      return (
       <div className="animate-fade-in container mx-auto px-4 py-8">
-        <h1 className="text-4xl font-extrabold text-spinny-text-dark dark:text-spinny-text-dark mb-6 border-b border-brand-gray-200 dark:border-brand-gray-200 pb-4">{categoryTitle}</h1>
+        <h1 className="text-4xl font-extrabold text-spinny-text-dark dark:text-spinny-text-dark mb-6 border-b border-gray-200-200 dark:border-gray-200-200 pb-4">{categoryTitle}</h1>
         <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {isLoading ? (
             Array.from({ length: 3 }).map((_, index) => <VehicleCardSkeleton key={index} />)
@@ -423,7 +423,7 @@ const VehicleList: React.FC<VehicleListProps> = ({ vehicles, onSelectVehicle, is
     );
   }
 
-  const formElementClass = "block w-full p-3 border border-brand-gray-300 dark:border-brand-gray-300 rounded-lg focus:outline-none transition bg-white dark:bg-white dark:text-spinny-text-dark disabled:bg-spinny-light-gray dark:disabled:bg-spinny-light-gray disabled:cursor-not-allowed";
+  const formElementClass = "block w-full p-3 border border-gray-200-300 dark:border-gray-200-300 rounded-lg focus:outline-none transition bg-white dark:bg-white dark:text-spinny-text-dark disabled:bg-spinny-light-gray dark:disabled:bg-spinny-light-gray disabled:cursor-not-allowed";
 
   const renderFilterControls = (isMobile: boolean) => {
     const state = isMobile ? tempFilters : { categoryFilter, makeFilter, modelFilter, priceRange, mileageRange, fuelTypeFilter, yearFilter, colorFilter, stateFilter, selectedFeatures, featureSearch };
@@ -586,16 +586,16 @@ const VehicleList: React.FC<VehicleListProps> = ({ vehicles, onSelectVehicle, is
                 <label htmlFor="features-filter-button" className="block text-sm font-medium text-spinny-text-dark dark:text-spinny-text-dark mb-1">Features</label>
                 <button id="features-filter-button" type="button" onClick={() => isMobile ? setIsMobileFeaturesOpen(p => !p) : setIsFeaturesOpen(p => !p)} className={`${formElementClass} flex justify-between items-center text-left min-h-[50px]`}>
                     <div className="flex flex-wrap gap-1 items-center">
-                        {state.selectedFeatures.length > 0 ? ( state.selectedFeatures.slice(0, 2).map(feature => ( <span key={feature} className="text-white text-xs font-semibold px-2 py-1 rounded-full flex items-center gap-1.5" style={{ background: 'var(--spinny-orange)' }}>{feature} <button type="button" onClick={(e) => { e.stopPropagation(); handleFeatureToggleLocal(feature); }} className="bg-spinny-white/20 hover:bg-spinny-white/40 rounded-full h-4 w-4 flex items-center justify-center text-white" aria-label={`Remove ${feature}`}>&times;</button></span>)) ) : ( <span className="text-spinny-text dark:text-spinny-text">Select features...</span> )}
+                        {state.selectedFeatures.length > 0 ? ( state.selectedFeatures.slice(0, 2).map(feature => ( <span key={feature} className="text-white text-xs font-semibold px-2 py-1 rounded-full flex items-center gap-1.5" style={{ background: '#FF6B35' }}>{feature} <button type="button" onClick={(e) => { e.stopPropagation(); handleFeatureToggleLocal(feature); }} className="bg-white/20 hover:bg-white/40 rounded-full h-4 w-4 flex items-center justify-center text-white" aria-label={`Remove ${feature}`}>&times;</button></span>)) ) : ( <span className="text-spinny-text dark:text-spinny-text">Select features...</span> )}
                         {state.selectedFeatures.length > 2 && ( <span className="text-xs font-semibold text-spinny-text dark:text-spinny-text">+{state.selectedFeatures.length - 2} more</span> )}
                     </div>
-                    <svg className={`w-5 h-5 text-brand-gray-400 transition-transform flex-shrink-0 ${(isMobile ? isMobileFeaturesOpen : isFeaturesOpen) ? 'transform rotate-180' : ''}`} xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" /></svg>
+                    <svg className={`w-5 h-5 text-gray-400 transition-transform flex-shrink-0 ${(isMobile ? isMobileFeaturesOpen : isFeaturesOpen) ? 'transform rotate-180' : ''}`} xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" /></svg>
                 </button>
                 {(isMobile ? isMobileFeaturesOpen : isFeaturesOpen) && (
-                    <div className="absolute top-full mt-2 w-full bg-spinny-white dark:bg-brand-gray-700 rounded-lg shadow-soft-xl border border-brand-gray-200 dark:border-brand-gray-300 z-20 overflow-hidden animate-fade-in">
-                        <div className="p-2"><input ref={featuresSearchInputRef} type="text" placeholder="Search features..." value={isMobile ? tempFilters.featureSearch : featureSearch} onChange={e => { isMobile ? setTempFilters(p => ({...p, featureSearch: e.target.value})) : setFeatureSearch(e.target.value) }} className="block w-full p-2 border border-brand-gray-300 dark:border-brand-gray-500 rounded-md bg-white text-sm focus:outline-none" onFocus={(e) => { e.currentTarget.style.borderColor = 'var(--spinny-orange)'; e.currentTarget.style.boxShadow = '0 0 0 2px var(--spinny-orange-light)'; }} onBlur={(e) => { e.currentTarget.style.borderColor = ''; e.currentTarget.style.boxShadow = ''; }} /></div>
+                    <div className="absolute top-full mt-2 w-full bg-white dark:bg-brand-gray-700 rounded-lg shadow-soft-xl border border-gray-200-200 dark:border-gray-200-300 z-20 overflow-hidden animate-fade-in">
+                        <div className="p-2"><input ref={featuresSearchInputRef} type="text" placeholder="Search features..." value={isMobile ? tempFilters.featureSearch : featureSearch} onChange={e => { isMobile ? setTempFilters(p => ({...p, featureSearch: e.target.value})) : setFeatureSearch(e.target.value) }} className="block w-full p-2 border border-gray-200-300 dark:border-gray-200-500 rounded-md bg-white text-sm focus:outline-none" onFocus={(e) => { e.currentTarget.style.borderColor = 'var(--spinny-orange)'; e.currentTarget.style.boxShadow = '0 0 0 2px rgba(255, 107, 53, 0.1)'; }} onBlur={(e) => { e.currentTarget.style.borderColor = ''; e.currentTarget.style.boxShadow = ''; }} /></div>
                         <div className="max-h-48 overflow-y-auto">
-                            {(isMobile ? tempFilteredFeatures : filteredFeatures).map(feature => ( <label key={feature} className="flex items-center space-x-3 cursor-pointer group p-3 transition-colors hover:bg-spinny-off-white dark:hover:bg-brand-gray-600"><input type="checkbox" checked={state.selectedFeatures.includes(feature)} onChange={() => handleFeatureToggleLocal(feature)} className="h-4 w-4 rounded border-brand-gray-300 dark:border-brand-gray-500 bg-transparent" style={{ accentColor: 'var(--spinny-orange)' }} /><span className="text-sm text-spinny-text-dark dark:text-brand-gray-200">{feature}</span></label> ))}
+                            {(isMobile ? tempFilteredFeatures : filteredFeatures).map(feature => ( <label key={feature} className="flex items-center space-x-3 cursor-pointer group p-3 transition-colors hover:bg-spinny-off-white dark:hover:bg-brand-gray-600"><input type="checkbox" checked={state.selectedFeatures.includes(feature)} onChange={() => handleFeatureToggleLocal(feature)} className="h-4 w-4 rounded border-gray-200-300 dark:border-gray-200-500 bg-transparent" style={{ accentcolor: '#FF6B35' }} /><span className="text-sm text-spinny-text-dark dark:text-brand-gray-200">{feature}</span></label> ))}
                             {(isMobile ? tempFilteredFeatures.length === 0 : filteredFeatures.length === 0) && ( <p className="p-3 text-sm text-center text-spinny-text dark:text-spinny-text">No features found.</p> )}
                         </div>
                     </div>
@@ -627,17 +627,17 @@ const VehicleList: React.FC<VehicleListProps> = ({ vehicles, onSelectVehicle, is
                       <button onClick={() => handleAiSearch()} disabled={isAiSearching} className="btn-brand-primary text-white font-bold py-2 px-6 rounded-lg transition-colors disabled:bg-brand-gray-400 disabled:cursor-wait">{isAiSearching ? '...' : 'Search'}</button>
                   </div>
                   {showSuggestions && suggestions.length > 0 && (
-                      <div className="absolute top-full mt-2 w-full bg-spinny-white dark:bg-brand-gray-700 rounded-lg shadow-soft-xl border border-brand-gray-200 dark:border-brand-gray-300 z-10 overflow-hidden"><ul className="divide-y divide-brand-gray-100 dark:divide-brand-gray-600">{suggestions.map((suggestion, index) => ( <li key={index}><button onClick={() => handleSuggestionClick(suggestion)} className="w-full text-left px-4 py-2 text-spinny-text-dark dark:text-brand-gray-200 hover:bg-spinny-off-white dark:hover:bg-brand-gray-600 transition-colors">{suggestion}</button></li>))}</ul></div>
+                      <div className="absolute top-full mt-2 w-full bg-white dark:bg-brand-gray-700 rounded-lg shadow-soft-xl border border-gray-200-200 dark:border-gray-200-300 z-10 overflow-hidden"><ul className="divide-y divide-brand-gray-100 dark:divide-brand-gray-600">{suggestions.map((suggestion, index) => ( <li key={index}><button onClick={() => handleSuggestionClick(suggestion)} className="w-full text-left px-4 py-2 text-spinny-text-dark dark:text-brand-gray-200 hover:bg-spinny-off-white dark:hover:bg-brand-gray-600 transition-colors">{suggestion}</button></li>))}</ul></div>
                   )}
               </div>
           </div>
 
           <div className="flex flex-col sm:flex-row justify-between items-center gap-4">
               <div className='flex items-center gap-2'>
-                <button onClick={() => setIsDesktopFilterVisible(prev => !prev)} className="hidden lg:block p-2 rounded-md bg-spinny-white dark:bg-brand-gray-700 hover:bg-spinny-off-white dark:hover:bg-brand-gray-600 transition-colors">
+                <button onClick={() => setIsDesktopFilterVisible(prev => !prev)} className="hidden lg:block p-2 rounded-md bg-white dark:bg-brand-gray-700 hover:bg-spinny-off-white dark:hover:bg-brand-gray-600 transition-colors">
                   <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fillRule="evenodd" d="M3 3a1 1 0 011-1h12a1 1 0 011 1v3a1 1 0 01-.293.707L12 11.414V15a1 1 0 01-.293.707l-2 2A1 1 0 018 17v-5.586L3.293 6.707A1 1 0 013 6V3z" clipRule="evenodd" /></svg>
                 </button>
-                <button onClick={handleOpenFilterModal} className="lg:hidden relative p-2 rounded-md bg-spinny-white dark:bg-brand-gray-700 hover:bg-spinny-off-white dark:hover:bg-brand-gray-600 transition-colors">
+                <button onClick={handleOpenFilterModal} className="lg:hidden relative p-2 rounded-md bg-white dark:bg-brand-gray-700 hover:bg-spinny-off-white dark:hover:bg-brand-gray-600 transition-colors">
                     <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fillRule="evenodd" d="M3 3a1 1 0 011-1h12a1 1 0 011 1v3a1 1 0 01-.293.707L12 11.414V15a1 1 0 01-.293.707l-2 2A1 1 0 018 17v-5.586L3.293 6.707A1 1 0 013 6V3z" clipRule="evenodd" /></svg>
                     {activeFilterCount > 0 && (
                         <span className="absolute -top-1 -right-1 inline-flex items-center justify-center px-1.5 py-0.5 text-xs font-bold leading-none text-spinny-orange bg-spinny-orange rounded-full">{activeFilterCount}</span>
@@ -647,10 +647,10 @@ const VehicleList: React.FC<VehicleListProps> = ({ vehicles, onSelectVehicle, is
               </div>
               <div className="flex items-center gap-4">
                 <div className="flex items-center p-1 bg-spinny-off-white dark:bg-brand-gray-700 rounded-lg">
-                  <button title="Grid View" onClick={() => setViewMode('grid')} className={`p-2 rounded-md transition-colors ${viewMode === 'grid' ? 'bg-white shadow' : 'text-spinny-text hover:text-spinny-text-dark dark:hover:text-brand-gray-200'}`} style={viewMode === 'grid' ? { color: 'var(--spinny-orange)' } : undefined}>
+                  <button title="Grid View" onClick={() => setViewMode('grid')} className={`p-2 rounded-md transition-colors ${viewMode === 'grid' ? 'bg-white shadow' : 'text-spinny-text hover:text-spinny-text-dark dark:hover:text-brand-gray-200'}`} style={viewMode === 'grid' ? { color: '#FF6B35' } : undefined}>
                     <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path d="M5 3a2 2 0 00-2 2v2a2 2 0 002 2h2a2 2 0 002-2V5a2 2 0 00-2-2H5zM5 11a2 2 0 00-2 2v2a2 2 0 002 2h2a2 2 0 002-2v-2a2 2 0 00-2-2H5zM11 5a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V5zM11 13a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" /></svg>
                   </button>
-                  <button title="List View" onClick={() => setViewMode('tile')} className={`p-2 rounded-md transition-colors ${viewMode === 'tile' ? 'bg-white shadow' : 'text-spinny-text hover:text-spinny-text-dark dark:hover:text-brand-gray-200'}`} style={viewMode === 'tile' ? { color: 'var(--spinny-orange)' } : undefined}>
+                  <button title="List View" onClick={() => setViewMode('tile')} className={`p-2 rounded-md transition-colors ${viewMode === 'tile' ? 'bg-white shadow' : 'text-spinny-text hover:text-spinny-text-dark dark:hover:text-brand-gray-200'}`} style={viewMode === 'tile' ? { color: '#FF6B35' } : undefined}>
                     <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path d="M2 4a1 1 0 011-1h14a1 1 0 110 2H3a1 1 0 01-1-1zM2 9a1 1 0 011-1h14a1 1 0 110 2H3a1 1 0 01-1-1zM2 14a1 1 0 011-1h14a1 1 0 110 2H3a1 1 0 01-1-1z" /></svg>
                   </button>
                 </div>
@@ -707,14 +707,14 @@ const VehicleList: React.FC<VehicleListProps> = ({ vehicles, onSelectVehicle, is
       {isFilterModalOpen && (
         <div className="lg:hidden fixed inset-0 bg-black bg-opacity-60 z-50 animate-fade-in" onClick={handleCloseFilterModal}>
             <div className="bg-white rounded-t-2xl h-[90vh] flex flex-col absolute bottom-0 left-0 right-0 animate-slide-in-up" onClick={e => e.stopPropagation()}>
-                <div className="p-4 border-b border-brand-gray-200 dark:border-brand-gray-200 flex justify-between items-center flex-shrink-0">
+                <div className="p-4 border-b border-gray-200-200 dark:border-gray-200-200 flex justify-between items-center flex-shrink-0">
                     <h2 className="text-xl font-bold text-spinny-text-dark dark:text-spinny-text-dark">Filters</h2>
                     <button onClick={handleCloseFilterModal} className="p-2 -mr-2 text-spinny-text text-2xl">&times;</button>
                 </div>
                 <div className="overflow-y-auto p-6 flex-grow">
                     {renderFilterControls(true)}
                 </div>
-                <div className="p-4 border-t border-brand-gray-200 dark:border-brand-gray-200 flex gap-4 bg-white flex-shrink-0">
+                <div className="p-4 border-t border-gray-200-200 dark:border-gray-200-200 flex gap-4 bg-white flex-shrink-0">
                     <button onClick={handleResetTempFilters} className="w-full bg-spinny-light-gray dark:bg-brand-gray-700 text-spinny-text-dark dark:text-brand-gray-200 font-bold py-3 px-4 rounded-lg hover:bg-brand-gray-300 dark:hover:bg-brand-gray-600 transition-colors">Reset</button>
                     <button onClick={handleApplyFilters} className="w-full btn-brand-primary text-white font-bold py-3 px-4 rounded-lg transition-colors">Apply Filters</button>
                 </div>
@@ -722,10 +722,10 @@ const VehicleList: React.FC<VehicleListProps> = ({ vehicles, onSelectVehicle, is
                   .slider-thumb { -webkit-appearance: none; appearance: none; background-color: transparent; pointer-events: none; }
                   .slider-thumb::-webkit-slider-thumb { -webkit-appearance: none; appearance: none; width: 20px; height: 20px; background-color: var(--spinny-orange); border: 3px solid var(--spinny-white); box-shadow: 0 0 0 1px var(--spinny-text-dark-light); border-radius: 50%; cursor: pointer; pointer-events: auto; transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out; }
                   html.dark .slider-thumb::-webkit-slider-thumb { border-color: var(--spinny-text-dark-dark); box-shadow: 0 0 0 1px var(--spinny-text-dark); }
-                  .slider-thumb:hover::-webkit-slider-thumb, .slider-thumb:focus::-webkit-slider-thumb { transform: scale(1.15); box-shadow: 0 0 0 4px var(--spinny-orange-light); }
+                  .slider-thumb:hover::-webkit-slider-thumb, .slider-thumb:focus::-webkit-slider-thumb { transform: scale(1.15); box-shadow: 0 0 0 4px rgba(255, 107, 53, 0.1); }
                   .slider-thumb::-moz-range-thumb { width: 20px; height: 20px; background-color: var(--spinny-orange); border: 3px solid var(--spinny-white); box-shadow: 0 0 0 1px var(--spinny-text-dark-light); border-radius: 50%; cursor: pointer; pointer-events: auto; transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out; }
                   html.dark .slider-thumb::-moz-range-thumb { border-color: var(--spinny-text-dark-dark); box-shadow: 0 0 0 1px var(--spinny-text-dark); }
-                  .slider-thumb:hover::-moz-range-thumb, .slider-thumb:focus::-moz-range-thumb { transform: scale(1.15); box-shadow: 0 0 0 4px var(--spinny-orange-light); }
+                  .slider-thumb:hover::-moz-range-thumb, .slider-thumb:focus::-moz-range-thumb { transform: scale(1.15); box-shadow: 0 0 0 4px rgba(255, 107, 53, 0.1); }
                 `}</style>
             </div>
         </div>

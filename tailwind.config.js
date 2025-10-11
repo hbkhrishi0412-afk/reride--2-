@@ -10,83 +10,94 @@ export default {
   theme: {
     extend: {
       colors: {
-        // Inside the Head Theme Colors
-        'brand': {
-          // Deep Red
-          'deep-red': '#8E0D3C',
-          'deep-red-hover': '#B01048',
-          'deep-red-light': 'rgba(142, 13, 60, 0.1)',
-          'deep-red-dark': '#6A0A2D',
+        // Spinny-Inspired Theme - Vibrant & Professional
+        'spinny': {
+          // Primary Orange (Main Brand Color)
+          'orange': '#FF6B35',
+          'orange-hover': '#FF8456',
+          'orange-light': 'rgba(255, 107, 53, 0.1)',
+          'orange-dark': '#E85A2B',
           
-          // Blackcurrant (Updated for better visibility)
-          'blackcurrant': '#2D2652',
-          'blackcurrant-light': '#4A3F7A',
-          'blackcurrant-dark': '#1D1842',
+          // Secondary Blue (Trust & Info)
+          'blue': '#1E88E5',
+          'blue-hover': '#42A5F5',
+          'blue-light': 'rgba(30, 136, 229, 0.1)',
+          'blue-dark': '#1976D2',
           
-          // Orange
-          'orange': '#EF3B33',
-          'orange-hover': '#FF4D44',
-          'orange-light': 'rgba(239, 59, 51, 0.1)',
-          'orange-dark': '#D42F27',
-          
-          // Rose Pink
-          'rose-pink': '#FDA1A2',
-          'rose-pink-hover': '#FEB5B6',
-          'rose-pink-light': 'rgba(253, 161, 162, 0.2)',
-          'rose-pink-dark': '#FC8D8E',
-          
-          // Neutral Colors
+          // Neutral Colors - Clean & Modern
           'white': '#FFFFFF',
-          'off-white': '#FFF8F9',
-          'light-gray': '#F8F9FA',
-          'gray': {
-            DEFAULT: '#E9ECEF',
-            50: '#F8F9FA',
-            100: '#F1F3F5',
-            200: '#E9ECEF',
-            300: '#DEE2E6',
-            400: '#CED4DA',
-            500: '#ADB5BD',
-            600: '#6C757D',
-            700: '#495057',
-            800: '#343A40',
-            900: '#212529',
-            'darker': '#1A1D20',
+          'off-white': '#FAFAFA',
+          'light-gray': '#F5F5F5',
+          'gray': '#E0E0E0',
+          'medium-gray': '#9E9E9E',
+          'dark-gray': '#616161',
+          
+          // Text Colors - High Contrast
+          'text': {
+            DEFAULT: '#2C2C2C',
+            dark: '#1A1A1A',
+            medium: '#616161',
+            light: '#9E9E9E',
           },
-          'medium-gray': '#6C757D',
-          'dark-gray': '#343A40',
-          'text-dark': '#2C3E50',
-          'text-gray': '#495057',
+          
+          // Status Colors
+          'success': '#4CAF50',
+          'warning': '#FFC107',
+          'error': '#F44336',
+          'info': '#1E88E5',
         },
         
-        // Legacy Spinny colors (mapped to new theme)
-        'spinny': {
-          'orange': '#EF3B33',
-          'orange-hover': '#FF4D44',
-          'orange-light': 'rgba(239, 59, 51, 0.1)',
-          'orange-dark': '#D42F27',
-        }
+        // Backward compatibility aliases
+        'brand': {
+          'orange': '#FF6B35',
+          'orange-hover': '#FF8456',
+          'orange-light': 'rgba(255, 107, 53, 0.1)',
+          'white': '#FFFFFF',
+          'text': {
+            DEFAULT: '#2C2C2C',
+            dark: '#1A1A1A',
+          },
+          'gray': {
+            50: '#FAFAFA',
+            100: '#F5F5F5',
+            200: '#E0E0E0',
+            300: '#BDBDBD',
+            400: '#9E9E9E',
+            500: '#757575',
+            600: '#616161',
+            700: '#424242',
+            800: '#2C2C2C',
+            900: '#1A1A1A',
+          },
+        },
       },
       backgroundImage: {
-        'gradient-primary': 'linear-gradient(135deg, #8E0D3C 0%, #4A3F7A 100%)',
-        'gradient-warm': 'linear-gradient(135deg, #EF3B33 0%, #8E0D3C 100%)',
-        'gradient-soft': 'linear-gradient(135deg, #FDA1A2 0%, #EF3B33 100%)',
-        'gradient-dark': 'linear-gradient(135deg, #2D2652 0%, #1D1842 100%)',
+        'gradient-orange': 'linear-gradient(135deg, #FF6B35 0%, #FF8456 100%)',
+        'gradient-hero': 'linear-gradient(135deg, #FF6B35 0%, #E85A2B 100%)',
+        'gradient-subtle': 'linear-gradient(180deg, #FFFFFF 0%, #F5F5F5 100%)',
+        'gradient-primary': 'linear-gradient(135deg, #FF6B35 0%, #FF8456 100%)',
       },
       boxShadow: {
-        'red': '0 4px 20px rgba(142, 13, 60, 0.3)',
-        'orange': '0 4px 20px rgba(239, 59, 51, 0.3)',
-        'pink': '0 4px 20px rgba(253, 161, 162, 0.3)',
-        'soft': '0 2px 8px rgba(29, 24, 66, 0.1)',
-        'soft-lg': '0 8px 32px rgba(29, 24, 66, 0.2)',
+        'spinny': '0 2px 8px rgba(0, 0, 0, 0.08)',
+        'spinny-md': '0 4px 16px rgba(0, 0, 0, 0.1)',
+        'spinny-lg': '0 8px 32px rgba(0, 0, 0, 0.12)',
+        'orange': '0 4px 20px rgba(255, 107, 53, 0.3)',
+        'soft': '0 2px 8px rgba(0, 0, 0, 0.08)',
+        'soft-lg': '0 8px 32px rgba(0, 0, 0, 0.12)',
       },
       borderRadius: {
-        'spinny-sm': '8px',
-        'spinny-md': '12px',
-        'spinny-lg': '16px',
-      }
+        'spinny-sm': '6px',
+        'spinny-md': '8px',
+        'spinny-lg': '12px',
+        'spinny-xl': '16px',
+        'brand-sm': '6px',
+        'brand-md': '8px',
+        'brand-lg': '12px',
+      },
+      fontFamily: {
+        sans: ['Nunito Sans', 'Inter', 'system-ui', 'sans-serif'],
+      },
     },
   },
   plugins: [],
 }
-

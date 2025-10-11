@@ -82,7 +82,7 @@ const FeaturedVehicleCard: React.FC<Pick<HomeProps, 'onSelectVehicle' | 'onToggl
                 backgroundColor: isInWishlist ? 'var(--spinny-orange)' : 'white',
                 color: isInWishlist ? 'white' : 'var(--spinny-text-dark)'
               }}
-              onMouseEnter={(e) => !isInWishlist && (e.currentTarget.style.backgroundColor = 'var(--spinny-blue-light)')}
+              onMouseEnter={(e) => !isInWishlist && (e.currentTarget.style.backgroundColor = 'rgba(30, 136, 229, 0.1)')}
               onMouseLeave={(e) => !isInWishlist && (e.currentTarget.style.backgroundColor = 'white')}
             >
               <svg className="h-5 w-5" fill={isInWishlist ? "currentColor" : "none"} viewBox="0 0 24 24" stroke="currentColor">
@@ -122,7 +122,7 @@ const FeaturedVehicleCard: React.FC<Pick<HomeProps, 'onSelectVehicle' | 'onToggl
           </div>
           
           {/* Price */}
-          <div className="flex justify-between items-center pt-4 border-t border-spinny-blue">
+          <div className="flex justify-between items-center pt-4 border-t border-gray-200">
             <div>
               <div className="spinny-price">
                 ₹{(vehicle.price / 100000).toFixed(2)} Lakh
@@ -134,7 +134,7 @@ const FeaturedVehicleCard: React.FC<Pick<HomeProps, 'onSelectVehicle' | 'onToggl
             <button 
               onClick={handleQuickViewClick}
               className="font-semibold text-sm flex items-center gap-1 transition-colors"
-              style={{ color: 'var(--spinny-orange)' }}
+              style={{ color: '#FF6B35' }}
               onMouseEnter={(e) => e.currentTarget.style.color = 'var(--spinny-blue)'}
               onMouseLeave={(e) => e.currentTarget.style.color = 'var(--spinny-orange)'}
             >
@@ -208,16 +208,16 @@ const Home: React.FC<HomeProps> = ({ onSearch, onSelectCategory, featuredVehicle
             {/* Hero Section */}
             <section className="spinny-hero">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-                    <h1 className="text-4xl md:text-5xl font-bold mb-4" style={{ color: 'var(--spinny-white)' }}>
+                    <h1 className="text-4xl md:text-5xl font-bold mb-4" style={{ color: 'white' }}>
                         Buy Quality Used Cars
                     </h1>
-                    <p className="text-xl mb-8" style={{ color: 'var(--spinny-blue)' }}>
+                    <p className="text-xl mb-8" style={{ color: '#1E88E5' }}>
                         200+ Quality Checks • Fixed Price • 5-Day Money Back
                     </p>
                     
                     {/* Search Bar */}
                     <div className="max-w-3xl mx-auto">
-                        <div className="bg-spinny-white rounded-2xl p-2 shadow-lg">
+                        <div className="bg-white rounded-2xl p-2 shadow-lg">
                             <div className="flex flex-col md:flex-row gap-2">
                                 <input
                                     type="text"
@@ -248,40 +248,40 @@ const Home: React.FC<HomeProps> = ({ onSearch, onSelectCategory, featuredVehicle
                     {/* Trust Badges */}
                     <div className="mt-12 grid grid-cols-1 md:grid-cols-4 gap-4 max-w-5xl mx-auto">
                         <div className="spinny-trust-badge">
-                            <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 20 20" style={{ color: 'var(--spinny-blue)' }}>
+                            <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 20 20" style={{ color: '#1E88E5' }}>
                                 <path fillRule="evenodd" d="M2.166 4.999A11.954 11.954 0 0010 1.944 11.954 11.954 0 0017.834 5c.11.65.166 1.32.166 2.001 0 5.225-3.34 9.67-8 11.317C5.34 16.67 2 12.225 2 7c0-.682.057-1.35.166-2.001zm11.541 3.708a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" />
                             </svg>
-                            <span className="font-semibold" style={{ color: 'var(--spinny-white)' }}>200+ Quality Checks</span>
+                            <span className="font-semibold" style={{ color: 'white' }}>200+ Quality Checks</span>
                         </div>
                         <div className="spinny-trust-badge">
-                            <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 20 20" style={{ color: 'var(--spinny-blue)' }}>
+                            <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 20 20" style={{ color: '#1E88E5' }}>
                                 <path d="M8.433 7.418c.155-.103.346-.196.567-.267v1.698a2.305 2.305 0 01-.567-.267C8.07 8.34 8 8.114 8 8c0-.114.07-.34.433-.582zM11 12.849v-1.698c.22.071.412.164.567.267.364.243.433.468.433.582 0 .114-.07.34-.433.582a2.305 2.305 0 01-.567.267z" />
                                 <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-13a1 1 0 10-2 0v.092a4.535 4.535 0 00-1.676.662C6.602 6.234 6 7.009 6 8c0 .99.602 1.765 1.324 2.246.48.32 1.054.545 1.676.662v1.941c-.391-.127-.68-.317-.843-.504a1 1 0 10-1.51 1.31c.562.649 1.413 1.076 2.353 1.253V15a1 1 0 102 0v-.092a4.535 4.535 0 001.676-.662C13.398 13.766 14 12.991 14 12c0-.99-.602-1.765-1.324-2.246A4.535 4.535 0 0011 9.092V7.151c.391.127.68.317.843.504a1 1 0 101.511-1.31c-.563-.649-1.413-1.076-2.354-1.253V5z" />
                             </svg>
-                            <span className="font-semibold" style={{ color: 'var(--spinny-white)' }}>Fixed Price</span>
+                            <span className="font-semibold" style={{ color: 'white' }}>Fixed Price</span>
                         </div>
                         <div className="spinny-trust-badge">
-                            <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 20 20" style={{ color: 'var(--spinny-blue)' }}>
+                            <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 20 20" style={{ color: '#1E88E5' }}>
                                 <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" />
                             </svg>
-                            <span className="font-semibold" style={{ color: 'var(--spinny-white)' }}>5-Day Money Back</span>
+                            <span className="font-semibold" style={{ color: 'white' }}>5-Day Money Back</span>
                         </div>
                         <div className="spinny-trust-badge">
-                            <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 20 20" style={{ color: 'var(--spinny-blue)' }}>
+                            <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 20 20" style={{ color: '#1E88E5' }}>
                                 <path d="M9 2a1 1 0 000 2h2a1 1 0 100-2H9z" />
                                 <path fillRule="evenodd" d="M4 5a2 2 0 012-2 3 3 0 003 3h2a3 3 0 003-3 2 2 0 012 2v11a2 2 0 01-2 2H6a2 2 0 01-2-2V5zm3 4a1 1 0 000 2h.01a1 1 0 100-2H7zm3 0a1 1 0 000 2h3a1 1 0 100-2h-3zm-3 4a1 1 0 100 2h.01a1 1 0 100-2H7zm3 0a1 1 0 100 2h3a1 1 0 100-2h-3z" />
                             </svg>
-                            <span className="font-semibold" style={{ color: 'var(--spinny-white)' }}>Free RC Transfer</span>
+                            <span className="font-semibold" style={{ color: 'white' }}>Free RC Transfer</span>
                         </div>
                     </div>
                 </div>
             </section>
             
             {/* Featured Vehicles Section */}
-            <section className="py-16 bg-spinny-white">
+            <section className="py-16 bg-white">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="flex justify-between items-center mb-8">
-                        <h2 className="spinny-section-header" style={{ color: 'var(--spinny-text-dark)' }}>Featured Cars</h2>
+                        <h2 className="spinny-section-header" style={{ color: '#1A1A1A' }}>Featured Cars</h2>
                         <button 
                             onClick={() => onNavigate(ViewEnum.USED_CARS)}
                             className="btn-brand-secondary"
@@ -309,9 +309,9 @@ const Home: React.FC<HomeProps> = ({ onSearch, onSelectCategory, featuredVehicle
             </section>
 
             {/* Categories Section */}
-            <section className="py-16 bg-spinny-white">
+            <section className="py-16 bg-white">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                    <h2 className="spinny-section-header text-center mb-8" style={{ color: 'var(--spinny-text-dark)' }}>
+                    <h2 className="spinny-section-header text-center mb-8" style={{ color: '#1A1A1A' }}>
                         Browse by Category
                     </h2>
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
@@ -321,10 +321,10 @@ const Home: React.FC<HomeProps> = ({ onSearch, onSelectCategory, featuredVehicle
                                 onClick={() => onSelectCategory(category)}
                                 className="category-button"
                             >
-                                <div className="mb-4" style={{ color: 'var(--spinny-blue)' }}>
+                                <div className="mb-4" style={{ color: '#1E88E5' }}>
                                     {categoryIcons[category]}
                                 </div>
-                                <h3 className="font-semibold" style={{ color: 'var(--spinny-text-dark)' }}>
+                                <h3 className="font-semibold" style={{ color: '#1A1A1A' }}>
                                     {category.replace('_', ' ')}
                                 </h3>
                             </button>
@@ -334,14 +334,14 @@ const Home: React.FC<HomeProps> = ({ onSearch, onSelectCategory, featuredVehicle
                 
                 {/* Background decorative elements */}
                 <div className="absolute top-0 left-0 w-full h-full pointer-events-none">
-                    <div className="absolute top-20 left-20 w-32 h-32 rounded-full opacity-20 animate-float" style={{ background: 'var(--spinny-blue-light)' }}></div>
+                    <div className="absolute top-20 left-20 w-32 h-32 rounded-full opacity-20 animate-float" style={{ background: 'rgba(30, 136, 229, 0.1)' }}></div>
                     <div className="absolute bottom-20 right-20 w-24 h-24 bg-spinny-orange rounded-full opacity-20 animate-float" style={{animationDelay: '1s'}}></div>
                 </div>
             </section>
 
             {/* Premium Recommended Section */}
             {recommendations.length > 0 && (
-                 <section className="py-20 bg-spinny-white relative overflow-hidden">
+                 <section className="py-20 bg-white relative overflow-hidden">
                     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                         <div className="text-center mb-16 animate-fadeInUp">
                              <h2 className="text-3xl md:text-4xl font-bold mb-4 premium-text-gradient">
@@ -374,13 +374,13 @@ const Home: React.FC<HomeProps> = ({ onSearch, onSelectCategory, featuredVehicle
                     </div>
                     
                     {/* Background decorative elements */}
-                    <div className="absolute top-0 right-0 w-96 h-96 rounded-full opacity-20 animate-float" style={{ background: 'radial-gradient(circle, var(--spinny-blue-light), var(--spinny-blue-light))' }}></div>
+                    <div className="absolute top-0 right-0 w-96 h-96 rounded-full opacity-20 animate-float" style={{ background: 'radial-gradient(circle, rgba(30, 136, 229, 0.1), rgba(30, 136, 229, 0.1))' }}></div>
                     <div className="absolute bottom-0 left-0 w-64 h-64 bg-gradient-to-tr from-spinny-white to-spinny-blue rounded-full opacity-20 animate-float" style={{animationDelay: '2s'}}></div>
                 </section>
             )}
 
             {/* Featured Listings */}
-            <section className="py-16 bg-spinny-white">
+            <section className="py-16 bg-white">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     <h2 className="text-3xl font-bold text-center mb-12 text-spinny-text-dark">Featured Collection</h2>
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
@@ -437,7 +437,7 @@ const Home: React.FC<HomeProps> = ({ onSearch, onSelectCategory, featuredVehicle
             )}
             
              {/* Seller CTA */}
-            <section style={{ background: 'linear-gradient(to right, var(--spinny-blue-light), var(--brand-gray))' }} className="dark:bg-gradient-dark">
+            <section style={{ background: 'linear-gradient(to right, rgba(30, 136, 229, 0.1), var(--brand-gray))' }} className="dark:bg-gradient-dark">
                 <div className="container mx-auto px-4 py-20 text-center scroll-animate">
                     <h2 className="text-4xl font-bold mb-4 text-spinny-text-dark dark:text-white">Are You a Seller?</h2>
                     <p className="max-w-2xl mx-auto mb-8 text-brand-gray-600 dark:text-spinny-text-dark">Join the most advanced vehicle marketplace today. Reach thousands of buyers and use our AI tools to sell faster.</p>

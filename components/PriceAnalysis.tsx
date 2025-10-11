@@ -60,7 +60,7 @@ const PriceAnalysis: React.FC<PriceAnalysisProps> = ({ vehicle, similarVehicles 
 
       {isLoading && (
         <div className="text-center py-8">
-            <div className="w-8 h-8 border-4 border-dashed rounded-full animate-spin mx-auto" style={{ borderColor: 'var(--spinny-orange)' }}></div>
+            <div className="w-8 h-8 border-4 border-dashed rounded-full animate-spin mx-auto" style={{ bordercolor: '#FF6B35' }}></div>
             <p className="mt-3 text-sm font-semibold text-brand-gray-600 dark:text-spinny-text">Analyzing market data...</p>
         </div>
       )}
@@ -87,7 +87,7 @@ const PriceAnalysis: React.FC<PriceAnalysisProps> = ({ vehicle, similarVehicles 
                     "{analysis.summary}"
                 </p>
             </div>
-            <button onClick={handleAnalyzePrice} className="text-xs font-bold hover:underline transition-colors" style={{ color: 'var(--spinny-orange)' }} onMouseEnter={(e) => e.currentTarget.style.color = 'var(--spinny-blue)'} onMouseLeave={(e) => e.currentTarget.style.color = 'var(--spinny-orange)'}>Re-analyze</button>
+            <button onClick={handleAnalyzePrice} className="text-xs font-bold hover:underline transition-colors" style={{ color: '#FF6B35' }} onMouseEnter={(e) => e.currentTarget.style.color = 'var(--spinny-blue)'} onMouseLeave={(e) => e.currentTarget.style.color = 'var(--spinny-orange)'}>Re-analyze</button>
         </div>
       )}
     </div>

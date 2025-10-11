@@ -32,7 +32,7 @@ const TestDriveModal: React.FC<TestDriveModalProps> = ({ onClose, onSubmit }) =>
           <div className="p-6">
             <div className="flex justify-between items-center mb-4">
               <h2 className="text-2xl font-bold text-spinny-text-dark dark:text-spinny-text-dark">Book a Test Drive</h2>
-              <button type="button" onClick={onClose} className="text-brand-gray-400 hover:text-spinny-text-dark dark:hover:text-white text-3xl">&times;</button>
+              <button type="button" onClick={onClose} className="text-gray-400 hover:text-spinny-text-dark dark:hover:text-white text-3xl">&times;</button>
             </div>
             <p className="text-brand-gray-600 dark:text-spinny-text mb-6">
               Select your preferred date and time. The seller will confirm your request via chat.
@@ -47,7 +47,7 @@ const TestDriveModal: React.FC<TestDriveModalProps> = ({ onClose, onSubmit }) =>
                   onChange={(e) => setDate(e.target.value)}
                   min={getTodayString()}
                   required
-                  className="mt-1 w-full p-3 border border-brand-gray-300 dark:border-brand-gray-300 rounded-lg bg-spinny-white dark:bg-brand-gray-700" onFocus={(e) => { e.currentTarget.style.borderColor = 'var(--spinny-orange)'; e.currentTarget.style.boxShadow = '0 0 0 2px var(--spinny-orange-light)'; }} onBlur={(e) => { e.currentTarget.style.borderColor = ''; e.currentTarget.style.boxShadow = ''; }}
+                  className="mt-1 w-full p-3 border border-gray-200-300 dark:border-gray-200-300 rounded-lg bg-white dark:bg-brand-gray-700" onFocus={(e) => { e.currentTarget.style.borderColor = 'var(--spinny-orange)'; e.currentTarget.style.boxShadow = '0 0 0 2px rgba(255, 107, 53, 0.1)'; }} onBlur={(e) => { e.currentTarget.style.borderColor = ''; e.currentTarget.style.boxShadow = ''; }}
                 />
               </div>
               <div>
@@ -58,7 +58,7 @@ const TestDriveModal: React.FC<TestDriveModalProps> = ({ onClose, onSubmit }) =>
                   value={time}
                   onChange={(e) => setTime(e.target.value)}
                   required
-                  className="mt-1 w-full p-3 border border-brand-gray-300 dark:border-brand-gray-300 rounded-lg bg-spinny-white dark:bg-brand-gray-700" onFocus={(e) => { e.currentTarget.style.borderColor = 'var(--spinny-orange)'; e.currentTarget.style.boxShadow = '0 0 0 2px var(--spinny-orange-light)'; }} onBlur={(e) => { e.currentTarget.style.borderColor = ''; e.currentTarget.style.boxShadow = ''; }}
+                  className="mt-1 w-full p-3 border border-gray-200-300 dark:border-gray-200-300 rounded-lg bg-white dark:bg-brand-gray-700" onFocus={(e) => { e.currentTarget.style.borderColor = 'var(--spinny-orange)'; e.currentTarget.style.boxShadow = '0 0 0 2px rgba(255, 107, 53, 0.1)'; }} onBlur={(e) => { e.currentTarget.style.borderColor = ''; e.currentTarget.style.boxShadow = ''; }}
                 />
               </div>
               {error && <p className="text-sm text-spinny-orange">{error}</p>}

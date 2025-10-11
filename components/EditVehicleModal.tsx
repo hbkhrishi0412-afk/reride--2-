@@ -104,7 +104,7 @@ const EditVehicleModal: React.FC<EditVehicleModalProps> = ({ vehicle, onClose, o
     const FormInput = ({ label, name, type = 'text', value, required = false }: { label: string, name: keyof Vehicle | string, type?: string, value: any, required?: boolean }) => (
         <div>
             <label className="block text-sm font-medium text-spinny-text-dark dark:text-spinny-text-dark">{label}</label>
-            <input type={type} name={name as string} value={value} onChange={handleChange} required={required} className="mt-1 block w-full p-2 border border-spinny-blue dark:border-brand-gray-300 rounded-md bg-white dark:text-spinny-text-dark" />
+            <input type={type} name={name as string} value={value} onChange={handleChange} required={required} className="mt-1 block w-full p-2 border border-gray-200 dark:border-gray-200-300 rounded-md bg-white dark:text-spinny-text-dark" />
         </div>
     );
 
@@ -138,7 +138,7 @@ const EditVehicleModal: React.FC<EditVehicleModalProps> = ({ vehicle, onClose, o
                                     <FormInput label="Insurance Validity" name="insuranceValidity" value={formData.insuranceValidity} />
                                     <div>
                                         <label className="block text-sm font-medium text-spinny-text-dark dark:text-spinny-text-dark">Insurance Type</label>
-                                        <select name="insuranceType" value={formData.insuranceType} onChange={handleChange} className="mt-1 block w-full p-2 border border-spinny-blue dark:border-brand-gray-300 rounded-md bg-white dark:text-spinny-text-dark">
+                                        <select name="insuranceType" value={formData.insuranceType} onChange={handleChange} className="mt-1 block w-full p-2 border border-gray-200 dark:border-gray-200-300 rounded-md bg-white dark:text-spinny-text-dark">
                                             <option>Third Party</option>
                                             <option>Comprehensive</option>
                                             <option>Expired</option>
@@ -162,28 +162,28 @@ const EditVehicleModal: React.FC<EditVehicleModalProps> = ({ vehicle, onClose, o
                                 <legend className="text-lg font-semibold text-spinny-text-dark dark:text-spinny-text-dark mb-4">Quality Report</legend>
                                 <div>
                                     <label className="block text-sm font-medium text-spinny-text-dark dark:text-spinny-text-dark">Summary</label>
-                                    <textarea name="summary" value={formData.qualityReport?.summary} onChange={handleQualityReportChange} rows={3} className="block w-full p-2 border border-spinny-blue dark:border-brand-gray-300 rounded-md bg-white dark:text-spinny-text-dark" />
+                                    <textarea name="summary" value={formData.qualityReport?.summary} onChange={handleQualityReportChange} rows={3} className="block w-full p-2 border border-gray-200 dark:border-gray-200-300 rounded-md bg-white dark:text-spinny-text-dark" />
                                 </div>
                                  <div className="mt-4">
                                     <label className="block text-sm font-medium text-spinny-text-dark dark:text-spinny-text-dark mb-1">Fixes Done</label>
                                     <div className="flex gap-2">
-                                        <input type="text" value={fixInput} onChange={(e) => setFixInput(e.target.value)} onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); handleAddFix(); } }} placeholder="e.g., New tires" className="flex-grow p-2 border border-spinny-blue dark:border-brand-gray-300 rounded-lg bg-white dark:text-spinny-text-dark" />
-                                        <button type="button" onClick={handleAddFix} className="bg-spinny-white-dark dark:bg-white font-bold py-2 px-4 rounded-lg">Add Fix</button>
+                                        <input type="text" value={fixInput} onChange={(e) => setFixInput(e.target.value)} onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); handleAddFix(); } }} placeholder="e.g., New tires" className="flex-grow p-2 border border-gray-200 dark:border-gray-200-300 rounded-lg bg-white dark:text-spinny-text-dark" />
+                                        <button type="button" onClick={handleAddFix} className="bg-white-dark dark:bg-white font-bold py-2 px-4 rounded-lg">Add Fix</button>
                                     </div>
                                     <div className="mt-2 flex flex-wrap gap-2">{formData.qualityReport?.fixesDone.map(fix => ( <span key={fix} className="bg-spinny-orange-light text-spinny-orange text-sm font-semibold px-3 py-1 rounded-full flex items-center gap-2">{fix}<button type="button" onClick={() => handleRemoveFix(fix)}>&times;</button></span> ))}</div>
                                 </div>
                             </fieldset>
                             <fieldset>
                                 <legend className="text-lg font-semibold text-spinny-text-dark dark:text-spinny-text-dark mb-4">Description</legend>
-                                <textarea name="description" value={formData.description} onChange={handleChange} rows={4} className="block w-full p-2 border border-spinny-blue dark:border-brand-gray-300 rounded-md bg-white dark:text-spinny-text-dark" />
+                                <textarea name="description" value={formData.description} onChange={handleChange} rows={4} className="block w-full p-2 border border-gray-200 dark:border-gray-200-300 rounded-md bg-white dark:text-spinny-text-dark" />
                             </fieldset>
                             
                             <fieldset>
                                 <legend className="text-lg font-semibold text-spinny-text-dark dark:text-spinny-text-dark mb-4">Media & Features</legend>
                                 <div>
                                     <label className="block text-sm font-medium text-spinny-text-dark dark:text-spinny-text-dark">Images</label>
-                                    <div className="mt-1 p-5 border-2 border-spinny-blue dark:border-brand-gray-300 border-dashed rounded-md text-center">
-                                        <label htmlFor="file-upload" className="cursor-pointer font-medium transition-colors" style={{ color: 'var(--spinny-orange)' }} onMouseEnter={(e) => e.currentTarget.style.color = 'var(--spinny-blue)'} onMouseLeave={(e) => e.currentTarget.style.color = 'var(--spinny-orange)'}><span>Upload files</span><input id="file-upload" name="file-upload" type="file" className="sr-only" multiple accept="image/*" onChange={handleImageUpload} /></label>
+                                    <div className="mt-1 p-5 border-2 border-gray-200 dark:border-gray-200-300 border-dashed rounded-md text-center">
+                                        <label htmlFor="file-upload" className="cursor-pointer font-medium transition-colors" style={{ color: '#FF6B35' }} onMouseEnter={(e) => e.currentTarget.style.color = 'var(--spinny-blue)'} onMouseLeave={(e) => e.currentTarget.style.color = 'var(--spinny-orange)'}><span>Upload files</span><input id="file-upload" name="file-upload" type="file" className="sr-only" multiple accept="image/*" onChange={handleImageUpload} /></label>
                                     </div>
                                     <div className="mt-2 grid grid-cols-4 sm:grid-cols-6 gap-2">
                                         {formData.images.map((url, index) => (
@@ -197,8 +197,8 @@ const EditVehicleModal: React.FC<EditVehicleModalProps> = ({ vehicle, onClose, o
                                 <div className="mt-4">
                                     <label className="block text-sm font-medium text-spinny-text-dark dark:text-spinny-text-dark mb-1">Key Features</label>
                                     <div className="flex gap-2">
-                                        <input type="text" value={featureInput} onChange={(e) => setFeatureInput(e.target.value)} onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); handleAddFeature(); } }} placeholder="e.g., Sunroof" className="flex-grow p-2 border border-spinny-blue dark:border-brand-gray-300 rounded-lg bg-white dark:text-spinny-text-dark" />
-                                        <button type="button" onClick={handleAddFeature} className="bg-spinny-white-dark dark:bg-white font-bold py-2 px-4 rounded-lg">Add</button>
+                                        <input type="text" value={featureInput} onChange={(e) => setFeatureInput(e.target.value)} onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); handleAddFeature(); } }} placeholder="e.g., Sunroof" className="flex-grow p-2 border border-gray-200 dark:border-gray-200-300 rounded-lg bg-white dark:text-spinny-text-dark" />
+                                        <button type="button" onClick={handleAddFeature} className="bg-white-dark dark:bg-white font-bold py-2 px-4 rounded-lg">Add</button>
                                     </div>
                                     <div className="mt-2 flex flex-wrap gap-2">{formData.features.map(feature => ( <span key={feature} className="brand-badge-orange text-sm font-semibold px-3 py-1 rounded-full flex items-center gap-2">{feature}<button type="button" onClick={() => handleRemoveFeature(feature)}>&times;</button></span> ))}</div>
                                 </div>
@@ -206,7 +206,7 @@ const EditVehicleModal: React.FC<EditVehicleModalProps> = ({ vehicle, onClose, o
                         </div>
                     </div>
                     <div className="bg-white px-6 py-3 flex justify-end gap-4 rounded-b-lg mt-auto">
-                        <button type="button" onClick={onClose} className="px-4 py-2 bg-spinny-white-dark text-spinny-text-dark rounded-md hover:bg-spinny-white">Cancel</button>
+                        <button type="button" onClick={onClose} className="px-4 py-2 bg-white-dark text-spinny-text-dark rounded-md hover:bg-white">Cancel</button>
                         <button type="submit" className="px-4 py-2 btn-brand-primary text-white rounded-md">Save Changes</button>
                     </div>
                 </form>

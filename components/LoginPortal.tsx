@@ -27,12 +27,12 @@ const LoginPortal: React.FC<LoginPortalProps> = ({ onNavigate }) => {
       <div className="text-sm mt-6">
           <button
               onClick={() => onNavigate(View.USED_CARS)}
-              className="font-medium transition-colors" style={{ color: 'var(--spinny-orange)' }} onMouseEnter={(e) => e.currentTarget.style.color = 'var(--spinny-blue)'} onMouseLeave={(e) => e.currentTarget.style.color = 'var(--spinny-orange)'}
+              className="font-medium transition-colors" style={{ color: '#FF6B35' }} onMouseEnter={(e) => e.currentTarget.style.color = 'var(--spinny-blue)'} onMouseLeave={(e) => e.currentTarget.style.color = 'var(--spinny-orange)'}
           >
               Or continue as a guest &rarr;
           </button>
       </div>
-       <div className="mt-6 pt-6 border-t border-brand-gray-200 dark:border-brand-gray-200">
+       <div className="mt-6 pt-6 border-t border-gray-200-200 dark:border-gray-200-200">
            <div className="text-sm">
               <button
                   onClick={() => onNavigate(View.ADMIN_LOGIN)}

@@ -31,11 +31,11 @@ const TestDriveRequestMessage: React.FC<{ msg: ChatMessage }> = ({ msg }) => {
         pending: { text: "Pending", color: "bg-spinny-blue-light text-spinny-text-dark dark:bg-spinny-blue/50 dark:text-spinny-text-dark" },
         confirmed: { text: "Confirmed", color: "bg-spinny-orange-light text-spinny-orange dark:bg-spinny-orange/50 dark:text-spinny-orange" },
         rejected: { text: "Declined", color: "bg-spinny-orange-light text-spinny-orange dark:bg-spinny-orange/50 dark:text-spinny-orange" },
-        countered: { text: "Countered", color: "bg-spinny-white-dark text-spinny-text-dark dark:bg-white dark:text-spinny-text-dark" },
+        countered: { text: "Countered", color: "bg-white-dark text-spinny-text-dark dark:bg-white dark:text-spinny-text-dark" },
         accepted: { text: "Accepted", color: "bg-spinny-orange-light text-spinny-orange dark:bg-spinny-orange/50 dark:text-spinny-orange" },
     };
     return (
-        <div className={`p-3 border-l-4 rounded-lg bg-spinny-off-white dark:bg-brand-gray-700/50 ${status === 'pending' ? 'border-spinny-blue' : status === 'confirmed' ? 'border-spinny-orange' : 'border-spinny-orange'}`}>
+        <div className={`p-3 border-l-4 rounded-lg bg-spinny-off-white dark:bg-brand-gray-700/50 ${status === 'pending' ? 'border-gray-200' : status === 'confirmed' ? 'border-spinny-orange' : 'border-spinny-orange'}`}>
             <p className="font-semibold text-spinny-text-dark dark:text-spinny-text-dark">Test Drive Request</p>
             <p className="text-sm text-brand-gray-600 dark:text-spinny-text-dark">Date: {date}</p>
             <p className="text-sm text-brand-gray-600 dark:text-spinny-text-dark">Time: {time}</p>
@@ -131,16 +131,16 @@ const CustomerInbox: React.FC<CustomerInboxProps> = ({ conversations, onSendMess
   const getSellerName = (sellerId: string) => {
     return users.find(u => u.email === sellerId)?.name || 'Seller';
   }
-  const formInputClass = "flex-grow p-3 border border-brand-gray-300 dark:border-brand-gray-300 rounded-lg focus:outline-none transition bg-white dark:text-spinny-text-dark";
+  const formInputClass = "flex-grow p-3 border border-gray-200-300 dark:border-gray-200-300 rounded-lg focus:outline-none transition bg-white dark:text-spinny-text-dark";
 
   return (
     <>
       <div className="animate-fade-in container mx-auto py-8">
-        <h1 className="text-3xl font-extrabold text-spinny-text-dark dark:text-spinny-text-dark mb-6 border-b border-brand-gray-200 dark:border-brand-gray-200 pb-4">My Inbox</h1>
+        <h1 className="text-3xl font-extrabold text-spinny-text-dark dark:text-spinny-text-dark mb-6 border-b border-gray-200-200 dark:border-gray-200-200 pb-4">My Inbox</h1>
         <div className="grid grid-cols-1 md:grid-cols-[320px_1fr] gap-6 bg-white rounded-xl shadow-soft-lg h-[75vh]">
           {/* Conversation List */}
-          <aside className="border-r border-brand-gray-200 dark:border-brand-gray-200 flex flex-col">
-            <div className="p-4 border-b border-brand-gray-200 dark:border-brand-gray-200">
+          <aside className="border-r border-gray-200-200 dark:border-gray-200-200 flex flex-col">
+            <div className="p-4 border-b border-gray-200-200 dark:border-gray-200-200">
                   <h2 className="text-lg font-bold text-spinny-text-dark dark:text-spinny-text-dark">Conversations</h2>
             </div>
             <div className="overflow-y-auto">
@@ -155,11 +155,11 @@ const CustomerInbox: React.FC<CustomerInboxProps> = ({ conversations, onSendMess
                                   <li key={conv.id}>
                                       <button
                                           onClick={() => handleSelectConversation(conv)}
-                                          className={`w-full text-left p-4 border-l-4 transition-colors ${selectedConv?.id === conv.id ? 'bg-spinny-off-white dark:bg-white' : 'border-transparent hover:bg-spinny-off-white dark:hover:bg-brand-gray-700'}`} style={selectedConv?.id === conv.id ? { borderColor: 'var(--spinny-orange)' } : undefined}
+                                          className={`w-full text-left p-4 border-l-4 transition-colors ${selectedConv?.id === conv.id ? 'bg-spinny-off-white dark:bg-white' : 'border-transparent hover:bg-spinny-off-white dark:hover:bg-brand-gray-700'}`} style={selectedConv?.id === conv.id ? { bordercolor: '#FF6B35' } : undefined}
                                       >
                                           <div className="flex justify-between items-center mb-1">
                                               <p className="font-bold text-spinny-text-dark dark:text-spinny-text-dark truncate">{conv.vehicleName}</p>
-                                              {!conv.isReadByCustomer && <div className="w-2.5 h-2.5 rounded-full flex-shrink-0 ml-2" style={{ backgroundColor: 'var(--spinny-orange)' }}></div>}
+                                              {!conv.isReadByCustomer && <div className="w-2.5 h-2.5 rounded-full flex-shrink-0 ml-2" style={{ backgroundcolor: '#FF6B35' }}></div>}
                                           </div>
                                           <p className="text-sm text-brand-gray-600 dark:text-spinny-text-dark">With {getSellerName(conv.sellerId)}</p>
                                           <p className="text-xs text-spinny-text dark:text-spinny-text truncate mt-1">
@@ -188,7 +188,7 @@ const CustomerInbox: React.FC<CustomerInboxProps> = ({ conversations, onSendMess
           <main className="flex flex-col">
               {selectedConv ? (
                   <>
-                      <div className="p-4 border-b border-brand-gray-200 dark:border-brand-gray-200 flex justify-between items-center">
+                      <div className="p-4 border-b border-gray-200-200 dark:border-gray-200-200 flex justify-between items-center">
                           <div>
                               <h3 className="font-bold text-lg text-spinny-text-dark dark:text-spinny-text-dark">{selectedConv.vehicleName}</h3>
                               <p className="text-sm text-spinny-text dark:text-spinny-text">Conversation with {getSellerName(selectedConv.sellerId)}</p>
@@ -217,7 +217,7 @@ const CustomerInbox: React.FC<CustomerInboxProps> = ({ conversations, onSendMess
                                           <div className={`px-4 py-3 max-w-lg ${ msg.sender === 'user' ? 'text-white rounded-l-xl rounded-t-xl' : 'bg-spinny-light-gray dark:bg-brand-gray-700 text-spinny-text-dark dark:text-brand-gray-200 rounded-r-xl rounded-t-xl'}`} style={msg.sender === 'user' ? { background: 'var(--gradient-primary)' } : undefined}>
                                               {msg.type === 'test_drive_request' ? <TestDriveRequestMessage msg={msg} /> : msg.type === 'offer' ? <OfferMessage msg={msg} currentUserRole="customer" listingPrice={selectedConv.vehiclePrice} onRespond={(messageId, response, counterPrice) => { if (selectedConv) { onOfferResponse(selectedConv.id, messageId, response, counterPrice); }}} /> : <p className="text-sm">{msg.text}</p>}
                                           </div>
-                                          <div className="text-xs text-brand-gray-400 mt-1 px-1 flex items-center">
+                                          <div className="text-xs text-gray-400 mt-1 px-1 flex items-center">
                                               {new Date(msg.timestamp).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}
                                               {msg.sender === 'user' && <ReadReceiptIcon isRead={msg.isRead} />}
                                           </div>
@@ -228,7 +228,7 @@ const CustomerInbox: React.FC<CustomerInboxProps> = ({ conversations, onSendMess
                           {typingStatus?.conversationId === selectedConv?.id && typingStatus?.userRole === 'seller' && <TypingIndicator name={getSellerName(selectedConv.sellerId)} />}
                           <div ref={chatEndRef} />
                       </div>
-                      <div className="p-4 border-t border-brand-gray-200 dark:border-brand-gray-200 bg-white">
+                      <div className="p-4 border-t border-gray-200-200 dark:border-gray-200-200 bg-white">
                           <form onSubmit={handleSendReply} className="flex gap-2">
                           <button type="button" onClick={() => setIsOfferModalOpen(true)} className="bg-spinny-orange text-white font-bold p-3 rounded-lg hover:bg-spinny-orange transition-colors" aria-label="Make an offer">
                                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path d="M8.433 7.418c.155-.103.346-.196.567-.267v1.698a2.5 2.5 0 00-1.134 0V7.151c.22.07.412.164.567.267zM11.567 7.418c.155-.103.346-.196.567-.267v1.698a2.5 2.5 0 01-1.134 0V7.151c.22.07.412.164.567.267z" /><path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-13a1 1 0 10-2 0v.092a4.5 4.5 0 00-1.876.662C6.168 6.23 5.5 7.085 5.5 8.003v.486c0 .918.668 1.773 1.624 2.214.509.232.957.488 1.376.786V12.5a.5.5 0 01.5.5h1a.5.5 0 01.5-.5v-1.214c.419-.298.867-.554 1.376-.786C14.332 10.26 15 9.405 15 8.489v-.486c0-.918-.668-1.773-1.624-2.214A4.5 4.5 0 0011 5.092V5z" clipRule="evenodd" /></svg>

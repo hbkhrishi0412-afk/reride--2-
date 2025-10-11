@@ -54,7 +54,7 @@ const FAQPage = lazy(() => import('./components/FAQPage'));
 const LoadingSpinner: React.FC = () => (
     <div className="min-h-[calc(100vh-140px)] flex items-center justify-center">
         <div className="flex items-center gap-4">
-            <div className="w-12 h-12 border-4 border-dashed rounded-full animate-spin border-brand-blue"></div>
+            <div className="w-12 h-12 border-4 border-dashed rounded-full animate-spin border-spinny-orange"></div>
             <span className="text-xl font-semibold text-brand-gray-600 dark:text-brand-gray-300">Loading...</span>
         </div>
     </div>

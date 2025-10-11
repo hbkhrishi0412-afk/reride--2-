@@ -3,7 +3,7 @@ import type { Vehicle } from '../types';
 
 // KeySpec component copied for reuse
 const KeySpec: React.FC<{ label: string; value: string | number; }> = memo(({ label, value }) => (
-    <div className="flex justify-between items-baseline py-2 border-b border-brand-gray-100 dark:border-brand-gray-200">
+    <div className="flex justify-between items-baseline py-2 border-b border-gray-200-100 dark:border-gray-200-200">
         <span className="text-sm font-medium text-brand-gray-600 dark:text-spinny-text">{label}</span>
         <span className="font-bold text-spinny-text-dark dark:text-spinny-text-dark text-right">{value}</span>
     </div>
@@ -67,7 +67,7 @@ const QuickViewModal: React.FC<QuickViewModalProps> = ({ vehicle, onClose, onSel
                 key={index}
                 src={img}
                 alt={`Thumbnail ${index + 1}`}
-                className={`cursor-pointer rounded-md border-2 h-16 w-full object-cover ${mainImage === img ? '' : 'border-transparent'} transition`} style={mainImage === img ? { borderColor: 'var(--spinny-orange)' } : undefined} onMouseEnter={(e) => mainImage !== img && (e.currentTarget.style.borderColor = 'var(--spinny-blue)')} onMouseLeave={(e) => mainImage !== img && (e.currentTarget.style.borderColor = '')}
+                className={`cursor-pointer rounded-md border-2 h-16 w-full object-cover ${mainImage === img ? '' : 'border-transparent'} transition`} style={mainImage === img ? { bordercolor: '#FF6B35' } : undefined} onMouseEnter={(e) => mainImage !== img && (e.currentTarget.style.borderColor = 'var(--spinny-blue)')} onMouseLeave={(e) => mainImage !== img && (e.currentTarget.style.borderColor = '')}
                 onClick={() => setMainImage(img)}
               />
             ))}
@@ -79,7 +79,7 @@ const QuickViewModal: React.FC<QuickViewModalProps> = ({ vehicle, onClose, onSel
           <div>
             <h2 className="text-3xl font-bold text-spinny-text-dark dark:text-spinny-text-dark">{vehicle.year} {vehicle.make} {vehicle.model}</h2>
             <p className="text-spinny-text dark:text-spinny-text">{vehicle.variant || ''}</p>
-            <p className="text-3xl font-extrabold my-4" style={{ color: 'var(--spinny-orange)' }}>₹{vehicle.price.toLocaleString('en-IN')}</p>
+            <p className="text-3xl font-extrabold my-4" style={{ color: '#FF6B35' }}>₹{vehicle.price.toLocaleString('en-IN')}</p>
           </div>
 
           <div className="space-y-2 my-4">

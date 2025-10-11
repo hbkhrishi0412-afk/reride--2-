@@ -87,10 +87,10 @@ const EMICalculator: React.FC<EMICalculatorProps> = ({ price }) => {
                     <input id="interestRate" type="range" min="7" max="20" step="0.05" value={interestRate} onChange={e => setInterestRate(Number(e.target.value))} className="w-full h-2 bg-spinny-light-gray rounded-lg appearance-none cursor-pointer dark:bg-brand-gray-700" />
                 </div>
             </div>
-            <div className="mt-6 pt-4 border-t border-brand-gray-200 dark:border-brand-gray-200 text-center">
+            <div className="mt-6 pt-4 border-t border-gray-200-200 dark:border-gray-200-200 text-center">
                  <p className="text-sm text-brand-gray-600 dark:text-spinny-text">Your EMI starts at</p>
-                 <p className="text-3xl font-extrabold" style={{ color: 'var(--spinny-orange)' }}>{formatCurrency(emi)}/month</p>
-                 <p className="text-xs text-brand-gray-400 mt-2">This is an estimate. Final EMI may vary.</p>
+                 <p className="text-3xl font-extrabold" style={{ color: '#FF6B35' }}>{formatCurrency(emi)}/month</p>
+                 <p className="text-xs text-gray-400 mt-2">This is an estimate. Final EMI may vary.</p>
             </div>
         </div>
     );

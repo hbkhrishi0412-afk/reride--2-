@@ -26,7 +26,7 @@ const NotificationIcon: React.FC<{ type: Notification['targetType'] }> = ({ type
     const baseClass = "h-6 w-6";
     switch(type) {
         case 'conversation':
-            return <svg xmlns="http://www.w3.org/2000/svg" className={baseClass} style={{ color: 'var(--spinny-blue)' }} fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" /></svg>;
+            return <svg xmlns="http://www.w3.org/2000/svg" className={baseClass} style={{ color: '#1E88E5' }} fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" /></svg>;
         case 'price_drop':
              return <svg xmlns="http://www.w3.org/2000/svg" className={`${baseClass} text-spinny-orange`} fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" /></svg>;
         case 'insurance_expiry':
@@ -40,9 +40,9 @@ const NotificationIcon: React.FC<{ type: Notification['targetType'] }> = ({ type
 
 const NotificationItem: React.FC<{ notification: Notification; onClick: () => void; }> = ({ notification, onClick }) => {
     return (
-        <li className="border-b border-brand-gray-200 dark:border-brand-gray-200 last:border-b-0">
+        <li className="border-b border-gray-200-200 dark:border-gray-200-200 last:border-b-0">
             <button onClick={onClick} className="w-full text-left p-3 hover:bg-spinny-off-white dark:hover:bg-brand-gray-700 transition-colors flex items-start gap-3">
-                {!notification.isRead && <div className="w-2 h-2 rounded-full mt-2 flex-shrink-0" style={{ backgroundColor: 'var(--spinny-orange)' }}></div>}
+                {!notification.isRead && <div className="w-2 h-2 rounded-full mt-2 flex-shrink-0" style={{ backgroundcolor: '#FF6B35' }}></div>}
                 <div className={`flex-shrink-0 ${notification.isRead ? 'ml-4' : ''}`}>
                     <NotificationIcon type={notification.targetType} />
                 </div>
@@ -64,11 +64,11 @@ const NotificationCenter: React.FC<NotificationCenterProps> = ({ notifications, 
     const unreadCount = useMemo(() => notifications.filter(n => !n.isRead).length, [notifications]);
 
     return (
-        <div className="absolute top-full right-0 mt-2 w-80 md:w-96 bg-white rounded-lg shadow-2xl border dark:border-brand-gray-200 animate-fade-in flex flex-col max-h-[70vh]">
-            <header className="p-3 border-b dark:border-brand-gray-200 flex justify-between items-center">
+        <div className="absolute top-full right-0 mt-2 w-80 md:w-96 bg-white rounded-lg shadow-2xl border dark:border-gray-200-200 animate-fade-in flex flex-col max-h-[70vh]">
+            <header className="p-3 border-b dark:border-gray-200-200 flex justify-between items-center">
                 <h3 className="font-bold text-lg text-spinny-text-dark dark:text-white">Notifications</h3>
                 {unreadCount > 0 && (
-                    <button onClick={onMarkAllAsRead} className="text-sm font-semibold hover:underline transition-colors" style={{ color: 'var(--spinny-orange)' }} onMouseEnter={(e) => e.currentTarget.style.color = 'var(--spinny-blue)'} onMouseLeave={(e) => e.currentTarget.style.color = 'var(--spinny-orange)'}>
+                    <button onClick={onMarkAllAsRead} className="text-sm font-semibold hover:underline transition-colors" style={{ color: '#FF6B35' }} onMouseEnter={(e) => e.currentTarget.style.color = 'var(--spinny-blue)'} onMouseLeave={(e) => e.currentTarget.style.color = 'var(--spinny-orange)'}>
                         Mark all as read
                     </button>
                 )}
@@ -90,9 +90,9 @@ const NotificationCenter: React.FC<NotificationCenterProps> = ({ notifications, 
                 )}
             </div>
             
-            <footer className="p-2 border-t dark:border-brand-gray-200 text-center">
+            <footer className="p-2 border-t dark:border-gray-200-200 text-center">
                 {/* This could eventually link to a full notifications page */}
-                <button className="text-sm font-semibold hover:underline w-full p-1 rounded transition-colors" style={{ color: 'var(--spinny-orange)' }} onMouseEnter={(e) => e.currentTarget.style.color = 'var(--spinny-blue)'} onMouseLeave={(e) => e.currentTarget.style.color = 'var(--spinny-orange)'}>
+                <button className="text-sm font-semibold hover:underline w-full p-1 rounded transition-colors" style={{ color: '#FF6B35' }} onMouseEnter={(e) => e.currentTarget.style.color = 'var(--spinny-blue)'} onMouseLeave={(e) => e.currentTarget.style.color = 'var(--spinny-orange)'}>
                     View All
                 </button>
             </footer>

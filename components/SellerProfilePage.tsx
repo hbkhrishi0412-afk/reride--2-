@@ -44,7 +44,7 @@ const SellerProfilePage: React.FC<SellerProfilePageProps> = ({ seller, vehicles,
                 <img 
                     src={seller.logoUrl || `https://i.pravatar.cc/150?u=${seller.email}`} 
                     alt={`${seller.dealershipName || seller.name} logo`} 
-                    className="w-32 h-32 rounded-full object-cover border-4 shadow-lg" style={{ borderColor: 'var(--spinny-blue)' }}
+                    className="w-32 h-32 rounded-full object-cover border-4 shadow-lg" style={{ bordercolor: '#1E88E5' }}
                 />
                 <div>
                     <h1 className="text-4xl font-extrabold text-spinny-text-dark dark:text-spinny-text-dark">{seller.dealershipName || seller.name}</h1>
@@ -69,7 +69,7 @@ const SellerProfilePage: React.FC<SellerProfilePageProps> = ({ seller, vehicles,
                         placeholder="Search this seller's listings..."
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
-                        className="w-full p-3 border border-brand-gray-300 dark:border-brand-gray-300 rounded-lg focus:outline-none bg-spinny-white dark:bg-brand-gray-700" onFocus={(e) => { e.currentTarget.style.borderColor = 'var(--spinny-orange)'; e.currentTarget.style.boxShadow = '0 0 0 2px var(--spinny-orange-light)'; }} onBlur={(e) => { e.currentTarget.style.borderColor = ''; e.currentTarget.style.boxShadow = ''; }}
+                        className="w-full p-3 border border-gray-200-300 dark:border-gray-200-300 rounded-lg focus:outline-none bg-white dark:bg-brand-gray-700" onFocus={(e) => { e.currentTarget.style.borderColor = 'var(--spinny-orange)'; e.currentTarget.style.boxShadow = '0 0 0 2px rgba(255, 107, 53, 0.1)'; }} onBlur={(e) => { e.currentTarget.style.borderColor = ''; e.currentTarget.style.boxShadow = ''; }}
                     />
                 </div>
             </div>

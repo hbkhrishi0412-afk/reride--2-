@@ -37,7 +37,7 @@ const CarModelCard: React.FC<{ car: NewCarModel; isExpanded: boolean; onToggle: 
         <button
             onClick={() => onToggle(car.id)}
             aria-expanded={isExpanded}
-            className="w-full p-4 text-left flex items-center gap-4 focus:outline-none rounded-xl" onFocus={(e) => e.currentTarget.style.boxShadow = '0 0 0 2px var(--spinny-orange-light)'} onBlur={(e) => e.currentTarget.style.boxShadow = ''}
+            className="w-full p-4 text-left flex items-center gap-4 focus:outline-none rounded-xl" onFocus={(e) => e.currentTarget.style.boxShadow = '0 0 0 2px rgba(255, 107, 53, 0.1)'} onBlur={(e) => e.currentTarget.style.boxShadow = ''}
         >
             <div className="w-32 h-24 bg-spinny-off-white dark:bg-brand-gray-700 rounded-lg flex-shrink-0 p-1">
                  <img src={car.image_url} alt={`${car.brand_name} ${car.model_name}`} className="w-full h-full object-contain" />
@@ -52,11 +52,11 @@ const CarModelCard: React.FC<{ car: NewCarModel; isExpanded: boolean; onToggle: 
                     <SpecItem icon={<svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor"><path fillRule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clipRule="evenodd" /></svg>} text={`${car.key_specs.seating_capacity} Seater`} />
                 </div>
                 
-                <p className="text-lg font-semibold mt-2" style={{ color: 'var(--spinny-orange)' }}>
+                <p className="text-lg font-semibold mt-2" style={{ color: '#FF6B35' }}>
                     Starts at {formatCurrency(Math.min(...car.variants.map(v => v.on_road_prices[selectedState] || Infinity)))}
                 </p>
             </div>
-            <div className="ml-auto text-brand-gray-400">
+            <div className="ml-auto text-gray-400">
                 <svg className={`w-6 h-6 transition-transform duration-300 ${isExpanded ? 'rotate-180' : ''}`} xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
                 </svg>
@@ -64,7 +64,7 @@ const CarModelCard: React.FC<{ car: NewCarModel; isExpanded: boolean; onToggle: 
         </button>
         {isExpanded && (
             <div className="px-4 pb-4 animate-fade-in">
-                <div className="border-t border-brand-gray-200 dark:border-brand-gray-200 pt-4 overflow-x-auto">
+                <div className="border-t border-gray-200-200 dark:border-gray-200-200 pt-4 overflow-x-auto">
                     <table className="min-w-full divide-y divide-brand-gray-200 dark:divide-brand-gray-700">
                         <thead className="bg-white dark:bg-brand-gray-700">
                             <tr>
@@ -79,7 +79,7 @@ const CarModelCard: React.FC<{ car: NewCarModel; isExpanded: boolean; onToggle: 
                                     <td className="px-4 py-3 whitespace-nowrap text-sm font-medium text-spinny-text-dark dark:text-spinny-text-dark">{variant.variant_name} ({variant.transmission})</td>
                                     <td className="px-4 py-3 whitespace-nowrap text-sm font-semibold text-spinny-text-dark dark:text-brand-gray-200">{formatCurrency(variant.on_road_prices[selectedState])}</td>
                                     <td className="px-4 py-3 whitespace-nowrap text-sm">
-                                        <button onClick={() => onViewSpecs(car, variant)} className="font-semibold hover:underline transition-colors" style={{ color: 'var(--spinny-orange)' }} onMouseEnter={(e) => e.currentTarget.style.color = 'var(--spinny-blue)'} onMouseLeave={(e) => e.currentTarget.style.color = 'var(--spinny-orange)'}>
+                                        <button onClick={() => onViewSpecs(car, variant)} className="font-semibold hover:underline transition-colors" style={{ color: '#FF6B35' }} onMouseEnter={(e) => e.currentTarget.style.color = 'var(--spinny-blue)'} onMouseLeave={(e) => e.currentTarget.style.color = 'var(--spinny-orange)'}>
                                             View Full Specs
                                         </button>
                                     </td>
@@ -96,7 +96,7 @@ const CarModelCard: React.FC<{ car: NewCarModel; isExpanded: boolean; onToggle: 
 const FilterSelect: React.FC<{ label: string; value: string; onChange: (e: React.ChangeEvent<HTMLSelectElement>) => void; children: React.ReactNode, disabled?: boolean }> = ({ label, value, onChange, children, disabled = false }) => (
     <div>
         <label className="block text-sm font-medium text-spinny-text-dark dark:text-spinny-text-dark mb-1">{label}</label>
-        <select value={value} onChange={onChange} disabled={disabled} className="w-full p-3 border border-brand-gray-300 dark:border-brand-gray-300 rounded-lg focus:outline-none bg-spinny-white dark:bg-brand-gray-700 text-spinny-text-dark dark:text-brand-gray-200 disabled:opacity-50 disabled:cursor-not-allowed" onFocus={(e) => !disabled && (e.currentTarget.style.boxShadow = '0 0 0 2px var(--spinny-orange-light)')} onBlur={(e) => e.currentTarget.style.boxShadow = ''}>
+        <select value={value} onChange={onChange} disabled={disabled} className="w-full p-3 border border-gray-200-300 dark:border-gray-200-300 rounded-lg focus:outline-none bg-white dark:bg-brand-gray-700 text-spinny-text-dark dark:text-brand-gray-200 disabled:opacity-50 disabled:cursor-not-allowed" onFocus={(e) => !disabled && (e.currentTarget.style.boxShadow = '0 0 0 2px rgba(255, 107, 53, 0.1)')} onBlur={(e) => e.currentTarget.style.boxShadow = ''}>
             {children}
         </select>
     </div>
@@ -283,10 +283,10 @@ const NewCars: React.FC = () => {
                         placeholder="Search by brand or model..."
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
-                        className="w-full p-4 border border-brand-gray-300 dark:border-brand-gray-300 rounded-xl focus:outline-none bg-spinny-white dark:bg-brand-gray-700 text-spinny-text-dark dark:text-brand-gray-200 text-lg" onFocus={(e) => { e.currentTarget.style.borderColor = 'var(--spinny-orange)'; e.currentTarget.style.boxShadow = '0 0 0 2px var(--spinny-orange-light)'; }} onBlur={(e) => { e.currentTarget.style.borderColor = ''; e.currentTarget.style.boxShadow = ''; }}
+                        className="w-full p-4 border border-gray-200-300 dark:border-gray-200-300 rounded-xl focus:outline-none bg-white dark:bg-brand-gray-700 text-spinny-text-dark dark:text-brand-gray-200 text-lg" onFocus={(e) => { e.currentTarget.style.borderColor = 'var(--spinny-orange)'; e.currentTarget.style.boxShadow = '0 0 0 2px rgba(255, 107, 53, 0.1)'; }} onBlur={(e) => { e.currentTarget.style.borderColor = ''; e.currentTarget.style.boxShadow = ''; }}
                     />
                     <div className="flex justify-between items-center">
-                        <button onClick={handleOpenFilterModal} className="lg:hidden flex items-center gap-2 font-semibold px-4 py-2 rounded-lg" style={{ color: 'var(--spinny-orange)', background: 'var(--spinny-blue-light)' }} onMouseEnter={(e) => e.currentTarget.style.background = 'var(--spinny-blue)'} onMouseLeave={(e) => e.currentTarget.style.background = 'var(--spinny-blue-light)'}>
+                        <button onClick={handleOpenFilterModal} className="lg:hidden flex items-center gap-2 font-semibold px-4 py-2 rounded-lg" style={{ color: '#FF6B35', background: 'rgba(30, 136, 229, 0.1)' }} onMouseEnter={(e) => e.currentTarget.style.background = 'var(--spinny-blue)'} onMouseLeave={(e) => e.currentTarget.style.background = 'rgba(30, 136, 229, 0.1)'}>
                            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fillRule="evenodd" d="M3 3a1 1 0 011-1h12a1 1 0 011 1v3a1 1 0 01-.293.707L12 11.414V15a1 1 0 01-.293.707l-2 2A1 1 0 018 17v-5.586L3.293 6.707A1 1 0 013 6V3z" clipRule="evenodd" /></svg>
                             Filters
                         </button>
@@ -325,14 +325,14 @@ const NewCars: React.FC = () => {
         {isFilterModalOpen && (
             <div className="lg:hidden fixed inset-0 bg-black bg-opacity-60 z-50 animate-fade-in" onClick={() => setIsFilterModalOpen(false)}>
                 <div className="bg-white rounded-t-2xl h-[90vh] flex flex-col absolute bottom-0 left-0 right-0 animate-slide-in-up" onClick={e => e.stopPropagation()}>
-                    <div className="p-4 border-b border-brand-gray-200 dark:border-brand-gray-200 flex justify-between items-center flex-shrink-0">
+                    <div className="p-4 border-b border-gray-200-200 dark:border-gray-200-200 flex justify-between items-center flex-shrink-0">
                         <h2 className="text-xl font-bold text-spinny-text-dark dark:text-spinny-text-dark">Filters</h2>
                         <button onClick={() => setIsFilterModalOpen(false)} className="p-2 -mr-2 text-spinny-text text-2xl">&times;</button>
                     </div>
                     <div className="overflow-y-auto p-6 flex-grow space-y-4">
                         {renderFilterControls(true)}
                     </div>
-                    <div className="p-4 border-t border-brand-gray-200 dark:border-brand-gray-200 flex gap-4 bg-white flex-shrink-0">
+                    <div className="p-4 border-t border-gray-200-200 dark:border-gray-200-200 flex gap-4 bg-white flex-shrink-0">
                         <button onClick={handleResetTempFilters} className="w-full bg-spinny-light-gray dark:bg-brand-gray-700 text-spinny-text-dark dark:text-brand-gray-200 font-bold py-3 px-4 rounded-lg hover:bg-brand-gray-300 dark:hover:bg-brand-gray-600 transition-colors">Reset</button>
                         <button onClick={handleApplyFilters} className="w-full btn-brand-primary text-white font-bold py-3 px-4 rounded-lg transition-colors">Apply Filters</button>
                     </div>

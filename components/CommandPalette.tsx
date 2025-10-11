@@ -111,7 +111,7 @@ const CommandPalette: React.FC<CommandPaletteProps> = ({ isOpen, onClose, onNavi
   return (
     <div className="fixed inset-0 bg-black/60 z-[100] flex items-start justify-center pt-20" onClick={onClose}>
       <div className="bg-white rounded-lg shadow-2xl w-full max-w-xl animate-fade-in" onClick={e => e.stopPropagation()}>
-        <div className="p-4 border-b border-spinny-blue dark:border-brand-gray-200 flex items-center gap-3">
+        <div className="p-4 border-b border-gray-200 dark:border-gray-200-200 flex items-center gap-3">
           {ICONS.SEARCH}
           <input
             ref={inputRef}
@@ -134,7 +134,7 @@ const CommandPalette: React.FC<CommandPaletteProps> = ({ isOpen, onClose, onNavi
                       <button
                         onClick={command.action}
                         onMouseEnter={() => setActiveIndex(globalIndex)}
-                        className={`w-full text-left flex items-center gap-3 px-3 py-2.5 rounded-md ${activeIndex === globalIndex ? 'text-white' : 'text-spinny-text-dark dark:text-spinny-text-dark hover:bg-spinny-white dark:hover:bg-spinny-white'}`} style={activeIndex === globalIndex ? { background: 'var(--gradient-primary)' } : undefined}
+                        className={`w-full text-left flex items-center gap-3 px-3 py-2.5 rounded-md ${activeIndex === globalIndex ? 'text-white' : 'text-spinny-text-dark dark:text-spinny-text-dark hover:bg-white dark:hover:bg-white'}`} style={activeIndex === globalIndex ? { background: 'var(--gradient-primary)' } : undefined}
                       >
                         <span className={activeIndex === globalIndex ? 'text-white' : 'text-spinny-text-dark dark:text-spinny-text-dark'}>{command.icon}</span>
                         <span>{command.title}</span>

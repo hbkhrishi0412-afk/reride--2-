@@ -16,7 +16,7 @@ const ForgotPassword: React.FC<ForgotPasswordProps> = ({ onResetRequest, onBack 
     setSubmitted(true);
   };
   
-  const formInputClass = "appearance-none relative block w-full px-4 py-3 border border-brand-gray-300 dark:border-brand-gray-300 placeholder-brand-gray-500 text-spinny-text-dark dark:text-brand-gray-200 bg-white focus:outline-none focus:z-10 sm:text-sm";
+  const formInputClass = "appearance-none relative block w-full px-4 py-3 border border-gray-200-300 dark:border-gray-200-300 placeholder-brand-gray-500 text-spinny-text-dark dark:text-brand-gray-200 bg-white focus:outline-none focus:z-10 sm:text-sm";
 
 
   return (
@@ -65,7 +65,7 @@ const ForgotPassword: React.FC<ForgotPasswordProps> = ({ onResetRequest, onBack 
       )}
 
       <div className="text-sm text-center">
-        <button onClick={onBack} className="font-medium transition-colors" style={{ color: 'var(--spinny-orange)' }} onMouseEnter={(e) => e.currentTarget.style.color = 'var(--spinny-blue)'} onMouseLeave={(e) => e.currentTarget.style.color = 'var(--spinny-orange)'}>
+        <button onClick={onBack} className="font-medium transition-colors" style={{ color: '#FF6B35' }} onMouseEnter={(e) => e.currentTarget.style.color = 'var(--spinny-blue)'} onMouseLeave={(e) => e.currentTarget.style.color = 'var(--spinny-orange)'}>
           &larr; Back to Login
         </button>
       </div>

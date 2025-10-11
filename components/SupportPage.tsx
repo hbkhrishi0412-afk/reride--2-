@@ -35,7 +35,7 @@ const SupportPage: React.FC<SupportPageProps> = ({ currentUser, onSubmitTicket }
     });
   };
   
-  const formInputClass = "block w-full p-3 border border-brand-gray-300 dark:border-brand-gray-300 rounded-lg focus:outline-none transition bg-white dark:text-spinny-text-dark disabled:bg-spinny-off-white dark:disabled:bg-spinny-light-gray";
+  const formInputClass = "block w-full p-3 border border-gray-200-300 dark:border-gray-200-300 rounded-lg focus:outline-none transition bg-white dark:text-spinny-text-dark disabled:bg-spinny-off-white dark:disabled:bg-spinny-light-gray";
 
   return (
     <div className="support animate-fade-in container mx-auto px-4 py-8 max-w-2xl">

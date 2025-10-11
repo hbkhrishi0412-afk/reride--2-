@@ -19,7 +19,7 @@ const ProfileInput: React.FC<{ label: string; name: string; value: string; onCha
       value={value}
       onChange={onChange}
       disabled={disabled}
-      className="mt-1 block w-full p-3 border border-brand-gray-300 dark:border-brand-gray-300 rounded-lg shadow-sm sm:text-sm bg-white disabled:bg-spinny-off-white dark:disabled:bg-spinny-light-gray" onFocus={(e) => !disabled && (e.currentTarget.style.boxShadow = '0 0 0 2px var(--spinny-orange-light)')} onBlur={(e) => e.currentTarget.style.boxShadow = ''}
+      className="mt-1 block w-full p-3 border border-gray-200-300 dark:border-gray-200-300 rounded-lg shadow-sm sm:text-sm bg-white disabled:bg-spinny-off-white dark:disabled:bg-spinny-light-gray" onFocus={(e) => !disabled && (e.currentTarget.style.boxShadow = '0 0 0 2px rgba(255, 107, 53, 0.1)')} onBlur={(e) => e.currentTarget.style.boxShadow = ''}
     />
   </div>
 );
@@ -120,10 +120,10 @@ const Profile: React.FC<ProfileProps> = ({ currentUser, onUpdateProfile, onUpdat
                 <img
                   src={formData.avatarUrl || `https://i.pravatar.cc/150?u=${currentUser.email}`}
                   alt="Profile Avatar"
-                  className="w-32 h-32 rounded-full object-cover border-4 border-brand-gray-200 dark:border-brand-gray-200"
+                  className="w-32 h-32 rounded-full object-cover border-4 border-gray-200-200 dark:border-gray-200-200"
                 />
                 {isEditing && (
-                  <label htmlFor="avatar-upload" className="absolute bottom-0 right-0 text-white rounded-full p-2 cursor-pointer transition-colors" style={{ background: 'var(--spinny-orange)' }} onMouseEnter={(e) => e.currentTarget.style.background = 'var(--spinny-blue)'} onMouseLeave={(e) => e.currentTarget.style.background = 'var(--spinny-orange)'}>
+                  <label htmlFor="avatar-upload" className="absolute bottom-0 right-0 text-white rounded-full p-2 cursor-pointer transition-colors" style={{ background: '#FF6B35' }} onMouseEnter={(e) => e.currentTarget.style.background = 'var(--spinny-blue)'} onMouseLeave={(e) => e.currentTarget.style.background = 'var(--spinny-orange)'}>
                     <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z" /></svg>
                     <input id="avatar-upload" type="file" className="sr-only" accept="image/*" onChange={handleAvatarUpload} />
                   </label>
@@ -141,7 +141,7 @@ const Profile: React.FC<ProfileProps> = ({ currentUser, onUpdateProfile, onUpdat
               <div>
                 <label className="block text-sm font-medium text-spinny-text-dark dark:text-spinny-text-dark">Email</label>
                 <p className="mt-1 text-lg text-spinny-text dark:text-spinny-text">{currentUser.email}</p>
-                <p className="mt-1 text-xs text-brand-gray-400">Email address cannot be changed.</p>
+                <p className="mt-1 text-xs text-gray-400">Email address cannot be changed.</p>
               </div>
               <ProfileInput
                 label="Mobile Number"

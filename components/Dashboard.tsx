@@ -48,7 +48,7 @@ type DashboardView = 'overview' | 'listings' | 'form' | 'inquiries' | 'analytics
 const HelpTooltip: React.FC<{ text: string }> = memo(({ text }) => (
     <span className="group relative ml-1">
         <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-spinny-text-dark cursor-help" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-        <span className="absolute bottom-full mb-2 w-48 bg-spinny-white text-white text-xs rounded py-1 px-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300 left-1/2 -translate-x-1/2 z-10">{text}</span>
+        <span className="absolute bottom-full mb-2 w-48 bg-white text-white text-xs rounded py-1 px-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300 left-1/2 -translate-x-1/2 z-10">{text}</span>
     </span>
 ));
 
@@ -60,13 +60,13 @@ const FormInput: React.FC<{ label: string; name: keyof Vehicle | 'summary'; type
         {tooltip && <HelpTooltip text={tooltip} />}
     </label>
     {type === 'select' ? (
-        <select id={String(name)} name={String(name)} value={String(value)} onChange={onChange} required={required} disabled={disabled} className={`block w-full p-3 border rounded-lg focus:outline-none transition bg-white dark:text-spinny-text-dark disabled:bg-spinny-white dark:disabled:bg-spinny-white ${error ? 'border-spinny-orange' : 'border-brand-gray dark:border-brand-gray-300'}`} onFocus={(e) => !error && (e.currentTarget.style.boxShadow = '0 0 0 3px var(--spinny-orange-light)')} onBlur={(e) => e.currentTarget.style.boxShadow = ''}>
+        <select id={String(name)} name={String(name)} value={String(value)} onChange={onChange} required={required} disabled={disabled} className={`block w-full p-3 border rounded-lg focus:outline-none transition bg-white dark:text-spinny-text-dark disabled:bg-white dark:disabled:bg-white ${error ? 'border-spinny-orange' : 'border-gray-200 dark:border-gray-200-300'}`} onFocus={(e) => !error && (e.currentTarget.style.boxShadow = '0 0 0 3px rgba(255, 107, 53, 0.1)')} onBlur={(e) => e.currentTarget.style.boxShadow = ''}>
             {children}
         </select>
     ) : type === 'textarea' ? (
-        <textarea id={String(name)} name={String(name)} value={String(value)} onChange={onChange} required={required} disabled={disabled} placeholder={placeholder} rows={rows} className={`block w-full p-3 border rounded-lg focus:outline-none transition bg-white dark:text-spinny-text-dark disabled:bg-spinny-white dark:disabled:bg-spinny-white ${error ? 'border-spinny-orange' : 'border-brand-gray dark:border-brand-gray-300'}`} onFocus={(e) => !error && (e.currentTarget.style.boxShadow = '0 0 0 3px var(--spinny-orange-light)')} onBlur={(e) => e.currentTarget.style.boxShadow = ''} />
+        <textarea id={String(name)} name={String(name)} value={String(value)} onChange={onChange} required={required} disabled={disabled} placeholder={placeholder} rows={rows} className={`block w-full p-3 border rounded-lg focus:outline-none transition bg-white dark:text-spinny-text-dark disabled:bg-white dark:disabled:bg-white ${error ? 'border-spinny-orange' : 'border-gray-200 dark:border-gray-200-300'}`} onFocus={(e) => !error && (e.currentTarget.style.boxShadow = '0 0 0 3px rgba(255, 107, 53, 0.1)')} onBlur={(e) => e.currentTarget.style.boxShadow = ''} />
     ) : (
-        <input type={type} id={String(name)} name={String(name)} value={value} onChange={onChange} required={required} disabled={disabled} placeholder={placeholder} className={`block w-full p-3 border rounded-lg focus:outline-none transition bg-white dark:text-spinny-text-dark disabled:bg-spinny-white dark:disabled:bg-spinny-white ${error ? 'border-spinny-orange' : 'border-brand-gray dark:border-brand-gray-300'}`} onFocus={(e) => !error && (e.currentTarget.style.boxShadow = '0 0 0 3px var(--spinny-orange-light)')} onBlur={(e) => { e.currentTarget.style.boxShadow = ''; if (onBlur) onBlur(e); }} />
+        <input type={type} id={String(name)} name={String(name)} value={value} onChange={onChange} required={required} disabled={disabled} placeholder={placeholder} className={`block w-full p-3 border rounded-lg focus:outline-none transition bg-white dark:text-spinny-text-dark disabled:bg-white dark:disabled:bg-white ${error ? 'border-spinny-orange' : 'border-gray-200 dark:border-gray-200-300'}`} onFocus={(e) => !error && (e.currentTarget.style.boxShadow = '0 0 0 3px rgba(255, 107, 53, 0.1)')} onBlur={(e) => { e.currentTarget.style.boxShadow = ''; if (onBlur) onBlur(e); }} />
     )}
     {error && <p className="mt-1 text-xs text-spinny-orange">{error}</p>}
   </div>
@@ -75,7 +75,7 @@ const FormInput: React.FC<{ label: string; name: keyof Vehicle | 'summary'; type
 
 const StatCard: React.FC<{ title: string; value: string | number; icon: React.ReactNode }> = memo(({ title, value, icon }) => (
   <div className="bg-white p-6 rounded-lg shadow-md flex items-center">
-    <div className="p-3 rounded-full mr-4" style={{ background: 'var(--spinny-blue-light)' }}>{icon}</div>
+    <div className="p-3 rounded-full mr-4" style={{ background: 'rgba(30, 136, 229, 0.1)' }}>{icon}</div>
     <div>
       <h3 className="text-sm font-medium text-spinny-text-dark dark:text-spinny-text-dark">{title}</h3>
       <p className="text-2xl font-bold text-spinny-text-dark dark:text-spinny-text-dark">{value}</p>
@@ -93,7 +93,7 @@ const PlanStatusCard: React.FC<{
     const usagePercentage = listingLimit === Infinity ? 0 : (activeListingsCount / listingLimit) * 100;
 
     return (
-        <div className="text-white p-6 rounded-lg shadow-lg flex flex-col h-full" style={{ background: 'var(--gradient-primary)' }}>
+        <div className="text-white p-6 rounded-lg shadow-lg flex flex-col h-full" style={{ background: 'linear-gradient(135deg, #FF6B35 0%, #FF8456 100%)' }}>
             <h3 className="text-lg font-bold flex justify-between items-center">
                 <span>Your Plan: <span className="text-spinny-text-dark">{plan.name}</span></span>
             </h3>
@@ -102,7 +102,7 @@ const PlanStatusCard: React.FC<{
                     <span>Active Listings:</span>
                     <span className="font-semibold">{activeListingsCount} / {plan.listingLimit === 'unlimited' ? '∞' : plan.listingLimit}</span>
                 </div>
-                <div className="w-full rounded-full h-2 mb-2" style={{ background: 'var(--spinny-blue-light)' }}>
+                <div className="w-full rounded-full h-2 mb-2" style={{ background: 'rgba(30, 136, 229, 0.1)' }}>
                     <div
                         className="bg-spinny-blue h-2 rounded-full transition-all duration-500"
                         style={{ width: `${Math.min(usagePercentage, 100)}%` }}
@@ -134,7 +134,7 @@ const PlanStatusCard: React.FC<{
             {plan.id !== 'premium' && (
                 <button
                     onClick={() => onNavigate(View.PRICING)}
-                    className="mt-6 w-full bg-spinny-white text-spinny-orange font-bold py-2 px-4 rounded-lg hover:bg-spinny-white transition-colors"
+                    className="mt-6 w-full bg-white text-spinny-orange font-bold py-2 px-4 rounded-lg hover:bg-white transition-colors"
                 >
                     Upgrade Plan
                 </button>
@@ -172,7 +172,7 @@ const initialFormState: Omit<Vehicle, 'id' | 'averageRating' | 'ratingCount'> = 
 const FormFieldset: React.FC<{ title: string; children: React.ReactNode }> = ({ title, children }) => {
     const [isOpen, setIsOpen] = useState(true);
     return (
-        <fieldset className="border border-spinny-blue dark:border-brand-gray-200 rounded-lg p-4">
+        <fieldset className="border border-gray-200 dark:border-gray-200-200 rounded-lg p-4">
             <legend className="px-2 text-lg font-semibold text-spinny-text-dark dark:text-spinny-text-dark">
                 <button type="button" onClick={() => setIsOpen(!isOpen)} className="flex items-center gap-2">
                     <span>{isOpen ? '▼' : '►'}</span>
@@ -449,7 +449,7 @@ const VehicleForm: React.FC<VehicleFormProps> = memo(({ editingVehicle, onAddVeh
 
     return (
       <div className="bg-white p-6 sm:p-8 rounded-lg shadow-md">
-        <h2 className="text-2xl font-bold text-spinny-text-dark dark:text-spinny-text-dark mb-6 border-b dark:border-brand-gray-200 pb-4">
+        <h2 className="text-2xl font-bold text-spinny-text-dark dark:text-spinny-text-dark mb-6 border-b dark:border-gray-200-200 pb-4">
           {editingVehicle ? 'Edit Vehicle Listing' : 'List a New Vehicle'}
         </h2>
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12">
@@ -548,8 +548,8 @@ const VehicleForm: React.FC<VehicleFormProps> = memo(({ editingVehicle, onAddVeh
                     <div>
                         <label className="block text-sm font-medium text-spinny-text-dark dark:text-spinny-text-dark mb-1">Fixes Done / Upgrades</label>
                         <div className="flex gap-2">
-                            <input type="text" value={fixInput} onChange={(e) => setFixInput(e.target.value)} onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); handleAddFix(); } }} placeholder="e.g., New tires installed" className="flex-grow p-3 border border-brand-gray dark:border-brand-gray-300 rounded-lg" />
-                            <button type="button" onClick={handleAddFix} className="bg-spinny-white-dark dark:bg-white font-bold py-2 px-4 rounded-lg">Add Fix</button>
+                            <input type="text" value={fixInput} onChange={(e) => setFixInput(e.target.value)} onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); handleAddFix(); } }} placeholder="e.g., New tires installed" className="flex-grow p-3 border border-gray-200 dark:border-gray-200-300 rounded-lg" />
+                            <button type="button" onClick={handleAddFix} className="bg-white-dark dark:bg-white font-bold py-2 px-4 rounded-lg">Add Fix</button>
                         </div>
                         <div className="mt-2 flex flex-wrap gap-2">
                             {(formData.qualityReport?.fixesDone || []).map(fix => (
@@ -568,11 +568,11 @@ const VehicleForm: React.FC<VehicleFormProps> = memo(({ editingVehicle, onAddVeh
                      <div>
                         <label className="block text-sm font-medium text-spinny-text-dark dark:text-spinny-text-dark">Images</label>
                         <div className="mt-1">
-                            <label htmlFor="file-upload" className={`relative cursor-pointer bg-white rounded-lg border-2 border-spinny-blue dark:border-brand-gray-300 border-dashed transition-colors duration-200 flex flex-col items-center justify-center text-center p-6 ${isUploading ? 'opacity-50 cursor-not-allowed' : ''}`} style={{ borderColor: isUploading ? '' : undefined }} onMouseEnter={(e) => !isUploading && (e.currentTarget.style.borderColor = 'var(--spinny-orange)')} onMouseLeave={(e) => !isUploading && (e.currentTarget.style.borderColor = '')}>
+                            <label htmlFor="file-upload" className={`relative cursor-pointer bg-white rounded-lg border-2 border-gray-200 dark:border-gray-200-300 border-dashed transition-colors duration-200 flex flex-col items-center justify-center text-center p-6 ${isUploading ? 'opacity-50 cursor-not-allowed' : ''}`} style={{ borderColor: isUploading ? '' : undefined }} onMouseEnter={(e) => !isUploading && (e.currentTarget.style.borderColor = 'var(--spinny-orange)')} onMouseLeave={(e) => !isUploading && (e.currentTarget.style.borderColor = '')}>
                                 <svg xmlns="http://www.w3.org/2000/svg" className="mx-auto h-12 w-12 text-spinny-text-dark" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
                                 </svg>
-                                <span className="mt-2 block text-sm font-semibold" style={{ color: 'var(--spinny-orange)' }}>
+                                <span className="mt-2 block text-sm font-semibold" style={{ color: '#FF6B35' }}>
                                     {isUploading ? 'Uploading...' : 'Upload images'}
                                 </span>
                                 <input id="file-upload" type="file" className="sr-only" multiple accept="image/png, image/jpeg" onChange={(e) => handleFileUpload(e, 'image')} disabled={isUploading} />
@@ -590,21 +590,21 @@ const VehicleForm: React.FC<VehicleFormProps> = memo(({ editingVehicle, onAddVeh
                      <div>
                         <label className="block text-sm font-medium text-spinny-text-dark dark:text-spinny-text-dark">Documents</label>
                         <div className="mt-1 flex items-center gap-2">
-                             <select id="document-type" className="p-3 border rounded-lg bg-white dark:text-spinny-text-dark border-brand-gray dark:border-brand-gray-300">
+                             <select id="document-type" className="p-3 border rounded-lg bg-white dark:text-spinny-text-dark border-gray-200 dark:border-gray-200-300">
                                 <option>Registration Certificate (RC)</option>
                                 <option>Insurance</option>
                                 <option>Pollution Under Control (PUC)</option>
                                 <option>Service Record</option>
                                 <option>Other</option>
                             </select>
-                            <label htmlFor="doc-upload" className={`cursor-pointer font-semibold text-white py-2 px-4 rounded-lg transition-colors ${isUploading ? 'bg-spinny-white' : 'btn-brand-primary'}`} style={!isUploading ? { background: 'var(--gradient-primary)', cursor: 'pointer' } : undefined}>
+                            <label htmlFor="doc-upload" className={`cursor-pointer font-semibold text-white py-2 px-4 rounded-lg transition-colors ${isUploading ? 'bg-white' : 'btn-brand-primary'}`} style={!isUploading ? { background: 'var(--gradient-primary)', cursor: 'pointer' } : undefined}>
                                 {isUploading ? '...' : 'Upload'}
                                 <input id="doc-upload" type="file" className="sr-only" accept=".pdf,.png,.jpg,.jpeg" onChange={(e) => handleFileUpload(e, 'document')} disabled={isUploading} />
                             </label>
                         </div>
                          <div className="mt-2 flex flex-wrap gap-2">
                             {(formData.documents || []).map(doc => (
-                                <span key={doc.url} className="bg-spinny-white-dark dark:bg-white text-sm font-semibold px-3 py-1 rounded-full flex items-center gap-2">
+                                <span key={doc.url} className="bg-white-dark dark:bg-white text-sm font-semibold px-3 py-1 rounded-full flex items-center gap-2">
                                     {doc.fileName} ({doc.name})
                                     <button type="button" onClick={() => handleRemoveDocument(doc.url)}>&times;</button>
                                 </span>
@@ -614,8 +614,8 @@ const VehicleForm: React.FC<VehicleFormProps> = memo(({ editingVehicle, onAddVeh
                     <div>
                         <label className="block text-sm font-medium text-spinny-text-dark dark:text-spinny-text-dark mb-1">Key Features</label>
                         <div className="flex gap-2">
-                            <input type="text" value={featureInput} onChange={(e) => setFeatureInput(e.target.value)} onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); handleAddFeature(); } }} placeholder="e.g., Sunroof" className="flex-grow p-3 border border-brand-gray dark:border-brand-gray-300 rounded-lg" />
-                            <button type="button" onClick={handleAddFeature} className="bg-spinny-white-dark dark:bg-white font-bold py-2 px-4 rounded-lg">Add</button>
+                            <input type="text" value={featureInput} onChange={(e) => setFeatureInput(e.target.value)} onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); handleAddFeature(); } }} placeholder="e.g., Sunroof" className="flex-grow p-3 border border-gray-200 dark:border-gray-200-300 rounded-lg" />
+                            <button type="button" onClick={handleAddFeature} className="bg-white-dark dark:bg-white font-bold py-2 px-4 rounded-lg">Add</button>
                         </div>
                         <div className="mt-2 flex flex-wrap gap-2">{formData.features.map(feature => ( <span key={feature} className="brand-badge-orange text-sm font-semibold px-3 py-1 rounded-full flex items-center gap-2">{feature}<button type="button" onClick={() => handleRemoveFeature(feature)}>&times;</button></span> ))}</div>
                     </div>
@@ -624,7 +624,7 @@ const VehicleForm: React.FC<VehicleFormProps> = memo(({ editingVehicle, onAddVeh
                             <label htmlFor="description" className="block text-sm font-medium">Vehicle Description</label>
                             <button type="button" onClick={handleGenerateDescription} disabled={isGeneratingDesc || !formData.make || !formData.model} className="text-sm font-semibold text-spinny-orange disabled:opacity-50"> {isGeneratingDesc ? '...' : '✨ Generate with AI'}</button>
                         </div>
-                        <textarea id="description" name="description" rows={4} value={formData.description} onChange={handleChange} className="block w-full p-3 border border-brand-gray dark:border-brand-gray-300 rounded-lg" />
+                        <textarea id="description" name="description" rows={4} value={formData.description} onChange={handleChange} className="block w-full p-3 border border-gray-200 dark:border-gray-200-300 rounded-lg" />
                     </div>
                 </div>
             </FormFieldset>
@@ -648,7 +648,7 @@ const VehicleForm: React.FC<VehicleFormProps> = memo(({ editingVehicle, onAddVeh
                                 checked={isFeaturing}
                                 onChange={(e) => setIsFeaturing(e.target.checked)}
                                 disabled={(seller.featuredCredits || 0) <= 0}
-                                className="h-6 w-6 text-spinny-orange bg-spinny-white border-spinny-blue rounded focus:ring-purple-500 disabled:opacity-50 disabled:cursor-not-allowed"
+                                className="h-6 w-6 text-spinny-orange bg-white border-gray-200 rounded focus:ring-purple-500 disabled:opacity-50 disabled:cursor-not-allowed"
                             />
                         </div>
                         {(seller.featuredCredits || 0) <= 0 && <p className="text-xs text-spinny-orange mt-2">You have no featured credits. Upgrade your plan to get more.</p>}
@@ -658,7 +658,7 @@ const VehicleForm: React.FC<VehicleFormProps> = memo(({ editingVehicle, onAddVeh
 
             <div className="pt-4 flex flex-col sm:flex-row items-center gap-4">
                 <button type="submit" className="w-full sm:w-auto flex-grow btn-brand-primary font-bold py-3 px-6 rounded-lg text-lg"> {editingVehicle ? 'Update Vehicle' : 'List My Vehicle'} </button>
-                <button type="button" onClick={onCancel} className="w-full sm:w-auto bg-spinny-white0 text-white font-bold py-3 px-6 rounded-lg text-lg hover:bg-spinny-white">Cancel</button>
+                <button type="button" onClick={onCancel} className="w-full sm:w-auto bg-white0 text-white font-bold py-3 px-6 rounded-lg text-lg hover:bg-white">Cancel</button>
             </div>
           </form>
 
@@ -673,16 +673,16 @@ const VehicleForm: React.FC<VehicleFormProps> = memo(({ editingVehicle, onAddVeh
                    {aiSuggestions && Object.keys(aiSuggestions.featureSuggestions).length > 0 && (
                      <div>
                         <h3 className="text-lg font-semibold text-spinny-text-dark dark:text-spinny-text-dark mb-4 flex items-center gap-2">✨ Suggested Features</h3>
-                        <div className="bg-brand-gray-light dark:bg-white p-4 rounded-lg border dark:border-brand-gray-200 max-h-96 overflow-y-auto">
+                        <div className="bg-brand-gray-light dark:bg-white p-4 rounded-lg border dark:border-gray-200-200 max-h-96 overflow-y-auto">
                             {Object.entries(aiSuggestions.featureSuggestions).map(([category, features]) => {
                                 if (!Array.isArray(features) || features.length === 0) return null;
                                 return (
                                     <div key={category} className="mb-4 last:mb-0">
-                                        <h4 className="font-bold text-spinny-text-dark dark:text-spinny-text-dark mb-2 pb-1 border-b dark:border-brand-gray-300">{category}</h4>
+                                        <h4 className="font-bold text-spinny-text-dark dark:text-spinny-text-dark mb-2 pb-1 border-b dark:border-gray-200-300">{category}</h4>
                                         <div className="space-y-2">
                                             {features.map(feature => (
                                                 <label key={feature} className="flex items-center space-x-3 cursor-pointer group">
-                                                    <input type="checkbox" checked={formData.features.includes(feature)} onChange={() => handleSuggestedFeatureToggle(feature)} className="h-4 w-4 rounded border-spinny-blue dark:border-gray-500 bg-transparent" style={{ accentColor: 'var(--spinny-orange)' }} />
+                                                    <input type="checkbox" checked={formData.features.includes(feature)} onChange={() => handleSuggestedFeatureToggle(feature)} className="h-4 w-4 rounded border-gray-200 dark:border-gray-500 bg-transparent" style={{ accentcolor: '#FF6B35' }} />
                                                     <span className="text-sm text-spinny-text-dark dark:text-spinny-text-dark transition-colors" onMouseEnter={(e) => e.currentTarget.style.color = 'var(--spinny-orange)'} onMouseLeave={(e) => e.currentTarget.style.color = ''}>{feature}</span>
                                                 </label>
                                             ))}
@@ -739,9 +739,9 @@ const InquiriesView: React.FC<{
          <h2 className="text-2xl font-bold text-spinny-text-dark dark:text-spinny-text-dark mb-6">Customer Inquiries</h2>
          <div className="space-y-2">
             {sortedConversations.length > 0 ? sortedConversations.map(conv => (
-              <div key={conv.id} onClick={() => handleSelectConversation(conv)} className="p-4 rounded-lg cursor-pointer hover:bg-brand-gray-light dark:hover:bg-white border-b dark:border-brand-gray-200 flex items-center justify-between">
+              <div key={conv.id} onClick={() => handleSelectConversation(conv)} className="p-4 rounded-lg cursor-pointer hover:bg-brand-gray-light dark:hover:bg-white border-b dark:border-gray-200-200 flex items-center justify-between">
                 <div className="flex items-center gap-3">
-                    {!conv.isReadBySeller && <div className="w-3 h-3 rounded-full flex-shrink-0" style={{ backgroundColor: 'var(--spinny-orange)' }}></div>}
+                    {!conv.isReadBySeller && <div className="w-3 h-3 rounded-full flex-shrink-0" style={{ backgroundcolor: '#FF6B35' }}></div>}
                     <div>
                       <p className="font-bold text-spinny-text-dark dark:text-spinny-text-dark">{conv.customerName} - <span className="font-normal text-spinny-text-dark dark:text-spinny-text-dark">{conv.vehicleName}</span></p>
                       <p className="text-sm text-spinny-text-dark dark:text-spinny-text-dark truncate max-w-md">{conv.messages[conv.messages.length - 1].text}</p>
@@ -772,7 +772,7 @@ const ProfileInput: React.FC<{ label: string; name: string; value: string; onCha
             id={name}
             value={value}
             onChange={onChange}
-            className="mt-1 block w-full p-3 border border-spinny-blue dark:border-brand-gray-300 rounded-lg shadow-sm sm:text-sm bg-white dark:text-spinny-text-dark" onFocus={(e) => { e.currentTarget.style.borderColor = 'var(--spinny-orange)'; e.currentTarget.style.boxShadow = '0 0 0 2px var(--spinny-orange-light)'; }} onBlur={(e) => { e.currentTarget.style.borderColor = ''; e.currentTarget.style.boxShadow = ''; }}
+            className="mt-1 block w-full p-3 border border-gray-200 dark:border-gray-200-300 rounded-lg shadow-sm sm:text-sm bg-white dark:text-spinny-text-dark" onFocus={(e) => { e.currentTarget.style.borderColor = 'var(--spinny-orange)'; e.currentTarget.style.boxShadow = '0 0 0 2px rgba(255, 107, 53, 0.1)'; }} onBlur={(e) => { e.currentTarget.style.borderColor = ''; e.currentTarget.style.boxShadow = ''; }}
         />
     </div>
 );
@@ -786,7 +786,7 @@ const ProfileTextarea: React.FC<{ label: string; name: string; value: string; on
             rows={4}
             value={value}
             onChange={onChange}
-            className="mt-1 block w-full p-3 border border-spinny-blue dark:border-brand-gray-300 rounded-lg shadow-sm sm:text-sm bg-white dark:text-spinny-text-dark" onFocus={(e) => { e.currentTarget.style.borderColor = 'var(--spinny-orange)'; e.currentTarget.style.boxShadow = '0 0 0 2px var(--spinny-orange-light)'; }} onBlur={(e) => { e.currentTarget.style.borderColor = ''; e.currentTarget.style.boxShadow = ''; }}
+            className="mt-1 block w-full p-3 border border-gray-200 dark:border-gray-200-300 rounded-lg shadow-sm sm:text-sm bg-white dark:text-spinny-text-dark" onFocus={(e) => { e.currentTarget.style.borderColor = 'var(--spinny-orange)'; e.currentTarget.style.boxShadow = '0 0 0 2px rgba(255, 107, 53, 0.1)'; }} onBlur={(e) => { e.currentTarget.style.borderColor = ''; e.currentTarget.style.boxShadow = ''; }}
             placeholder={placeholder}
         />
     </div>
@@ -840,9 +840,9 @@ const SellerProfileForm: React.FC<{ seller: User; onUpdateProfile: (details: any
             <h2 className="text-2xl font-bold text-spinny-text-dark dark:text-spinny-text-dark mb-6">Seller Profile</h2>
             <form onSubmit={handleSubmit} className="space-y-6">
                 <div className="flex items-center gap-6">
-                    <img src={formData.logoUrl || 'https://via.placeholder.com/100'} alt="Logo" className="w-24 h-24 rounded-full object-cover bg-spinny-white-dark" />
+                    <img src={formData.logoUrl || 'https://via.placeholder.com/100'} alt="Logo" className="w-24 h-24 rounded-full object-cover bg-white-dark" />
                     <div>
-                        <label htmlFor="logo-upload" className="cursor-pointer font-medium transition-colors" style={{ color: 'var(--spinny-orange)' }} onMouseEnter={(e) => e.currentTarget.style.color = 'var(--spinny-blue)'} onMouseLeave={(e) => e.currentTarget.style.color = 'var(--spinny-orange)'}>
+                        <label htmlFor="logo-upload" className="cursor-pointer font-medium transition-colors" style={{ color: '#FF6B35' }} onMouseEnter={(e) => e.currentTarget.style.color = 'var(--spinny-blue)'} onMouseLeave={(e) => e.currentTarget.style.color = 'var(--spinny-orange)'}>
                             <span>Upload New Logo</span>
                             <input id="logo-upload" name="logo-upload" type="file" className="sr-only" accept="image/*" onChange={handleLogoUpload} />
                         </label>
@@ -867,19 +867,19 @@ const SellerProfileForm: React.FC<{ seller: User; onUpdateProfile: (details: any
                 </div>
             </form>
 
-             <div className="mt-8 pt-6 border-t border-spinny-blue dark:border-brand-gray-200">
+             <div className="mt-8 pt-6 border-t border-gray-200 dark:border-gray-200-200">
                 <h3 className="text-xl font-bold text-spinny-text-dark dark:text-spinny-text-dark mb-4">Your Public Profile</h3>
                 <div className="flex flex-col sm:flex-row items-center gap-6 p-4 bg-white rounded-lg">
                     <div className="text-center">
-                        <img src={qrCodeUrl} alt="Seller Profile QR Code" className="w-36 h-36 rounded-lg border dark:border-brand-gray-300" />
-                         <a href={qrCodeUrl} download={`qr-code-${seller.email}.png`} className="mt-2 inline-block text-sm hover:underline transition-colors" style={{ color: 'var(--spinny-orange)' }} onMouseEnter={(e) => e.currentTarget.style.color = 'var(--spinny-blue)'} onMouseLeave={(e) => e.currentTarget.style.color = 'var(--spinny-orange)'}>
+                        <img src={qrCodeUrl} alt="Seller Profile QR Code" className="w-36 h-36 rounded-lg border dark:border-gray-200-300" />
+                         <a href={qrCodeUrl} download={`qr-code-${seller.email}.png`} className="mt-2 inline-block text-sm hover:underline transition-colors" style={{ color: '#FF6B35' }} onMouseEnter={(e) => e.currentTarget.style.color = 'var(--spinny-blue)'} onMouseLeave={(e) => e.currentTarget.style.color = 'var(--spinny-orange)'}>
                             Download QR Code
                         </a>
                     </div>
                     <div>
                         <p className="text-sm text-spinny-text-dark dark:text-spinny-text-dark mb-3">Share this QR code or link with customers. When they scan or click it, they'll be taken directly to your profile page with all your listings.</p>
-                        <div className="mt-2 p-2 bg-spinny-white-dark dark:bg-white rounded-md flex items-center justify-between gap-2">
-                           <a href={profileUrl} target="_blank" rel="noopener noreferrer" className="text-sm font-mono truncate hover:underline transition-colors" style={{ color: 'var(--spinny-orange)' }} onMouseEnter={(e) => e.currentTarget.style.color = 'var(--spinny-blue)'} onMouseLeave={(e) => e.currentTarget.style.color = 'var(--spinny-orange)'}>{profileUrl}</a>
+                        <div className="mt-2 p-2 bg-white-dark dark:bg-white rounded-md flex items-center justify-between gap-2">
+                           <a href={profileUrl} target="_blank" rel="noopener noreferrer" className="text-sm font-mono truncate hover:underline transition-colors" style={{ color: '#FF6B35' }} onMouseEnter={(e) => e.currentTarget.style.color = 'var(--spinny-blue)'} onMouseLeave={(e) => e.currentTarget.style.color = 'var(--spinny-orange)'}>{profileUrl}</a>
                            <button onClick={handleCopy} className="text-sm font-semibold px-3 py-1 text-white rounded-md transition-colors whitespace-nowrap btn-brand-primary">
                                {copySuccess || 'Copy Link'}
                            </button>
@@ -901,13 +901,13 @@ const ReportsView: React.FC<{
         {reportedVehicles.length > 0 ? (
             <div className="space-y-4">
                 {reportedVehicles.map(v => (
-                    <div key={v.id} className="border border-spinny-blue dark:border-spinny-blue bg-spinny-blue-light dark:bg-spinny-blue/20 p-4 rounded-lg">
+                    <div key={v.id} className="border border-gray-200 dark:border-gray-200 bg-spinny-blue-light dark:bg-spinny-blue/20 p-4 rounded-lg">
                         <h3 className="font-bold text-spinny-text-dark dark:text-spinny-text-dark">{v.year} {v.make} {v.model}</h3>
                         <p className="text-sm text-spinny-text-dark dark:text-spinny-text-dark mt-1">Reported on: {v.flaggedAt ? new Date(v.flaggedAt).toLocaleString() : 'N/A'}</p>
                         <p className="mt-2 text-sm italic text-spinny-text-dark dark:text-spinny-text-dark">Reason: "{v.flagReason || 'No reason provided.'}"</p>
                         <p className="text-xs text-spinny-text-dark dark:text-spinny-text-dark mt-2">An administrator will review this report. You can edit the listing to correct any issues or delete it if it's no longer valid.</p>
                         <div className="mt-3 space-x-4">
-                            <button onClick={() => onEditVehicle(v)} className="font-semibold text-sm hover:underline transition-colors" style={{ color: 'var(--spinny-orange)' }} onMouseEnter={(e) => e.currentTarget.style.color = 'var(--spinny-blue)'} onMouseLeave={(e) => e.currentTarget.style.color = 'var(--spinny-orange)'}> Edit Listing</button>
+                            <button onClick={() => onEditVehicle(v)} className="font-semibold text-sm hover:underline transition-colors" style={{ color: '#FF6B35' }} onMouseEnter={(e) => e.currentTarget.style.color = 'var(--spinny-blue)'} onMouseLeave={(e) => e.currentTarget.style.color = 'var(--spinny-orange)'}> Edit Listing</button>
                             <button onClick={() => onDeleteVehicle(v.id)} className="text-spinny-orange font-semibold text-sm hover:underline">Delete Listing</button>
                         </div>
                     </div>
@@ -1120,7 +1120,7 @@ const Dashboard: React.FC<DashboardProps> = ({ seller, sellerVehicles, reportedV
             {activeListings.length > 0 ? (
               <div className="overflow-x-auto">
                 <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
-                  <thead className="bg-spinny-white dark:bg-white"><tr><th className="px-6 py-3 text-left text-xs font-medium uppercase">Vehicle</th><th className="px-6 py-3 text-left text-xs font-medium uppercase">Price</th><th className="relative px-6 py-3 text-right text-xs font-medium uppercase">Actions</th></tr></thead>
+                  <thead className="bg-white dark:bg-white"><tr><th className="px-6 py-3 text-left text-xs font-medium uppercase">Vehicle</th><th className="px-6 py-3 text-left text-xs font-medium uppercase">Price</th><th className="relative px-6 py-3 text-right text-xs font-medium uppercase">Actions</th></tr></thead>
                   <tbody className="bg-white divide-y divide-gray-200 dark:divide-gray-700">
                     {activeListings.map((v) => (
                       <tr key={v.id}>
@@ -1132,7 +1132,7 @@ const Dashboard: React.FC<DashboardProps> = ({ seller, sellerVehicles, reportedV
                           )}
                           {getCertificationButton(v)}
                           <button onClick={() => onMarkAsSold(v.id)} className="text-spinny-orange hover:text-spinny-orange">Sold</button>
-                          <button onClick={() => handleEditClick(v)} className="transition-colors" style={{ color: 'var(--spinny-orange)' }} onMouseEnter={(e) => e.currentTarget.style.color = 'var(--spinny-blue)'} onMouseLeave={(e) => e.currentTarget.style.color = 'var(--spinny-orange)'}>Edit</button>
+                          <button onClick={() => handleEditClick(v)} className="transition-colors" style={{ color: '#FF6B35' }} onMouseEnter={(e) => e.currentTarget.style.color = 'var(--spinny-blue)'} onMouseLeave={(e) => e.currentTarget.style.color = 'var(--spinny-orange)'}>Edit</button>
                           <button onClick={() => onDeleteVehicle(v.id)} className="text-spinny-orange hover:text-spinny-orange">Delete</button>
                         </td>
                       </tr>
@@ -1141,7 +1141,7 @@ const Dashboard: React.FC<DashboardProps> = ({ seller, sellerVehicles, reportedV
                 </table>
               </div>
             ) : (
-                <div className="text-center py-12 bg-white rounded-lg border border-dashed border-spinny-blue dark:border-brand-gray-300">
+                <div className="text-center py-12 bg-white rounded-lg border border-dashed border-gray-200 dark:border-gray-200-300">
                     <svg xmlns="http://www.w3.org/2000/svg" className="mx-auto h-12 w-12 text-spinny-text-dark" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 13h6m-3-3v6m-9 1V7a2 2 0 012-2h6l2 2h6a2 2 0 012 2v8a2 2 0 01-2-2H5a2 2 0 01-2-2z" />
                     </svg>
@@ -1166,7 +1166,7 @@ const Dashboard: React.FC<DashboardProps> = ({ seller, sellerVehicles, reportedV
             {soldListings.length > 0 ? (
                 <div className="overflow-x-auto">
                 <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
-                  <thead className="bg-spinny-white dark:bg-white"><tr><th className="px-6 py-3 text-left text-xs font-medium uppercase">Vehicle</th><th className="px-6 py-3 text-left text-xs font-medium uppercase">Sold Price</th></tr></thead>
+                  <thead className="bg-white dark:bg-white"><tr><th className="px-6 py-3 text-left text-xs font-medium uppercase">Vehicle</th><th className="px-6 py-3 text-left text-xs font-medium uppercase">Sold Price</th></tr></thead>
                   <tbody className="bg-white divide-y divide-gray-200 dark:divide-gray-700">
                     {soldListings.map((v) => (
                       <tr key={v.id}>

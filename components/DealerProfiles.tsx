@@ -16,7 +16,7 @@ const DealerCard: React.FC<{ seller: User; onViewProfile: (sellerEmail: string) 
         <img
             src={seller.logoUrl || `https://i.pravatar.cc/100?u=${seller.email}`}
             alt={`${seller.dealershipName || seller.name}'s logo`}
-            className="w-24 h-24 rounded-full object-cover border-4 border-brand-gray-200 dark:border-brand-gray-200 mb-4"
+            className="w-24 h-24 rounded-full object-cover border-4 border-gray-200-200 dark:border-gray-200-200 mb-4"
         />
         <h3 className="font-bold text-xl text-spinny-text-dark dark:text-spinny-text-dark">{seller.dealershipName || seller.name}</h3>
         <div className="my-2">

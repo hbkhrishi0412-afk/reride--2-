@@ -118,14 +118,14 @@ const Comparison: React.FC<ComparisonProps> = ({ vehicles, onBack: onBackToHome,
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
         <div>
             <h1 className="text-3xl font-extrabold text-spinny-text-dark dark:text-spinny-text-dark">Compare Vehicles</h1>
-            <button onClick={onBackToHome} className="text-sm font-medium hover:underline mt-1 transition-colors" style={{ color: 'var(--spinny-orange)' }} onMouseEnter={(e) => e.currentTarget.style.color = 'var(--spinny-blue)'} onMouseLeave={(e) => e.currentTarget.style.color = 'var(--spinny-orange)'}>
+            <button onClick={onBackToHome} className="text-sm font-medium hover:underline mt-1 transition-colors" style={{ color: '#FF6B35' }} onMouseEnter={(e) => e.currentTarget.style.color = 'var(--spinny-blue)'} onMouseLeave={(e) => e.currentTarget.style.color = 'var(--spinny-orange)'}>
                 &larr; Back to Listings
             </button>
         </div>
         <div className="flex items-center space-x-3 bg-spinny-off-white dark:bg-brand-gray-700 p-2 rounded-lg">
           <label htmlFor="highlight-toggle" className="text-sm font-medium text-spinny-text-dark dark:text-brand-gray-200">Highlight Differences</label>
-          <button onClick={() => setHighlightDiffs(!highlightDiffs)} id="highlight-toggle" className={`${highlightDiffs ? '' : 'bg-brand-gray-300 dark:bg-brand-gray-600'} relative inline-flex items-center h-6 rounded-full w-11 transition-colors`} style={highlightDiffs ? { background: 'var(--spinny-orange)' } : undefined}>
-              <span className={`${highlightDiffs ? 'translate-x-6' : 'translate-x-1'} inline-block w-4 h-4 transform bg-spinny-white rounded-full transition-transform`} />
+          <button onClick={() => setHighlightDiffs(!highlightDiffs)} id="highlight-toggle" className={`${highlightDiffs ? '' : 'bg-brand-gray-300 dark:bg-brand-gray-600'} relative inline-flex items-center h-6 rounded-full w-11 transition-colors`} style={highlightDiffs ? { background: '#FF6B35' } : undefined}>
+              <span className={`${highlightDiffs ? 'translate-x-6' : 'translate-x-1'} inline-block w-4 h-4 transform bg-white rounded-full transition-transform`} />
           </button>
         </div>
       </div>
@@ -133,7 +133,7 @@ const Comparison: React.FC<ComparisonProps> = ({ vehicles, onBack: onBackToHome,
       <div className="overflow-x-auto">
         <table className="w-full border-collapse">
           <thead>
-            <tr className="border-b-2 border-brand-gray-300 dark:border-brand-gray-300">
+            <tr className="border-b-2 border-gray-200-300 dark:border-gray-200-300">
               <th className="text-left font-bold text-lg text-spinny-text-dark p-4 sticky left-0 bg-white z-10">Feature</th>
               {vehicles.map(vehicle => (
                 <th key={vehicle.id} className="p-4 min-w-[220px]">
@@ -148,7 +148,7 @@ const Comparison: React.FC<ComparisonProps> = ({ vehicles, onBack: onBackToHome,
             {specFields.map((key) => {
               const hasDifference = areValuesDifferent(key);
               return (
-                <tr key={String(key)} className="border-b border-brand-gray-200 dark:border-brand-gray-200">
+                <tr key={String(key)} className="border-b border-gray-200-200 dark:border-gray-200-200">
                   <td className="font-semibold text-brand-gray-600 dark:text-spinny-text-dark p-4 sticky left-0 bg-white z-10">{specLabels[key]}</td>
                   {vehicles.map(vehicle => {
                     let value = vehicle[key];
@@ -158,7 +158,7 @@ const Comparison: React.FC<ComparisonProps> = ({ vehicles, onBack: onBackToHome,
 
                     const isBest = typeof value === 'number' && isBestValue(key, value);
                     const cellClass = highlightDiffs && hasDifference ? '' : '';
-                    const cellStyle = highlightDiffs && hasDifference ? { backgroundColor: 'var(--spinny-blue-light)' } : undefined;
+                    const cellStyle = highlightDiffs && hasDifference ? { backgroundColor: 'rgba(30, 136, 229, 0.1)' } : undefined;
                     return (
                       <td key={`${vehicle.id}-${String(key)}`} className={`p-4 text-center dark:text-brand-gray-200 transition-colors ${cellClass} ${isBest ? 'bg-spinny-orange-light dark:bg-spinny-orange/20' : ''}`}>
                          <span className={`inline-flex items-center gap-2 ${isBest ? 'font-bold text-spinny-orange dark:text-spinny-orange' : ''}`}>
@@ -188,16 +188,16 @@ const Comparison: React.FC<ComparisonProps> = ({ vehicles, onBack: onBackToHome,
             <tr className="h-4"></tr>
             <tr>
               <td colSpan={vehicles.length + 1} className="pt-6 pb-2">
-                 <h2 className="text-2xl font-bold text-spinny-text-dark dark:text-spinny-text-dark border-b-2 border-brand-gray-300 dark:border-brand-gray-300 pb-2">Features</h2>
+                 <h2 className="text-2xl font-bold text-spinny-text-dark dark:text-spinny-text-dark border-b-2 border-gray-200-300 dark:border-gray-200-300 pb-2">Features</h2>
               </td>
             </tr>
             {allFeatures.map((feature) => {
               const hasDifference = areValuesDifferent('features');
               return (
-                 <tr key={feature} className="border-b border-brand-gray-200 dark:border-brand-gray-200">
+                 <tr key={feature} className="border-b border-gray-200-200 dark:border-gray-200-200">
                      <td className="font-semibold text-brand-gray-600 dark:text-spinny-text-dark p-4 sticky left-0 bg-white z-10">{feature}</td>
                      {vehicles.map(vehicle => (
-                        <td key={`${vehicle.id}-${feature}`} className="p-4 transition-colors" style={highlightDiffs && hasDifference ? { backgroundColor: 'var(--spinny-blue-light)' } : undefined}>
+                        <td key={`${vehicle.id}-${feature}`} className="p-4 transition-colors" style={highlightDiffs && hasDifference ? { backgroundColor: 'rgba(30, 136, 229, 0.1)' } : undefined}>
                             {vehicle.features.includes(feature) ? <CheckIcon /> : <XIcon />}
                         </td>
                      ))}
