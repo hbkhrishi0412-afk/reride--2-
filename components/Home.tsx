@@ -80,39 +80,37 @@ const FeaturedVehicleCard: React.FC<Pick<HomeProps, 'onSelectVehicle' | 'onToggl
               </button>
           </div>
         </div>
-        <div className="p-4 flex-grow flex flex-col">
-          <div className="flex justify-between items-start mb-2">
-              <h3 className="text-lg font-bold" style={{color: 'var(--carandbike-dark-gray)'}}>{vehicle.make} {vehicle.model}</h3>
-              <span className="text-sm font-semibold px-2 py-1 rounded" style={{color: 'var(--carandbike-light-gray)', backgroundColor: 'var(--carandbike-off-white)'}}>{vehicle.year}</span>
+        <div className="p-6 flex-grow flex flex-col bg-white">
+          <div className="flex justify-between items-start mb-3">
+              <h3 className="text-lg font-bold text-gray-900">{vehicle.make} {vehicle.model}</h3>
+              <span className="text-sm font-semibold px-3 py-1 rounded-full bg-gray-100 text-gray-600">{vehicle.year}</span>
           </div>
-           <p className="text-sm mb-2" style={{color: 'var(--carandbike-light-gray)'}}>{vehicle.variant || ''}</p>
-          <div className="mb-3 text-sm truncate" style={{color: 'var(--carandbike-light-gray)'}}>
-             By: <button onClick={handleSellerClick} className="font-semibold hover:underline focus:outline-none" style={{color: 'var(--carandbike-primary-blue)'}}>{vehicle.sellerName}</button>
+           <p className="text-sm mb-3 text-gray-500">{vehicle.variant || ''}</p>
+          <div className="mb-4 text-sm text-gray-500 truncate">
+             By: <button onClick={handleSellerClick} className="font-semibold hover:underline focus:outline-none text-blue-600">{vehicle.sellerName}</button>
           </div>
           
-          <div className="mt-3 pt-3 grid grid-cols-3 gap-2 text-center text-sm" style={{borderTop: '1px solid var(--carandbike-border)', color: 'var(--carandbike-medium-gray)'}}>
+          <div className="mt-3 pt-4 grid grid-cols-3 gap-2 text-center text-sm border-t border-gray-200 text-gray-600">
              <span>{vehicle.mileage.toLocaleString('en-IN')} kms</span>
              <span>{vehicle.fuelType}</span>
              <span>{vehicle.transmission}</span>
           </div>
   
-          <div className="mt-4 flex justify-between items-center">
-               <p className="text-xl font-bold" style={{color: 'var(--carandbike-dark-gray)'}}>₹{vehicle.price.toLocaleString('en-IN')}</p>
+          <div className="mt-6 flex justify-between items-center">
+               <p className="text-xl font-bold text-gray-900">₹{vehicle.price.toLocaleString('en-IN')}</p>
                <label 
                 onClick={handleCompareClick} 
                 title={isCompareDisabled ? "Comparison limit reached (max 4)" : "Add to compare"}
-                className={`flex items-center text-sm font-medium px-3 py-2 rounded-md transition-colors ${isCompareDisabled ? 'opacity-60 cursor-not-allowed' : 'cursor-pointer hover:bg-gray-100'}`}
-                style={{color: 'var(--carandbike-medium-gray)'}}
+                className={`flex items-center text-sm font-medium px-4 py-2 rounded-lg transition-colors ${isCompareDisabled ? 'opacity-60 cursor-not-allowed bg-gray-100' : 'cursor-pointer hover:bg-blue-50 text-blue-600'}`}
               >
                 <input 
                   type="checkbox" 
                   checked={isSelectedForCompare}
                   readOnly
                   disabled={isCompareDisabled}
-                  className="form-checkbox h-4 w-4 rounded focus:ring-blue-500 disabled:opacity-50"
-                  style={{color: 'var(--carandbike-primary-blue)', backgroundColor: 'var(--carandbike-off-white)', borderColor: 'var(--carandbike-border)'}}
+                  className="form-checkbox h-4 w-4 text-blue-600 rounded focus:ring-blue-500 disabled:opacity-50 mr-2"
                 />
-                <span className="ml-2">Compare</span>
+                <span>Compare</span>
               </label>
           </div>
         </div>
@@ -177,15 +175,15 @@ const Home: React.FC<HomeProps> = ({ onSearch, onSelectCategory, featuredVehicle
             <section className="premium-hero relative min-h-screen flex items-center justify-center">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
                     <div className="text-center animate-fadeInUp">
-                        <h1 className="text-5xl md:text-7xl font-bold mb-6 text-white">
+                        <h1 className="text-4xl md:text-5xl font-bold mb-6 text-white">
                             Find Your 
-                            <span className="block premium-text-gradient animate-pulse">
+                            <span className="block premium-text-gradient">
                                 Dream Vehicle
                             </span>
                         </h1>
-                        <p className="text-xl md:text-2xl mb-8 text-white/90 max-w-3xl mx-auto leading-relaxed">
+                        <p className="text-lg md:text-xl mb-8 text-white/90 max-w-3xl mx-auto leading-relaxed">
                             Discover premium vehicles with AI-powered recommendations
-                            <span className="block text-lg mt-2 text-white/70">
+                            <span className="block text-base mt-2 text-white/70">
                                 BY BRAND • BY BUDGET • BY PREFERENCE
                             </span>
                         </p>
@@ -261,10 +259,10 @@ const Home: React.FC<HomeProps> = ({ onSearch, onSelectCategory, featuredVehicle
             <section className="py-20 bg-gradient-to-br from-gray-50 to-white relative overflow-hidden">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                      <div className="text-center mb-16 animate-fadeInUp">
-                         <h2 className="text-4xl md:text-5xl font-bold mb-4 premium-text-gradient">
+                         <h2 className="text-3xl md:text-4xl font-bold mb-4 premium-text-gradient">
                              Explore by Category
                          </h2>
-                         <p className="text-xl text-gray-600 max-w-2xl mx-auto">
+                         <p className="text-lg text-gray-600 max-w-2xl mx-auto">
                              Find your perfect vehicle across different categories
                          </p>
                      </div>
@@ -302,12 +300,12 @@ const Home: React.FC<HomeProps> = ({ onSearch, onSelectCategory, featuredVehicle
                  <section className="py-20 bg-white relative overflow-hidden">
                     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                         <div className="text-center mb-16 animate-fadeInUp">
-                            <h2 className="text-4xl md:text-5xl font-bold mb-4 premium-text-gradient">
-                                Recommended For You
-                            </h2>
-                            <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-                                Handpicked vehicles based on your preferences and market trends
-                            </p>
+                             <h2 className="text-3xl md:text-4xl font-bold mb-4 premium-text-gradient">
+                                 Recommended For You
+                             </h2>
+                             <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+                                 Handpicked vehicles based on your preferences and market trends
+                             </p>
                         </div>
                         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
                             {recommendations.map((vehicle, index) => (
