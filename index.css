@@ -148,3 +148,53 @@ button:disabled {
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
+/* CarAndBike-inspired styles */
+.carandbike-card {
+  @apply bg-white border border-gray-200 rounded-lg overflow-hidden transition-all duration-300 hover:border-blue-500 hover:shadow-lg hover:-translate-y-1;
+}
+
+.carandbike-button {
+  @apply bg-blue-600 text-white px-4 py-2 rounded-md font-medium hover:bg-blue-700 transition-colors;
+}
+
+.carandbike-button-secondary {
+  @apply bg-orange-500 text-white px-4 py-2 rounded-md font-medium hover:bg-orange-600 transition-colors;
+}
+
+.carandbike-search {
+  @apply bg-white rounded-lg p-2 shadow-lg;
+}
+
+.carandbike-hero {
+  @apply bg-gradient-to-r from-blue-600 to-blue-800 text-white py-20;
+}
+
+/* Enhanced vehicle card styles */
+.vehicle-card {
+  @apply bg-white border border-gray-200 rounded-lg overflow-hidden transition-all duration-300 hover:border-blue-500 hover:shadow-lg hover:-translate-y-1;
+}
+
+.vehicle-card:hover {
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+}
+
+/* Price styling */
+.price-highlight {
+  @apply text-xl font-bold text-gray-900;
+}
+
+/* Category button styles */
+.category-button {
+  @apply group p-6 bg-gray-50 border border-gray-200 rounded-lg text-center transition-all duration-300 hover:border-blue-500 hover:shadow-lg hover:-translate-y-1;
+}
+
+/* Search bar styles */
+.search-container {
+  @apply bg-white rounded-lg p-2 shadow-lg;
+}
+
+/* Hero section styles */
+.hero-section {
+  @apply bg-gradient-to-r from-blue-600 to-blue-800 text-white py-20;
+}
+

@@ -89,16 +89,16 @@ const Header: React.FC<HeaderProps> = ({
   
   return (
     <>
-    <header className={headerClasses} id="main-header">
+    <header className="bg-white shadow-sm border-b border-gray-200 sticky top-0 z-50" id="main-header">
       {/* Top Bar */}
-      <div className={`bg-brand-gray-darker text-brand-gray-400 text-xs transition-colors duration-300`}>
-          <div className="container mx-auto px-4 flex justify-between items-center h-8">
+      <div className="bg-gray-50 text-gray-600 text-xs">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex justify-between items-center h-8">
               <div className="flex items-center gap-x-4">
-                  <a href="#" onClick={(e) => { e.preventDefault(); handleNavigate(ViewEnum.SUPPORT) }} className="hover:text-white">Support</a>
-                  <a href="#" onClick={(e) => { e.preventDefault(); handleNavigate(ViewEnum.FAQ) }} className="hover:text-white">FAQ</a>
+                  <a href="#" onClick={(e) => { e.preventDefault(); handleNavigate(ViewEnum.SUPPORT) }} className="hover:text-gray-900">Support</a>
+                  <a href="#" onClick={(e) => { e.preventDefault(); handleNavigate(ViewEnum.FAQ) }} className="hover:text-gray-900">FAQ</a>
               </div>
               <div className="flex items-center gap-x-4">
-                  <button onClick={() => setIsLocationModalOpen(true)} className="flex items-center gap-1 hover:text-white">
+                  <button onClick={() => setIsLocationModalOpen(true)} className="flex items-center gap-1 hover:text-gray-900">
                     <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" /></svg> 
                     {userLocation}
                   </button>
@@ -106,18 +106,20 @@ const Header: React.FC<HeaderProps> = ({
           </div>
       </div>
       {/* Main Bar */}
-      <div className={`transition-colors duration-300 bg-brand-gray-900`}>
-        <div className="container mx-auto px-4">
+      <div className="bg-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="flex justify-between items-center h-16">
             <div className="flex items-center space-x-8">
-                <button onClick={() => handleNavigate(ViewEnum.HOME)} className={`text-2xl font-bold text-white`}>
+                <button onClick={() => handleNavigate(ViewEnum.HOME)} className="text-2xl font-bold text-gray-900 hover:text-blue-600 transition-colors">
                 ReRide
                 </button>
                 <nav className="hidden md:flex items-center space-x-6">
                 <div className="relative" ref={newCarsMenuRef} onMouseLeave={() => setIsNewCarsMenuOpen(false)}>
-                    <button onMouseEnter={() => setIsNewCarsMenuOpen(true)} className={`font-semibold flex items-center gap-1 py-5 ${mainNavLinkClasses}`}>
+                    <button onMouseEnter={() => setIsNewCarsMenuOpen(true)} className="text-gray-700 hover:text-blue-600 px-3 py-2 text-sm font-medium flex items-center">
                         New Cars
-                        <svg className={`w-4 h-4 transition-transform ${isNewCarsMenuOpen ? 'rotate-180' : ''}`} xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" /></svg>
+                        <svg className="ml-1 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                        </svg>
                     </button>
                     {isNewCarsMenuOpen && (
                         <div onMouseEnter={() => setIsNewCarsMenuOpen(true)} className="absolute top-full -left-8 w-[700px] bg-white dark:bg-brand-gray-800 rounded-b-lg shadow-lg border-t-2 border-brand-blue animate-fade-in z-20">
@@ -144,14 +146,14 @@ const Header: React.FC<HeaderProps> = ({
                         </div>
                     )}
                 </div>
-                <button onClick={() => handleNavigate(ViewEnum.USED_CARS)} className={`font-semibold py-5 ${mainNavLinkClasses}`}>Used Cars</button>
-                <button onClick={() => handleNavigate(ViewEnum.DEALER_PROFILES)} className={`font-semibold py-5 ${mainNavLinkClasses}`}>Dealers</button>
-                <button onClick={() => handleNavigate(ViewEnum.PRICING)} className={`font-semibold py-5 ${mainNavLinkClasses}`}>Pricing</button>
+                <button onClick={() => handleNavigate(ViewEnum.USED_CARS)} className="text-gray-700 hover:text-blue-600 px-3 py-2 text-sm font-medium">Used Cars</button>
+                <button onClick={() => handleNavigate(ViewEnum.DEALER_PROFILES)} className="text-gray-700 hover:text-blue-600 px-3 py-2 text-sm font-medium">Dealers</button>
+                <button onClick={() => handleNavigate(ViewEnum.PRICING)} className="text-gray-700 hover:text-blue-600 px-3 py-2 text-sm font-medium">Pricing</button>
                 </nav>
             </div>
 
-            <div className="hidden md:flex items-center space-x-2">
-                <button onClick={() => handleNavigate(ViewEnum.SELLER_LOGIN)} className={`font-semibold border-2 rounded-full py-2 px-5 transition-colors duration-300 border-white text-white hover:bg-white hover:text-brand-blue`}>Sell Your Car</button>
+            <div className="hidden md:flex items-center space-x-4">
+                <button onClick={() => handleNavigate(ViewEnum.SELLER_LOGIN)} className="bg-blue-600 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-blue-700 transition-colors">Sell Your Car</button>
                 
                 <button onClick={onOpenCommandPalette} className={`p-2 rounded-full ${mainNavLinkClasses}`} aria-label="Search"><svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg></button>
                 

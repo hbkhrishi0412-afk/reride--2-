@@ -58,7 +58,7 @@ const FeaturedVehicleCard: React.FC<Pick<HomeProps, 'onSelectVehicle' | 'onToggl
     return (
       <div 
         onClick={() => onSelectVehicle(vehicle)}
-        className="bg-white dark:bg-brand-gray-dark/50 backdrop-blur-sm border border-brand-gray-200 dark:border-brand-gray-700 rounded-2xl overflow-hidden group cursor-pointer transition-all duration-300 hover:border-brand-blue hover:shadow-glow hover:-translate-y-2"
+        className="bg-white border border-gray-200 rounded-lg overflow-hidden group cursor-pointer transition-all duration-300 hover:border-blue-500 hover:shadow-lg hover:-translate-y-1"
       >
         <div className="relative overflow-hidden">
           <img className="w-full h-48 sm:h-56 object-cover group-hover:scale-105 transition-transform duration-500 ease-in-out" src={vehicle.images[0]} alt={`${vehicle.make} ${vehicle.model}`} loading="lazy" />
@@ -80,35 +80,35 @@ const FeaturedVehicleCard: React.FC<Pick<HomeProps, 'onSelectVehicle' | 'onToggl
               </button>
           </div>
         </div>
-        <div className="p-3 sm:p-5 flex-grow flex flex-col">
-          <div className="flex justify-between items-start">
-              <h3 className="text-base sm:text-xl font-bold text-brand-gray-800 dark:text-brand-gray-100">{vehicle.make} {vehicle.model}</h3>
-              <span className="text-sm sm:text-lg font-semibold text-brand-gray-500 dark:text-brand-gray-400 bg-brand-gray-100 dark:bg-brand-gray-800 px-2 py-0.5 rounded">{vehicle.year}</span>
+        <div className="p-4 flex-grow flex flex-col">
+          <div className="flex justify-between items-start mb-2">
+              <h3 className="text-lg font-bold text-gray-900">{vehicle.make} {vehicle.model}</h3>
+              <span className="text-sm font-semibold text-gray-500 bg-gray-100 px-2 py-1 rounded">{vehicle.year}</span>
           </div>
-           <p className="text-xs sm:text-sm text-brand-gray-500 dark:text-brand-gray-400 mt-1">{vehicle.variant || ''}</p>
-          <div className="mt-2 text-xs text-brand-gray-500 dark:text-brand-gray-500 truncate">
-             By: <button onClick={handleSellerClick} className="font-semibold hover:underline focus:outline-none text-brand-blue dark:text-brand-blue-light">{vehicle.sellerName}</button>
+           <p className="text-sm text-gray-500 mb-2">{vehicle.variant || ''}</p>
+          <div className="mb-3 text-sm text-gray-500 truncate">
+             By: <button onClick={handleSellerClick} className="font-semibold hover:underline focus:outline-none text-blue-600">{vehicle.sellerName}</button>
           </div>
           
-          <div className="mt-3 pt-3 sm:mt-4 sm:pt-4 border-t border-brand-gray-200 dark:border-brand-gray-700 grid grid-cols-3 gap-2 text-center text-xs sm:text-sm text-brand-gray-600 dark:text-brand-gray-400">
+          <div className="mt-3 pt-3 border-t border-gray-200 grid grid-cols-3 gap-2 text-center text-sm text-gray-600">
              <span>{vehicle.mileage.toLocaleString('en-IN')} kms</span>
              <span>{vehicle.fuelType}</span>
              <span>{vehicle.transmission}</span>
           </div>
   
-          <div className="mt-auto pt-3 sm:pt-4 flex justify-between items-center">
-               <p className="text-xl sm:text-2xl font-extrabold text-brand-blue dark:text-brand-blue-light">₹{vehicle.price.toLocaleString('en-IN')}</p>
+          <div className="mt-4 flex justify-between items-center">
+               <p className="text-xl font-bold text-gray-900">₹{vehicle.price.toLocaleString('en-IN')}</p>
                <label 
                 onClick={handleCompareClick} 
                 title={isCompareDisabled ? "Comparison limit reached (max 4)" : "Add to compare"}
-                className={`flex items-center text-xs font-bold px-3 py-2 rounded-lg transition-colors text-brand-gray-600 dark:text-brand-gray-300 ${isCompareDisabled ? 'opacity-60 cursor-not-allowed' : 'cursor-pointer hover:bg-brand-gray-100 dark:hover:bg-brand-gray-700'}`}
+                className={`flex items-center text-sm font-medium px-3 py-2 rounded-md transition-colors text-gray-600 ${isCompareDisabled ? 'opacity-60 cursor-not-allowed' : 'cursor-pointer hover:bg-gray-100'}`}
               >
                 <input 
                   type="checkbox" 
                   checked={isSelectedForCompare}
                   readOnly
                   disabled={isCompareDisabled}
-                  className="form-checkbox h-4 w-4 text-brand-blue bg-brand-gray-100 dark:bg-brand-gray-800 border-brand-gray-300 dark:border-brand-gray-600 rounded focus:ring-brand-blue disabled:opacity-50"
+                  className="form-checkbox h-4 w-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 disabled:opacity-50"
                 />
                 <span className="ml-2">Compare</span>
               </label>
@@ -172,49 +172,57 @@ const Home: React.FC<HomeProps> = ({ onSearch, onSelectCategory, featuredVehicle
     return (
         <>
             {/* Hero Section */}
-            <section className="relative h-screen flex items-center justify-center text-center px-4 overflow-hidden">
-                <div className="absolute inset-0 w-full h-full z-0">
-                    <video autoPlay loop muted playsInline className="absolute inset-0 w-full h-full object-cover">
-                        <source src="https://cdn.coverr.co/videos/coverr-a-car-driving-on-a-california-highway-3149/1080p.mp4" type="video/mp4" />
-                        Your browser does not support the video tag.
-                    </video>
-                    <div className="absolute inset-0 bg-black/60"></div>
-                </div>
-
-                <div className="relative z-20 space-y-6 animate-fade-in-up">
-                    <h1 className="text-5xl md:text-7xl font-extrabold tracking-tight text-white" style={{ textShadow: '2px 2px 8px rgba(0,0,0,0.7)' }}>The Future of Motion</h1>
-                    <p className="text-lg md:text-xl max-w-3xl mx-auto text-gray-200" style={{ textShadow: '1px 1px 4px rgba(0,0,0,0.7)' }}>Discover a curated collection of premium vehicles, powered by cutting-edge AI for a seamless journey.</p>
-                    <div className="mt-8 max-w-xl mx-auto">
-                        <div className="flex rounded-full shadow-2xl bg-white/80 dark:bg-black/30 backdrop-blur-sm border border-brand-gray-300 dark:border-white/20 p-2">
-                             <input
-                                type="text"
-                                placeholder="e.g., 'SUV under ₹15 lakhs with sunroof'"
-                                value={aiSearchQuery}
-                                onChange={(e) => setAiSearchQuery(e.target.value)}
-                                onKeyDown={(e) => { if (e.key === 'Enter') handleAiSearch(); }}
-                                className="flex-grow bg-transparent text-brand-gray-900 dark:text-white placeholder-brand-gray-500 dark:placeholder-gray-300 focus:outline-none px-4"
-                            />
-                            <button onClick={handleAiSearch} disabled={isAiSearching} className="bg-brand-blue text-white font-bold py-3 px-6 rounded-full hover:bg-brand-blue-dark transition-colors disabled:bg-brand-gray-400">
-                                {isAiSearching ? '...' : 'Search'}
-                            </button>
+            <section className="bg-gradient-to-r from-blue-600 to-blue-800 text-white py-20">
+                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                    <div className="text-center">
+                        <h1 className="text-4xl md:text-6xl font-bold mb-6">
+                            The Future of Motion
+                        </h1>
+                        <p className="text-xl md:text-2xl mb-8 text-blue-100">
+                            Discover a curated collection of premium vehicles, powered by cutting-edge AI for a seamless journey
+                        </p>
+                        
+                        {/* Search Bar */}
+                        <div className="max-w-4xl mx-auto">
+                            <div className="bg-white rounded-lg p-2 shadow-lg">
+                                <div className="flex flex-col md:flex-row gap-2">
+                                    <div className="flex-1">
+                                        <input
+                                            type="text"
+                                            placeholder="e.g., 'SUV under ₹15 lakhs with sunroof'"
+                                            value={aiSearchQuery}
+                                            onChange={(e) => setAiSearchQuery(e.target.value)}
+                                            onKeyDown={(e) => { if (e.key === 'Enter') handleAiSearch(); }}
+                                            className="w-full px-4 py-3 text-gray-900 placeholder-gray-500 border-0 focus:outline-none"
+                                        />
+                                    </div>
+                                    <button 
+                                        onClick={handleAiSearch} 
+                                        disabled={isAiSearching}
+                                        className="bg-orange-500 text-white px-8 py-3 rounded-md font-medium hover:bg-orange-600 transition-colors disabled:bg-gray-400"
+                                    >
+                                        {isAiSearching ? '...' : 'Search'}
+                                    </button>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
             </section>
             
             {/* Category Section */}
-            <section className="py-20 md:py-24 bg-brand-gray-100 dark:bg-brand-gray-darker">
-                <div className="container mx-auto px-4 scroll-animate">
-                     <h2 className="text-4xl font-bold text-center mb-12 text-brand-gray-900 dark:text-white">Browse by Category</h2>
-                     <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+            <section className="py-16 bg-white">
+                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                     <h2 className="text-3xl font-bold text-center mb-12 text-gray-900">Browse by Category</h2>
+                     <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-6">
                          {Object.values(CategoryEnum).map(category => (
                             <button
                                 key={category}
                                 onClick={() => onSelectCategory(category)}
-                                className="group p-4 bg-white dark:bg-brand-gray-dark border border-brand-gray-200 dark:border-brand-gray-700 rounded-lg text-center transition-all duration-300 transform hover:-translate-y-1 hover:border-brand-blue hover:shadow-soft-lg dark:hover:shadow-glow"
+                                className="group p-6 bg-gray-50 border border-gray-200 rounded-lg text-center transition-all duration-300 hover:border-blue-500 hover:shadow-lg hover:-translate-y-1"
                             >
-                                <div className="text-brand-blue dark:text-brand-blue-light mx-auto mb-2 group-hover:text-brand-blue-dark dark:group-hover:text-white transition-colors">{categoryIcons[category]}</div>
-                                <span className="font-semibold text-brand-gray-700 dark:text-brand-gray-300 group-hover:text-brand-gray-900 dark:group-hover:text-white transition-colors">{category}</span>
+                                <div className="text-blue-600 mx-auto mb-3 group-hover:text-blue-700 transition-colors">{categoryIcons[category]}</div>
+                                <span className="font-semibold text-gray-700 group-hover:text-gray-900 transition-colors">{category}</span>
                             </button>
                          ))}
                      </div>
@@ -223,9 +231,9 @@ const Home: React.FC<HomeProps> = ({ onSearch, onSelectCategory, featuredVehicle
 
             {/* Recommended For You */}
             {recommendations.length > 0 && (
-                 <section className="py-20 md:py-24 bg-brand-gray-50 dark:bg-brand-gray-dark">
-                    <div className="container mx-auto px-4 scroll-animate">
-                        <h2 className="text-4xl font-bold text-center mb-12 text-brand-gray-900 dark:text-white">Recommended For You</h2>
+                 <section className="py-16 bg-gray-50">
+                    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                        <h2 className="text-3xl font-bold text-center mb-12 text-gray-900">Recommended For You</h2>
                         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
                             {recommendations.map(vehicle => (
                                 <FeaturedVehicleCard
@@ -246,9 +254,9 @@ const Home: React.FC<HomeProps> = ({ onSearch, onSelectCategory, featuredVehicle
             )}
 
             {/* Featured Listings */}
-            <section className="py-20 md:py-24 bg-brand-gray-100 dark:bg-brand-gray-darker">
-                <div className="container mx-auto px-4 scroll-animate">
-                    <h2 className="text-4xl font-bold text-center mb-12 text-brand-gray-900 dark:text-white">Featured Collection</h2>
+            <section className="py-16 bg-white">
+                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                    <h2 className="text-3xl font-bold text-center mb-12 text-gray-900">Featured Collection</h2>
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
                         {featuredVehicles.map(vehicle => (
                             <FeaturedVehicleCard
