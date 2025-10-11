@@ -47,7 +47,7 @@ const TestDriveModal: React.FC<TestDriveModalProps> = ({ onClose, onSubmit }) =>
                   onChange={(e) => setDate(e.target.value)}
                   min={getTodayString()}
                   required
-                  className="mt-1 w-full p-3 border border-brand-gray-300 dark:border-brand-gray-600 rounded-lg bg-white dark:bg-brand-gray-700 focus:ring-brand-blue"
+                  className="mt-1 w-full p-3 border border-brand-gray-300 dark:border-brand-gray-600 rounded-lg bg-white dark:bg-brand-gray-700" onFocus={(e) => { e.currentTarget.style.borderColor = 'var(--brand-deep-red)'; e.currentTarget.style.boxShadow = '0 0 0 2px var(--brand-deep-red-light)'; }} onBlur={(e) => { e.currentTarget.style.borderColor = ''; e.currentTarget.style.boxShadow = ''; }}
                 />
               </div>
               <div>
@@ -58,7 +58,7 @@ const TestDriveModal: React.FC<TestDriveModalProps> = ({ onClose, onSubmit }) =>
                   value={time}
                   onChange={(e) => setTime(e.target.value)}
                   required
-                  className="mt-1 w-full p-3 border border-brand-gray-300 dark:border-brand-gray-600 rounded-lg bg-white dark:bg-brand-gray-700 focus:ring-brand-blue"
+                  className="mt-1 w-full p-3 border border-brand-gray-300 dark:border-brand-gray-600 rounded-lg bg-white dark:bg-brand-gray-700" onFocus={(e) => { e.currentTarget.style.borderColor = 'var(--brand-deep-red)'; e.currentTarget.style.boxShadow = '0 0 0 2px var(--brand-deep-red-light)'; }} onBlur={(e) => { e.currentTarget.style.borderColor = ''; e.currentTarget.style.boxShadow = ''; }}
                 />
               </div>
               {error && <p className="text-sm text-red-500">{error}</p>}

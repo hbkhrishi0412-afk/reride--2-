@@ -44,7 +44,7 @@ const SellerProfilePage: React.FC<SellerProfilePageProps> = ({ seller, vehicles,
                 <img 
                     src={seller.logoUrl || `https://i.pravatar.cc/150?u=${seller.email}`} 
                     alt={`${seller.dealershipName || seller.name} logo`} 
-                    className="w-32 h-32 rounded-full object-cover border-4 border-brand-blue-light shadow-lg"
+                    className="w-32 h-32 rounded-full object-cover border-4 shadow-lg" style={{ borderColor: 'var(--brand-rose-pink)' }}
                 />
                 <div>
                     <h1 className="text-4xl font-extrabold text-brand-gray-800 dark:text-brand-gray-100">{seller.dealershipName || seller.name}</h1>
@@ -69,7 +69,7 @@ const SellerProfilePage: React.FC<SellerProfilePageProps> = ({ seller, vehicles,
                         placeholder="Search this seller's listings..."
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
-                        className="w-full p-3 border border-brand-gray-300 dark:border-brand-gray-600 rounded-lg focus:ring-2 focus:ring-brand-blue focus:outline-none bg-white dark:bg-brand-gray-700"
+                        className="w-full p-3 border border-brand-gray-300 dark:border-brand-gray-600 rounded-lg focus:outline-none bg-white dark:bg-brand-gray-700" onFocus={(e) => { e.currentTarget.style.borderColor = 'var(--brand-deep-red)'; e.currentTarget.style.boxShadow = '0 0 0 2px var(--brand-deep-red-light)'; }} onBlur={(e) => { e.currentTarget.style.borderColor = ''; e.currentTarget.style.boxShadow = ''; }}
                     />
                 </div>
             </div>

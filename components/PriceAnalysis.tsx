@@ -60,7 +60,7 @@ const PriceAnalysis: React.FC<PriceAnalysisProps> = ({ vehicle, similarVehicles 
 
       {isLoading && (
         <div className="text-center py-8">
-            <div className="w-8 h-8 border-4 border-dashed rounded-full animate-spin border-brand-blue mx-auto"></div>
+            <div className="w-8 h-8 border-4 border-dashed rounded-full animate-spin mx-auto" style={{ borderColor: 'var(--brand-deep-red)' }}></div>
             <p className="mt-3 text-sm font-semibold text-brand-gray-600 dark:text-brand-gray-400">Analyzing market data...</p>
         </div>
       )}
