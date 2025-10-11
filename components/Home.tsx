@@ -437,7 +437,7 @@ const Home: React.FC<HomeProps> = ({ onSearch, onSelectCategory, featuredVehicle
             )}
             
              {/* Seller CTA */}
-            <section className="bg-gradient-to-r from-brand-blue-lightest to-brand-gray-100 dark:from-brand-blue/20 dark:via-brand-gray-dark dark:to-brand-gray-darker">
+            <section style={{ background: 'linear-gradient(to right, var(--brand-rose-pink-light), var(--brand-gray))' }} className="dark:bg-gradient-dark">
                 <div className="container mx-auto px-4 py-20 text-center scroll-animate">
                     <h2 className="text-4xl font-bold mb-4 text-brand-gray-900 dark:text-white">Are You a Seller?</h2>
                     <p className="max-w-2xl mx-auto mb-8 text-brand-gray-600 dark:text-brand-gray-300">Join the most advanced vehicle marketplace today. Reach thousands of buyers and use our AI tools to sell faster.</p>
