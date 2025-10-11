@@ -53,7 +53,7 @@ type SortConfig = {
 
 const StatCard: React.FC<{ title: string; value: string | number; icon: React.ReactNode, onClick?: () => void }> = ({ title, value, icon, onClick }) => (
   <div className={`bg-white dark:bg-brand-gray-dark p-6 rounded-lg shadow-md flex items-center ${onClick ? 'cursor-pointer hover:shadow-lg hover:-translate-y-1 transition-transform' : ''}`} onClick={onClick}>
-    <div className="bg-brand-blue-lightest p-3 rounded-full mr-4">{icon}</div>
+    <div className="p-3 rounded-full mr-4" style={{ background: 'var(--brand-rose-pink-light)' }}>{icon}</div>
     <div>
       <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400">{title}</h3>
       <p className="text-2xl font-bold text-gray-900 dark:text-gray-100">{value}</p>
@@ -106,8 +106,8 @@ const BarChart: React.FC<{ title: string; data: { label: string; value: number }
                         <div className="flex items-center gap-2">
                             <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-5">
                                 <div
-                                    className="bg-brand-blue h-5 rounded-full text-white text-xs flex items-center justify-end pr-2"
-                                    style={{ width: `${(value / maxValue) * 100}%` }}
+                                    className="h-5 rounded-full text-white text-xs flex items-center justify-end pr-2"
+                                    style={{ width: `${(value / maxValue) * 100}%`, background: 'var(--gradient-warm)' }}
                                 >
                                     {value}
                                 </div>
@@ -307,7 +307,7 @@ const VehicleDataEditor: React.FC<{ vehicleData: VehicleData, onUpdate: (newData
                                     <input type="text" value={editingItem.value} onChange={e => setEditingItem(prev => ({ ...prev!, value: e.target.value }))} autoFocus onKeyDown={e => e.key === 'Enter' && handleSaveEdit()} onBlur={handleSaveEdit} className="w-full text-sm p-1 border rounded bg-white dark:bg-gray-900" />
                                 </div>
                             ) : (
-                                <div onClick={() => !disabled && onSelect(item)} className={`group flex justify-between items-center p-2 rounded-md ${!disabled ? 'cursor-pointer' : 'cursor-default'} ${selectedItem === item ? 'bg-brand-blue text-white' : !disabled ? 'hover:bg-gray-200 dark:hover:bg-gray-700' : ''}`}>
+                                <div onClick={() => !disabled && onSelect(item)} className={`group flex justify-between items-center p-2 rounded-md ${!disabled ? 'cursor-pointer' : 'cursor-default'} ${selectedItem === item ? 'text-white' : !disabled ? 'hover:bg-gray-200 dark:hover:bg-gray-700' : ''}`} style={selectedItem === item ? { background: 'var(--gradient-primary)' } : undefined}>
                                     <span className="text-sm">{item}</span>
                                     <div className={`opacity-0 group-hover:opacity-100 transition-opacity ${selectedItem === item ? '!opacity-100' : ''}`}>
                                         <button onClick={e => { e.stopPropagation(); if (!disabled) setEditingItem({ path, value: item }); }} disabled={disabled} className="p-1 hover:bg-white/20 rounded-md">&#x270E;</button>
@@ -327,7 +327,7 @@ const VehicleDataEditor: React.FC<{ vehicleData: VehicleData, onUpdate: (newData
                         <input type="text" value={newItemValue} onChange={e => setNewItemValue(e.target.value)} autoFocus onKeyDown={e => e.key === 'Enter' && handleSaveNewItem()} placeholder={`New ${itemType}...`} className="w-full text-sm p-1 border rounded bg-white dark:bg-gray-900" />
                     </div>
                 ) : (
-                    <button onClick={() => !disabled && setAddingAt({ path: pathPrefix, type: itemType })} disabled={disabled} className="w-full text-sm p-2 rounded-md hover:bg-gray-200 dark:hover:bg-gray-700 text-brand-blue dark:text-brand-blue-light disabled:opacity-50 disabled:cursor-not-allowed">+ Add New {itemType}</button>
+                    <button onClick={() => !disabled && setAddingAt({ path: pathPrefix, type: itemType })} disabled={disabled} className="w-full text-sm p-2 rounded-md hover:bg-gray-200 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors" style={{ color: 'var(--brand-deep-red)' }} onMouseEnter={(e) => !disabled && (e.currentTarget.style.color = 'var(--brand-orange)')} onMouseLeave={(e) => !disabled && (e.currentTarget.style.color = 'var(--brand-deep-red)')}>+ Add New {itemType}</button>
                 )}
             </div>
         </div>
@@ -451,7 +451,7 @@ const PlatformSettingsView: React.FC<{
         }
     };
 
-    const formElementClass = "block w-full p-3 border border-brand-gray-300 dark:border-brand-gray-600 rounded-lg focus:ring-2 focus:ring-brand-blue focus:border-brand-blue focus:outline-none transition bg-brand-gray-50 dark:bg-brand-gray-800 dark:text-gray-200";
+    const formElementClass = "block w-full p-3 border border-brand-gray-300 dark:border-brand-gray-600 rounded-lg focus:outline-none transition bg-brand-gray-50 dark:bg-brand-gray-800 dark:text-gray-200";
 
     return (
         <div className="space-y-8">
@@ -488,7 +488,7 @@ const PlatformSettingsView: React.FC<{
                          <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">Leave empty to hide the banner.</p>
                     </div>
                     <div>
-                        <button type="submit" className="bg-brand-blue text-white font-bold py-2 px-6 rounded-lg hover:bg-brand-blue-dark transition-colors">
+                        <button type="submit" className="btn-brand-primary text-white font-bold py-2 px-6 rounded-lg transition-colors">
                             Save Settings
                         </button>
                     </div>
@@ -660,7 +660,7 @@ const SupportTicketsView: React.FC<{
                     <h2 className="text-xl font-bold text-gray-800 dark:text-gray-100 mb-2">Support Tickets</h2>
                     <div className="flex gap-2">
                         {(['All', 'Open', 'In Progress', 'Closed'] as const).map(status => (
-                            <button key={status} onClick={() => setStatusFilter(status)} className={`px-3 py-1 text-xs font-semibold rounded-full ${statusFilter === status ? 'bg-brand-blue text-white' : 'bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-300'}`}>
+                            <button key={status} onClick={() => setStatusFilter(status)} className={`px-3 py-1 text-xs font-semibold rounded-full ${statusFilter === status ? 'text-white' : 'bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-300'}`} style={statusFilter === status ? { background: 'var(--brand-deep-red)' } : undefined}>
                                 {status}
                             </button>
                         ))}
