@@ -148,139 +148,135 @@ button:disabled {
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-/* CarAndBike Exact Design System */
+/* Premium Design System */
 :root {
-  /* CarAndBike Colors */
-  --cb-primary-blue: #0066cc;
-  --cb-dark-gray: #333333;
-  --cb-medium-gray: #555555;
-  --cb-light-gray: #f5f5f5;
-  --cb-yellow: #ffc107;
-  --cb-green: #28a745;
-  --cb-white: #ffffff;
-  --cb-black: #000000;
-  --cb-border: #e0e0e0;
-  --cb-shadow: rgba(0, 0, 0, 0.1);
-  --cb-text-gray: #666666;
-  --cb-text-dark: #333333;
+  --carandbike-primary-blue: #1e40af;
+  --carandbike-dark-blue: #1e3a8a;
+  --carandbike-orange: #f97316;
+  --carandbike-orange-hover: #ea580c;
+  --carandbike-dark-gray: #1f2937;
+  --carandbike-medium-gray: #374151;
+  --carandbike-light-gray: #6b7280;
+  --carandbike-lighter-gray: #9ca3af;
+  --carandbike-white: #ffffff;
+  --carandbike-off-white: #f9fafb;
+  --carandbike-purple: #8b5cf6;
+  --carandbike-border: #e5e7eb;
+  --carandbike-shadow: rgba(0, 0, 0, 0.1);
+  
+  /* Premium colors */
+  --premium-gold: #fbbf24;
+  --premium-silver: #e5e7eb;
+  --premium-gradient-start: #667eea;
+  --premium-gradient-end: #764ba2;
+  --premium-gradient-orange: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+  --premium-gradient-blue: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  --premium-gradient-dark: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+  --premium-shadow-soft: 0 10px 40px rgba(0, 0, 0, 0.1);
+  --premium-shadow-medium: 0 20px 60px rgba(0, 0, 0, 0.15);
+  --premium-shadow-strong: 0 30px 80px rgba(0, 0, 0, 0.2);
+  --glass-bg: rgba(255, 255, 255, 0.1);
+  --glass-border: rgba(255, 255, 255, 0.2);
 }
 
-/* CarAndBike Layout Components */
-.cb-header-top {
-  background-color: var(--cb-dark-gray);
-  color: var(--cb-white);
-  padding: 8px 0;
-  font-size: 13px;
-}
-
-.cb-header-main {
-  background-color: var(--cb-medium-gray);
-  color: var(--cb-white);
-  padding: 12px 0;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-}
-
-.cb-search-bar {
-  background-color: var(--cb-light-gray);
-  border: none;
-  border-radius: 4px;
-  padding: 10px 16px;
-  font-size: 14px;
-  color: var(--cb-text-gray);
-}
-
-.cb-nav-link {
-  color: var(--cb-white);
-  text-decoration: none;
-  padding: 8px 16px;
-  border-radius: 4px;
-  transition: all 0.3s ease;
-  font-size: 14px;
-  font-weight: 500;
-}
-
-.cb-nav-link:hover {
-  background-color: rgba(255, 255, 255, 0.1);
-}
-
-.cb-nav-link.active {
-  border-bottom: 3px solid var(--cb-yellow);
-  color: var(--cb-white);
-}
-
-.cb-vehicle-card {
-  background-color: var(--cb-white);
-  border-radius: 8px;
-  box-shadow: 0 2px 8px var(--cb-shadow);
+/* Premium Components */
+.premium-card {
+  background: linear-gradient(145deg, #ffffff 0%, #f8fafc 100%);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 20px;
+  box-shadow: var(--premium-shadow-soft);
+  backdrop-filter: blur(10px);
+  transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  position: relative;
   overflow: hidden;
-  transition: all 0.3s ease;
-  width: 280px;
-  flex-shrink: 0;
 }
 
-.cb-vehicle-card:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
-}
-
-.cb-feature-badge {
-  background-color: #f8f9fa;
-  border: 1px solid var(--cb-border);
-  border-radius: 4px;
-  padding: 4px 8px;
-  font-size: 12px;
-  color: var(--cb-text-gray);
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-}
-
-.cb-price-section {
-  background-color: var(--cb-white);
-  padding: 12px;
-  border-top: 1px solid var(--cb-border);
-}
-
-.cb-price-range {
-  font-size: 14px;
-  color: var(--cb-text-gray);
-  margin-bottom: 4px;
-}
-
-.cb-price-amount {
-  font-size: 16px;
-  font-weight: bold;
-  color: var(--cb-black);
-  margin-bottom: 4px;
-}
-
-.cb-emi-info {
-  font-size: 12px;
-  color: var(--cb-text-gray);
-}
-
-.cb-ev-badge {
-  background-color: var(--cb-green);
-  color: var(--cb-white);
-  padding: 4px 8px;
-  border-radius: 4px;
-  font-size: 12px;
-  font-weight: bold;
+.premium-card::before {
+  content: '';
   position: absolute;
-  top: 8px;
-  right: 8px;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+  transition: left 0.5s;
 }
 
-.cb-variants-link {
-  color: var(--cb-primary-blue);
-  text-decoration: none;
-  font-size: 14px;
-  margin-top: 8px;
-  display: inline-block;
+.premium-card:hover::before {
+  left: 100%;
 }
 
-.cb-variants-link:hover {
-  text-decoration: underline;
+.premium-card:hover {
+  transform: translateY(-10px) scale(1.02);
+  box-shadow: var(--premium-shadow-strong);
+  border-color: rgba(102, 126, 234, 0.3);
+}
+
+.premium-hero {
+  background: var(--premium-gradient-blue);
+  position: relative;
+  overflow: hidden;
+}
+
+.premium-hero::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grain" width="100" height="100" patternUnits="userSpaceOnUse"><circle cx="50" cy="50" r="1" fill="white" opacity="0.1"/></pattern></defs><rect width="100" height="100" fill="url(%23grain)"/></svg>');
+  animation: float 6s ease-in-out infinite;
+}
+
+.glass-morphism {
+  background: var(--glass-bg);
+  backdrop-filter: blur(20px);
+  border: 1px solid var(--glass-border);
+  border-radius: 16px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+}
+
+.premium-button {
+  background: var(--premium-gradient-orange);
+  color: white;
+  padding: 16px 32px;
+  border-radius: 12px;
+  font-weight: 600;
+  border: none;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 4px 20px rgba(240, 147, 251, 0.4);
+}
+
+.premium-button::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+  transition: left 0.5s;
+}
+
+.premium-button:hover::before {
+  left: 100%;
+}
+
+.premium-button:hover {
+  transform: translateY(-2px) scale(1.05);
+  box-shadow: 0 8px 30px rgba(240, 147, 251, 0.6);
+}
+
+.premium-text-gradient {
+  background: var(--premium-gradient-blue);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  font-weight: 700;
 }
 
 /* CarAndBike exact styling */
