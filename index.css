@@ -175,7 +175,7 @@ button:disabled {
   --brand-rose-pink-dark: #FC8D8E;
   
   /* Neutral Colors */
-  --brand-white: #FFFFFF;
+  --brand-white: #000000;
   --brand-off-white: #FFF8F9;
   --brand-light-gray: #F8F9FA;
   --brand-gray: #E9ECEF;
@@ -189,7 +189,7 @@ button:disabled {
   --spinny-orange-hover: #FF4D44;
   --spinny-orange-light: rgba(239, 59, 51, 0.1);
   --spinny-orange-dark: #D42F27;
-  --spinny-white: #FFFFFF;
+  --spinny-white: #000000;
   --spinny-off-white: #FFF8F9;
   --spinny-light-gray: #F8F9FA;
   --spinny-gray: #E9ECEF;
