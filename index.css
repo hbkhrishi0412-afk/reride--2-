@@ -154,68 +154,69 @@ button:disabled {
 
 /* Inside the Head - Bold Color Scheme */
 :root {
-  /* Primary Brand Colors */
+  /* Primary Brand Colors - New Palette */
   --brand-deep-red: #8E0D3C;
-  --brand-deep-red-hover: #B01048;
+  --brand-deep-red-hover: #A01044;
   --brand-deep-red-light: rgba(142, 13, 60, 0.1);
   --brand-deep-red-dark: #6A0A2D;
   
-  --brand-blackcurrant: #2D2652;
-  --brand-blackcurrant-light: #4A3F7A;
-  --brand-blackcurrant-dark: #1D1842;
-  
-  --brand-orange: #EF3B33;
-  --brand-orange-hover: #FF4D44;
-  --brand-orange-light: rgba(239, 59, 51, 0.1);
-  --brand-orange-dark: #D42F27;
+  --brand-warm-purple: #f39af5;
+  --brand-warm-purple-hover: #f5aef7;
+  --brand-warm-purple-light: rgba(243, 154, 245, 0.2);
+  --brand-warm-purple-dark: #e986eb;
   
   --brand-rose-pink: #FDA1A2;
   --brand-rose-pink-hover: #FEB5B6;
   --brand-rose-pink-light: rgba(253, 161, 162, 0.2);
   --brand-rose-pink-dark: #FC8D8E;
   
-  /* Neutral Colors */
-  --brand-white: #000000;
-  --brand-off-white: #FFF8F9;
-  --brand-light-gray: #F8F9FA;
-  --brand-gray: #E9ECEF;
-  --brand-medium-gray: #6C757D;
-  --brand-dark-gray: #343A40;
-  --brand-text-dark: #2C3E50;
-  --brand-text-gray: #495057;
+  --brand-light-lavender: #eccaed;
+  --brand-light-lavender-hover: #f0d5f1;
+  --brand-light-lavender-light: rgba(236, 202, 237, 0.3);
+  --brand-light-lavender-dark: #e0b5e1;
   
-  /* Legacy Spinny variable mappings for compatibility */
-  --spinny-orange: #EF3B33;
-  --spinny-orange-hover: #FF4D44;
-  --spinny-orange-light: rgba(239, 59, 51, 0.1);
-  --spinny-orange-dark: #D42F27;
-  --spinny-white: #000000;
-  --spinny-off-white: #FFF8F9;
-  --spinny-light-gray: #F8F9FA;
-  --spinny-gray: #E9ECEF;
-  --spinny-medium-gray: #6C757D;
-  --spinny-dark-gray: #2C3E50;
-  --spinny-text-dark: #2C3E50;
-  --spinny-text-gray: #495057;
+  /* Neutral Colors - Black and Grays Only */
+  --brand-white: #FFFFFF;
+  --brand-off-white: #F9F9F9;
+  --brand-light-gray: #E5E5E5;
+  --brand-gray: #CCCCCC;
+  --brand-medium-gray: #808080;
+  --brand-dark-gray: #4A4A4A;
+  --brand-text-dark: #000000;
+  --brand-text-gray: #666666;
   
-  /* Accent Colors */
-  --spinny-success: #28A745;
+  /* Legacy Spinny variable mappings - Updated to new palette */
+  --spinny-orange: #f39af5;
+  --spinny-orange-hover: #f5aef7;
+  --spinny-orange-light: rgba(243, 154, 245, 0.2);
+  --spinny-orange-dark: #e986eb;
+  --spinny-white: #FFFFFF;
+  --spinny-off-white: #F9F9F9;
+  --spinny-light-gray: #E5E5E5;
+  --spinny-gray: #CCCCCC;
+  --spinny-medium-gray: #808080;
+  --spinny-dark-gray: #4A4A4A;
+  --spinny-text-dark: #000000;
+  --spinny-text-gray: #666666;
+  
+  /* Accent Colors - Using new palette */
+  --spinny-success: #8E0D3C;
   --spinny-info: #8E0D3C;
-  --spinny-warning: #EF3B33;
-  --spinny-error: #DC3545;
+  --spinny-warning: #f39af5;
+  --spinny-error: #8E0D3C;
   
-  /* Gradients - Updated for better visibility */
-  --gradient-primary: linear-gradient(135deg, #8E0D3C 0%, #4A3F7A 100%);
-  --gradient-warm: linear-gradient(135deg, #EF3B33 0%, #8E0D3C 100%);
-  --gradient-soft: linear-gradient(135deg, #FDA1A2 0%, #EF3B33 100%);
-  --gradient-dark: linear-gradient(135deg, #2D2652 0%, #1D1842 100%);
+  /* Gradients - New Design */
+  --gradient-primary: linear-gradient(135deg, #8E0D3C 0%, #f39af5 100%);
+  --gradient-warm: linear-gradient(135deg, #f39af5 0%, #FDA1A2 100%);
+  --gradient-soft: linear-gradient(135deg, #FDA1A2 0%, #eccaed 100%);
+  --gradient-dark: linear-gradient(135deg, #8E0D3C 0%, #6A0A2D 100%);
   
-  /* Shadows */
-  --spinny-shadow-sm: 0 2px 8px rgba(29, 24, 66, 0.1);
-  --spinny-shadow-md: 0 4px 16px rgba(29, 24, 66, 0.15);
-  --spinny-shadow-lg: 0 8px 32px rgba(29, 24, 66, 0.2);
+  /* Shadows - Using new palette */
+  --spinny-shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.1);
+  --spinny-shadow-md: 0 4px 16px rgba(0, 0, 0, 0.15);
+  --spinny-shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.2);
   --shadow-red: 0 4px 20px rgba(142, 13, 60, 0.3);
-  --shadow-orange: 0 4px 20px rgba(239, 59, 51, 0.3);
+  --shadow-purple: 0 4px 20px rgba(243, 154, 245, 0.3);
   --shadow-pink: 0 4px 20px rgba(253, 161, 162, 0.3);
   
   /* Border Radius */
@@ -241,9 +242,9 @@ button:disabled {
   border-bottom: 1px solid var(--brand-blackcurrant-light);
 }
 
-/* Buttons */
+/* Buttons - Updated to new palette */
 .spinny-button-primary {
-  background: var(--spinny-orange);
+  background: var(--gradient-primary);
   color: var(--spinny-white);
   padding: 12px 24px;
   border-radius: var(--spinny-radius-sm);
@@ -251,11 +252,11 @@ button:disabled {
   border: none;
   cursor: pointer;
   transition: all 0.3s ease;
-  box-shadow: var(--spinny-shadow-sm);
+  box-shadow: var(--shadow-red);
 }
 
 .spinny-button-primary:hover {
-  background: var(--spinny-orange-hover);
+  background: var(--gradient-warm);
   box-shadow: var(--spinny-shadow-md);
   transform: translateY(-2px);
 }
@@ -268,8 +269,8 @@ button:disabled {
 
 .spinny-button-secondary {
   background: var(--spinny-white);
-  color: var(--spinny-orange);
-  border: 2px solid var(--spinny-orange);
+  color: var(--brand-deep-red);
+  border: 2px solid var(--brand-deep-red);
   padding: 12px 24px;
   border-radius: var(--spinny-radius-sm);
   font-weight: 600;
@@ -278,7 +279,8 @@ button:disabled {
 }
 
 .spinny-button-secondary:hover {
-  background: var(--spinny-orange-light);
+  background: var(--brand-deep-red-light);
+  border-color: var(--brand-warm-purple);
 }
 
 /* Cards */
@@ -297,9 +299,9 @@ button:disabled {
   border-color: var(--spinny-orange-light);
 }
 
-/* Badges */
+/* Badges - Updated to new palette */
 .spinny-badge {
-  background: var(--spinny-orange);
+  background: var(--gradient-primary);
   color: var(--spinny-white);
   padding: 4px 12px;
   border-radius: 4px;
@@ -309,11 +311,11 @@ button:disabled {
 }
 
 .spinny-badge-success {
-  background: var(--spinny-success);
+  background: var(--brand-deep-red);
 }
 
 .spinny-badge-info {
-  background: var(--spinny-info);
+  background: var(--brand-warm-purple);
 }
 
 /* Search Bar */
@@ -357,7 +359,7 @@ button:disabled {
 }
 
 .spinny-price {
-  color: var(--spinny-orange);
+  color: var(--brand-deep-red);
   font-size: 24px;
   font-weight: 700;
 }
@@ -412,7 +414,7 @@ button:disabled {
 }
 
 .spinny-nav-link.active {
-  background: var(--brand-orange);
+  background: var(--gradient-primary);
   color: var(--brand-white);
 }
 
@@ -1031,8 +1033,9 @@ button:disabled {
 .dealers button,
 .support button,
 .used-cars-page button {
-  background-color: #EF3B33 !important;
+  background: var(--gradient-primary) !important;
   color: white !important;
+  border: none !important;
 }
 
 .filters input,
