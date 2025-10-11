@@ -19,7 +19,7 @@ const ProfileInput: React.FC<{ label: string; name: string; value: string; onCha
       value={value}
       onChange={onChange}
       disabled={disabled}
-      className="mt-1 block w-full p-3 border border-brand-gray-300 dark:border-brand-gray-600 rounded-lg shadow-sm focus:ring-brand-blue focus:border-brand-blue sm:text-sm bg-white dark:bg-brand-gray-800 disabled:bg-brand-gray-100 dark:disabled:bg-brand-gray-700"
+      className="mt-1 block w-full p-3 border border-brand-gray-300 dark:border-brand-gray-600 rounded-lg shadow-sm sm:text-sm bg-white dark:bg-brand-gray-800 disabled:bg-brand-gray-100 dark:disabled:bg-brand-gray-700" onFocus={(e) => !disabled && (e.currentTarget.style.boxShadow = '0 0 0 2px var(--brand-deep-red-light)')} onBlur={(e) => e.currentTarget.style.boxShadow = ''}
     />
   </div>
 );

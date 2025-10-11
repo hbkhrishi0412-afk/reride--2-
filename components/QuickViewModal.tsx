@@ -67,7 +67,7 @@ const QuickViewModal: React.FC<QuickViewModalProps> = ({ vehicle, onClose, onSel
                 key={index}
                 src={img}
                 alt={`Thumbnail ${index + 1}`}
-                className={`cursor-pointer rounded-md border-2 h-16 w-full object-cover ${mainImage === img ? 'border-brand-blue' : 'border-transparent'} hover:border-brand-blue-light transition`}
+                className={`cursor-pointer rounded-md border-2 h-16 w-full object-cover ${mainImage === img ? '' : 'border-transparent'} transition`} style={mainImage === img ? { borderColor: 'var(--brand-deep-red)' } : undefined} onMouseEnter={(e) => mainImage !== img && (e.currentTarget.style.borderColor = 'var(--brand-rose-pink)')} onMouseLeave={(e) => mainImage !== img && (e.currentTarget.style.borderColor = '')}
                 onClick={() => setMainImage(img)}
               />
             ))}

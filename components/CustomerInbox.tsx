@@ -155,7 +155,7 @@ const CustomerInbox: React.FC<CustomerInboxProps> = ({ conversations, onSendMess
                                   <li key={conv.id}>
                                       <button
                                           onClick={() => handleSelectConversation(conv)}
-                                          className={`w-full text-left p-4 border-l-4 transition-colors ${selectedConv?.id === conv.id ? 'border-brand-blue bg-brand-gray-100 dark:bg-brand-gray-900' : 'border-transparent hover:bg-brand-gray-100 dark:hover:bg-brand-gray-700'}`}
+                                          className={`w-full text-left p-4 border-l-4 transition-colors ${selectedConv?.id === conv.id ? 'bg-brand-gray-100 dark:bg-brand-gray-900' : 'border-transparent hover:bg-brand-gray-100 dark:hover:bg-brand-gray-700'}`} style={selectedConv?.id === conv.id ? { borderColor: 'var(--brand-deep-red)' } : undefined}
                                       >
                                           <div className="flex justify-between items-center mb-1">
                                               <p className="font-bold text-brand-gray-800 dark:text-brand-gray-100 truncate">{conv.vehicleName}</p>

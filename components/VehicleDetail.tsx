@@ -289,7 +289,7 @@ export const VehicleDetail: React.FC<VehicleDetailProps> = ({ vehicle, onBack: o
                         {vehicle.images.length > 1 && (
                             <div className="flex space-x-2 overflow-x-auto pb-2 -mt-2">
                                 {vehicle.images.map((img, index) => (
-                                    <img key={index} src={img} alt={`Thumbnail ${index + 1}`} className={`cursor-pointer rounded-md border-2 h-20 w-28 object-cover flex-shrink-0 ${currentIndex === index ? 'border-brand-blue' : 'border-transparent'} hover:border-brand-blue-light transition`} onClick={() => setCurrentIndex(index)} />
+                                    <img key={index} src={img} alt={`Thumbnail ${index + 1}`} className={`cursor-pointer rounded-md border-2 h-20 w-28 object-cover flex-shrink-0 ${currentIndex === index ? '' : 'border-transparent'} transition`} style={currentIndex === index ? { borderColor: 'var(--brand-deep-red)' } : undefined} onMouseEnter={(e) => currentIndex !== index && (e.currentTarget.style.borderColor = 'var(--brand-rose-pink)')} onMouseLeave={(e) => currentIndex !== index && (e.currentTarget.style.borderColor = '')} onClick={() => setCurrentIndex(index)} />
                                 ))}
                             </div>
                         )}
@@ -407,7 +407,7 @@ export const VehicleDetail: React.FC<VehicleDetailProps> = ({ vehicle, onBack: o
                              <div>
                                 <h4 className="text-lg font-semibold text-brand-gray-800 dark:text-brand-gray-100 mb-4">AI Expert Analysis</h4>
                                 {isGeneratingProsCons ? (
-                                    <div className="flex items-center gap-2 text-brand-gray-500"><div className="w-5 h-5 border-2 border-dashed rounded-full animate-spin border-brand-blue"></div> Generating...</div>
+                                    <div className="flex items-center gap-2 text-brand-gray-500"><div className="w-5 h-5 border-2 border-dashed rounded-full animate-spin" style={{ borderColor: 'var(--brand-deep-red)' }}></div> Generating...</div>
                                 ) : prosAndCons ? (
                                     <div className="grid grid-cols-2 gap-4">
                                         <div>

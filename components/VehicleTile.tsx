@@ -33,7 +33,7 @@ const VehicleTile: React.FC<VehicleTileProps> = ({ vehicle, onSelect, onToggleCo
   return (
     <div 
       onClick={() => onSelect(vehicle)}
-      className="bg-white dark:bg-brand-gray-800 rounded-xl shadow-soft overflow-hidden transform hover:-translate-y-1 hover:shadow-soft-lg transition-all duration-300 flex cursor-pointer group hover:ring-2 ring-brand-blue ring-offset-2 dark:ring-offset-brand-gray-dark"
+      className="bg-white dark:bg-brand-gray-800 rounded-xl shadow-soft overflow-hidden transform hover:-translate-y-1 hover:shadow-soft-lg transition-all duration-300 flex cursor-pointer group hover:ring-2 ring-offset-2 dark:ring-offset-brand-gray-dark" style={{ ['--ring-color' as any]: 'var(--brand-deep-red)' }} onMouseEnter={(e) => e.currentTarget.style.outline = '2px solid var(--brand-deep-red)'} onMouseLeave={(e) => e.currentTarget.style.outline = ''}
     >
       <img className="w-32 sm:w-48 h-full object-cover flex-shrink-0" src={vehicle.images[0]} alt={`${vehicle.make} ${vehicle.model}`} />
       
