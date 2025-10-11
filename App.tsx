@@ -115,27 +115,19 @@ const App: React.FC = () => {
     const loadInitialData = async () => {
         setIsLoading(true);
         try {
+            console.log("Loading initial data...");
             const [vehiclesData, usersData] = await Promise.all([
                 vehicleService.getVehicles(),
                 userService.getUsers()
             ]);
+            console.log("Successfully loaded data:", { vehicles: vehiclesData.length, users: usersData.length });
             setVehicles(vehiclesData);
             setUsers(usersData);
         } catch (error) {
-            console.error("Failed to load initial data from API, falling back to local data.", error);
-            addToast("Could not connect to the server. Displaying local data.", "info");
-            // Fallback to local data
-            try {
-                const [vehiclesData, usersData] = await Promise.all([
-                    getVehiclesLocal(),
-                    getUsersLocal(),
-                ]);
-                setVehicles(vehiclesData);
-                setUsers(usersData);
-            } catch (localError) {
-                console.error("Failed to load local mock data.", localError);
-                addToast("Fatal: Could not load any application data.", "error");
-            }
+            console.error("Failed to load initial data:", error);
+            // The service functions now have built-in fallback, so this should rarely happen
+            // Only show error if both API and local fallback fail
+            addToast("Could not load application data. Please refresh the page.", "error");
         } finally {
             setIsLoading(false);
         }

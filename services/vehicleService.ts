@@ -90,9 +90,70 @@ const deleteVehicleApi = async (vehicleId: number): Promise<{ success: boolean, 
 };
 
 
+// --- Environment Detection ---
+const isDevelopment = import.meta.env.DEV || window.location.hostname === 'localhost' || window.location.hostname.includes('localhost');
+
 // --- Exported Environment-Aware Service Functions ---
 
-export const getVehicles = getVehiclesApi;
-export const addVehicle = addVehicleApi;
-export const updateVehicle = updateVehicleApi;
-export const deleteVehicle = deleteVehicleApi;
+export const getVehicles = async (): Promise<Vehicle[]> => {
+  // Always try API first for production, with fallback to local
+  if (!isDevelopment) {
+    try {
+      return await getVehiclesApi();
+    } catch (error) {
+      console.warn('API getVehicles failed, falling back to local storage:', error);
+      // Fallback to local storage if API fails
+      return await getVehiclesLocal();
+    }
+  } else {
+    // Development mode - use local storage
+    return await getVehiclesLocal();
+  }
+};
+export const addVehicle = async (vehicleData: Vehicle): Promise<Vehicle> => {
+  // Always try API first for production, with fallback to local
+  if (!isDevelopment) {
+    try {
+      return await addVehicleApi(vehicleData);
+    } catch (error) {
+      console.warn('API addVehicle failed, falling back to local storage:', error);
+      // Fallback to local storage if API fails
+      return await addVehicleLocal(vehicleData);
+    }
+  } else {
+    // Development mode - use local storage
+    return await addVehicleLocal(vehicleData);
+  }
+};
+
+export const updateVehicle = async (vehicleData: Vehicle): Promise<Vehicle> => {
+  // Always try API first for production, with fallback to local
+  if (!isDevelopment) {
+    try {
+      return await updateVehicleApi(vehicleData);
+    } catch (error) {
+      console.warn('API updateVehicle failed, falling back to local storage:', error);
+      // Fallback to local storage if API fails
+      return await updateVehicleLocal(vehicleData);
+    }
+  } else {
+    // Development mode - use local storage
+    return await updateVehicleLocal(vehicleData);
+  }
+};
+
+export const deleteVehicle = async (vehicleId: number): Promise<{ success: boolean, id: number }> => {
+  // Always try API first for production, with fallback to local
+  if (!isDevelopment) {
+    try {
+      return await deleteVehicleApi(vehicleId);
+    } catch (error) {
+      console.warn('API deleteVehicle failed, falling back to local storage:', error);
+      // Fallback to local storage if API fails
+      return await deleteVehicleLocal(vehicleId);
+    }
+  } else {
+    // Development mode - use local storage
+    return await deleteVehicleLocal(vehicleId);
+  }
+};
