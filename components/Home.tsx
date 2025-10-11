@@ -374,7 +374,7 @@ const Home: React.FC<HomeProps> = ({ onSearch, onSelectCategory, featuredVehicle
                     </div>
                     
                     {/* Background decorative elements */}
-                    <div className="absolute top-0 right-0 w-96 h-96 bg-gradient-to-br from-blue-100 to-purple-100 rounded-full opacity-20 animate-float"></div>
+                    <div className="absolute top-0 right-0 w-96 h-96 rounded-full opacity-20 animate-float" style={{ background: 'radial-gradient(circle, var(--brand-rose-pink-light), var(--brand-orange-light))' }}></div>
                     <div className="absolute bottom-0 left-0 w-64 h-64 bg-gradient-to-tr from-purple-100 to-pink-100 rounded-full opacity-20 animate-float" style={{animationDelay: '2s'}}></div>
                 </section>
             )}

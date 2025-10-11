@@ -93,7 +93,7 @@ const PlanStatusCard: React.FC<{
     const usagePercentage = listingLimit === Infinity ? 0 : (activeListingsCount / listingLimit) * 100;
 
     return (
-        <div className="bg-gradient-to-br from-indigo-500 to-blue-600 dark:from-indigo-700 dark:to-blue-800 text-white p-6 rounded-lg shadow-lg flex flex-col h-full">
+        <div className="text-white p-6 rounded-lg shadow-lg flex flex-col h-full" style={{ background: 'var(--gradient-primary)' }}>
             <h3 className="text-lg font-bold flex justify-between items-center">
                 <span>Your Plan: <span className="text-yellow-300">{plan.name}</span></span>
             </h3>

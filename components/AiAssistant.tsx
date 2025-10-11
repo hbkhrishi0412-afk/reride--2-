@@ -25,7 +25,7 @@ const SuggestionIcon: React.FC<{ type: Suggestion['type'] }> = memo(({ type }) =
 const priorityStyles = {
     high: 'border-red-500/50',
     medium: 'border-yellow-500/50',
-    low: 'border-blue-500/50',
+    low: 'border-rose-pink',
 };
 
 const SuggestionCard: React.FC<{ suggestion: Suggestion; onClick: () => void }> = ({ suggestion, onClick }) => (
