@@ -734,7 +734,9 @@ const App: React.FC = () => {
     setInitialSearchQuery('');
     const preserveSelectedVehicle = (view === View.SELLER_PROFILE && currentView === View.DETAIL) || (view === View.DETAIL && currentView === View.SELLER_PROFILE);
     if (!preserveSelectedVehicle) setSelectedVehicle(null);
-    if (view === View.USED_CARS) setSelectedCategory('ALL');
+    // Only reset category to 'ALL' if navigating from non-category sources (like header "Buy Car" button)
+    // Don't reset if category was just selected from homepage
+    if (view === View.USED_CARS && currentView !== View.HOME) setSelectedCategory('ALL');
     if (view === View.SELLER_DASHBOARD && currentUser?.role !== 'seller') setCurrentView(View.LOGIN_PORTAL);
     else if (view === View.ADMIN_PANEL && currentUser?.role !== 'admin') setCurrentView(View.ADMIN_LOGIN);
     else if ((view === View.PROFILE || view === View.INBOX) && !currentUser) setCurrentView(View.LOGIN_PORTAL);

@@ -514,8 +514,20 @@ a:hover {
   color: var(--spinny-orange);
 }
 
+.text-spinny-white {
+  color: white;
+}
+
 .bg-spinny-orange {
   background-color: var(--spinny-orange);
+}
+
+.bg-spinny-orange-hover {
+  background-color: var(--spinny-orange-hover);
+}
+
+.hover\:bg-spinny-orange-hover:hover {
+  background-color: var(--spinny-orange-hover);
 }
 
 .bg-spinny-white {
@@ -572,4 +584,31 @@ a:hover {
 
 .shadow-spinny-lg {
   box-shadow: var(--shadow-lg);
+}
+
+/* Category Buttons - Spinny Style */
+.category-button {
+  padding: 2rem 1.5rem;
+  background: white;
+  border: 2px solid #F0F0F0;
+  border-radius: 12px;
+  text-align: center;
+  transition: all 0.3s ease;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 140px;
+}
+
+.category-button:hover {
+  border-color: var(--spinny-orange);
+  box-shadow: 0 8px 24px rgba(255, 107, 53, 0.2);
+  transform: translateY(-4px);
+  background: linear-gradient(135deg, rgba(255, 107, 53, 0.05) 0%, rgba(255, 107, 53, 0.02) 100%);
+}
+
+.category-button:active {
+  transform: translateY(-2px);
 }

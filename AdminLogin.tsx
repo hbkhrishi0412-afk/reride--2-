@@ -87,7 +87,7 @@ const AdminLogin: React.FC<AdminLoginProps> = ({ onLogin, onNavigate }) => {
         {error && <p className="text-spinny-orange text-sm text-center">{error}</p>}
 
         <div>
-          <button type="submit" disabled={isLoading} className="group relative w-full flex justify-center py-3 px-4 border border-transparent text-sm font-medium rounded-md text-spinny-white bg-spinny-orange-dark hover:bg-spinny-orange-darkest focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-spinny-orange transition-colors disabled:opacity-50">
+          <button type="submit" disabled={isLoading} className="btn-brand-primary group relative w-full flex justify-center py-3 px-4 text-sm font-medium rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 transition-colors disabled:opacity-50">
             {isLoading ? 'Signing in...' : 'Sign in as Admin'}
           </button>
         </div>
