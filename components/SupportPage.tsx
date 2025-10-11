@@ -35,39 +35,39 @@ const SupportPage: React.FC<SupportPageProps> = ({ currentUser, onSubmitTicket }
     });
   };
   
-  const formInputClass = "block w-full p-3 border border-brand-gray-300 dark:border-brand-gray-600 rounded-lg focus:outline-none transition bg-brand-white dark:bg-brand-gray-800 dark:text-brand-blackcurrant disabled:bg-brand-gray-100 dark:disabled:bg-brand-gray-700";
+  const formInputClass = "block w-full p-3 border border-brand-gray-300 dark:border-brand-gray-300 rounded-lg focus:outline-none transition bg-white dark:text-brand-text-dark disabled:bg-brand-gray-100 dark:disabled:bg-brand-gray-200";
 
   return (
     <div className="support animate-fade-in container mx-auto px-4 py-8 max-w-2xl">
-      <div className="bg-brand-white dark:bg-brand-gray-800 p-8 rounded-xl shadow-soft-lg">
-        <h1 className="text-3xl font-extrabold text-brand-gray-900 dark:text-brand-gray-100 mb-2">Contact Support</h1>
-        <p className="text-brand-gray-600 dark:text-brand-gray-400 mb-6">
+      <div className="bg-white p-8 rounded-xl shadow-soft-lg">
+        <h1 className="text-3xl font-extrabold text-brand-gray-900 dark:text-brand-text-dark mb-2">Contact Support</h1>
+        <p className="text-brand-gray-600 dark:text-brand-text mb-6">
           Have a question or facing an issue? Fill out the form below, and our team will get back to you as soon as possible.
         </p>
         <form onSubmit={handleSubmit} className="space-y-6">
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
             <div>
-              <label htmlFor="name" className="block text-sm font-medium text-brand-gray-700 dark:text-brand-gray-300 mb-1">Your Name</label>
+              <label htmlFor="name" className="block text-sm font-medium text-brand-text-dark dark:text-brand-text-dark mb-1">Your Name</label>
               <input type="text" id="name" name="name" value={formData.name} onChange={handleChange} required disabled={!!currentUser} className={formInputClass} />
             </div>
             <div>
-              <label htmlFor="email" className="block text-sm font-medium text-brand-gray-700 dark:text-brand-gray-300 mb-1">Your Email</label>
+              <label htmlFor="email" className="block text-sm font-medium text-brand-text-dark dark:text-brand-text-dark mb-1">Your Email</label>
               <input type="email" id="email" name="email" value={formData.email} onChange={handleChange} required disabled={!!currentUser} className={formInputClass} />
             </div>
           </div>
           <div>
-            <label htmlFor="subject" className="block text-sm font-medium text-brand-gray-700 dark:text-brand-gray-300 mb-1">Subject</label>
+            <label htmlFor="subject" className="block text-sm font-medium text-brand-text-dark dark:text-brand-text-dark mb-1">Subject</label>
             <input type="text" id="subject" name="subject" value={formData.subject} onChange={handleChange} required className={formInputClass} />
           </div>
           <div>
-            <label htmlFor="message" className="block text-sm font-medium text-brand-gray-700 dark:text-brand-gray-300 mb-1">Message</label>
+            <label htmlFor="message" className="block text-sm font-medium text-brand-text-dark dark:text-brand-text-dark mb-1">Message</label>
             <textarea id="message" name="message" value={formData.message} onChange={handleChange} required rows={6} className={formInputClass}></textarea>
           </div>
-          {error && <p className="text-sm text-brand-deep-red">{error}</p>}
+          {error && <p className="text-sm text-brand-turquoise">{error}</p>}
           <div>
             <button
               type="submit"
-              className="w-full btn-brand-primary text-brand-white font-bold py-3 px-6 rounded-lg text-lg transition-colors"
+              className="w-full btn-brand-primary text-white font-bold py-3 px-6 rounded-lg text-lg transition-colors"
             >
               Submit Ticket
             </button>

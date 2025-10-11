@@ -55,41 +55,41 @@ const EMICalculator: React.FC<EMICalculatorProps> = ({ price }) => {
     };
     
     return (
-        <div className="bg-brand-white dark:bg-brand-gray-800 rounded-xl shadow-soft-lg p-6">
-            <h3 className="text-lg font-semibold text-brand-gray-800 dark:text-brand-gray-100 mb-4">EMI Calculator</h3>
+        <div className="bg-white rounded-xl shadow-soft-lg p-6">
+            <h3 className="text-lg font-semibold text-brand-text-dark dark:text-brand-text-dark mb-4">EMI Calculator</h3>
             <div className="space-y-4">
                 <div>
                     <div className="flex justify-between items-center text-sm mb-1">
-                        <label htmlFor="loanAmount" className="font-medium text-brand-gray-600 dark:text-brand-gray-300">Loan Amount</label>
-                        <span className="font-bold text-brand-gray-900 dark:text-brand-gray-100">{formatCurrency(loanAmount)}</span>
+                        <label htmlFor="loanAmount" className="font-medium text-brand-gray-600 dark:text-brand-text-dark">Loan Amount</label>
+                        <span className="font-bold text-brand-gray-900 dark:text-brand-text-dark">{formatCurrency(loanAmount)}</span>
                     </div>
                     <input id="loanAmount" type="range" min="0" max={maxLoanAmount} step="1000" value={loanAmount} onChange={handleLoanAmountChange} className="w-full h-2 bg-brand-gray-200 rounded-lg appearance-none cursor-pointer dark:bg-brand-gray-700" />
                 </div>
                  <div>
                     <div className="flex justify-between items-center text-sm mb-1">
-                        <label htmlFor="downPayment" className="font-medium text-brand-gray-600 dark:text-brand-gray-300">Down Payment</label>
-                        <span className="font-bold text-brand-gray-900 dark:text-brand-gray-100">{formatCurrency(downPayment)}</span>
+                        <label htmlFor="downPayment" className="font-medium text-brand-gray-600 dark:text-brand-text-dark">Down Payment</label>
+                        <span className="font-bold text-brand-gray-900 dark:text-brand-text-dark">{formatCurrency(downPayment)}</span>
                     </div>
                     <input id="downPayment" type="range" min={minDownPayment} max={price} step="1000" value={downPayment} onChange={handleDownPaymentChange} className="w-full h-2 bg-brand-gray-200 rounded-lg appearance-none cursor-pointer dark:bg-brand-gray-700" />
                 </div>
                 <div>
                     <div className="flex justify-between items-center text-sm mb-1">
-                        <label htmlFor="tenure" className="font-medium text-brand-gray-600 dark:text-brand-gray-300">Loan Tenure</label>
-                        <span className="font-bold text-brand-gray-900 dark:text-brand-gray-100">{tenure} months ({Math.round(tenure/12 * 10)/10} years)</span>
+                        <label htmlFor="tenure" className="font-medium text-brand-gray-600 dark:text-brand-text-dark">Loan Tenure</label>
+                        <span className="font-bold text-brand-gray-900 dark:text-brand-text-dark">{tenure} months ({Math.round(tenure/12 * 10)/10} years)</span>
                     </div>
                     <input id="tenure" type="range" min="12" max={maxTenure} step="1" value={tenure} onChange={e => setTenure(Number(e.target.value))} className="w-full h-2 bg-brand-gray-200 rounded-lg appearance-none cursor-pointer dark:bg-brand-gray-700" />
                 </div>
                 <div>
                     <div className="flex justify-between items-center text-sm mb-1">
-                        <label htmlFor="interestRate" className="font-medium text-brand-gray-600 dark:text-brand-gray-300">Interest Rate</label>
-                        <span className="font-bold text-brand-gray-900 dark:text-brand-gray-100">{interestRate.toFixed(2)} %</span>
+                        <label htmlFor="interestRate" className="font-medium text-brand-gray-600 dark:text-brand-text-dark">Interest Rate</label>
+                        <span className="font-bold text-brand-gray-900 dark:text-brand-text-dark">{interestRate.toFixed(2)} %</span>
                     </div>
                     <input id="interestRate" type="range" min="7" max="20" step="0.05" value={interestRate} onChange={e => setInterestRate(Number(e.target.value))} className="w-full h-2 bg-brand-gray-200 rounded-lg appearance-none cursor-pointer dark:bg-brand-gray-700" />
                 </div>
             </div>
-            <div className="mt-6 pt-4 border-t border-brand-gray-200 dark:border-brand-gray-700 text-center">
-                 <p className="text-sm text-brand-gray-600 dark:text-brand-gray-400">Your EMI starts at</p>
-                 <p className="text-3xl font-extrabold" style={{ color: 'var(--brand-deep-red)' }}>{formatCurrency(emi)}/month</p>
+            <div className="mt-6 pt-4 border-t border-brand-gray-200 dark:border-brand-gray-200 text-center">
+                 <p className="text-sm text-brand-gray-600 dark:text-brand-text">Your EMI starts at</p>
+                 <p className="text-3xl font-extrabold" style={{ color: 'var(--brand-turquoise)' }}>{formatCurrency(emi)}/month</p>
                  <p className="text-xs text-brand-gray-400 mt-2">This is an estimate. Final EMI may vary.</p>
             </div>
         </div>

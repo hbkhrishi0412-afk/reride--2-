@@ -71,15 +71,15 @@ const SocialShareButtons: React.FC<SocialShareButtonsProps> = ({ vehicle }) => {
     };
 
     return (
-        <div className="mt-6 pt-6 border-t border-brand-gray-200 dark:border-brand-gray-700">
-            <h4 className="text-sm font-semibold text-center text-brand-gray-600 dark:text-brand-gray-400 mb-3">Share this listing</h4>
+        <div className="mt-6 pt-6 border-t border-brand-gray-200 dark:border-brand-gray-200">
+            <h4 className="text-sm font-semibold text-center text-brand-gray-600 dark:text-brand-text mb-3">Share this listing</h4>
             <div className="flex justify-center items-center gap-3">
-                <button onClick={() => handleShare('facebook')} aria-label="Share on Facebook" className="p-2 rounded-full text-brand-white transition-colors" style={{ background: 'var(--brand-deep-red)' }} onMouseEnter={(e) => e.currentTarget.style.background = 'var(--brand-deep-red-hover)'} onMouseLeave={(e) => e.currentTarget.style.background = 'var(--brand-deep-red)'}>{ICONS.facebook}</button>
-                <button onClick={() => handleShare('twitter')} aria-label="Share on Twitter" className="p-2 rounded-full bg-sky-500 text-brand-white hover:bg-sky-600 transition-colors">{ICONS.twitter}</button>
-                <button onClick={() => handleShare('whatsapp')} aria-label="Share on WhatsApp" className="p-2 rounded-full bg-brand-deep-red-light0 text-brand-white hover:bg-brand-deep-red transition-colors">{ICONS.whatsapp}</button>
+                <button onClick={() => handleShare('facebook')} aria-label="Share on Facebook" className="p-2 rounded-full text-white transition-colors" style={{ background: 'var(--brand-turquoise)' }} onMouseEnter={(e) => e.currentTarget.style.background = 'var(--brand-turquoise-hover)'} onMouseLeave={(e) => e.currentTarget.style.background = 'var(--brand-turquoise)'}>{ICONS.facebook}</button>
+                <button onClick={() => handleShare('twitter')} aria-label="Share on Twitter" className="p-2 rounded-full bg-sky-500 text-white hover:bg-sky-600 transition-colors">{ICONS.twitter}</button>
+                <button onClick={() => handleShare('whatsapp')} aria-label="Share on WhatsApp" className="p-2 rounded-full bg-brand-turquoise-light0 text-white hover:bg-brand-turquoise transition-colors">{ICONS.whatsapp}</button>
                 <button 
                     onClick={handleCopyLink} 
-                    className="flex items-center gap-2 text-sm font-semibold bg-brand-gray-200 dark:bg-brand-gray-700 text-brand-gray-800 dark:text-brand-gray-200 px-3 py-2 rounded-full hover:bg-brand-gray-300 dark:hover:bg-brand-gray-600 transition-colors"
+                    className="flex items-center gap-2 text-sm font-semibold bg-brand-gray-200 dark:bg-brand-gray-700 text-brand-text-dark dark:text-brand-gray-200 px-3 py-2 rounded-full hover:bg-brand-gray-300 dark:hover:bg-brand-gray-600 transition-colors"
                 >
                     {ICONS.link}
                     <span>{copyStatus}</span>
@@ -93,20 +93,20 @@ const CollapsibleSection: React.FC<{ title: string; children: React.ReactNode; d
     const [isOpen, setIsOpen] = useState(defaultOpen);
 
     return (
-        <div className="bg-brand-white dark:bg-brand-gray-800 rounded-xl shadow-soft overflow-hidden">
+        <div className="bg-white rounded-xl shadow-soft overflow-hidden">
             <button
                 onClick={() => setIsOpen(!isOpen)}
                 className="w-full flex justify-between items-center text-left p-6"
                 aria-expanded={isOpen}
             >
-                <h3 className="text-xl font-semibold text-brand-gray-800 dark:text-brand-gray-100">{title}</h3>
-                <svg className={`w-6 h-6 text-brand-gray-500 transition-transform duration-300 ${isOpen ? 'rotate-180' : ''}`} xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <h3 className="text-xl font-semibold text-brand-text-dark dark:text-brand-text-dark">{title}</h3>
+                <svg className={`w-6 h-6 text-brand-text transition-transform duration-300 ${isOpen ? 'rotate-180' : ''}`} xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
                 </svg>
             </button>
             <div className={`grid transition-[grid-template-rows] duration-500 ease-in-out ${isOpen ? 'grid-rows-[1fr]' : 'grid-rows-[0fr]'}`}>
                 <div className="overflow-hidden">
-                    <div className="p-6 pt-0 border-t border-brand-gray-200 dark:border-brand-gray-700">
+                    <div className="p-6 pt-0 border-t border-brand-gray-200 dark:border-brand-gray-200">
                         {children}
                     </div>
                 </div>
@@ -117,16 +117,16 @@ const CollapsibleSection: React.FC<{ title: string; children: React.ReactNode; d
 
 
 const KeySpec: React.FC<{ label: string; value: string | number; icon?: React.ReactNode }> = memo(({ label, value, icon }) => (
-    <div className="flex flex-col gap-1 p-4 bg-brand-gray-100 dark:bg-brand-gray-800 rounded-lg text-center">
-        {icon && <div className="mx-auto mb-1" style={{ color: 'var(--brand-orange)' }}>{icon}</div>}
-        <span className="text-sm font-medium text-brand-gray-600 dark:text-brand-gray-400">{label}</span>
-        <span className="font-bold text-brand-gray-900 dark:text-brand-gray-100">{value}</span>
+    <div className="flex flex-col gap-1 p-4 bg-brand-gray-100 dark:bg-white rounded-lg text-center">
+        {icon && <div className="mx-auto mb-1" style={{ color: 'var(--brand-mint)' }}>{icon}</div>}
+        <span className="text-sm font-medium text-brand-gray-600 dark:text-brand-text">{label}</span>
+        <span className="font-bold text-brand-gray-900 dark:text-brand-text-dark">{value}</span>
     </div>
 ));
 
 const SpecDetail: React.FC<{ label: string; value: string | number | undefined }> = ({ label, value }) => (
-    <div className="flex justify-between py-2 border-b border-brand-gray-100 dark:border-brand-gray-700 last:border-b-0">
-        <dt className="text-sm text-brand-gray-600 dark:text-brand-gray-400">{label}</dt>
+    <div className="flex justify-between py-2 border-b border-brand-gray-100 dark:border-brand-gray-200 last:border-b-0">
+        <dt className="text-sm text-brand-gray-600 dark:text-brand-text">{label}</dt>
         <dd className="text-sm font-semibold text-brand-gray-900 dark:text-brand-gray-200 text-right">{value || '-'}</dd>
     </div>
 );
@@ -135,7 +135,7 @@ const SpecDetail: React.FC<{ label: string; value: string | number | undefined }
 const DocumentChip: React.FC<{ doc: VehicleDocument }> = ({ doc }) => {
     return (
         <a href={doc.url} target="_blank" rel="noopener noreferrer" title={`View ${doc.fileName}`}
-           className="flex items-center gap-2 bg-brand-white dark:bg-brand-white text-brand-blackcurrant dark:text-brand-blackcurrant px-3 py-1.5 rounded-full text-sm font-medium hover:bg-brand-white-dark dark:hover:bg-brand-white transition-colors">
+           className="flex items-center gap-2 bg-brand-white dark:bg-brand-white text-brand-text-dark dark:text-brand-text-dark px-3 py-1.5 rounded-full text-sm font-medium hover:bg-brand-white-dark dark:hover:bg-brand-white transition-colors">
             <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
               <path fillRule="evenodd" d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2-2H6a2 2 0 01-2-2V4zm2 6a1 1 0 011-1h6a1 1 0 110 2H7a1 1 0 01-1-1zm1 3a1 1 0 100 2h6a1 1 0 100-2H7z" clipRule="evenodd" />
             </svg>
@@ -146,33 +146,33 @@ const DocumentChip: React.FC<{ doc: VehicleDocument }> = ({ doc }) => {
 
 const CertifiedInspectionReport: React.FC<{ report: CertifiedInspection }> = ({ report }) => {
     const scoreColor = (score: number) => {
-        if (score >= 90) return 'bg-brand-deep-red-light0';
-        if (score >= 75) return 'bg-brand-orange-light0';
-        return 'bg-brand-deep-red-light0';
+        if (score >= 90) return 'bg-brand-turquoise-light0';
+        if (score >= 75) return 'bg-brand-mint-light0';
+        return 'bg-brand-turquoise-light0';
     };
     return (
         <div className="p-6">
-            <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center border-b dark:border-gray-700 pb-4 mb-4">
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-12 w-12 text-brand-deep-red flex-shrink-0" viewBox="0 0 20 20" fill="currentColor">
+            <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center border-b dark:border-brand-gray-200 pb-4 mb-4">
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-12 w-12 text-brand-turquoise flex-shrink-0" viewBox="0 0 20 20" fill="currentColor">
                     <path fillRule="evenodd" d="M6.267 3.455a3.066 3.066 0 001.745-.723 3.066 3.066 0 013.976 0 3.066 3.066 0 001.745.723 3.066 3.066 0 012.812 2.812c.051.643.304 1.254.723 1.745a3.066 3.066 0 010 3.976 3.066 3.066 0 00-.723 1.745 3.066 3.066 0 01-2.812 2.812 3.066 3.066 0 00-1.745.723 3.066 3.066 0 01-3.976 0 3.066 3.066 0 00-1.745-.723 3.066 3.066 0 01-2.812-2.812 3.066 3.066 0 00-.723-1.745 3.066 3.066 0 010-3.976 3.066 3.066 0 00.723-1.745 3.066 3.066 0 012.812-2.812zm7.44-1.22a.75.75 0 00-1.06 0L8.172 6.172a.75.75 0 00-1.06 1.06L8.94 9.332a.75.75 0 001.191.04l3.22-4.294a.75.75 0 00-.04-1.19z" clipRule="evenodd" />
                 </svg>
                 <div>
-                    <h3 className="text-xl font-semibold text-brand-gray-800 dark:text-brand-gray-100">ReRide Certified Inspection</h3>
-                    <p className="text-sm text-brand-gray-600 dark:text-brand-gray-400">Inspected by {report.inspector} on {new Date(report.date).toLocaleDateString()}</p>
+                    <h3 className="text-xl font-semibold text-brand-text-dark dark:text-brand-text-dark">ReRide Certified Inspection</h3>
+                    <p className="text-sm text-brand-gray-600 dark:text-brand-text">Inspected by {report.inspector} on {new Date(report.date).toLocaleDateString()}</p>
                 </div>
             </div>
-            <p className="italic text-brand-gray-700 dark:text-brand-gray-300 mb-6">{report.summary}</p>
+            <p className="italic text-brand-text-dark dark:text-brand-text-dark mb-6">{report.summary}</p>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-4">
                 {Object.entries(report.scores).map(([key, score]) => (
                     <div key={key}>
                         <div className="flex justify-between items-center mb-1">
-                            <span className="font-medium text-sm text-brand-gray-700 dark:text-brand-gray-300">{key}</span>
-                            <span className="font-bold text-sm text-brand-gray-900 dark:text-brand-gray-100">{score}/100</span>
+                            <span className="font-medium text-sm text-brand-text-dark dark:text-brand-text-dark">{key}</span>
+                            <span className="font-bold text-sm text-brand-gray-900 dark:text-brand-text-dark">{score}/100</span>
                         </div>
                         <div className="w-full bg-brand-gray-200 dark:bg-brand-gray-700 rounded-full h-2.5">
                             <div className={`${scoreColor(Number(score))} h-2.5 rounded-full`} style={{ width: `${score}%` }}></div>
                         </div>
-                        <p className="text-xs text-brand-gray-500 dark:text-brand-gray-400 mt-1">{report.details[key]}</p>
+                        <p className="text-xs text-brand-text dark:text-brand-text mt-1">{report.details[key]}</p>
                     </div>
                 ))}
             </div>
@@ -244,22 +244,22 @@ export const VehicleDetail: React.FC<VehicleDetailProps> = ({ vehicle, onBack: o
   
   return (
     <>
-      <div className="bg-brand-gray-50 dark:bg-brand-gray-dark animate-fade-in">
+      <div className="bg-white dark:bg-white animate-fade-in">
           <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
-              <button onClick={onBackToHome} className="mb-6 bg-brand-white dark:bg-brand-gray-800 text-brand-gray-700 dark:text-brand-gray-200 font-bold py-2 px-4 rounded-lg hover:bg-brand-gray-100 dark:hover:bg-brand-gray-700 transition-colors shadow-soft">
+              <button onClick={onBackToHome} className="mb-6 bg-white text-brand-text-dark dark:text-brand-gray-200 font-bold py-2 px-4 rounded-lg hover:bg-brand-gray-100 dark:hover:bg-brand-gray-700 transition-colors shadow-soft">
                 &larr; Back to Listings
               </button>
               
-              <h1 className="text-4xl font-extrabold text-brand-gray-900 dark:text-brand-gray-100 mb-2">{vehicle.year} {vehicle.make} {vehicle.model} {vehicle.variant || ''}</h1>
+              <h1 className="text-4xl font-extrabold text-brand-gray-900 dark:text-brand-text-dark mb-2">{vehicle.year} {vehicle.make} {vehicle.model} {vehicle.variant || ''}</h1>
               <div className="flex items-center gap-4 mb-6">
                   <div className="flex items-center gap-2">
                     <StarRating rating={vehicle.averageRating || 0} readOnly />
-                    <span className="text-brand-gray-600 dark:text-brand-gray-400">
+                    <span className="text-brand-gray-600 dark:text-brand-text">
                         {vehicle.averageRating?.toFixed(1) || 'No rating'} ({vehicle.ratingCount || 0} reviews)
                     </span>
                   </div>
                   {vehicle.certifiedInspection && (
-                      <span className="bg-brand-deep-red-light text-brand-deep-red text-xs font-bold px-3 py-1 rounded-full flex items-center gap-1">
+                      <span className="bg-brand-turquoise-light text-brand-turquoise text-xs font-bold px-3 py-1 rounded-full flex items-center gap-1">
                           <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor"><path fillRule="evenodd" d="M6.267 3.455a3.066 3.066 0 001.745-.723 3.066 3.066 0 013.976 0 3.066 3.066 0 001.745.723 3.066 3.066 0 012.812 2.812c.051.643.304 1.254.723 1.745a3.066 3.066 0 010 3.976 3.066 3.066 0 00-.723 1.745 3.066 3.066 0 01-2.812 2.812 3.066 3.066 0 00-1.745.723 3.066 3.066 0 01-3.976 0 3.066 3.066 0 00-1.745-.723 3.066 3.066 0 01-2.812-2.812 3.066 3.066 0 00-.723-1.745 3.066 3.066 0 010-3.976 3.066 3.066 0 00.723-1.745 3.066 3.066 0 012.812-2.812zm7.44-1.22a.75.75 0 00-1.06 0L8.172 6.172a.75.75 0 00-1.06 1.06L8.94 9.332a.75.75 0 001.191.04l3.22-4.294a.75.75 0 00-.04-1.19z" clipRule="evenodd" /></svg>
                           Certified
                       </span>
@@ -270,9 +270,9 @@ export const VehicleDetail: React.FC<VehicleDetailProps> = ({ vehicle, onBack: o
                   {/* Left Column: Media */}
                   <div className="lg:col-span-2 space-y-4">
                     {vehicle.videoUrl && (
-                      <div className="flex space-x-2 border-b-2 border-brand-gray-200 dark:border-brand-gray-700">
-                        <button onClick={() => setActiveMediaTab('images')} className={`py-2 px-4 font-semibold ${activeMediaTab === 'images' ? 'border-b-2' : 'text-brand-gray-500'}`} style={activeMediaTab === 'images' ? { borderColor: 'var(--brand-deep-red)', color: 'var(--brand-deep-red)' } : undefined}>Images</button>
-                        <button onClick={() => setActiveMediaTab('video')} className={`py-2 px-4 font-semibold ${activeMediaTab === 'video' ? 'border-b-2' : 'text-brand-gray-500'}`} style={activeMediaTab === 'video' ? { borderColor: 'var(--brand-deep-red)', color: 'var(--brand-deep-red)' } : undefined}>Video</button>
+                      <div className="flex space-x-2 border-b-2 border-brand-gray-200 dark:border-brand-gray-200">
+                        <button onClick={() => setActiveMediaTab('images')} className={`py-2 px-4 font-semibold ${activeMediaTab === 'images' ? 'border-b-2' : 'text-brand-text'}`} style={activeMediaTab === 'images' ? { borderColor: 'var(--brand-turquoise)', color: 'var(--brand-turquoise)' } : undefined}>Images</button>
+                        <button onClick={() => setActiveMediaTab('video')} className={`py-2 px-4 font-semibold ${activeMediaTab === 'video' ? 'border-b-2' : 'text-brand-text'}`} style={activeMediaTab === 'video' ? { borderColor: 'var(--brand-turquoise)', color: 'var(--brand-turquoise)' } : undefined}>Video</button>
                       </div>
                     )}
                     {activeMediaTab === 'images' ? (
@@ -281,15 +281,15 @@ export const VehicleDetail: React.FC<VehicleDetailProps> = ({ vehicle, onBack: o
                             <img key={currentIndex} className="w-full h-auto object-cover rounded-xl shadow-soft-xl animate-fade-in" src={vehicle.images[currentIndex]} alt={`${vehicle.make} ${vehicle.model} image ${currentIndex + 1}`} />
                             {vehicle.images.length > 1 && (
                                 <>
-                                    <button onClick={handlePrevImage} className="absolute top-1/2 left-4 -translate-y-1/2 bg-black/40 text-brand-white p-2 rounded-full opacity-0 group-hover:opacity-100 transition-opacity focus:opacity-100" aria-label="Previous image"><svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" /></svg></button>
-                                    <button onClick={handleNextImage} className="absolute top-1/2 right-4 -translate-y-1/2 bg-black/40 text-brand-white p-2 rounded-full opacity-0 group-hover:opacity-100 transition-opacity focus:opacity-100" aria-label="Next image"><svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" /></svg></button>
+                                    <button onClick={handlePrevImage} className="absolute top-1/2 left-4 -translate-y-1/2 bg-black/40 text-white p-2 rounded-full opacity-0 group-hover:opacity-100 transition-opacity focus:opacity-100" aria-label="Previous image"><svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" /></svg></button>
+                                    <button onClick={handleNextImage} className="absolute top-1/2 right-4 -translate-y-1/2 bg-black/40 text-white p-2 rounded-full opacity-0 group-hover:opacity-100 transition-opacity focus:opacity-100" aria-label="Next image"><svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" /></svg></button>
                                 </>
                             )}
                         </div>
                         {vehicle.images.length > 1 && (
                             <div className="flex space-x-2 overflow-x-auto pb-2 -mt-2">
                                 {vehicle.images.map((img, index) => (
-                                    <img key={index} src={img} alt={`Thumbnail ${index + 1}`} className={`cursor-pointer rounded-md border-2 h-20 w-28 object-cover flex-shrink-0 ${currentIndex === index ? '' : 'border-transparent'} transition`} style={currentIndex === index ? { borderColor: 'var(--brand-deep-red)' } : undefined} onMouseEnter={(e) => currentIndex !== index && (e.currentTarget.style.borderColor = 'var(--brand-orange)')} onMouseLeave={(e) => currentIndex !== index && (e.currentTarget.style.borderColor = '')} onClick={() => setCurrentIndex(index)} />
+                                    <img key={index} src={img} alt={`Thumbnail ${index + 1}`} className={`cursor-pointer rounded-md border-2 h-20 w-28 object-cover flex-shrink-0 ${currentIndex === index ? '' : 'border-transparent'} transition`} style={currentIndex === index ? { borderColor: 'var(--brand-turquoise)' } : undefined} onMouseEnter={(e) => currentIndex !== index && (e.currentTarget.style.borderColor = 'var(--brand-mint)')} onMouseLeave={(e) => currentIndex !== index && (e.currentTarget.style.borderColor = '')} onClick={() => setCurrentIndex(index)} />
                                 ))}
                             </div>
                         )}
@@ -303,22 +303,22 @@ export const VehicleDetail: React.FC<VehicleDetailProps> = ({ vehicle, onBack: o
                   
                   {/* Right Column: Price and Actions */}
                   <div className="space-y-6 self-start lg:sticky top-24">
-                      <div className="p-6 bg-brand-white dark:bg-brand-gray-800 rounded-xl shadow-soft-lg space-y-4">
-                           <p className="text-4xl font-extrabold" style={{ color: 'var(--brand-deep-red)' }}>₹{vehicle.price.toLocaleString('en-IN')}</p>
-                           <button onClick={() => onStartChat(vehicle)} className="w-full btn-brand-primary text-brand-white font-bold py-3 px-6 rounded-lg text-lg transition-all transform hover:scale-105">
+                      <div className="p-6 bg-white rounded-xl shadow-soft-lg space-y-4">
+                           <p className="text-4xl font-extrabold" style={{ color: 'var(--brand-turquoise)' }}>₹{vehicle.price.toLocaleString('en-IN')}</p>
+                           <button onClick={() => onStartChat(vehicle)} className="w-full btn-brand-primary text-white font-bold py-3 px-6 rounded-lg text-lg transition-all transform hover:scale-105">
                                 Chat with Seller
                             </button>
                             <div className="flex gap-4">
                                <button
                                   onClick={() => onToggleCompare(vehicle.id)}
                                   disabled={isCompareDisabled}
-                                  className={`w-full font-bold py-3 px-4 rounded-lg text-lg transition-all flex items-center justify-center gap-2 ${isComparing ? 'bg-brand-deep-red text-brand-deep-red' : 'bg-brand-gray-200 dark:bg-brand-gray-700'} ${isCompareDisabled ? 'opacity-50 cursor-not-allowed' : ''}`}
+                                  className={`w-full font-bold py-3 px-4 rounded-lg text-lg transition-all flex items-center justify-center gap-2 ${isComparing ? 'bg-brand-turquoise text-brand-turquoise' : 'bg-brand-gray-200 dark:bg-brand-gray-700'} ${isCompareDisabled ? 'opacity-50 cursor-not-allowed' : ''}`}
                                 >
                                   {isComparing ? 'Comparing' : 'Compare'}
                               </button>
                                <button
                                   onClick={() => onToggleWishlist(vehicle.id)}
-                                  className={`w-full font-bold py-3 px-4 rounded-lg text-lg transition-all flex items-center justify-center gap-2 ${isInWishlist ? 'bg-brand-orange text-brand-deep-red' : 'bg-brand-gray-200 dark:bg-brand-gray-700'}`}
+                                  className={`w-full font-bold py-3 px-4 rounded-lg text-lg transition-all flex items-center justify-center gap-2 ${isInWishlist ? 'bg-brand-mint text-brand-turquoise' : 'bg-brand-gray-200 dark:bg-brand-gray-700'}`}
                                 >
                                   <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" viewBox="0 0 20 20" fill="currentColor"><path fillRule="evenodd" d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z" clipRule="evenodd" /></svg>
                                   {isInWishlist ? 'Saved' : 'Save'}
@@ -327,26 +327,26 @@ export const VehicleDetail: React.FC<VehicleDetailProps> = ({ vehicle, onBack: o
                             <SocialShareButtons vehicle={vehicle} />
                       </div>
                       
-                      {seller && <div className="p-6 bg-brand-white dark:bg-brand-gray-800 rounded-xl shadow-soft">
-                            <h3 className="text-lg font-semibold text-brand-gray-800 dark:text-brand-gray-100 mb-3">Seller Information</h3>
+                      {seller && <div className="p-6 bg-white rounded-xl shadow-soft">
+                            <h3 className="text-lg font-semibold text-brand-text-dark dark:text-brand-text-dark mb-3">Seller Information</h3>
                             <div className="flex items-center gap-4">
                                 <img src={seller.logoUrl || `https://i.pravatar.cc/100?u=${seller.email}`} alt="Seller Logo" className="w-16 h-16 rounded-full object-cover" />
                                 <div>
-                                    <h4 className="font-bold text-brand-gray-900 dark:text-brand-gray-100">{seller.dealershipName || seller.name}</h4>
+                                    <h4 className="font-bold text-brand-gray-900 dark:text-brand-text-dark">{seller.dealershipName || seller.name}</h4>
                                     <div className="flex items-center gap-1 mt-1">
                                         <StarRating rating={seller.averageRating || 0} size="sm" readOnly />
-                                        <span className="text-xs text-brand-gray-500 dark:text-brand-gray-400">({seller.ratingCount || 0})</span>
+                                        <span className="text-xs text-brand-text dark:text-brand-text">({seller.ratingCount || 0})</span>
                                     </div>
                                     <BadgeDisplay badges={seller.badges || []} size="sm" />
                                 </div>
                             </div>
-                            <button onClick={() => onViewSellerProfile(seller.email)} className="mt-4 w-full text-center text-sm font-bold hover:underline transition-colors" style={{ color: 'var(--brand-deep-red)' }} onMouseEnter={(e) => e.currentTarget.style.color = 'var(--brand-orange)'} onMouseLeave={(e) => e.currentTarget.style.color = 'var(--brand-deep-red)'}>View Seller Profile</button>
-                            {canRate && <div className="mt-4 pt-4 border-t dark:border-gray-700">
-                                <p className="text-sm font-medium text-center text-brand-gray-600 dark:text-brand-gray-400 mb-2">Rate your experience with this seller</p>
+                            <button onClick={() => onViewSellerProfile(seller.email)} className="mt-4 w-full text-center text-sm font-bold hover:underline transition-colors" style={{ color: 'var(--brand-turquoise)' }} onMouseEnter={(e) => e.currentTarget.style.color = 'var(--brand-mint)'} onMouseLeave={(e) => e.currentTarget.style.color = 'var(--brand-turquoise)'}>View Seller Profile</button>
+                            {canRate && <div className="mt-4 pt-4 border-t dark:border-brand-gray-200">
+                                <p className="text-sm font-medium text-center text-brand-gray-600 dark:text-brand-text mb-2">Rate your experience with this seller</p>
                                 <div className="flex justify-center">
                                   <StarRating rating={0} onRate={handleRateSeller} />
                                 </div>
-                                {showSellerRatingSuccess && <p className="text-center text-brand-deep-red text-sm mt-2">Thanks for your feedback!</p>}
+                                {showSellerRatingSuccess && <p className="text-center text-brand-turquoise text-sm mt-2">Thanks for your feedback!</p>}
                             </div>}
                       </div>}
                       
@@ -370,8 +370,8 @@ export const VehicleDetail: React.FC<VehicleDetailProps> = ({ vehicle, onBack: o
                         </div>
                         {vehicle.description && (
                             <div>
-                                <h4 className="text-lg font-semibold text-brand-gray-800 dark:text-brand-gray-100 mb-2">Description</h4>
-                                <p className="text-brand-gray-700 dark:text-brand-gray-300 whitespace-pre-line">{vehicle.description}</p>
+                                <h4 className="text-lg font-semibold text-brand-text-dark dark:text-brand-text-dark mb-2">Description</h4>
+                                <p className="text-brand-text-dark dark:text-brand-text-dark whitespace-pre-line">{vehicle.description}</p>
                             </div>
                         )}
                     </CollapsibleSection>
@@ -392,35 +392,35 @@ export const VehicleDetail: React.FC<VehicleDetailProps> = ({ vehicle, onBack: o
                     <CollapsibleSection title="Features, Pros & Cons">
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                             <div>
-                                <h4 className="text-lg font-semibold text-brand-gray-800 dark:text-brand-gray-100 mb-4">Included Features</h4>
+                                <h4 className="text-lg font-semibold text-brand-text-dark dark:text-brand-text-dark mb-4">Included Features</h4>
                                 {vehicle.features.length > 0 ? (
                                     <div className="flex flex-wrap gap-3">
                                         {vehicle.features.map(feature => (
-                                          <div key={feature} className="flex items-center gap-2 text-brand-gray-700 dark:text-brand-gray-300 bg-brand-gray-100 dark:bg-brand-gray-700 px-3 py-1 rounded-full text-sm">
-                                            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-brand-deep-red" viewBox="0 0 20 20" fill="currentColor"><path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" /></svg>
+                                          <div key={feature} className="flex items-center gap-2 text-brand-text-dark dark:text-brand-text-dark bg-brand-gray-100 dark:bg-brand-gray-700 px-3 py-1 rounded-full text-sm">
+                                            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-brand-turquoise" viewBox="0 0 20 20" fill="currentColor"><path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" /></svg>
                                             {feature}
                                           </div>
                                         ))}
                                     </div>
-                                ) : <p className="text-brand-gray-500">No features listed.</p>}
+                                ) : <p className="text-brand-text">No features listed.</p>}
                             </div>
                              <div>
-                                <h4 className="text-lg font-semibold text-brand-gray-800 dark:text-brand-gray-100 mb-4">AI Expert Analysis</h4>
+                                <h4 className="text-lg font-semibold text-brand-text-dark dark:text-brand-text-dark mb-4">AI Expert Analysis</h4>
                                 {isGeneratingProsCons ? (
-                                    <div className="flex items-center gap-2 text-brand-gray-500"><div className="w-5 h-5 border-2 border-dashed rounded-full animate-spin" style={{ borderColor: 'var(--brand-deep-red)' }}></div> Generating...</div>
+                                    <div className="flex items-center gap-2 text-brand-text"><div className="w-5 h-5 border-2 border-dashed rounded-full animate-spin" style={{ borderColor: 'var(--brand-turquoise)' }}></div> Generating...</div>
                                 ) : prosAndCons ? (
                                     <div className="grid grid-cols-2 gap-4">
                                         <div>
-                                            <h5 className="font-semibold text-brand-deep-red mb-2">Pros</h5>
+                                            <h5 className="font-semibold text-brand-turquoise mb-2">Pros</h5>
                                             <ul className="list-disc list-inside space-y-1 text-sm">{prosAndCons.pros.map((p, i) => <li key={i}>{p}</li>)}</ul>
                                         </div>
                                         <div>
-                                            <h5 className="font-semibold text-brand-deep-red mb-2">Cons</h5>
+                                            <h5 className="font-semibold text-brand-turquoise mb-2">Cons</h5>
                                             <ul className="list-disc list-inside space-y-1 text-sm">{prosAndCons.cons.map((c, i) => <li key={i}>{c}</li>)}</ul>
                                         </div>
                                     </div>
                                 ) : (
-                                    <button onClick={handleGenerateProsCons} className="text-sm font-bold hover:underline transition-colors" style={{ color: 'var(--brand-deep-red)' }} onMouseEnter={(e) => e.currentTarget.style.color = 'var(--brand-orange)'} onMouseLeave={(e) => e.currentTarget.style.color = 'var(--brand-deep-red)'}>Generate Pros & Cons</button>
+                                    <button onClick={handleGenerateProsCons} className="text-sm font-bold hover:underline transition-colors" style={{ color: 'var(--brand-turquoise)' }} onMouseEnter={(e) => e.currentTarget.style.color = 'var(--brand-mint)'} onMouseLeave={(e) => e.currentTarget.style.color = 'var(--brand-turquoise)'}>Generate Pros & Cons</button>
                                 )}
                             </div>
                         </div>
@@ -438,7 +438,7 @@ export const VehicleDetail: React.FC<VehicleDetailProps> = ({ vehicle, onBack: o
                                 <VehicleHistory serviceRecords={vehicle.serviceRecords || []} accidentHistory={vehicle.accidentHistory || []} />
                             )}
                             {vehicle.documents && vehicle.documents.length > 0 && <div className="mt-6">
-                                <h4 className="text-lg font-semibold text-brand-gray-800 dark:text-brand-gray-100 mb-4">Available Documents</h4>
+                                <h4 className="text-lg font-semibold text-brand-text-dark dark:text-brand-text-dark mb-4">Available Documents</h4>
                                 <div className="flex flex-wrap gap-4">
                                     {vehicle.documents.map(doc => <DocumentChip key={doc.name} doc={doc} />)}
                                 </div>
@@ -448,11 +448,11 @@ export const VehicleDetail: React.FC<VehicleDetailProps> = ({ vehicle, onBack: o
                </div>
 
               <div className="text-center mt-12">
-                  <button onClick={handleFlagClick} className="text-xs text-brand-gray-500 hover:text-brand-deep-red">Report this listing</button>
+                  <button onClick={handleFlagClick} className="text-xs text-brand-text hover:text-brand-turquoise">Report this listing</button>
               </div>
 
               {filteredRecommendations.length > 0 && <div className="mt-12">
-                  <h2 className="text-3xl font-bold text-brand-gray-800 dark:text-brand-gray-100 mb-6">Similar Vehicles</h2>
+                  <h2 className="text-3xl font-bold text-brand-text-dark dark:text-brand-text-dark mb-6">Similar Vehicles</h2>
                   <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                       {filteredRecommendations.map(v => (
                           <VehicleCard key={v.id} vehicle={v} onSelect={onSelectVehicle} onToggleCompare={onToggleCompare} isSelectedForCompare={comparisonList.includes(v.id)} onToggleWishlist={onToggleWishlist} isInWishlist={wishlist.includes(v.id)} isCompareDisabled={!comparisonList.includes(v.id) && comparisonList.length >= 4} onViewSellerProfile={onViewSellerProfile} onQuickView={setQuickViewVehicle}/>

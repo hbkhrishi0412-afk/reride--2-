@@ -35,10 +35,10 @@ const FAQPage: React.FC<FAQPageProps> = ({ faqItems }) => {
   return (
     <div className="animate-fade-in container mx-auto px-4 py-8 max-w-4xl">
       <div className="text-center mb-12">
-        <h1 className="text-4xl md:text-5xl font-extrabold text-brand-gray-900 dark:text-brand-gray-100">
+        <h1 className="text-4xl md:text-5xl font-extrabold text-brand-gray-900 dark:text-brand-text-dark">
           Frequently Asked Questions
         </h1>
-        <p className="mt-4 text-lg text-brand-gray-600 dark:text-brand-gray-400">
+        <p className="mt-4 text-lg text-brand-gray-600 dark:text-brand-text">
           Find answers to common questions about buying and selling on ReRide.
         </p>
       </div>
@@ -49,29 +49,29 @@ const FAQPage: React.FC<FAQPageProps> = ({ faqItems }) => {
           placeholder="Search questions..."
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
-          className="w-full p-4 border border-brand-gray-300 dark:border-brand-gray-600 rounded-xl focus:outline-none bg-brand-white dark:bg-brand-gray-700 text-lg" onFocus={(e) => { e.currentTarget.style.borderColor = 'var(--brand-deep-red)'; e.currentTarget.style.boxShadow = '0 0 0 2px var(--brand-deep-red-light)'; }} onBlur={(e) => { e.currentTarget.style.borderColor = ''; e.currentTarget.style.boxShadow = ''; }}
+          className="w-full p-4 border border-brand-gray-300 dark:border-brand-gray-300 rounded-xl focus:outline-none bg-brand-white dark:bg-brand-gray-700 text-lg" onFocus={(e) => { e.currentTarget.style.borderColor = 'var(--brand-turquoise)'; e.currentTarget.style.boxShadow = '0 0 0 2px var(--brand-turquoise-light)'; }} onBlur={(e) => { e.currentTarget.style.borderColor = ''; e.currentTarget.style.boxShadow = ''; }}
         />
       </div>
 
       <div className="space-y-8">
         {Object.entries(filteredAndGroupedFAQs).map(([category, items]) => (
           <div key={category}>
-            <h2 className="text-2xl font-bold text-brand-gray-800 dark:text-brand-gray-100 mb-4 border-b border-brand-gray-200 dark:border-brand-gray-700 pb-2">
+            <h2 className="text-2xl font-bold text-brand-text-dark dark:text-brand-text-dark mb-4 border-b border-brand-gray-200 dark:border-brand-gray-200 pb-2">
               {category}
             </h2>
             <div className="space-y-4">
               {(items as FAQItem[]).map((item) => (
-                <div key={item.id} className="border-b border-brand-gray-200 dark:border-brand-gray-700 last:border-b-0">
+                <div key={item.id} className="border-b border-brand-gray-200 dark:border-brand-gray-200 last:border-b-0">
                   <button
                     onClick={() => toggleItem(item.id)}
                     className="w-full flex justify-between items-center text-left py-4 focus:outline-none"
                     aria-expanded={openItem === item.id}
                   >
-                    <span className="text-lg font-semibold text-brand-gray-800 dark:text-brand-gray-100">
+                    <span className="text-lg font-semibold text-brand-text-dark dark:text-brand-text-dark">
                       {item.question}
                     </span>
                     <svg
-                      className={`w-6 h-6 text-brand-gray-500 transition-transform ${
+                      className={`w-6 h-6 text-brand-text transition-transform ${
                         openItem === item.id ? 'transform rotate-180' : ''
                       }`}
                       fill="none"
@@ -82,7 +82,7 @@ const FAQPage: React.FC<FAQPageProps> = ({ faqItems }) => {
                     </svg>
                   </button>
                   {openItem === item.id && (
-                    <div className="pb-4 text-brand-gray-600 dark:text-brand-gray-300 animate-fade-in">
+                    <div className="pb-4 text-brand-gray-600 dark:text-brand-text-dark animate-fade-in">
                       <p>{item.answer}</p>
                     </div>
                   )}
@@ -92,7 +92,7 @@ const FAQPage: React.FC<FAQPageProps> = ({ faqItems }) => {
           </div>
         ))}
         {Object.keys(filteredAndGroupedFAQs).length === 0 && (
-            <p className="text-center text-lg text-brand-gray-500 py-10">No questions found matching your search.</p>
+            <p className="text-center text-lg text-brand-text py-10">No questions found matching your search.</p>
         )}
       </div>
     </div>

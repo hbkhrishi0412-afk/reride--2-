@@ -197,17 +197,17 @@ const LocationModal: React.FC<LocationModalProps> = ({ isOpen, onClose, currentL
 
     return (
         <div className="fixed inset-0 bg-black/60 z-[101] flex items-center justify-center p-4 animate-fade-in" onClick={onClose}>
-            <div className="bg-brand-white dark:bg-brand-gray-800 rounded-xl shadow-2xl w-full max-w-md" onClick={e => e.stopPropagation()}>
-                <div className="p-6 border-b dark:border-gray-700">
-                    <h2 className="text-xl font-bold text-brand-blackcurrant dark:text-brand-blackcurrant">Select Your Location</h2>
-                    <p className="text-sm text-brand-blackcurrant dark:text-brand-blackcurrant mt-1">Prices and availability may vary based on your location.</p>
+            <div className="bg-white rounded-xl shadow-2xl w-full max-w-md" onClick={e => e.stopPropagation()}>
+                <div className="p-6 border-b dark:border-brand-gray-200">
+                    <h2 className="text-xl font-bold text-brand-text-dark dark:text-brand-text-dark">Select Your Location</h2>
+                    <p className="text-sm text-brand-text-dark dark:text-brand-text-dark mt-1">Prices and availability may vary based on your location.</p>
                     {currentLocation && (
                         <div className="mt-3 flex items-center gap-2 text-sm">
-                            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" style={{ color: 'var(--brand-orange)' }}>
+                            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" style={{ color: 'var(--brand-mint)' }}>
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
                             </svg>
-                            <span className="text-brand-blackcurrant dark:text-brand-blackcurrant">Current: <strong style={{ color: 'var(--brand-deep-red)' }}>{currentLocation}</strong></span>
+                            <span className="text-brand-text-dark dark:text-brand-text-dark">Current: <strong style={{ color: 'var(--brand-turquoise)' }}>{currentLocation}</strong></span>
                         </div>
                     )}
                 </div>
@@ -215,7 +215,7 @@ const LocationModal: React.FC<LocationModalProps> = ({ isOpen, onClose, currentL
                     <button
                         onClick={handleDetectLocation}
                         disabled={isDetecting}
-                        className="w-full flex items-center justify-center gap-2 font-bold py-3 px-4 rounded-lg transition-colors disabled:opacity-70 disabled:cursor-wait" style={{ background: 'var(--brand-orange-light)', color: 'var(--brand-blackcurrant)' }} onMouseEnter={(e) => !isDetecting && (e.currentTarget.style.background = 'var(--brand-orange)')} onMouseLeave={(e) => !isDetecting && (e.currentTarget.style.background = 'var(--brand-orange-light)')}
+                        className="w-full flex items-center justify-center gap-2 font-bold py-3 px-4 rounded-lg transition-colors disabled:opacity-70 disabled:cursor-wait" style={{ background: 'var(--brand-mint-light)', color: 'var(--brand-text-dark)' }} onMouseEnter={(e) => !isDetecting && (e.currentTarget.style.background = 'var(--brand-mint)')} onMouseLeave={(e) => !isDetecting && (e.currentTarget.style.background = 'var(--brand-mint-light)')}
                     >
                         {isDetecting ? (
                             <>
@@ -230,34 +230,34 @@ const LocationModal: React.FC<LocationModalProps> = ({ isOpen, onClose, currentL
                         )}
                     </button>
 
-                    <div className="flex items-center text-xs text-brand-blackcurrant">
-                        <span className="flex-grow border-t dark:border-gray-600"></span>
+                    <div className="flex items-center text-xs text-brand-text-dark">
+                        <span className="flex-grow border-t dark:border-brand-gray-300"></span>
                         <span className="px-4">OR</span>
-                        <span className="flex-grow border-t dark:border-gray-600"></span>
+                        <span className="flex-grow border-t dark:border-brand-gray-300"></span>
                     </div>
 
-                    <p className="text-sm font-semibold text-center text-brand-blackcurrant dark:text-brand-blackcurrant">Select your location manually</p>
+                    <p className="text-sm font-semibold text-center text-brand-text-dark dark:text-brand-text-dark">Select your location manually</p>
 
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <div>
-                            <label htmlFor="state-select" className="block text-sm font-medium text-brand-blackcurrant dark:text-brand-blackcurrant mb-1">State</label>
-                            <select id="state-select" value={selectedState} onChange={e => { setSelectedState(e.target.value); setSelectedCity(''); }} className="w-full p-2 border border-brand-orange dark:border-gray-600 rounded-md bg-brand-white dark:bg-brand-gray-700">
+                            <label htmlFor="state-select" className="block text-sm font-medium text-brand-text-dark dark:text-brand-text-dark mb-1">State</label>
+                            <select id="state-select" value={selectedState} onChange={e => { setSelectedState(e.target.value); setSelectedCity(''); }} className="w-full p-2 border border-brand-mint dark:border-brand-gray-300 rounded-md bg-brand-white dark:bg-brand-gray-700">
                                 <option value="" disabled>Select a state</option>
                                 {INDIAN_STATES.map(state => <option key={state.code} value={state.code}>{state.name}</option>)}
                             </select>
                         </div>
                         <div>
-                            <label htmlFor="city-select" className="block text-sm font-medium text-brand-blackcurrant dark:text-brand-blackcurrant mb-1">City</label>
-                            <select id="city-select" value={selectedCity} onChange={e => setSelectedCity(e.target.value)} disabled={!selectedState || availableCities.length === 0} className="w-full p-2 border border-brand-orange dark:border-gray-600 rounded-md bg-brand-white dark:bg-brand-gray-700 disabled:bg-brand-white dark:disabled:bg-brand-white">
+                            <label htmlFor="city-select" className="block text-sm font-medium text-brand-text-dark dark:text-brand-text-dark mb-1">City</label>
+                            <select id="city-select" value={selectedCity} onChange={e => setSelectedCity(e.target.value)} disabled={!selectedState || availableCities.length === 0} className="w-full p-2 border border-brand-mint dark:border-brand-gray-300 rounded-md bg-brand-white dark:bg-brand-gray-700 disabled:bg-brand-white dark:disabled:bg-brand-white">
                                 <option value="" disabled>Select a city</option>
                                 {availableCities.map(city => <option key={city} value={city}>{city}</option>)}
                             </select>
                         </div>
                     </div>
                 </div>
-                <div className="bg-brand-white dark:bg-brand-gray-darker px-6 py-4 flex justify-end gap-4 rounded-b-xl">
-                    <button onClick={onClose} className="px-4 py-2 bg-brand-white-dark dark:bg-brand-white text-brand-blackcurrant dark:text-brand-blackcurrant rounded-md hover:bg-brand-white dark:hover:bg-brand-white0">Cancel</button>
-                    <button onClick={handleManualSelect} disabled={!selectedCity} className="px-4 py-2 btn-brand-primary text-brand-white rounded-md disabled:opacity-50">Set Location</button>
+                <div className="bg-white px-6 py-4 flex justify-end gap-4 rounded-b-xl">
+                    <button onClick={onClose} className="px-4 py-2 bg-brand-white-dark dark:bg-brand-white text-brand-text-dark dark:text-brand-text-dark rounded-md hover:bg-brand-white dark:hover:bg-brand-white0">Cancel</button>
+                    <button onClick={handleManualSelect} disabled={!selectedCity} className="px-4 py-2 btn-brand-primary text-white rounded-md disabled:opacity-50">Set Location</button>
                 </div>
             </div>
         </div>

@@ -56,43 +56,43 @@ const CreateUserModal: React.FC<{
 
     return (
         <div className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50 p-4 animate-fade-in">
-            <div className="bg-brand-white dark:bg-brand-gray-dark rounded-lg shadow-2xl w-full max-w-md">
+            <div className="bg-white rounded-lg shadow-2xl w-full max-w-md">
                 <form onSubmit={handleSubmit}>
                     <div className="p-6">
                         <div className="flex justify-between items-center mb-4">
-                           <h2 className="text-xl font-bold text-brand-blackcurrant dark:text-brand-blackcurrant">Create New User</h2>
-                           <button type="button" onClick={onClose} className="text-brand-blackcurrant dark:text-brand-blackcurrant text-2xl hover:text-brand-blackcurrant dark:hover:text-brand-blackcurrant">&times;</button>
+                           <h2 className="text-xl font-bold text-brand-text-dark dark:text-brand-text-dark">Create New User</h2>
+                           <button type="button" onClick={onClose} className="text-brand-text-dark dark:text-brand-text-dark text-2xl hover:text-brand-text-dark dark:hover:text-brand-text-dark">&times;</button>
                         </div>
                         <div className="space-y-4">
                             <div>
-                                <label className="block text-sm font-medium text-brand-blackcurrant dark:text-brand-blackcurrant">Full Name</label>
+                                <label className="block text-sm font-medium text-brand-text-dark dark:text-brand-text-dark">Full Name</label>
                                 <input type="text" name="name" value={formData.name} onChange={handleChange} required className="mt-1 block w-full p-2 border rounded-md" />
                             </div>
                             <div>
-                                <label className="block text-sm font-medium text-brand-blackcurrant dark:text-brand-blackcurrant">Email</label>
+                                <label className="block text-sm font-medium text-brand-text-dark dark:text-brand-text-dark">Email</label>
                                 <input type="email" name="email" value={formData.email} onChange={handleChange} required className="mt-1 block w-full p-2 border rounded-md" />
                             </div>
                              <div>
-                                <label className="block text-sm font-medium text-brand-blackcurrant dark:text-brand-blackcurrant">Mobile Number</label>
+                                <label className="block text-sm font-medium text-brand-text-dark dark:text-brand-text-dark">Mobile Number</label>
                                 <input type="tel" name="mobile" value={formData.mobile} onChange={handleChange} required className="mt-1 block w-full p-2 border rounded-md" />
                             </div>
                              <div>
-                                <label className="block text-sm font-medium text-brand-blackcurrant dark:text-brand-blackcurrant">Password</label>
+                                <label className="block text-sm font-medium text-brand-text-dark dark:text-brand-text-dark">Password</label>
                                 <input type="password" name="password" value={formData.password} onChange={handleChange} required className="mt-1 block w-full p-2 border rounded-md" />
                             </div>
                             <div>
-                                <label className="block text-sm font-medium text-brand-blackcurrant dark:text-brand-blackcurrant">Role</label>
+                                <label className="block text-sm font-medium text-brand-text-dark dark:text-brand-text-dark">Role</label>
                                 <select name="role" value={formData.role} onChange={handleChange} className="mt-1 block w-full p-2 border rounded-md">
                                     <option value="customer">Customer</option>
                                     <option value="seller">Seller</option>
                                 </select>
                             </div>
-                            {error && <p className="text-sm text-brand-deep-red">{error}</p>}
+                            {error && <p className="text-sm text-brand-turquoise">{error}</p>}
                         </div>
                     </div>
-                    <div className="bg-brand-white dark:bg-brand-gray-darker px-6 py-3 flex justify-end gap-4 rounded-b-lg">
-                        <button type="button" onClick={onClose} className="px-4 py-2 bg-brand-white-dark text-brand-blackcurrant rounded-md hover:bg-brand-white">Cancel</button>
-                        <button type="submit" className="px-4 py-2 btn-brand-primary text-brand-white rounded-md">Create User</button>
+                    <div className="bg-white px-6 py-3 flex justify-end gap-4 rounded-b-lg">
+                        <button type="button" onClick={onClose} className="px-4 py-2 bg-brand-white-dark text-brand-text-dark rounded-md hover:bg-brand-white">Cancel</button>
+                        <button type="submit" className="px-4 py-2 btn-brand-primary text-white rounded-md">Create User</button>
                     </div>
                 </form>
             </div>
@@ -110,7 +110,7 @@ const UserManagement: React.FC<UserManagementProps> = ({ users, currentUser, onT
     }, [users, roleFilter]);
 
     const filterActions = (
-        <select value={roleFilter} onChange={(e) => setRoleFilter(e.target.value as RoleFilter)} className="p-2 border border-brand-gray dark:border-gray-600 rounded-lg bg-brand-white dark:bg-brand-gray-darker dark:text-brand-blackcurrant">
+        <select value={roleFilter} onChange={(e) => setRoleFilter(e.target.value as RoleFilter)} className="p-2 border border-brand-gray dark:border-brand-gray-300 rounded-lg bg-white dark:text-brand-text-dark">
             <option value="all">All Users</option>
             <option value="customer">Customers</option>
             <option value="seller">Sellers</option>
@@ -121,17 +121,17 @@ const UserManagement: React.FC<UserManagementProps> = ({ users, currentUser, onT
         <div className="space-y-6 animate-fade-in">
             <div className="flex justify-between items-center">
                 <div>
-                     <button onClick={() => onNavigate(ViewEnum.ADMIN_PANEL)} className="text-sm hover:underline mb-2 transition-colors" style={{ color: 'var(--brand-deep-red)' }} onMouseEnter={(e) => e.currentTarget.style.color = 'var(--brand-orange)'} onMouseLeave={(e) => e.currentTarget.style.color = 'var(--brand-deep-red)'}>&larr; Back to Admin Dashboard</button>
-                     <h1 className="text-3xl font-extrabold text-brand-blackcurrant dark:text-brand-blackcurrant">User Management</h1>
+                     <button onClick={() => onNavigate(ViewEnum.ADMIN_PANEL)} className="text-sm hover:underline mb-2 transition-colors" style={{ color: 'var(--brand-turquoise)' }} onMouseEnter={(e) => e.currentTarget.style.color = 'var(--brand-mint)'} onMouseLeave={(e) => e.currentTarget.style.color = 'var(--brand-turquoise)'}>&larr; Back to Admin Dashboard</button>
+                     <h1 className="text-3xl font-extrabold text-brand-text-dark dark:text-brand-text-dark">User Management</h1>
                 </div>
-                <button onClick={() => setIsCreateModalOpen(true)} className="bg-brand-deep-red-light0 text-brand-white font-bold py-2 px-4 rounded-lg hover:bg-brand-deep-red transition-colors">
+                <button onClick={() => setIsCreateModalOpen(true)} className="bg-brand-turquoise-light0 text-white font-bold py-2 px-4 rounded-lg hover:bg-brand-turquoise transition-colors">
                     Create User
                 </button>
             </div>
             
-            <div className="bg-brand-white dark:bg-brand-gray-dark p-6 rounded-lg shadow-md">
+            <div className="bg-white p-6 rounded-lg shadow-md">
                 <div className="flex justify-between items-center mb-4">
-                    <h2 className="text-xl font-bold text-brand-blackcurrant dark:text-brand-blackcurrant">All Users</h2>
+                    <h2 className="text-xl font-bold text-brand-text-dark dark:text-brand-text-dark">All Users</h2>
                     <div>{filterActions}</div>
                 </div>
                 <div className="overflow-x-auto">
@@ -145,26 +145,26 @@ const UserManagement: React.FC<UserManagementProps> = ({ users, currentUser, onT
                                 <th className="px-6 py-3 text-left text-xs font-medium uppercase">Actions</th>
                             </tr>
                         </thead>
-                        <tbody className="bg-brand-white dark:bg-brand-gray-dark divide-y divide-gray-200 dark:divide-gray-700">
+                        <tbody className="bg-white divide-y divide-gray-200 dark:divide-gray-700">
                             {filteredUsers.map(user => {
                                 const isCurrentUser = user.email === currentUser.email;
                                 return (
                                     <tr key={user.email}>
                                         <td className="px-6 py-4">{user.name}</td>
                                         <td className="px-6 py-4">{user.email}</td>
-                                        <td className="px-6 py-4"><span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${user.role === 'admin' ? 'bg-brand-deep-red-light text-brand-deep-red' : user.role === 'seller' ? 'brand-badge-orange' : 'bg-brand-deep-red-light text-brand-deep-red'}`}>{user.role}</span></td>
-                                        <td className="px-6 py-4"><span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${user.status === 'active' ? 'bg-brand-deep-red-light text-brand-deep-red' : 'bg-brand-white-dark text-brand-blackcurrant'}`}>{user.status}</span></td>
+                                        <td className="px-6 py-4"><span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${user.role === 'admin' ? 'bg-brand-turquoise-light text-brand-turquoise' : user.role === 'seller' ? 'brand-badge-orange' : 'bg-brand-turquoise-light text-brand-turquoise'}`}>{user.role}</span></td>
+                                        <td className="px-6 py-4"><span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${user.status === 'active' ? 'bg-brand-turquoise-light text-brand-turquoise' : 'bg-brand-white-dark text-brand-text-dark'}`}>{user.status}</span></td>
                                         <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                                             <button 
                                                 onClick={() => onToggleUserStatus(user.email)} 
                                                 disabled={isCurrentUser}
-                                                className={`mr-3 ${user.status === 'active' ? 'text-brand-blackcurrant hover:text-brand-blackcurrant' : 'text-brand-deep-red hover:text-brand-deep-red'} disabled:opacity-50 disabled:cursor-not-allowed`}>
+                                                className={`mr-3 ${user.status === 'active' ? 'text-brand-text-dark hover:text-brand-text-dark' : 'text-brand-turquoise hover:text-brand-turquoise'} disabled:opacity-50 disabled:cursor-not-allowed`}>
                                                 {user.status === 'active' ? 'Deactivate' : 'Reactivate'}
                                             </button>
                                             <button 
                                                 onClick={() => onDeleteUser(user.email)} 
                                                 disabled={isCurrentUser}
-                                                className="text-brand-deep-red hover:text-brand-deep-red disabled:opacity-50 disabled:cursor-not-allowed">
+                                                className="text-brand-turquoise hover:text-brand-turquoise disabled:opacity-50 disabled:cursor-not-allowed">
                                                 Delete
                                             </button>
                                         </td>

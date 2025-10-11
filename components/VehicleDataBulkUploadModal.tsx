@@ -145,10 +145,10 @@ export const VehicleDataBulkUploadModal: React.FC<BulkUploadModalProps> = ({ onC
 
     return (
         <div className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50 p-4 animate-fade-in" onClick={onClose}>
-            <div className="bg-brand-white dark:bg-brand-gray-dark rounded-lg shadow-2xl w-full max-w-2xl max-h-[90vh] flex flex-col" onClick={e => e.stopPropagation()}>
-                <div className="p-6 border-b dark:border-gray-700">
-                    <h2 className="text-xl font-bold text-brand-blackcurrant dark:text-brand-blackcurrant">Bulk Upload Vehicle Data</h2>
-                    <p className="text-sm text-brand-blackcurrant dark:text-brand-blackcurrant">Upload makes, models, and variants from a CSV file.</p>
+            <div className="bg-white rounded-lg shadow-2xl w-full max-w-2xl max-h-[90vh] flex flex-col" onClick={e => e.stopPropagation()}>
+                <div className="p-6 border-b dark:border-brand-gray-200">
+                    <h2 className="text-xl font-bold text-brand-text-dark dark:text-brand-text-dark">Bulk Upload Vehicle Data</h2>
+                    <p className="text-sm text-brand-text-dark dark:text-brand-text-dark">Upload makes, models, and variants from a CSV file.</p>
                 </div>
 
                 <div className="p-6 overflow-y-auto">
@@ -156,33 +156,33 @@ export const VehicleDataBulkUploadModal: React.FC<BulkUploadModalProps> = ({ onC
                         <div className="space-y-4 text-center">
                             <h3 className="font-semibold">Step 1: Prepare Your CSV File</h3>
                             <p>Download our template, fill it with your vehicle data, and upload it here.</p>
-                            <button onClick={downloadTemplate} className="font-semibold hover:underline transition-colors" style={{ color: 'var(--brand-deep-red)' }} onMouseEnter={(e) => e.currentTarget.style.color = 'var(--brand-orange)'} onMouseLeave={(e) => e.currentTarget.style.color = 'var(--brand-deep-red)'}>Download CSV Template</button>
-                            <div className="mt-4 p-6 border-2 border-dashed border-brand-orange dark:border-gray-600 rounded-lg">
-                                <input type="file" accept=".csv" onChange={handleFileChange} className="block w-full text-sm text-brand-blackcurrant file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:text-brand-white" style={{ ['--file-bg' as any]: 'var(--brand-deep-red)' }} />
+                            <button onClick={downloadTemplate} className="font-semibold hover:underline transition-colors" style={{ color: 'var(--brand-turquoise)' }} onMouseEnter={(e) => e.currentTarget.style.color = 'var(--brand-mint)'} onMouseLeave={(e) => e.currentTarget.style.color = 'var(--brand-turquoise)'}>Download CSV Template</button>
+                            <div className="mt-4 p-6 border-2 border-dashed border-brand-mint dark:border-brand-gray-300 rounded-lg">
+                                <input type="file" accept=".csv" onChange={handleFileChange} className="block w-full text-sm text-brand-text-dark file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:text-white" style={{ ['--file-bg' as any]: 'var(--brand-turquoise)' }} />
                             </div>
-                            {error && <p className="text-brand-deep-red text-sm mt-2">{error}</p>}
+                            {error && <p className="text-brand-turquoise text-sm mt-2">{error}</p>}
                         </div>
                     )}
                     {step === 2 && (
                         <div className="space-y-4">
                             <h3 className="font-semibold">Step 2: Review and Confirm</h3>
                             {parsedData && (
-                                <div className="p-4 bg-brand-white dark:bg-brand-gray-darker rounded-lg text-sm">
-                                    <p className="font-bold text-brand-deep-red dark:text-brand-deep-red">
+                                <div className="p-4 bg-white rounded-lg text-sm">
+                                    <p className="font-bold text-brand-turquoise dark:text-brand-turquoise">
                                         Found {Object.keys(parsedData).length} categories with a total of {Object.values(parsedData).reduce((acc: number, makes) => acc + (makes as VehicleMake[]).length, 0)} makes.
                                     </p>
-                                    <p>This will <span className="font-bold text-brand-deep-red">overwrite</span> all existing vehicle dropdown data. This action cannot be undone.</p>
+                                    <p>This will <span className="font-bold text-brand-turquoise">overwrite</span> all existing vehicle dropdown data. This action cannot be undone.</p>
                                 </div>
                             )}
-                            {error && <p className="text-brand-deep-red text-sm mt-2">{error}</p>}
+                            {error && <p className="text-brand-turquoise text-sm mt-2">{error}</p>}
                         </div>
                     )}
                 </div>
 
-                <div className="bg-brand-white dark:bg-brand-gray-darker px-6 py-3 flex justify-end gap-4 rounded-b-lg mt-auto">
-                    <button onClick={onClose} className="px-4 py-2 bg-brand-white-dark dark:bg-brand-white text-brand-blackcurrant dark:text-brand-blackcurrant rounded-md hover:bg-brand-white dark:hover:bg-brand-white0">Cancel</button>
-                    {step === 1 && <button onClick={handleParseAndValidate} disabled={!file} className="px-4 py-2 btn-brand-primary text-brand-white rounded-md disabled:opacity-50">Next: Review</button>}
-                    {step === 2 && <button onClick={handleConfirm} disabled={!parsedData} className="px-4 py-2 bg-brand-deep-red text-brand-white rounded-md hover:bg-brand-deep-red disabled:opacity-50">Confirm & Overwrite</button>}
+                <div className="bg-white px-6 py-3 flex justify-end gap-4 rounded-b-lg mt-auto">
+                    <button onClick={onClose} className="px-4 py-2 bg-brand-white-dark dark:bg-brand-white text-brand-text-dark dark:text-brand-text-dark rounded-md hover:bg-brand-white dark:hover:bg-brand-white0">Cancel</button>
+                    {step === 1 && <button onClick={handleParseAndValidate} disabled={!file} className="px-4 py-2 btn-brand-primary text-white rounded-md disabled:opacity-50">Next: Review</button>}
+                    {step === 2 && <button onClick={handleConfirm} disabled={!parsedData} className="px-4 py-2 bg-brand-turquoise text-white rounded-md hover:bg-brand-turquoise disabled:opacity-50">Confirm & Overwrite</button>}
                 </div>
             </div>
         </div>

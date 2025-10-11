@@ -16,22 +16,22 @@ const ForgotPassword: React.FC<ForgotPasswordProps> = ({ onResetRequest, onBack 
     setSubmitted(true);
   };
   
-  const formInputClass = "appearance-none relative block w-full px-4 py-3 border border-brand-gray-300 dark:border-brand-gray-600 placeholder-brand-gray-500 text-brand-gray-900 dark:text-brand-gray-200 bg-brand-white dark:bg-brand-gray-800 focus:outline-none focus:z-10 sm:text-sm";
+  const formInputClass = "appearance-none relative block w-full px-4 py-3 border border-brand-gray-300 dark:border-brand-gray-300 placeholder-brand-gray-500 text-brand-gray-900 dark:text-brand-gray-200 bg-white focus:outline-none focus:z-10 sm:text-sm";
 
 
   return (
-    <div className="w-full max-w-md space-y-8 bg-brand-white dark:bg-brand-gray-800 p-10 rounded-xl shadow-soft-xl">
+    <div className="w-full max-w-md space-y-8 bg-white p-10 rounded-xl shadow-soft-xl">
       <div>
-        <h2 className="mt-6 text-center text-3xl font-extrabold text-brand-gray-900 dark:text-brand-gray-100">
+        <h2 className="mt-6 text-center text-3xl font-extrabold text-brand-gray-900 dark:text-brand-text-dark">
           Forgot Your Password?
         </h2>
-        <p className="mt-2 text-center text-sm text-brand-gray-600 dark:text-brand-gray-400">
+        <p className="mt-2 text-center text-sm text-brand-gray-600 dark:text-brand-text">
           No problem. Enter your email address below and we'll send you instructions to reset it.
         </p>
       </div>
       
       {submitted ? (
-          <div className="text-center p-4 bg-brand-deep-red-light dark:bg-brand-deep-red/50 text-brand-deep-red dark:text-brand-deep-red rounded-lg">
+          <div className="text-center p-4 bg-brand-turquoise-light dark:bg-brand-turquoise/50 text-brand-turquoise dark:text-brand-turquoise rounded-lg">
               <p>If an account with your email exists, password reset instructions have been sent. Please check your inbox.</p>
           </div>
       ) : (
@@ -56,7 +56,7 @@ const ForgotPassword: React.FC<ForgotPasswordProps> = ({ onResetRequest, onBack 
             <div>
               <button
                 type="submit"
-                className="group relative w-full flex justify-center py-3 px-4 border border-transparent text-sm font-medium rounded-md text-brand-white btn-brand-primary focus:outline-none focus:ring-2 focus:ring-offset-2 transition-colors"
+                className="group relative w-full flex justify-center py-3 px-4 border border-transparent text-sm font-medium rounded-md text-white btn-brand-primary focus:outline-none focus:ring-2 focus:ring-offset-2 transition-colors"
               >
                 Send Reset Link
               </button>
@@ -65,7 +65,7 @@ const ForgotPassword: React.FC<ForgotPasswordProps> = ({ onResetRequest, onBack 
       )}
 
       <div className="text-sm text-center">
-        <button onClick={onBack} className="font-medium transition-colors" style={{ color: 'var(--brand-deep-red)' }} onMouseEnter={(e) => e.currentTarget.style.color = 'var(--brand-orange)'} onMouseLeave={(e) => e.currentTarget.style.color = 'var(--brand-deep-red)'}>
+        <button onClick={onBack} className="font-medium transition-colors" style={{ color: 'var(--brand-turquoise)' }} onMouseEnter={(e) => e.currentTarget.style.color = 'var(--brand-mint)'} onMouseLeave={(e) => e.currentTarget.style.color = 'var(--brand-turquoise)'}>
           &larr; Back to Login
         </button>
       </div>

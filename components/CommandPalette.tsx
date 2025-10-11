@@ -110,8 +110,8 @@ const CommandPalette: React.FC<CommandPaletteProps> = ({ isOpen, onClose, onNavi
 
   return (
     <div className="fixed inset-0 bg-black/60 z-[100] flex items-start justify-center pt-20" onClick={onClose}>
-      <div className="bg-brand-white dark:bg-brand-gray-800 rounded-lg shadow-2xl w-full max-w-xl animate-fade-in" onClick={e => e.stopPropagation()}>
-        <div className="p-4 border-b border-brand-orange dark:border-gray-700 flex items-center gap-3">
+      <div className="bg-white rounded-lg shadow-2xl w-full max-w-xl animate-fade-in" onClick={e => e.stopPropagation()}>
+        <div className="p-4 border-b border-brand-mint dark:border-brand-gray-200 flex items-center gap-3">
           {ICONS.SEARCH}
           <input
             ref={inputRef}
@@ -119,13 +119,13 @@ const CommandPalette: React.FC<CommandPaletteProps> = ({ isOpen, onClose, onNavi
             placeholder="Type a command or search..."
             value={query}
             onChange={e => setQuery(e.target.value)}
-            className="w-full bg-transparent focus:outline-none text-lg text-brand-blackcurrant dark:text-brand-blackcurrant"
+            className="w-full bg-transparent focus:outline-none text-lg text-brand-text-dark dark:text-brand-text-dark"
           />
         </div>
         <div className="max-h-96 overflow-y-auto">
           {Object.entries(groupedCommands).map(([section, commands]) => (
             <div key={section} className="p-2">
-              <h3 className="text-xs font-semibold text-brand-blackcurrant dark:text-brand-blackcurrant px-2 mb-1">{section}</h3>
+              <h3 className="text-xs font-semibold text-brand-text-dark dark:text-brand-text-dark px-2 mb-1">{section}</h3>
               <ul>
                 {(commands as Command[]).map((command) => {
                   const globalIndex = filteredCommands.findIndex(c => c.id === command.id);
@@ -134,9 +134,9 @@ const CommandPalette: React.FC<CommandPaletteProps> = ({ isOpen, onClose, onNavi
                       <button
                         onClick={command.action}
                         onMouseEnter={() => setActiveIndex(globalIndex)}
-                        className={`w-full text-left flex items-center gap-3 px-3 py-2.5 rounded-md ${activeIndex === globalIndex ? 'text-brand-white' : 'text-brand-blackcurrant dark:text-brand-blackcurrant hover:bg-brand-white dark:hover:bg-brand-white'}`} style={activeIndex === globalIndex ? { background: 'var(--gradient-primary)' } : undefined}
+                        className={`w-full text-left flex items-center gap-3 px-3 py-2.5 rounded-md ${activeIndex === globalIndex ? 'text-white' : 'text-brand-text-dark dark:text-brand-text-dark hover:bg-brand-white dark:hover:bg-brand-white'}`} style={activeIndex === globalIndex ? { background: 'var(--gradient-primary)' } : undefined}
                       >
-                        <span className={activeIndex === globalIndex ? 'text-brand-white' : 'text-brand-blackcurrant dark:text-brand-blackcurrant'}>{command.icon}</span>
+                        <span className={activeIndex === globalIndex ? 'text-white' : 'text-brand-text-dark dark:text-brand-text-dark'}>{command.icon}</span>
                         <span>{command.title}</span>
                       </button>
                     </li>
@@ -146,7 +146,7 @@ const CommandPalette: React.FC<CommandPaletteProps> = ({ isOpen, onClose, onNavi
             </div>
           ))}
           {filteredCommands.length === 0 && (
-            <p className="p-4 text-center text-brand-blackcurrant">No commands found.</p>
+            <p className="p-4 text-center text-brand-text-dark">No commands found.</p>
           )}
         </div>
       </div>

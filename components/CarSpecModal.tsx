@@ -9,7 +9,7 @@ interface CarSpecModalProps {
 
 const SpecSection: React.FC<{ title: string, children: React.ReactNode }> = ({ title, children }) => (
     <div>
-        <h3 className="text-lg font-bold text-brand-gray-800 dark:text-brand-gray-100 mb-2 border-b border-brand-gray-200 dark:border-brand-gray-700 pb-1">
+        <h3 className="text-lg font-bold text-brand-text-dark dark:text-brand-text-dark mb-2 border-b border-brand-gray-200 dark:border-brand-gray-200 pb-1">
             {title}
         </h3>
         {children}
@@ -18,17 +18,17 @@ const SpecSection: React.FC<{ title: string, children: React.ReactNode }> = ({ t
 
 const SpecDetail: React.FC<{ label: string, value: string | number | undefined }> = ({ label, value }) => (
     <div className="flex justify-between py-1.5 px-2 rounded hover:bg-brand-gray-100 dark:hover:bg-brand-gray-700">
-        <dt className="text-sm text-brand-gray-600 dark:text-brand-gray-400">{label}</dt>
+        <dt className="text-sm text-brand-gray-600 dark:text-brand-text">{label}</dt>
         <dd className="text-sm font-semibold text-brand-gray-900 dark:text-brand-gray-200 text-right">{value || '-'}</dd>
     </div>
 );
 
 const FeatureList: React.FC<{ features: string[] }> = ({ features }) => {
     if (features.length === 0) {
-        return <p className="text-sm text-brand-gray-500 italic">No features listed for this category.</p>;
+        return <p className="text-sm text-brand-text italic">No features listed for this category.</p>;
     }
     return (
-        <ul className="list-disc list-inside space-y-1 text-sm text-brand-gray-700 dark:text-brand-gray-300">
+        <ul className="list-disc list-inside space-y-1 text-sm text-brand-text-dark dark:text-brand-text-dark">
             {features.map(feature => <li key={feature}>{feature}</li>)}
         </ul>
     );
@@ -56,18 +56,18 @@ const CarSpecModal: React.FC<CarSpecModalProps> = ({ car, variant, onClose }) =>
             onClick={onClose}
         >
             <div 
-                className="bg-brand-white dark:bg-brand-gray-800 rounded-xl shadow-2xl w-full max-w-4xl max-h-[90vh] flex flex-col overflow-hidden"
+                className="bg-white rounded-xl shadow-2xl w-full max-w-4xl max-h-[90vh] flex flex-col overflow-hidden"
                 onClick={(e) => e.stopPropagation()}
             >
                 {/* Header */}
-                <div className="p-4 border-b border-brand-gray-200 dark:border-brand-gray-700 flex justify-between items-center flex-shrink-0">
+                <div className="p-4 border-b border-brand-gray-200 dark:border-brand-gray-200 flex justify-between items-center flex-shrink-0">
                     <div>
-                        <h2 className="text-2xl font-bold text-brand-gray-900 dark:text-brand-gray-100">
+                        <h2 className="text-2xl font-bold text-brand-gray-900 dark:text-brand-text-dark">
                             {car.brand_name} {car.model_name}
                         </h2>
-                        <p className="text-md text-brand-gray-600 dark:text-brand-gray-300">{variant.variant_name}</p>
+                        <p className="text-md text-brand-gray-600 dark:text-brand-text-dark">{variant.variant_name}</p>
                     </div>
-                    <button onClick={onClose} className="text-brand-gray-400 hover:text-brand-gray-800 dark:hover:text-brand-white text-3xl">&times;</button>
+                    <button onClick={onClose} className="text-brand-gray-400 hover:text-brand-text-dark dark:hover:text-white text-3xl">&times;</button>
                 </div>
 
                 {/* Body */}
