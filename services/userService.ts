@@ -70,13 +70,42 @@ const deleteUserLocal = async (email: string): Promise<{ success: boolean, email
 };
 
 const loginLocal = async (credentials: any): Promise<{ success: boolean, user?: User, reason?: string }> => {
+    console.log('🔐 loginLocal called with:', { email: credentials.email, role: credentials.role });
     const { email, password, role } = credentials;
     const users = await getUsersLocal();
+    console.log('📋 Total users loaded:', users.length);
+    console.log('🔍 Looking for user with email:', email);
+    
     const user = users.find(u => u.email === email && u.password === password);
-    if (!user) return { success: false, reason: 'Invalid credentials.' };
-    if (role && user.role !== role) return { success: false, reason: `User is not a registered ${role}.` };
-    if (user.status === 'inactive') return { success: false, reason: 'Your account has been deactivated.' };
+    
+    if (!user) {
+        console.log('❌ User not found with provided credentials');
+        // Try to find user by email only to help debug
+        const userByEmail = users.find(u => u.email === email);
+        if (userByEmail) {
+            console.log('⚠️  User exists with this email but password doesn\'t match');
+            console.log('User role:', userByEmail.role, 'Expected role:', role);
+        } else {
+            console.log('⚠️  No user found with email:', email);
+            console.log('Available emails:', users.map(u => u.email).join(', '));
+        }
+        return { success: false, reason: 'Invalid credentials.' };
+    }
+    
+    console.log('✅ User found:', user.name, 'Role:', user.role);
+    
+    if (role && user.role !== role) {
+        console.log('❌ Role mismatch. User role:', user.role, 'Expected:', role);
+        return { success: false, reason: `User is not a registered ${role}.` };
+    }
+    
+    if (user.status === 'inactive') {
+        console.log('❌ User account is inactive');
+        return { success: false, reason: 'Your account has been deactivated.' };
+    }
+    
     const { password: _, ...userWithoutPassword } = user;
+    console.log('✅ Login successful for:', user.name);
     return { success: true, user: userWithoutPassword };
 };
 
@@ -196,17 +225,23 @@ export const getUsers = async (): Promise<User[]> => {
 export const updateUser = isDevelopment ? updateUserLocal : updateUserApi;
 export const deleteUser = isDevelopment ? deleteUserLocal : deleteUserApi;
 export const login = async (credentials: any): Promise<{ success: boolean, user?: User, reason?: string }> => {
+  console.log('🚀 Login attempt:', { email: credentials.email, role: credentials.role, isDevelopment });
+  
   // Always try API first for production, with fallback to local
   if (!isDevelopment) {
     try {
-      return await authApi({ action: 'login', ...credentials });
+      console.log('🌐 Trying API login...');
+      const result = await authApi({ action: 'login', ...credentials });
+      console.log('✅ API login successful');
+      return result;
     } catch (error) {
-      console.warn('API login failed, falling back to local storage:', error);
+      console.warn('⚠️  API login failed, falling back to local storage:', error);
       // Fallback to local storage if API fails
       return await loginLocal(credentials);
     }
   } else {
     // Development mode - use local storage
+    console.log('💻 Development mode - using local storage');
     return await loginLocal(credentials);
   }
 };

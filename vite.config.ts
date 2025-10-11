@@ -38,9 +38,9 @@ export default defineConfig({
     },
     // Enable minification with esbuild (faster)
     minify: 'esbuild',
-    // Drop console and debugger in production
+    // Keep console logs temporarily for debugging login issues
     esbuild: {
-      drop: ['console', 'debugger'],
+      drop: ['debugger'],
       legalComments: 'none'
     },
     // Optimize CSS
