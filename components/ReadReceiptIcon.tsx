@@ -9,7 +9,7 @@ const ReadReceiptIcon: React.FC<ReadReceiptIconProps> = ({ isRead }) => {
     if (isRead) {
         // Double check for "Read"
         return (
-            <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4 inline-block ml-1" viewBox="0 0 24 24" fill="none" style={{ color: 'var(--brand-rose-pink)' }}>
+            <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4 inline-block ml-1" viewBox="0 0 24 24" fill="none" style={{ color: 'var(--brand-gold)' }}>
                 <path d="M1.5 12.5L5.5 16.5L11.5 10.5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
                 <path d="M8.5 12.5L12.5 16.5L22.5 6.5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
             </svg>
@@ -52,7 +52,7 @@ export const OfferModal: React.FC<{
 
     return (
         <div className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-[101] p-4 animate-fade-in" onClick={onClose}>
-            <div className="bg-white dark:bg-brand-gray-dark rounded-xl shadow-2xl w-full max-w-sm" onClick={e => e.stopPropagation()}>
+            <div className="bg-brand-cream dark:bg-brand-gray-dark rounded-xl shadow-2xl w-full max-w-sm" onClick={e => e.stopPropagation()}>
                 <form onSubmit={handleSubmit}>
                     <div className="p-6">
                         <div className="flex justify-between items-start mb-4">
@@ -69,13 +69,13 @@ export const OfferModal: React.FC<{
                                 onChange={e => setPrice(e.target.value)}
                                 autoFocus
                                 required
-                                className="w-full p-3 border border-brand-gray-300 dark:border-brand-gray-600 rounded-lg bg-white dark:bg-brand-gray-700 text-lg focus:outline-none" onFocus={(e) => { e.currentTarget.style.borderColor = 'var(--brand-deep-red)'; e.currentTarget.style.boxShadow = '0 0 0 2px var(--brand-deep-red-light)'; }} onBlur={(e) => { e.currentTarget.style.borderColor = ''; e.currentTarget.style.boxShadow = ''; }}
+                                className="w-full p-3 border border-brand-gray-300 dark:border-brand-gray-600 rounded-lg bg-brand-cream dark:bg-brand-gray-700 text-lg focus:outline-none" onFocus={(e) => { e.currentTarget.style.borderColor = 'var(--brand-teal)'; e.currentTarget.style.boxShadow = '0 0 0 2px var(--brand-teal-light)'; }} onBlur={(e) => { e.currentTarget.style.borderColor = ''; e.currentTarget.style.boxShadow = ''; }}
                             />
                         </div>
-                        {error && <p className="text-sm text-red-500 mt-2">{error}</p>}
+                        {error && <p className="text-sm text-brand-teal mt-2">{error}</p>}
                     </div>
                     <div className="bg-brand-gray-50 dark:bg-brand-gray-darker px-6 py-4 flex justify-end rounded-b-xl">
-                        <button type="submit" className="px-6 py-2 btn-brand-primary text-white font-bold rounded-lg transition-colors">Submit Offer</button>
+                        <button type="submit" className="px-6 py-2 btn-brand-primary text-brand-cream font-bold rounded-lg transition-colors">Submit Offer</button>
                     </div>
                 </form>
             </div>
@@ -96,11 +96,11 @@ export const OfferMessage: React.FC<{
     const showActions = isRecipient && status === 'pending';
     
     const statusInfo = {
-        pending: { text: "Pending", color: "bg-yellow-100 text-yellow-800 dark:bg-yellow-900/50 dark:text-yellow-300 border-yellow-500" },
-        accepted: { text: "Accepted", color: "bg-green-100 text-green-800 dark:bg-green-900/50 dark:text-green-300 border-green-500" },
-        rejected: { text: "Rejected", color: "bg-red-100 text-red-800 dark:bg-red-900/50 dark:text-red-300 border-red-500" },
-        countered: { text: "Countered", color: "bg-gray-200 text-gray-800 dark:bg-gray-700 dark:text-gray-300 border-gray-500" },
-        confirmed: { text: "Confirmed", color: "bg-green-100 text-green-800 dark:bg-green-900/50 dark:text-green-300 border-green-500" },
+        pending: { text: "Pending", color: "bg-brand-gold-light text-brand-slate dark:bg-brand-gold/50 dark:text-brand-slate border-brand-gold" },
+        accepted: { text: "Accepted", color: "bg-brand-teal-light text-brand-teal dark:bg-brand-teal/50 dark:text-brand-teal border-brand-teal" },
+        rejected: { text: "Rejected", color: "bg-brand-teal-light text-brand-teal dark:bg-brand-teal/50 dark:text-brand-teal border-brand-teal" },
+        countered: { text: "Countered", color: "bg-brand-cream-dark text-brand-slate dark:bg-brand-cream dark:text-brand-slate border-gray-500" },
+        confirmed: { text: "Confirmed", color: "bg-brand-teal-light text-brand-teal dark:bg-brand-teal/50 dark:text-brand-teal border-brand-teal" },
     };
 
     const handleCounterSubmit = (price: number) => {
@@ -127,10 +127,10 @@ export const OfferMessage: React.FC<{
                 </div>
                 {showActions && (
                     <div className="mt-3 pt-3 border-t border-brand-gray-200 dark:border-brand-gray-600 flex gap-2">
-                        <button onClick={() => onRespond(msg.id, 'accepted')} className="flex-1 text-sm bg-green-500 text-white font-bold py-1.5 px-3 rounded-md hover:bg-green-600 transition-colors">Accept</button>
-                        <button onClick={() => onRespond(msg.id, 'rejected')} className="flex-1 text-sm bg-red-500 text-white font-bold py-1.5 px-3 rounded-md hover:bg-red-600 transition-colors">Reject</button>
+                        <button onClick={() => onRespond(msg.id, 'accepted')} className="flex-1 text-sm bg-brand-teal-light0 text-brand-cream font-bold py-1.5 px-3 rounded-md hover:bg-brand-teal transition-colors">Accept</button>
+                        <button onClick={() => onRespond(msg.id, 'rejected')} className="flex-1 text-sm bg-brand-teal-light0 text-brand-cream font-bold py-1.5 px-3 rounded-md hover:bg-brand-teal transition-colors">Reject</button>
                         {currentUserRole === 'seller' && (
-                            <button onClick={() => setIsCounterModalOpen(true)} className="flex-1 text-sm bg-gray-600 text-white font-bold py-1.5 px-3 rounded-md hover:bg-gray-700 transition-colors">Counter</button>
+                            <button onClick={() => setIsCounterModalOpen(true)} className="flex-1 text-sm bg-brand-cream text-brand-cream font-bold py-1.5 px-3 rounded-md hover:bg-brand-cream transition-colors">Counter</button>
                         )}
                     </div>
                 )}

@@ -74,9 +74,9 @@ const SocialShareButtons: React.FC<SocialShareButtonsProps> = ({ vehicle }) => {
         <div className="mt-6 pt-6 border-t border-brand-gray-200 dark:border-brand-gray-700">
             <h4 className="text-sm font-semibold text-center text-brand-gray-600 dark:text-brand-gray-400 mb-3">Share this listing</h4>
             <div className="flex justify-center items-center gap-3">
-                <button onClick={() => handleShare('facebook')} aria-label="Share on Facebook" className="p-2 rounded-full text-white transition-colors" style={{ background: 'var(--brand-deep-red)' }} onMouseEnter={(e) => e.currentTarget.style.background = 'var(--brand-deep-red-hover)'} onMouseLeave={(e) => e.currentTarget.style.background = 'var(--brand-deep-red)'}>{ICONS.facebook}</button>
-                <button onClick={() => handleShare('twitter')} aria-label="Share on Twitter" className="p-2 rounded-full bg-sky-500 text-white hover:bg-sky-600 transition-colors">{ICONS.twitter}</button>
-                <button onClick={() => handleShare('whatsapp')} aria-label="Share on WhatsApp" className="p-2 rounded-full bg-green-500 text-white hover:bg-green-600 transition-colors">{ICONS.whatsapp}</button>
+                <button onClick={() => handleShare('facebook')} aria-label="Share on Facebook" className="p-2 rounded-full text-brand-cream transition-colors" style={{ background: 'var(--brand-teal)' }} onMouseEnter={(e) => e.currentTarget.style.background = 'var(--brand-teal-hover)'} onMouseLeave={(e) => e.currentTarget.style.background = 'var(--brand-teal)'}>{ICONS.facebook}</button>
+                <button onClick={() => handleShare('twitter')} aria-label="Share on Twitter" className="p-2 rounded-full bg-sky-500 text-brand-cream hover:bg-sky-600 transition-colors">{ICONS.twitter}</button>
+                <button onClick={() => handleShare('whatsapp')} aria-label="Share on WhatsApp" className="p-2 rounded-full bg-brand-teal-light0 text-brand-cream hover:bg-brand-teal transition-colors">{ICONS.whatsapp}</button>
                 <button 
                     onClick={handleCopyLink} 
                     className="flex items-center gap-2 text-sm font-semibold bg-brand-gray-200 dark:bg-brand-gray-700 text-brand-gray-800 dark:text-brand-gray-200 px-3 py-2 rounded-full hover:bg-brand-gray-300 dark:hover:bg-brand-gray-600 transition-colors"
@@ -93,7 +93,7 @@ const CollapsibleSection: React.FC<{ title: string; children: React.ReactNode; d
     const [isOpen, setIsOpen] = useState(defaultOpen);
 
     return (
-        <div className="bg-white dark:bg-brand-gray-800 rounded-xl shadow-soft overflow-hidden">
+        <div className="bg-brand-cream dark:bg-brand-gray-800 rounded-xl shadow-soft overflow-hidden">
             <button
                 onClick={() => setIsOpen(!isOpen)}
                 className="w-full flex justify-between items-center text-left p-6"
@@ -118,7 +118,7 @@ const CollapsibleSection: React.FC<{ title: string; children: React.ReactNode; d
 
 const KeySpec: React.FC<{ label: string; value: string | number; icon?: React.ReactNode }> = memo(({ label, value, icon }) => (
     <div className="flex flex-col gap-1 p-4 bg-brand-gray-100 dark:bg-brand-gray-800 rounded-lg text-center">
-        {icon && <div className="mx-auto mb-1" style={{ color: 'var(--brand-orange)' }}>{icon}</div>}
+        {icon && <div className="mx-auto mb-1" style={{ color: 'var(--brand-gold)' }}>{icon}</div>}
         <span className="text-sm font-medium text-brand-gray-600 dark:text-brand-gray-400">{label}</span>
         <span className="font-bold text-brand-gray-900 dark:text-brand-gray-100">{value}</span>
     </div>
@@ -135,7 +135,7 @@ const SpecDetail: React.FC<{ label: string; value: string | number | undefined }
 const DocumentChip: React.FC<{ doc: VehicleDocument }> = ({ doc }) => {
     return (
         <a href={doc.url} target="_blank" rel="noopener noreferrer" title={`View ${doc.fileName}`}
-           className="flex items-center gap-2 bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200 px-3 py-1.5 rounded-full text-sm font-medium hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors">
+           className="flex items-center gap-2 bg-brand-cream dark:bg-brand-cream text-brand-slate dark:text-brand-slate px-3 py-1.5 rounded-full text-sm font-medium hover:bg-brand-cream-dark dark:hover:bg-brand-cream transition-colors">
             <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
               <path fillRule="evenodd" d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2-2H6a2 2 0 01-2-2V4zm2 6a1 1 0 011-1h6a1 1 0 110 2H7a1 1 0 01-1-1zm1 3a1 1 0 100 2h6a1 1 0 100-2H7z" clipRule="evenodd" />
             </svg>
@@ -146,14 +146,14 @@ const DocumentChip: React.FC<{ doc: VehicleDocument }> = ({ doc }) => {
 
 const CertifiedInspectionReport: React.FC<{ report: CertifiedInspection }> = ({ report }) => {
     const scoreColor = (score: number) => {
-        if (score >= 90) return 'bg-green-500';
-        if (score >= 75) return 'bg-yellow-500';
-        return 'bg-red-500';
+        if (score >= 90) return 'bg-brand-teal-light0';
+        if (score >= 75) return 'bg-brand-gold-light0';
+        return 'bg-brand-teal-light0';
     };
     return (
         <div className="p-6">
             <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center border-b dark:border-gray-700 pb-4 mb-4">
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-12 w-12 text-green-500 flex-shrink-0" viewBox="0 0 20 20" fill="currentColor">
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-12 w-12 text-brand-teal flex-shrink-0" viewBox="0 0 20 20" fill="currentColor">
                     <path fillRule="evenodd" d="M6.267 3.455a3.066 3.066 0 001.745-.723 3.066 3.066 0 013.976 0 3.066 3.066 0 001.745.723 3.066 3.066 0 012.812 2.812c.051.643.304 1.254.723 1.745a3.066 3.066 0 010 3.976 3.066 3.066 0 00-.723 1.745 3.066 3.066 0 01-2.812 2.812 3.066 3.066 0 00-1.745.723 3.066 3.066 0 01-3.976 0 3.066 3.066 0 00-1.745-.723 3.066 3.066 0 01-2.812-2.812 3.066 3.066 0 00-.723-1.745 3.066 3.066 0 010-3.976 3.066 3.066 0 00.723-1.745 3.066 3.066 0 012.812-2.812zm7.44-1.22a.75.75 0 00-1.06 0L8.172 6.172a.75.75 0 00-1.06 1.06L8.94 9.332a.75.75 0 001.191.04l3.22-4.294a.75.75 0 00-.04-1.19z" clipRule="evenodd" />
                 </svg>
                 <div>
@@ -246,7 +246,7 @@ export const VehicleDetail: React.FC<VehicleDetailProps> = ({ vehicle, onBack: o
     <>
       <div className="bg-brand-gray-50 dark:bg-brand-gray-dark animate-fade-in">
           <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
-              <button onClick={onBackToHome} className="mb-6 bg-white dark:bg-brand-gray-800 text-brand-gray-700 dark:text-brand-gray-200 font-bold py-2 px-4 rounded-lg hover:bg-brand-gray-100 dark:hover:bg-brand-gray-700 transition-colors shadow-soft">
+              <button onClick={onBackToHome} className="mb-6 bg-brand-cream dark:bg-brand-gray-800 text-brand-gray-700 dark:text-brand-gray-200 font-bold py-2 px-4 rounded-lg hover:bg-brand-gray-100 dark:hover:bg-brand-gray-700 transition-colors shadow-soft">
                 &larr; Back to Listings
               </button>
               
@@ -259,7 +259,7 @@ export const VehicleDetail: React.FC<VehicleDetailProps> = ({ vehicle, onBack: o
                     </span>
                   </div>
                   {vehicle.certifiedInspection && (
-                      <span className="bg-green-100 text-green-800 text-xs font-bold px-3 py-1 rounded-full flex items-center gap-1">
+                      <span className="bg-brand-teal-light text-brand-teal text-xs font-bold px-3 py-1 rounded-full flex items-center gap-1">
                           <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor"><path fillRule="evenodd" d="M6.267 3.455a3.066 3.066 0 001.745-.723 3.066 3.066 0 013.976 0 3.066 3.066 0 001.745.723 3.066 3.066 0 012.812 2.812c.051.643.304 1.254.723 1.745a3.066 3.066 0 010 3.976 3.066 3.066 0 00-.723 1.745 3.066 3.066 0 01-2.812 2.812 3.066 3.066 0 00-1.745.723 3.066 3.066 0 01-3.976 0 3.066 3.066 0 00-1.745-.723 3.066 3.066 0 01-2.812-2.812 3.066 3.066 0 00-.723-1.745 3.066 3.066 0 010-3.976 3.066 3.066 0 00.723-1.745 3.066 3.066 0 012.812-2.812zm7.44-1.22a.75.75 0 00-1.06 0L8.172 6.172a.75.75 0 00-1.06 1.06L8.94 9.332a.75.75 0 001.191.04l3.22-4.294a.75.75 0 00-.04-1.19z" clipRule="evenodd" /></svg>
                           Certified
                       </span>
@@ -271,8 +271,8 @@ export const VehicleDetail: React.FC<VehicleDetailProps> = ({ vehicle, onBack: o
                   <div className="lg:col-span-2 space-y-4">
                     {vehicle.videoUrl && (
                       <div className="flex space-x-2 border-b-2 border-brand-gray-200 dark:border-brand-gray-700">
-                        <button onClick={() => setActiveMediaTab('images')} className={`py-2 px-4 font-semibold ${activeMediaTab === 'images' ? 'border-b-2' : 'text-brand-gray-500'}`} style={activeMediaTab === 'images' ? { borderColor: 'var(--brand-deep-red)', color: 'var(--brand-deep-red)' } : undefined}>Images</button>
-                        <button onClick={() => setActiveMediaTab('video')} className={`py-2 px-4 font-semibold ${activeMediaTab === 'video' ? 'border-b-2' : 'text-brand-gray-500'}`} style={activeMediaTab === 'video' ? { borderColor: 'var(--brand-deep-red)', color: 'var(--brand-deep-red)' } : undefined}>Video</button>
+                        <button onClick={() => setActiveMediaTab('images')} className={`py-2 px-4 font-semibold ${activeMediaTab === 'images' ? 'border-b-2' : 'text-brand-gray-500'}`} style={activeMediaTab === 'images' ? { borderColor: 'var(--brand-teal)', color: 'var(--brand-teal)' } : undefined}>Images</button>
+                        <button onClick={() => setActiveMediaTab('video')} className={`py-2 px-4 font-semibold ${activeMediaTab === 'video' ? 'border-b-2' : 'text-brand-gray-500'}`} style={activeMediaTab === 'video' ? { borderColor: 'var(--brand-teal)', color: 'var(--brand-teal)' } : undefined}>Video</button>
                       </div>
                     )}
                     {activeMediaTab === 'images' ? (
@@ -281,15 +281,15 @@ export const VehicleDetail: React.FC<VehicleDetailProps> = ({ vehicle, onBack: o
                             <img key={currentIndex} className="w-full h-auto object-cover rounded-xl shadow-soft-xl animate-fade-in" src={vehicle.images[currentIndex]} alt={`${vehicle.make} ${vehicle.model} image ${currentIndex + 1}`} />
                             {vehicle.images.length > 1 && (
                                 <>
-                                    <button onClick={handlePrevImage} className="absolute top-1/2 left-4 -translate-y-1/2 bg-black/40 text-white p-2 rounded-full opacity-0 group-hover:opacity-100 transition-opacity focus:opacity-100" aria-label="Previous image"><svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" /></svg></button>
-                                    <button onClick={handleNextImage} className="absolute top-1/2 right-4 -translate-y-1/2 bg-black/40 text-white p-2 rounded-full opacity-0 group-hover:opacity-100 transition-opacity focus:opacity-100" aria-label="Next image"><svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" /></svg></button>
+                                    <button onClick={handlePrevImage} className="absolute top-1/2 left-4 -translate-y-1/2 bg-black/40 text-brand-cream p-2 rounded-full opacity-0 group-hover:opacity-100 transition-opacity focus:opacity-100" aria-label="Previous image"><svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" /></svg></button>
+                                    <button onClick={handleNextImage} className="absolute top-1/2 right-4 -translate-y-1/2 bg-black/40 text-brand-cream p-2 rounded-full opacity-0 group-hover:opacity-100 transition-opacity focus:opacity-100" aria-label="Next image"><svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" /></svg></button>
                                 </>
                             )}
                         </div>
                         {vehicle.images.length > 1 && (
                             <div className="flex space-x-2 overflow-x-auto pb-2 -mt-2">
                                 {vehicle.images.map((img, index) => (
-                                    <img key={index} src={img} alt={`Thumbnail ${index + 1}`} className={`cursor-pointer rounded-md border-2 h-20 w-28 object-cover flex-shrink-0 ${currentIndex === index ? '' : 'border-transparent'} transition`} style={currentIndex === index ? { borderColor: 'var(--brand-deep-red)' } : undefined} onMouseEnter={(e) => currentIndex !== index && (e.currentTarget.style.borderColor = 'var(--brand-rose-pink)')} onMouseLeave={(e) => currentIndex !== index && (e.currentTarget.style.borderColor = '')} onClick={() => setCurrentIndex(index)} />
+                                    <img key={index} src={img} alt={`Thumbnail ${index + 1}`} className={`cursor-pointer rounded-md border-2 h-20 w-28 object-cover flex-shrink-0 ${currentIndex === index ? '' : 'border-transparent'} transition`} style={currentIndex === index ? { borderColor: 'var(--brand-teal)' } : undefined} onMouseEnter={(e) => currentIndex !== index && (e.currentTarget.style.borderColor = 'var(--brand-gold)')} onMouseLeave={(e) => currentIndex !== index && (e.currentTarget.style.borderColor = '')} onClick={() => setCurrentIndex(index)} />
                                 ))}
                             </div>
                         )}
@@ -303,22 +303,22 @@ export const VehicleDetail: React.FC<VehicleDetailProps> = ({ vehicle, onBack: o
                   
                   {/* Right Column: Price and Actions */}
                   <div className="space-y-6 self-start lg:sticky top-24">
-                      <div className="p-6 bg-white dark:bg-brand-gray-800 rounded-xl shadow-soft-lg space-y-4">
-                           <p className="text-4xl font-extrabold" style={{ color: 'var(--brand-deep-red)' }}>₹{vehicle.price.toLocaleString('en-IN')}</p>
-                           <button onClick={() => onStartChat(vehicle)} className="w-full btn-brand-primary text-white font-bold py-3 px-6 rounded-lg text-lg transition-all transform hover:scale-105">
+                      <div className="p-6 bg-brand-cream dark:bg-brand-gray-800 rounded-xl shadow-soft-lg space-y-4">
+                           <p className="text-4xl font-extrabold" style={{ color: 'var(--brand-teal)' }}>₹{vehicle.price.toLocaleString('en-IN')}</p>
+                           <button onClick={() => onStartChat(vehicle)} className="w-full btn-brand-primary text-brand-cream font-bold py-3 px-6 rounded-lg text-lg transition-all transform hover:scale-105">
                                 Chat with Seller
                             </button>
                             <div className="flex gap-4">
                                <button
                                   onClick={() => onToggleCompare(vehicle.id)}
                                   disabled={isCompareDisabled}
-                                  className={`w-full font-bold py-3 px-4 rounded-lg text-lg transition-all flex items-center justify-center gap-2 ${isComparing ? 'bg-indigo-100 text-indigo-600' : 'bg-brand-gray-200 dark:bg-brand-gray-700'} ${isCompareDisabled ? 'opacity-50 cursor-not-allowed' : ''}`}
+                                  className={`w-full font-bold py-3 px-4 rounded-lg text-lg transition-all flex items-center justify-center gap-2 ${isComparing ? 'bg-brand-teal text-brand-teal' : 'bg-brand-gray-200 dark:bg-brand-gray-700'} ${isCompareDisabled ? 'opacity-50 cursor-not-allowed' : ''}`}
                                 >
                                   {isComparing ? 'Comparing' : 'Compare'}
                               </button>
                                <button
                                   onClick={() => onToggleWishlist(vehicle.id)}
-                                  className={`w-full font-bold py-3 px-4 rounded-lg text-lg transition-all flex items-center justify-center gap-2 ${isInWishlist ? 'bg-pink-100 text-pink-600' : 'bg-brand-gray-200 dark:bg-brand-gray-700'}`}
+                                  className={`w-full font-bold py-3 px-4 rounded-lg text-lg transition-all flex items-center justify-center gap-2 ${isInWishlist ? 'bg-brand-gold text-brand-teal' : 'bg-brand-gray-200 dark:bg-brand-gray-700'}`}
                                 >
                                   <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" viewBox="0 0 20 20" fill="currentColor"><path fillRule="evenodd" d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z" clipRule="evenodd" /></svg>
                                   {isInWishlist ? 'Saved' : 'Save'}
@@ -327,7 +327,7 @@ export const VehicleDetail: React.FC<VehicleDetailProps> = ({ vehicle, onBack: o
                             <SocialShareButtons vehicle={vehicle} />
                       </div>
                       
-                      {seller && <div className="p-6 bg-white dark:bg-brand-gray-800 rounded-xl shadow-soft">
+                      {seller && <div className="p-6 bg-brand-cream dark:bg-brand-gray-800 rounded-xl shadow-soft">
                             <h3 className="text-lg font-semibold text-brand-gray-800 dark:text-brand-gray-100 mb-3">Seller Information</h3>
                             <div className="flex items-center gap-4">
                                 <img src={seller.logoUrl || `https://i.pravatar.cc/100?u=${seller.email}`} alt="Seller Logo" className="w-16 h-16 rounded-full object-cover" />
@@ -340,13 +340,13 @@ export const VehicleDetail: React.FC<VehicleDetailProps> = ({ vehicle, onBack: o
                                     <BadgeDisplay badges={seller.badges || []} size="sm" />
                                 </div>
                             </div>
-                            <button onClick={() => onViewSellerProfile(seller.email)} className="mt-4 w-full text-center text-sm font-bold hover:underline transition-colors" style={{ color: 'var(--brand-deep-red)' }} onMouseEnter={(e) => e.currentTarget.style.color = 'var(--brand-orange)'} onMouseLeave={(e) => e.currentTarget.style.color = 'var(--brand-deep-red)'}>View Seller Profile</button>
+                            <button onClick={() => onViewSellerProfile(seller.email)} className="mt-4 w-full text-center text-sm font-bold hover:underline transition-colors" style={{ color: 'var(--brand-teal)' }} onMouseEnter={(e) => e.currentTarget.style.color = 'var(--brand-gold)'} onMouseLeave={(e) => e.currentTarget.style.color = 'var(--brand-teal)'}>View Seller Profile</button>
                             {canRate && <div className="mt-4 pt-4 border-t dark:border-gray-700">
                                 <p className="text-sm font-medium text-center text-brand-gray-600 dark:text-brand-gray-400 mb-2">Rate your experience with this seller</p>
                                 <div className="flex justify-center">
                                   <StarRating rating={0} onRate={handleRateSeller} />
                                 </div>
-                                {showSellerRatingSuccess && <p className="text-center text-green-600 text-sm mt-2">Thanks for your feedback!</p>}
+                                {showSellerRatingSuccess && <p className="text-center text-brand-teal text-sm mt-2">Thanks for your feedback!</p>}
                             </div>}
                       </div>}
                       
@@ -397,7 +397,7 @@ export const VehicleDetail: React.FC<VehicleDetailProps> = ({ vehicle, onBack: o
                                     <div className="flex flex-wrap gap-3">
                                         {vehicle.features.map(feature => (
                                           <div key={feature} className="flex items-center gap-2 text-brand-gray-700 dark:text-brand-gray-300 bg-brand-gray-100 dark:bg-brand-gray-700 px-3 py-1 rounded-full text-sm">
-                                            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-green-500" viewBox="0 0 20 20" fill="currentColor"><path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" /></svg>
+                                            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-brand-teal" viewBox="0 0 20 20" fill="currentColor"><path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" /></svg>
                                             {feature}
                                           </div>
                                         ))}
@@ -407,20 +407,20 @@ export const VehicleDetail: React.FC<VehicleDetailProps> = ({ vehicle, onBack: o
                              <div>
                                 <h4 className="text-lg font-semibold text-brand-gray-800 dark:text-brand-gray-100 mb-4">AI Expert Analysis</h4>
                                 {isGeneratingProsCons ? (
-                                    <div className="flex items-center gap-2 text-brand-gray-500"><div className="w-5 h-5 border-2 border-dashed rounded-full animate-spin" style={{ borderColor: 'var(--brand-deep-red)' }}></div> Generating...</div>
+                                    <div className="flex items-center gap-2 text-brand-gray-500"><div className="w-5 h-5 border-2 border-dashed rounded-full animate-spin" style={{ borderColor: 'var(--brand-teal)' }}></div> Generating...</div>
                                 ) : prosAndCons ? (
                                     <div className="grid grid-cols-2 gap-4">
                                         <div>
-                                            <h5 className="font-semibold text-green-600 mb-2">Pros</h5>
+                                            <h5 className="font-semibold text-brand-teal mb-2">Pros</h5>
                                             <ul className="list-disc list-inside space-y-1 text-sm">{prosAndCons.pros.map((p, i) => <li key={i}>{p}</li>)}</ul>
                                         </div>
                                         <div>
-                                            <h5 className="font-semibold text-red-500 mb-2">Cons</h5>
+                                            <h5 className="font-semibold text-brand-teal mb-2">Cons</h5>
                                             <ul className="list-disc list-inside space-y-1 text-sm">{prosAndCons.cons.map((c, i) => <li key={i}>{c}</li>)}</ul>
                                         </div>
                                     </div>
                                 ) : (
-                                    <button onClick={handleGenerateProsCons} className="text-sm font-bold hover:underline transition-colors" style={{ color: 'var(--brand-deep-red)' }} onMouseEnter={(e) => e.currentTarget.style.color = 'var(--brand-orange)'} onMouseLeave={(e) => e.currentTarget.style.color = 'var(--brand-deep-red)'}>Generate Pros & Cons</button>
+                                    <button onClick={handleGenerateProsCons} className="text-sm font-bold hover:underline transition-colors" style={{ color: 'var(--brand-teal)' }} onMouseEnter={(e) => e.currentTarget.style.color = 'var(--brand-gold)'} onMouseLeave={(e) => e.currentTarget.style.color = 'var(--brand-teal)'}>Generate Pros & Cons</button>
                                 )}
                             </div>
                         </div>
@@ -448,7 +448,7 @@ export const VehicleDetail: React.FC<VehicleDetailProps> = ({ vehicle, onBack: o
                </div>
 
               <div className="text-center mt-12">
-                  <button onClick={handleFlagClick} className="text-xs text-brand-gray-500 hover:text-red-500">Report this listing</button>
+                  <button onClick={handleFlagClick} className="text-xs text-brand-gray-500 hover:text-brand-teal">Report this listing</button>
               </div>
 
               {filteredRecommendations.length > 0 && <div className="mt-12">

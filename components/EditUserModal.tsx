@@ -38,28 +38,28 @@ const EditUserModal: React.FC<EditUserModalProps> = ({ user, onClose, onSave }) 
 
     return (
         <div className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50 p-4 animate-fade-in">
-            <div className="bg-white dark:bg-brand-gray-dark rounded-lg shadow-2xl w-full max-w-md">
+            <div className="bg-brand-cream dark:bg-brand-gray-dark rounded-lg shadow-2xl w-full max-w-md">
                 <form onSubmit={handleSubmit}>
                     <div className="p-6">
                         <div className="flex justify-between items-center mb-4">
-                           <h2 className="text-xl font-bold text-gray-800 dark:text-gray-100">Edit User: {user.name}</h2>
-                           <button type="button" onClick={onClose} className="text-gray-500 dark:text-gray-400 text-2xl hover:text-gray-800 dark:hover:text-gray-200">&times;</button>
+                           <h2 className="text-xl font-bold text-brand-slate dark:text-brand-slate">Edit User: {user.name}</h2>
+                           <button type="button" onClick={onClose} className="text-brand-slate dark:text-brand-slate text-2xl hover:text-brand-slate dark:hover:text-brand-slate">&times;</button>
                         </div>
                         <div className="space-y-4">
                              <div>
-                                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Email (Cannot be changed)</label>
-                                <input type="email" value={user.email} disabled className="mt-1 block w-full p-2 border rounded-md bg-gray-100 dark:bg-gray-800" />
+                                <label className="block text-sm font-medium text-brand-slate dark:text-brand-slate">Email (Cannot be changed)</label>
+                                <input type="email" value={user.email} disabled className="mt-1 block w-full p-2 border rounded-md bg-brand-cream dark:bg-brand-cream" />
                             </div>
                             <div>
-                                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Full Name</label>
+                                <label className="block text-sm font-medium text-brand-slate dark:text-brand-slate">Full Name</label>
                                 <input type="text" name="name" value={formData.name} onChange={handleChange} required className="mt-1 block w-full p-2 border rounded-md" />
                             </div>
                              <div>
-                                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Mobile Number</label>
+                                <label className="block text-sm font-medium text-brand-slate dark:text-brand-slate">Mobile Number</label>
                                 <input type="tel" name="mobile" value={formData.mobile} onChange={handleChange} required className="mt-1 block w-full p-2 border rounded-md" />
                             </div>
                             <div>
-                                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Role</label>
+                                <label className="block text-sm font-medium text-brand-slate dark:text-brand-slate">Role</label>
                                 <select name="role" value={formData.role} onChange={handleChange} className="mt-1 block w-full p-2 border rounded-md">
                                     <option value="customer">Customer</option>
                                     <option value="seller">Seller</option>
@@ -68,9 +68,9 @@ const EditUserModal: React.FC<EditUserModalProps> = ({ user, onClose, onSave }) 
                             </div>
                         </div>
                     </div>
-                    <div className="bg-gray-50 dark:bg-brand-gray-darker px-6 py-3 flex justify-end gap-4 rounded-b-lg">
-                        <button type="button" onClick={onClose} className="px-4 py-2 bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300">Cancel</button>
-                        <button type="submit" className="px-4 py-2 btn-brand-primary text-white rounded-md">Save Changes</button>
+                    <div className="bg-brand-cream dark:bg-brand-gray-darker px-6 py-3 flex justify-end gap-4 rounded-b-lg">
+                        <button type="button" onClick={onClose} className="px-4 py-2 bg-brand-cream-dark text-brand-slate rounded-md hover:bg-brand-cream">Cancel</button>
+                        <button type="submit" className="px-4 py-2 btn-brand-primary text-brand-cream rounded-md">Save Changes</button>
                     </div>
                 </form>
             </div>

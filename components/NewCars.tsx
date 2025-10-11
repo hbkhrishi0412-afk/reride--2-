@@ -13,7 +13,7 @@ const formatCurrency = (value: number) => {
 };
 
 const CarModelCardSkeleton: React.FC = () => (
-    <div className="bg-white dark:bg-brand-gray-800 rounded-xl shadow-soft p-4 animate-pulse">
+    <div className="bg-brand-cream dark:bg-brand-gray-800 rounded-xl shadow-soft p-4 animate-pulse">
         <div className="flex gap-4">
             <div className="w-32 h-24 bg-brand-gray-200 dark:bg-brand-gray-700 rounded-lg flex-shrink-0"></div>
             <div className="flex-grow space-y-3">
@@ -33,11 +33,11 @@ const SpecItem: React.FC<{ icon: React.ReactNode; text: string | number }> = ({ 
 );
 
 const CarModelCard: React.FC<{ car: NewCarModel; isExpanded: boolean; onToggle: (id: number) => void; selectedState: string; onViewSpecs: (car: NewCarModel, variant: NewCarVariant) => void; }> = ({ car, isExpanded, onToggle, selectedState, onViewSpecs }) => (
-    <div className="bg-white dark:bg-brand-gray-800 rounded-xl shadow-soft transition-all duration-300 hover:-translate-y-1 hover:shadow-soft-lg">
+    <div className="bg-brand-cream dark:bg-brand-gray-800 rounded-xl shadow-soft transition-all duration-300 hover:-translate-y-1 hover:shadow-soft-lg">
         <button
             onClick={() => onToggle(car.id)}
             aria-expanded={isExpanded}
-            className="w-full p-4 text-left flex items-center gap-4 focus:outline-none rounded-xl" onFocus={(e) => e.currentTarget.style.boxShadow = '0 0 0 2px var(--brand-deep-red-light)'} onBlur={(e) => e.currentTarget.style.boxShadow = ''}
+            className="w-full p-4 text-left flex items-center gap-4 focus:outline-none rounded-xl" onFocus={(e) => e.currentTarget.style.boxShadow = '0 0 0 2px var(--brand-teal-light)'} onBlur={(e) => e.currentTarget.style.boxShadow = ''}
         >
             <div className="w-32 h-24 bg-brand-gray-100 dark:bg-brand-gray-700 rounded-lg flex-shrink-0 p-1">
                  <img src={car.image_url} alt={`${car.brand_name} ${car.model_name}`} className="w-full h-full object-contain" />
@@ -52,7 +52,7 @@ const CarModelCard: React.FC<{ car: NewCarModel; isExpanded: boolean; onToggle: 
                     <SpecItem icon={<svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor"><path fillRule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clipRule="evenodd" /></svg>} text={`${car.key_specs.seating_capacity} Seater`} />
                 </div>
                 
-                <p className="text-lg font-semibold mt-2" style={{ color: 'var(--brand-deep-red)' }}>
+                <p className="text-lg font-semibold mt-2" style={{ color: 'var(--brand-teal)' }}>
                     Starts at {formatCurrency(Math.min(...car.variants.map(v => v.on_road_prices[selectedState] || Infinity)))}
                 </p>
             </div>
@@ -73,13 +73,13 @@ const CarModelCard: React.FC<{ car: NewCarModel; isExpanded: boolean; onToggle: 
                                 <th className="px-4 py-2 text-left text-xs font-medium text-brand-gray-500 dark:text-brand-gray-300 uppercase">Actions</th>
                             </tr>
                         </thead>
-                        <tbody className="bg-white dark:bg-brand-gray-800 divide-y divide-brand-gray-200 dark:divide-brand-gray-700">
+                        <tbody className="bg-brand-cream dark:bg-brand-gray-800 divide-y divide-brand-gray-200 dark:divide-brand-gray-700">
                             {car.variants.map(variant => (
                                 <tr key={variant.variant_name}>
                                     <td className="px-4 py-3 whitespace-nowrap text-sm font-medium text-brand-gray-900 dark:text-brand-gray-100">{variant.variant_name} ({variant.transmission})</td>
                                     <td className="px-4 py-3 whitespace-nowrap text-sm font-semibold text-brand-gray-800 dark:text-brand-gray-200">{formatCurrency(variant.on_road_prices[selectedState])}</td>
                                     <td className="px-4 py-3 whitespace-nowrap text-sm">
-                                        <button onClick={() => onViewSpecs(car, variant)} className="font-semibold hover:underline transition-colors" style={{ color: 'var(--brand-deep-red)' }} onMouseEnter={(e) => e.currentTarget.style.color = 'var(--brand-orange)'} onMouseLeave={(e) => e.currentTarget.style.color = 'var(--brand-deep-red)'}>
+                                        <button onClick={() => onViewSpecs(car, variant)} className="font-semibold hover:underline transition-colors" style={{ color: 'var(--brand-teal)' }} onMouseEnter={(e) => e.currentTarget.style.color = 'var(--brand-gold)'} onMouseLeave={(e) => e.currentTarget.style.color = 'var(--brand-teal)'}>
                                             View Full Specs
                                         </button>
                                     </td>
@@ -96,7 +96,7 @@ const CarModelCard: React.FC<{ car: NewCarModel; isExpanded: boolean; onToggle: 
 const FilterSelect: React.FC<{ label: string; value: string; onChange: (e: React.ChangeEvent<HTMLSelectElement>) => void; children: React.ReactNode, disabled?: boolean }> = ({ label, value, onChange, children, disabled = false }) => (
     <div>
         <label className="block text-sm font-medium text-brand-gray-700 dark:text-brand-gray-300 mb-1">{label}</label>
-        <select value={value} onChange={onChange} disabled={disabled} className="w-full p-3 border border-brand-gray-300 dark:border-brand-gray-600 rounded-lg focus:outline-none bg-white dark:bg-brand-gray-700 text-brand-gray-800 dark:text-brand-gray-200 disabled:opacity-50 disabled:cursor-not-allowed" onFocus={(e) => !disabled && (e.currentTarget.style.boxShadow = '0 0 0 2px var(--brand-deep-red-light)')} onBlur={(e) => e.currentTarget.style.boxShadow = ''}>
+        <select value={value} onChange={onChange} disabled={disabled} className="w-full p-3 border border-brand-gray-300 dark:border-brand-gray-600 rounded-lg focus:outline-none bg-brand-cream dark:bg-brand-gray-700 text-brand-gray-800 dark:text-brand-gray-200 disabled:opacity-50 disabled:cursor-not-allowed" onFocus={(e) => !disabled && (e.currentTarget.style.boxShadow = '0 0 0 2px var(--brand-teal-light)')} onBlur={(e) => e.currentTarget.style.boxShadow = ''}>
             {children}
         </select>
     </div>
@@ -267,7 +267,7 @@ const NewCars: React.FC = () => {
             <div className="grid grid-cols-1 lg:grid-cols-[300px_1fr] gap-8">
                 {/* Sidebar */}
                 <aside className="hidden lg:block self-start sticky top-24">
-                    <div className="bg-white dark:bg-brand-gray-800 p-6 rounded-xl shadow-soft-lg space-y-4">
+                    <div className="bg-brand-cream dark:bg-brand-gray-800 p-6 rounded-xl shadow-soft-lg space-y-4">
                         <h2 className="text-xl font-bold text-brand-gray-800 dark:text-brand-gray-100">Filters</h2>
                         {renderFilterControls(false)}
                         <button onClick={handleClearFilters} className="w-full mt-2 bg-brand-gray-200 dark:bg-brand-gray-700 text-brand-gray-800 dark:text-brand-gray-200 font-bold py-3 px-4 rounded-lg hover:bg-brand-gray-300 dark:hover:bg-brand-gray-600 transition-colors">
@@ -283,10 +283,10 @@ const NewCars: React.FC = () => {
                         placeholder="Search by brand or model..."
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
-                        className="w-full p-4 border border-brand-gray-300 dark:border-brand-gray-600 rounded-xl focus:outline-none bg-white dark:bg-brand-gray-700 text-brand-gray-800 dark:text-brand-gray-200 text-lg" onFocus={(e) => { e.currentTarget.style.borderColor = 'var(--brand-deep-red)'; e.currentTarget.style.boxShadow = '0 0 0 2px var(--brand-deep-red-light)'; }} onBlur={(e) => { e.currentTarget.style.borderColor = ''; e.currentTarget.style.boxShadow = ''; }}
+                        className="w-full p-4 border border-brand-gray-300 dark:border-brand-gray-600 rounded-xl focus:outline-none bg-brand-cream dark:bg-brand-gray-700 text-brand-gray-800 dark:text-brand-gray-200 text-lg" onFocus={(e) => { e.currentTarget.style.borderColor = 'var(--brand-teal)'; e.currentTarget.style.boxShadow = '0 0 0 2px var(--brand-teal-light)'; }} onBlur={(e) => { e.currentTarget.style.borderColor = ''; e.currentTarget.style.boxShadow = ''; }}
                     />
                     <div className="flex justify-between items-center">
-                        <button onClick={handleOpenFilterModal} className="lg:hidden flex items-center gap-2 font-semibold px-4 py-2 rounded-lg" style={{ color: 'var(--brand-deep-red)', background: 'var(--brand-rose-pink-light)' }} onMouseEnter={(e) => e.currentTarget.style.background = 'var(--brand-rose-pink)'} onMouseLeave={(e) => e.currentTarget.style.background = 'var(--brand-rose-pink-light)'}>
+                        <button onClick={handleOpenFilterModal} className="lg:hidden flex items-center gap-2 font-semibold px-4 py-2 rounded-lg" style={{ color: 'var(--brand-teal)', background: 'var(--brand-gold-light)' }} onMouseEnter={(e) => e.currentTarget.style.background = 'var(--brand-gold)'} onMouseLeave={(e) => e.currentTarget.style.background = 'var(--brand-gold-light)'}>
                            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fillRule="evenodd" d="M3 3a1 1 0 011-1h12a1 1 0 011 1v3a1 1 0 01-.293.707L12 11.414V15a1 1 0 01-.293.707l-2 2A1 1 0 018 17v-5.586L3.293 6.707A1 1 0 013 6V3z" clipRule="evenodd" /></svg>
                             Filters
                         </button>
@@ -309,7 +309,7 @@ const NewCars: React.FC = () => {
                                 />
                             ))
                         ) : (
-                            <div className="xl:col-span-2 text-center py-16 bg-white dark:bg-brand-gray-800 rounded-xl shadow-soft">
+                            <div className="xl:col-span-2 text-center py-16 bg-brand-cream dark:bg-brand-gray-800 rounded-xl shadow-soft">
                                 <h3 className="text-2xl font-semibold text-brand-gray-700 dark:text-brand-gray-200">No Cars Found</h3>
                                 <p className="text-brand-gray-500 dark:text-brand-gray-400 mt-2">
                                     Try adjusting your filters or clearing them to see all available models.
@@ -324,7 +324,7 @@ const NewCars: React.FC = () => {
         {/* Mobile Filter Modal */}
         {isFilterModalOpen && (
             <div className="lg:hidden fixed inset-0 bg-black bg-opacity-60 z-50 animate-fade-in" onClick={() => setIsFilterModalOpen(false)}>
-                <div className="bg-white dark:bg-brand-gray-800 rounded-t-2xl h-[90vh] flex flex-col absolute bottom-0 left-0 right-0 animate-slide-in-up" onClick={e => e.stopPropagation()}>
+                <div className="bg-brand-cream dark:bg-brand-gray-800 rounded-t-2xl h-[90vh] flex flex-col absolute bottom-0 left-0 right-0 animate-slide-in-up" onClick={e => e.stopPropagation()}>
                     <div className="p-4 border-b border-brand-gray-200 dark:border-brand-gray-700 flex justify-between items-center flex-shrink-0">
                         <h2 className="text-xl font-bold text-brand-gray-800 dark:text-brand-gray-100">Filters</h2>
                         <button onClick={() => setIsFilterModalOpen(false)} className="p-2 -mr-2 text-brand-gray-500 text-2xl">&times;</button>
@@ -332,9 +332,9 @@ const NewCars: React.FC = () => {
                     <div className="overflow-y-auto p-6 flex-grow space-y-4">
                         {renderFilterControls(true)}
                     </div>
-                    <div className="p-4 border-t border-brand-gray-200 dark:border-brand-gray-700 flex gap-4 bg-white dark:bg-brand-gray-800 flex-shrink-0">
+                    <div className="p-4 border-t border-brand-gray-200 dark:border-brand-gray-700 flex gap-4 bg-brand-cream dark:bg-brand-gray-800 flex-shrink-0">
                         <button onClick={handleResetTempFilters} className="w-full bg-brand-gray-200 dark:bg-brand-gray-700 text-brand-gray-800 dark:text-brand-gray-200 font-bold py-3 px-4 rounded-lg hover:bg-brand-gray-300 dark:hover:bg-brand-gray-600 transition-colors">Reset</button>
-                        <button onClick={handleApplyFilters} className="w-full btn-brand-primary text-white font-bold py-3 px-4 rounded-lg transition-colors">Apply Filters</button>
+                        <button onClick={handleApplyFilters} className="w-full btn-brand-primary text-brand-cream font-bold py-3 px-4 rounded-lg transition-colors">Apply Filters</button>
                     </div>
                 </div>
             </div>

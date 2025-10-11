@@ -197,17 +197,17 @@ const LocationModal: React.FC<LocationModalProps> = ({ isOpen, onClose, currentL
 
     return (
         <div className="fixed inset-0 bg-black/60 z-[101] flex items-center justify-center p-4 animate-fade-in" onClick={onClose}>
-            <div className="bg-white dark:bg-brand-gray-800 rounded-xl shadow-2xl w-full max-w-md" onClick={e => e.stopPropagation()}>
+            <div className="bg-brand-cream dark:bg-brand-gray-800 rounded-xl shadow-2xl w-full max-w-md" onClick={e => e.stopPropagation()}>
                 <div className="p-6 border-b dark:border-gray-700">
-                    <h2 className="text-xl font-bold text-gray-800 dark:text-gray-100">Select Your Location</h2>
-                    <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">Prices and availability may vary based on your location.</p>
+                    <h2 className="text-xl font-bold text-brand-slate dark:text-brand-slate">Select Your Location</h2>
+                    <p className="text-sm text-brand-slate dark:text-brand-slate mt-1">Prices and availability may vary based on your location.</p>
                     {currentLocation && (
                         <div className="mt-3 flex items-center gap-2 text-sm">
-                            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" style={{ color: 'var(--brand-orange)' }}>
+                            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" style={{ color: 'var(--brand-gold)' }}>
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
                             </svg>
-                            <span className="text-gray-600 dark:text-gray-300">Current: <strong style={{ color: 'var(--brand-deep-red)' }}>{currentLocation}</strong></span>
+                            <span className="text-brand-slate dark:text-brand-slate">Current: <strong style={{ color: 'var(--brand-teal)' }}>{currentLocation}</strong></span>
                         </div>
                     )}
                 </div>
@@ -215,7 +215,7 @@ const LocationModal: React.FC<LocationModalProps> = ({ isOpen, onClose, currentL
                     <button
                         onClick={handleDetectLocation}
                         disabled={isDetecting}
-                        className="w-full flex items-center justify-center gap-2 font-bold py-3 px-4 rounded-lg transition-colors disabled:opacity-70 disabled:cursor-wait" style={{ background: 'var(--brand-rose-pink-light)', color: 'var(--brand-blackcurrant)' }} onMouseEnter={(e) => !isDetecting && (e.currentTarget.style.background = 'var(--brand-rose-pink)')} onMouseLeave={(e) => !isDetecting && (e.currentTarget.style.background = 'var(--brand-rose-pink-light)')}
+                        className="w-full flex items-center justify-center gap-2 font-bold py-3 px-4 rounded-lg transition-colors disabled:opacity-70 disabled:cursor-wait" style={{ background: 'var(--brand-gold-light)', color: 'var(--brand-slate)' }} onMouseEnter={(e) => !isDetecting && (e.currentTarget.style.background = 'var(--brand-gold)')} onMouseLeave={(e) => !isDetecting && (e.currentTarget.style.background = 'var(--brand-gold-light)')}
                     >
                         {isDetecting ? (
                             <>
@@ -230,34 +230,34 @@ const LocationModal: React.FC<LocationModalProps> = ({ isOpen, onClose, currentL
                         )}
                     </button>
 
-                    <div className="flex items-center text-xs text-gray-400">
+                    <div className="flex items-center text-xs text-brand-slate">
                         <span className="flex-grow border-t dark:border-gray-600"></span>
                         <span className="px-4">OR</span>
                         <span className="flex-grow border-t dark:border-gray-600"></span>
                     </div>
 
-                    <p className="text-sm font-semibold text-center text-gray-700 dark:text-gray-300">Select your location manually</p>
+                    <p className="text-sm font-semibold text-center text-brand-slate dark:text-brand-slate">Select your location manually</p>
 
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <div>
-                            <label htmlFor="state-select" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">State</label>
-                            <select id="state-select" value={selectedState} onChange={e => { setSelectedState(e.target.value); setSelectedCity(''); }} className="w-full p-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-brand-gray-700">
+                            <label htmlFor="state-select" className="block text-sm font-medium text-brand-slate dark:text-brand-slate mb-1">State</label>
+                            <select id="state-select" value={selectedState} onChange={e => { setSelectedState(e.target.value); setSelectedCity(''); }} className="w-full p-2 border border-brand-gold dark:border-gray-600 rounded-md bg-brand-cream dark:bg-brand-gray-700">
                                 <option value="" disabled>Select a state</option>
                                 {INDIAN_STATES.map(state => <option key={state.code} value={state.code}>{state.name}</option>)}
                             </select>
                         </div>
                         <div>
-                            <label htmlFor="city-select" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">City</label>
-                            <select id="city-select" value={selectedCity} onChange={e => setSelectedCity(e.target.value)} disabled={!selectedState || availableCities.length === 0} className="w-full p-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-brand-gray-700 disabled:bg-gray-100 dark:disabled:bg-gray-600">
+                            <label htmlFor="city-select" className="block text-sm font-medium text-brand-slate dark:text-brand-slate mb-1">City</label>
+                            <select id="city-select" value={selectedCity} onChange={e => setSelectedCity(e.target.value)} disabled={!selectedState || availableCities.length === 0} className="w-full p-2 border border-brand-gold dark:border-gray-600 rounded-md bg-brand-cream dark:bg-brand-gray-700 disabled:bg-brand-cream dark:disabled:bg-brand-cream">
                                 <option value="" disabled>Select a city</option>
                                 {availableCities.map(city => <option key={city} value={city}>{city}</option>)}
                             </select>
                         </div>
                     </div>
                 </div>
-                <div className="bg-gray-50 dark:bg-brand-gray-darker px-6 py-4 flex justify-end gap-4 rounded-b-xl">
-                    <button onClick={onClose} className="px-4 py-2 bg-gray-200 dark:bg-gray-600 text-gray-800 dark:text-gray-200 rounded-md hover:bg-gray-300 dark:hover:bg-gray-500">Cancel</button>
-                    <button onClick={handleManualSelect} disabled={!selectedCity} className="px-4 py-2 btn-brand-primary text-white rounded-md disabled:opacity-50">Set Location</button>
+                <div className="bg-brand-cream dark:bg-brand-gray-darker px-6 py-4 flex justify-end gap-4 rounded-b-xl">
+                    <button onClick={onClose} className="px-4 py-2 bg-brand-cream-dark dark:bg-brand-cream text-brand-slate dark:text-brand-slate rounded-md hover:bg-brand-cream dark:hover:bg-brand-cream0">Cancel</button>
+                    <button onClick={handleManualSelect} disabled={!selectedCity} className="px-4 py-2 btn-brand-primary text-brand-cream rounded-md disabled:opacity-50">Set Location</button>
                 </div>
             </div>
         </div>

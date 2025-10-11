@@ -16,7 +16,7 @@ const Star: React.FC<{
 }> = ({ filled, onClick, onMouseEnter, onMouseLeave, sizeClass }) => (
   <svg
     className={`stroke-current transition-colors duration-200 ${
-      filled ? 'text-yellow-400' : 'text-gray-300 dark:text-gray-600'
+      filled ? 'text-brand-slate' : 'text-brand-slate dark:text-brand-slate'
     } ${onClick ? 'cursor-pointer' : ''} ${sizeClass}`}
     fill={filled ? 'currentColor' : 'none'}
     viewBox="0 0 24 24"

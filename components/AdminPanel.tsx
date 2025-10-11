@@ -52,19 +52,19 @@ type SortConfig = {
 // --- Sub-components ---
 
 const StatCard: React.FC<{ title: string; value: string | number; icon: React.ReactNode, onClick?: () => void }> = ({ title, value, icon, onClick }) => (
-  <div className={`bg-white dark:bg-brand-gray-dark p-6 rounded-lg shadow-md flex items-center ${onClick ? 'cursor-pointer hover:shadow-lg hover:-translate-y-1 transition-transform' : ''}`} onClick={onClick}>
-    <div className="p-3 rounded-full mr-4" style={{ background: 'var(--brand-rose-pink-light)' }}>{icon}</div>
+  <div className={`bg-brand-cream dark:bg-brand-gray-dark p-6 rounded-lg shadow-md flex items-center ${onClick ? 'cursor-pointer hover:shadow-lg hover:-translate-y-1 transition-transform' : ''}`} onClick={onClick}>
+    <div className="p-3 rounded-full mr-4" style={{ background: 'var(--brand-gold-light)' }}>{icon}</div>
     <div>
-      <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400">{title}</h3>
-      <p className="text-2xl font-bold text-gray-900 dark:text-gray-100">{value}</p>
+      <h3 className="text-sm font-medium text-brand-slate dark:text-brand-slate">{title}</h3>
+      <p className="text-2xl font-bold text-brand-slate dark:text-brand-slate">{value}</p>
     </div>
   </div>
 );
 
 const TableContainer: React.FC<{ title: string; children: React.ReactNode; actions?: React.ReactNode }> = ({ title, children, actions }) => (
-    <div className="bg-white dark:bg-brand-gray-dark p-6 rounded-lg shadow-md">
+    <div className="bg-brand-cream dark:bg-brand-gray-dark p-6 rounded-lg shadow-md">
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 gap-4">
-            <h2 className="text-xl font-bold text-gray-800 dark:text-gray-100">{title}</h2>
+            <h2 className="text-xl font-bold text-brand-slate dark:text-brand-slate">{title}</h2>
             {actions && <div className="w-full sm:w-auto">{actions}</div>}
         </div>
         <div className="overflow-x-auto">
@@ -85,8 +85,8 @@ const SortableHeader: React.FC<{
     return (
         <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">
             <button onClick={() => requestSort(sortKey)} className="flex items-center gap-1.5 group">
-                <span className="group-hover:text-gray-800 dark:group-hover:text-gray-200">{title}</span>
-                <span className="text-gray-400">
+                <span className="group-hover:text-brand-slate dark:group-hover:text-brand-slate">{title}</span>
+                <span className="text-brand-slate">
                     {isSorted ? (direction === 'ascending' ? '▲' : '▼') : '↕'}
                 </span>
             </button>
@@ -97,16 +97,16 @@ const SortableHeader: React.FC<{
 const BarChart: React.FC<{ title: string; data: { label: string; value: number }[] }> = ({ title, data }) => {
     const maxValue = Math.max(...data.map(d => d.value), 1);
     return (
-        <div className="bg-white dark:bg-brand-gray-dark p-6 rounded-lg shadow-md">
-            <h3 className="text-lg font-bold text-gray-800 dark:text-gray-100 mb-4">{title}</h3>
+        <div className="bg-brand-cream dark:bg-brand-gray-dark p-6 rounded-lg shadow-md">
+            <h3 className="text-lg font-bold text-brand-slate dark:text-brand-slate mb-4">{title}</h3>
             <div className="space-y-4">
                 {data.map(({ label, value }) => (
                     <div key={label} className="grid grid-cols-[100px_1fr] items-center gap-4 text-sm">
-                        <span className="font-medium text-gray-600 dark:text-gray-300 truncate text-right">{label}</span>
+                        <span className="font-medium text-brand-slate dark:text-brand-slate truncate text-right">{label}</span>
                         <div className="flex items-center gap-2">
-                            <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-5">
+                            <div className="w-full bg-brand-cream-dark dark:bg-brand-cream rounded-full h-5">
                                 <div
-                                    className="h-5 rounded-full text-white text-xs flex items-center justify-end pr-2"
+                                    className="h-5 rounded-full text-brand-cream text-xs flex items-center justify-end pr-2"
                                     style={{ width: `${(value / maxValue) * 100}%`, background: 'var(--gradient-warm)' }}
                                 >
                                     {value}
@@ -141,7 +141,7 @@ const CertificationRequestsView: React.FC<{
         <TableContainer title={`Pending Certification Requests (${requests.length})`}>
             {requests.length > 0 ? (
                 <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
-                    <thead className="bg-gray-50 dark:bg-gray-800">
+                    <thead className="bg-brand-cream dark:bg-brand-cream">
                         <tr>
                             <th className="px-6 py-3 text-left text-xs font-medium uppercase">Vehicle</th>
                             <th className="px-6 py-3 text-left text-xs font-medium uppercase">Seller</th>
@@ -149,7 +149,7 @@ const CertificationRequestsView: React.FC<{
                             <th className="px-6 py-3 text-left text-xs font-medium uppercase">Actions</th>
                         </tr>
                     </thead>
-                    <tbody className="bg-white dark:bg-brand-gray-dark divide-y divide-gray-200 dark:divide-gray-700">
+                    <tbody className="bg-brand-cream dark:bg-brand-gray-dark divide-y divide-gray-200 dark:divide-gray-700">
                         {requests.map(v => {
                             const sellerInfo = getSellerInfo(v.sellerEmail);
                             return (
@@ -159,18 +159,18 @@ const CertificationRequestsView: React.FC<{
                                     <td className="px-6 py-4">
                                         <div>Plan: <span className="font-semibold">{sellerInfo.planName}</span></div>
                                         <div className="text-sm">Free Certs Used: {sellerInfo.usage}</div>
-                                        {!sellerInfo.hasFreeCredits && <div className="text-xs text-yellow-600">No free credits left</div>}
+                                        {!sellerInfo.hasFreeCredits && <div className="text-xs text-brand-slate">No free credits left</div>}
                                     </td>
                                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium space-x-3">
-                                        <button onClick={() => onCertificationApproval(v.id, 'approved')} className="text-green-600 hover:text-green-900">Approve</button>
-                                        <button onClick={() => onCertificationApproval(v.id, 'rejected')} className="text-red-600 hover:text-red-900">Reject</button>
+                                        <button onClick={() => onCertificationApproval(v.id, 'approved')} className="text-brand-teal hover:text-brand-teal">Approve</button>
+                                        <button onClick={() => onCertificationApproval(v.id, 'rejected')} className="text-brand-teal hover:text-brand-teal">Reject</button>
                                     </td>
                                 </tr>
                             );
                         })}
                     </tbody>
                 </table>
-            ) : <p className="text-center py-8 text-gray-500 dark:text-gray-400">No pending certification requests.</p>}
+            ) : <p className="text-center py-8 text-brand-slate dark:text-brand-slate">No pending certification requests.</p>}
         </TableContainer>
     );
 };
@@ -295,7 +295,7 @@ const VehicleDataEditor: React.FC<{ vehicleData: VehicleData, onUpdate: (newData
 
     const renderColumn = (title: string, items: string[], pathPrefix: string[], selectedItem: string | null, onSelect: (item: string | null) => void, itemType: string, disabled: boolean = false) => (
         <div className={`bg-brand-gray-50 dark:bg-brand-gray-darker p-3 rounded-lg border dark:border-gray-700 flex flex-col transition-opacity ${disabled ? 'opacity-50' : ''}`}>
-            <h3 className="text-md font-bold text-gray-800 dark:text-gray-100 mb-2 px-1">{title}</h3>
+            <h3 className="text-md font-bold text-brand-slate dark:text-brand-slate mb-2 px-1">{title}</h3>
             <ul className="space-y-1 overflow-y-auto flex-grow min-h-[200px] max-h-[400px]">
                 {items.map(item => {
                     const path = [...pathPrefix, item];
@@ -304,43 +304,43 @@ const VehicleDataEditor: React.FC<{ vehicleData: VehicleData, onUpdate: (newData
                         <li key={item} className="rounded-md">
                             {isEditing ? (
                                 <div className="flex items-center gap-2 p-2">
-                                    <input type="text" value={editingItem.value} onChange={e => setEditingItem(prev => ({ ...prev!, value: e.target.value }))} autoFocus onKeyDown={e => e.key === 'Enter' && handleSaveEdit()} onBlur={handleSaveEdit} className="w-full text-sm p-1 border rounded bg-white dark:bg-gray-900" />
+                                    <input type="text" value={editingItem.value} onChange={e => setEditingItem(prev => ({ ...prev!, value: e.target.value }))} autoFocus onKeyDown={e => e.key === 'Enter' && handleSaveEdit()} onBlur={handleSaveEdit} className="w-full text-sm p-1 border rounded bg-brand-cream dark:bg-brand-cream" />
                                 </div>
                             ) : (
-                                <div onClick={() => !disabled && onSelect(item)} className={`group flex justify-between items-center p-2 rounded-md ${!disabled ? 'cursor-pointer' : 'cursor-default'} ${selectedItem === item ? 'text-white' : !disabled ? 'hover:bg-gray-200 dark:hover:bg-gray-700' : ''}`} style={selectedItem === item ? { background: 'var(--gradient-primary)' } : undefined}>
+                                <div onClick={() => !disabled && onSelect(item)} className={`group flex justify-between items-center p-2 rounded-md ${!disabled ? 'cursor-pointer' : 'cursor-default'} ${selectedItem === item ? 'text-brand-cream' : !disabled ? 'hover:bg-brand-cream-dark dark:hover:bg-brand-cream' : ''}`} style={selectedItem === item ? { background: 'var(--gradient-primary)' } : undefined}>
                                     <span className="text-sm">{item}</span>
                                     <div className={`opacity-0 group-hover:opacity-100 transition-opacity ${selectedItem === item ? '!opacity-100' : ''}`}>
-                                        <button onClick={e => { e.stopPropagation(); if (!disabled) setEditingItem({ path, value: item }); }} disabled={disabled} className="p-1 hover:bg-white/20 rounded-md">&#x270E;</button>
-                                        <button onClick={e => { e.stopPropagation(); if (!disabled) handleDelete(path); }} disabled={disabled} className="p-1 hover:bg-white/20 rounded-md">&times;</button>
+                                        <button onClick={e => { e.stopPropagation(); if (!disabled) setEditingItem({ path, value: item }); }} disabled={disabled} className="p-1 hover:bg-brand-cream/20 rounded-md">&#x270E;</button>
+                                        <button onClick={e => { e.stopPropagation(); if (!disabled) handleDelete(path); }} disabled={disabled} className="p-1 hover:bg-brand-cream/20 rounded-md">&times;</button>
                                     </div>
                                 </div>
                             )}
                         </li>
                     );
                 })}
-                {!disabled && items.length === 0 && <div className="text-center text-sm text-gray-500 py-4 px-2">No items.</div>}
-                {disabled && <div className="text-center text-sm text-gray-500 py-4 px-2">Select an item from the previous column.</div>}
+                {!disabled && items.length === 0 && <div className="text-center text-sm text-brand-slate py-4 px-2">No items.</div>}
+                {disabled && <div className="text-center text-sm text-brand-slate py-4 px-2">Select an item from the previous column.</div>}
             </ul>
             <div className="mt-2 pt-2 border-t dark:border-gray-700">
                 {addingAt?.path.join() === pathPrefix.join() ? (
                     <div className="flex items-center gap-2 p-1">
-                        <input type="text" value={newItemValue} onChange={e => setNewItemValue(e.target.value)} autoFocus onKeyDown={e => e.key === 'Enter' && handleSaveNewItem()} placeholder={`New ${itemType}...`} className="w-full text-sm p-1 border rounded bg-white dark:bg-gray-900" />
+                        <input type="text" value={newItemValue} onChange={e => setNewItemValue(e.target.value)} autoFocus onKeyDown={e => e.key === 'Enter' && handleSaveNewItem()} placeholder={`New ${itemType}...`} className="w-full text-sm p-1 border rounded bg-brand-cream dark:bg-brand-cream" />
                     </div>
                 ) : (
-                    <button onClick={() => !disabled && setAddingAt({ path: pathPrefix, type: itemType })} disabled={disabled} className="w-full text-sm p-2 rounded-md hover:bg-gray-200 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors" style={{ color: 'var(--brand-deep-red)' }} onMouseEnter={(e) => !disabled && (e.currentTarget.style.color = 'var(--brand-orange)')} onMouseLeave={(e) => !disabled && (e.currentTarget.style.color = 'var(--brand-deep-red)')}>+ Add New {itemType}</button>
+                    <button onClick={() => !disabled && setAddingAt({ path: pathPrefix, type: itemType })} disabled={disabled} className="w-full text-sm p-2 rounded-md hover:bg-brand-cream-dark dark:hover:bg-brand-cream disabled:opacity-50 disabled:cursor-not-allowed transition-colors" style={{ color: 'var(--brand-teal)' }} onMouseEnter={(e) => !disabled && (e.currentTarget.style.color = 'var(--brand-gold)')} onMouseLeave={(e) => !disabled && (e.currentTarget.style.color = 'var(--brand-teal)')}>+ Add New {itemType}</button>
                 )}
             </div>
         </div>
     );
 
     return (
-        <div className="bg-white dark:bg-brand-gray-dark p-6 rounded-lg shadow-md">
+        <div className="bg-brand-cream dark:bg-brand-gray-dark p-6 rounded-lg shadow-md">
             <div className="flex justify-between items-center mb-4">
                 <div>
-                    <h2 className="text-xl font-bold text-gray-800 dark:text-gray-100">Manage Vehicle Data</h2>
-                    <p className="text-sm text-gray-500 dark:text-gray-400">Manage dropdown options for the vehicle creation form.</p>
+                    <h2 className="text-xl font-bold text-brand-slate dark:text-brand-slate">Manage Vehicle Data</h2>
+                    <p className="text-sm text-brand-slate dark:text-brand-slate">Manage dropdown options for the vehicle creation form.</p>
                 </div>
-                <button onClick={() => setIsBulkUploadOpen(true)} className="bg-green-600 text-white font-bold py-2 px-4 rounded-lg hover:bg-green-700">
+                <button onClick={() => setIsBulkUploadOpen(true)} className="bg-brand-teal text-brand-cream font-bold py-2 px-4 rounded-lg hover:bg-brand-teal">
                     Bulk Upload
                 </button>
             </div>
@@ -382,14 +382,14 @@ const AuditLogView: React.FC<{ auditLog: AuditLogEntry[] }> = ({ auditLog }) => 
       placeholder="Search logs..."
       value={searchTerm}
       onChange={(e) => setSearchTerm(e.target.value)}
-      className="flex-grow p-2 border border-brand-gray dark:border-gray-600 rounded-lg bg-white dark:bg-brand-gray-darker dark:text-gray-200 focus:outline-none transition w-full sm:w-64" onFocus={(e) => { e.currentTarget.style.borderColor = 'var(--brand-deep-red)'; e.currentTarget.style.boxShadow = '0 0 0 3px var(--brand-deep-red-light)'; }} onBlur={(e) => { e.currentTarget.style.borderColor = ''; e.currentTarget.style.boxShadow = ''; }}
+      className="flex-grow p-2 border border-brand-gray dark:border-gray-600 rounded-lg bg-brand-cream dark:bg-brand-gray-darker dark:text-brand-slate focus:outline-none transition w-full sm:w-64" onFocus={(e) => { e.currentTarget.style.borderColor = 'var(--brand-teal)'; e.currentTarget.style.boxShadow = '0 0 0 3px var(--brand-teal-light)'; }} onBlur={(e) => { e.currentTarget.style.borderColor = ''; e.currentTarget.style.boxShadow = ''; }}
     />
   );
 
   return (
     <TableContainer title="Audit Log" actions={searchAction}>
       <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
-        <thead className="bg-gray-50 dark:bg-gray-800 text-gray-500 dark:text-gray-400">
+        <thead className="bg-brand-cream dark:bg-brand-cream text-brand-slate dark:text-brand-slate">
           <tr>
             <th className="px-6 py-3 text-left text-xs font-medium uppercase">Timestamp</th>
             <th className="px-6 py-3 text-left text-xs font-medium uppercase">Actor</th>
@@ -398,19 +398,19 @@ const AuditLogView: React.FC<{ auditLog: AuditLogEntry[] }> = ({ auditLog }) => 
             <th className="px-6 py-3 text-left text-xs font-medium uppercase">Details</th>
           </tr>
         </thead>
-        <tbody className="bg-white dark:bg-brand-gray-dark divide-y divide-gray-200 dark:divide-gray-700">
+        <tbody className="bg-brand-cream dark:bg-brand-gray-dark divide-y divide-gray-200 dark:divide-gray-700">
           {filteredLog.map(entry => (
             <tr key={entry.id}>
-              <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">{new Date(entry.timestamp).toLocaleString()}</td>
+              <td className="px-6 py-4 whitespace-nowrap text-sm text-brand-slate dark:text-brand-slate">{new Date(entry.timestamp).toLocaleString()}</td>
               <td className="px-6 py-4 whitespace-nowrap font-medium">{entry.actor}</td>
               <td className="px-6 py-4 whitespace-nowrap">{entry.action}</td>
               <td className="px-6 py-4 whitespace-nowrap">{entry.target}</td>
-              <td className="px-6 py-4 text-sm text-gray-500 dark:text-gray-400 truncate max-w-xs" title={entry.details}>{entry.details}</td>
+              <td className="px-6 py-4 text-sm text-brand-slate dark:text-brand-slate truncate max-w-xs" title={entry.details}>{entry.details}</td>
             </tr>
           ))}
         </tbody>
       </table>
-      {filteredLog.length === 0 && <p className="text-center py-8 text-gray-500 dark:text-gray-400">No log entries found matching your search.</p>}
+      {filteredLog.length === 0 && <p className="text-center py-8 text-brand-slate dark:text-brand-slate">No log entries found matching your search.</p>}
     </TableContainer>
   );
 };
@@ -451,15 +451,15 @@ const PlatformSettingsView: React.FC<{
         }
     };
 
-    const formElementClass = "block w-full p-3 border border-brand-gray-300 dark:border-brand-gray-600 rounded-lg focus:outline-none transition bg-brand-gray-50 dark:bg-brand-gray-800 dark:text-gray-200";
+    const formElementClass = "block w-full p-3 border border-brand-gray-300 dark:border-brand-gray-600 rounded-lg focus:outline-none transition bg-brand-gray-50 dark:bg-brand-gray-800 dark:text-brand-slate";
 
     return (
         <div className="space-y-8">
-            <div className="bg-white dark:bg-brand-gray-dark p-6 rounded-lg shadow-md">
-                <h2 className="text-xl font-bold text-gray-800 dark:text-gray-100 mb-4">General Settings</h2>
+            <div className="bg-brand-cream dark:bg-brand-gray-dark p-6 rounded-lg shadow-md">
+                <h2 className="text-xl font-bold text-brand-slate dark:text-brand-slate mb-4">General Settings</h2>
                 <form onSubmit={handleSave} className="space-y-6">
                     <div>
-                        <label htmlFor="listingFee" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                        <label htmlFor="listingFee" className="block text-sm font-medium text-brand-slate dark:text-brand-slate mb-1">
                             Listing Fee (₹)
                         </label>
                         <input
@@ -473,7 +473,7 @@ const PlatformSettingsView: React.FC<{
                         />
                     </div>
                     <div>
-                        <label htmlFor="siteAnnouncement" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                        <label htmlFor="siteAnnouncement" className="block text-sm font-medium text-brand-slate dark:text-brand-slate mb-1">
                             Site Announcement Banner
                         </label>
                         <textarea
@@ -485,21 +485,21 @@ const PlatformSettingsView: React.FC<{
                             className={formElementClass}
                             placeholder="e.g., Special weekend discount on all EVs!"
                         />
-                         <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">Leave empty to hide the banner.</p>
+                         <p className="text-xs text-brand-slate dark:text-brand-slate mt-1">Leave empty to hide the banner.</p>
                     </div>
                     <div>
-                        <button type="submit" className="btn-brand-primary text-white font-bold py-2 px-6 rounded-lg transition-colors">
+                        <button type="submit" className="btn-brand-primary text-brand-cream font-bold py-2 px-6 rounded-lg transition-colors">
                             Save Settings
                         </button>
                     </div>
                 </form>
             </div>
 
-            <div className="bg-white dark:bg-brand-gray-dark p-6 rounded-lg shadow-md">
-                <h2 className="text-xl font-bold text-gray-800 dark:text-gray-100 mb-4">Communication</h2>
+            <div className="bg-brand-cream dark:bg-brand-gray-dark p-6 rounded-lg shadow-md">
+                <h2 className="text-xl font-bold text-brand-slate dark:text-brand-slate mb-4">Communication</h2>
                 <form onSubmit={handleBroadcast} className="space-y-4">
                     <div>
-                         <label htmlFor="broadcastMessage" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                         <label htmlFor="broadcastMessage" className="block text-sm font-medium text-brand-slate dark:text-brand-slate mb-1">
                             Send Broadcast Message
                         </label>
                         <textarea
@@ -513,7 +513,7 @@ const PlatformSettingsView: React.FC<{
                         />
                     </div>
                      <div>
-                        <button type="submit" className="bg-red-500 text-white font-bold py-2 px-6 rounded-lg hover:bg-red-600 transition-colors disabled:opacity-50" disabled={!broadcastMessage.trim()}>
+                        <button type="submit" className="bg-brand-teal-light0 text-brand-cream font-bold py-2 px-6 rounded-lg hover:bg-brand-teal transition-colors disabled:opacity-50" disabled={!broadcastMessage.trim()}>
                             Send Broadcast
                         </button>
                     </div>
@@ -539,62 +539,62 @@ const ModerationQueueView: React.FC<{
             <TableContainer title={`Flagged Vehicles (${flaggedVehicles.length})`}>
                 {flaggedVehicles.length > 0 ? (
                     <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
-                        <thead className="bg-gray-50 dark:bg-gray-800"><tr>
+                        <thead className="bg-brand-cream dark:bg-brand-cream"><tr>
                             <th className="px-6 py-3 text-left text-xs font-medium uppercase">Vehicle</th>
                             <th className="px-6 py-3 text-left text-xs font-medium uppercase">Seller</th>
                             <th className="px-6 py-3 text-left text-xs font-medium uppercase">Reason</th>
                             <th className="px-6 py-3 text-left text-xs font-medium uppercase">Reported On</th>
                             <th className="px-6 py-3 text-left text-xs font-medium uppercase">Actions</th>
                         </tr></thead>
-                        <tbody className="bg-white dark:bg-brand-gray-dark divide-y divide-gray-200 dark:divide-gray-700">
+                        <tbody className="bg-brand-cream dark:bg-brand-gray-dark divide-y divide-gray-200 dark:divide-gray-700">
                             {flaggedVehicles.map(v => (
                                 <tr key={v.id}>
                                     <td className="px-6 py-4 whitespace-nowrap font-medium">{v.year} {v.make} {v.model}</td>
                                     <td className="px-6 py-4">{v.sellerEmail}</td>
-                                    <td className="px-6 py-4 text-sm text-gray-500 dark:text-gray-400 max-w-xs truncate" title={v.flagReason}>{v.flagReason || 'N/A'}</td>
-                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">{v.flaggedAt ? new Date(v.flaggedAt).toLocaleString() : 'N/A'}</td>
+                                    <td className="px-6 py-4 text-sm text-brand-slate dark:text-brand-slate max-w-xs truncate" title={v.flagReason}>{v.flagReason || 'N/A'}</td>
+                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-brand-slate dark:text-brand-slate">{v.flaggedAt ? new Date(v.flaggedAt).toLocaleString() : 'N/A'}</td>
                                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium space-x-3">
-                                        <button onClick={() => onResolveFlag('vehicle', v.id)} className="text-green-600 hover:text-green-900">Dismiss Flag</button>
-                                        <button onClick={() => { onToggleVehicleStatus(v.id); onResolveFlag('vehicle', v.id); }} className="text-yellow-600 hover:text-yellow-900">Unpublish</button>
-                                        <button onClick={() => onToggleUserStatus(v.sellerEmail)} className="text-red-600 hover:text-red-900">Ban Seller</button>
+                                        <button onClick={() => onResolveFlag('vehicle', v.id)} className="text-brand-teal hover:text-brand-teal">Dismiss Flag</button>
+                                        <button onClick={() => { onToggleVehicleStatus(v.id); onResolveFlag('vehicle', v.id); }} className="text-brand-slate hover:text-brand-slate">Unpublish</button>
+                                        <button onClick={() => onToggleUserStatus(v.sellerEmail)} className="text-brand-teal hover:text-brand-teal">Ban Seller</button>
                                     </td>
                                 </tr>
                             ))}
                         </tbody>
                     </table>
-                ) : <p className="text-center py-8 text-gray-500 dark:text-gray-400">No vehicles are currently flagged.</p>}
+                ) : <p className="text-center py-8 text-brand-slate dark:text-brand-slate">No vehicles are currently flagged.</p>}
             </TableContainer>
 
             <TableContainer title={`Flagged Conversations (${flaggedConversations.length})`}>
                 {flaggedConversations.length > 0 ? (
                      <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
-                        <thead className="bg-gray-50 dark:bg-gray-800"><tr>
+                        <thead className="bg-brand-cream dark:bg-brand-cream"><tr>
                             <th className="px-6 py-3 text-left text-xs font-medium uppercase">Participants</th>
                             <th className="px-6 py-3 text-left text-xs font-medium uppercase">Reason</th>
                             <th className="px-6 py-3 text-left text-xs font-medium uppercase">Reported On</th>
                             <th className="px-6 py-3 text-left text-xs font-medium uppercase">Actions</th>
                         </tr></thead>
-                        <tbody className="bg-white dark:bg-brand-gray-dark divide-y divide-gray-200 dark:divide-gray-700">
+                        <tbody className="bg-brand-cream dark:bg-brand-gray-dark divide-y divide-gray-200 dark:divide-gray-700">
                            {flaggedConversations.map(c => (
                                 <tr key={c.id}>
                                     <td className="px-6 py-4 text-sm">
                                         <div>C: {c.customerName}</div>
                                         <div>S: {c.sellerId}</div>
                                     </td>
-                                    <td className="px-6 py-4 text-sm text-gray-500 dark:text-gray-400 max-w-sm truncate" title={c.flagReason}>
+                                    <td className="px-6 py-4 text-sm text-brand-slate dark:text-brand-slate max-w-sm truncate" title={c.flagReason}>
                                         {c.flagReason || 'N/A'}
                                     </td>
-                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">{c.flaggedAt ? new Date(c.flaggedAt).toLocaleString() : 'N/A'}</td>
+                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-brand-slate dark:text-brand-slate">{c.flaggedAt ? new Date(c.flaggedAt).toLocaleString() : 'N/A'}</td>
                                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium space-x-3">
-                                        <button onClick={() => onResolveFlag('conversation', c.id)} className="text-green-600 hover:text-green-900">Dismiss</button>
-                                        <button onClick={() => onToggleUserStatus(c.customerId)} className="text-red-600 hover:text-red-900">Ban Customer</button>
-                                        <button onClick={() => onToggleUserStatus(c.sellerId)} className="text-red-600 hover:text-red-900">Ban Seller</button>
+                                        <button onClick={() => onResolveFlag('conversation', c.id)} className="text-brand-teal hover:text-brand-teal">Dismiss</button>
+                                        <button onClick={() => onToggleUserStatus(c.customerId)} className="text-brand-teal hover:text-brand-teal">Ban Customer</button>
+                                        <button onClick={() => onToggleUserStatus(c.sellerId)} className="text-brand-teal hover:text-brand-teal">Ban Seller</button>
                                     </td>
                                 </tr>
                            ))}
                         </tbody>
                     </table>
-                ) : <p className="text-center py-8 text-gray-500 dark:text-gray-400">No conversations are currently flagged.</p>}
+                ) : <p className="text-center py-8 text-brand-slate dark:text-brand-slate">No conversations are currently flagged.</p>}
             </TableContainer>
         </div>
     );
@@ -646,21 +646,21 @@ const SupportTicketsView: React.FC<{
     
     const statusColor = (status: SupportTicket['status']) => {
         switch (status) {
-            case 'Open': return 'text-white' + ' ' + 'dark:text-white';
-            case 'In Progress': return 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/50 dark:text-yellow-300';
-            case 'Closed': return 'bg-gray-200 text-gray-800 dark:bg-gray-700 dark:text-gray-300';
+            case 'Open': return 'text-brand-cream' + ' ' + 'dark:text-brand-cream';
+            case 'In Progress': return 'bg-brand-gold-light text-brand-slate dark:bg-brand-gold/50 dark:text-brand-slate';
+            case 'Closed': return 'bg-brand-cream-dark text-brand-slate dark:bg-brand-cream dark:text-brand-slate';
         }
     };
 
     return (
         <div className="grid grid-cols-1 md:grid-cols-[400px_1fr] gap-6 h-[calc(100vh-200px)]">
             {/* Ticket List */}
-            <div className="bg-white dark:bg-brand-gray-dark p-4 rounded-lg shadow-md flex flex-col">
+            <div className="bg-brand-cream dark:bg-brand-gray-dark p-4 rounded-lg shadow-md flex flex-col">
                 <div className="p-2 border-b dark:border-gray-700">
-                    <h2 className="text-xl font-bold text-gray-800 dark:text-gray-100 mb-2">Support Tickets</h2>
+                    <h2 className="text-xl font-bold text-brand-slate dark:text-brand-slate mb-2">Support Tickets</h2>
                     <div className="flex gap-2">
                         {(['All', 'Open', 'In Progress', 'Closed'] as const).map(status => (
-                            <button key={status} onClick={() => setStatusFilter(status)} className={`px-3 py-1 text-xs font-semibold rounded-full ${statusFilter === status ? 'text-white' : 'bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-300'}`} style={statusFilter === status ? { background: 'var(--brand-deep-red)' } : undefined}>
+                            <button key={status} onClick={() => setStatusFilter(status)} className={`px-3 py-1 text-xs font-semibold rounded-full ${statusFilter === status ? 'text-brand-cream' : 'bg-brand-cream-dark dark:bg-brand-cream text-brand-slate dark:text-brand-slate'}`} style={statusFilter === status ? { background: 'var(--brand-teal)' } : undefined}>
                                 {status}
                             </button>
                         ))}
@@ -669,13 +669,13 @@ const SupportTicketsView: React.FC<{
                 <ul className="overflow-y-auto mt-2 flex-grow">
                     {filteredTickets.map(ticket => (
                         <li key={ticket.id}>
-                            <button onClick={() => setSelectedTicket(ticket)} className={`w-full text-left p-3 rounded-md hover:bg-gray-100 dark:hover:bg-gray-700 ${selectedTicket?.id === ticket.id ? '' : ''}`} style={selectedTicket?.id === ticket.id ? { backgroundColor: 'var(--brand-rose-pink-light)' } : undefined}>
+                            <button onClick={() => setSelectedTicket(ticket)} className={`w-full text-left p-3 rounded-md hover:bg-brand-cream dark:hover:bg-brand-cream ${selectedTicket?.id === ticket.id ? '' : ''}`} style={selectedTicket?.id === ticket.id ? { backgroundColor: 'var(--brand-gold-light)' } : undefined}>
                                 <div className="flex justify-between items-start">
-                                    <p className="font-semibold text-sm truncate pr-2 text-gray-800 dark:text-gray-100">{ticket.subject}</p>
+                                    <p className="font-semibold text-sm truncate pr-2 text-brand-slate dark:text-brand-slate">{ticket.subject}</p>
                                     <span className={`text-xs font-bold px-2 py-0.5 rounded-full whitespace-nowrap ${statusColor(ticket.status)}`}>{ticket.status}</span>
                                 </div>
-                                <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">{ticket.userName} ({ticket.userEmail})</p>
-                                <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">Updated: {new Date(ticket.updatedAt).toLocaleString()}</p>
+                                <p className="text-xs text-brand-slate dark:text-brand-slate mt-1">{ticket.userName} ({ticket.userEmail})</p>
+                                <p className="text-xs text-brand-slate dark:text-brand-slate mt-1">Updated: {new Date(ticket.updatedAt).toLocaleString()}</p>
                             </button>
                         </li>
                     ))}
@@ -683,26 +683,26 @@ const SupportTicketsView: React.FC<{
             </div>
 
             {/* Ticket Detail View */}
-            <div className="bg-white dark:bg-brand-gray-dark p-4 rounded-lg shadow-md flex flex-col">
+            <div className="bg-brand-cream dark:bg-brand-gray-dark p-4 rounded-lg shadow-md flex flex-col">
                 {selectedTicket ? (
                     <>
                         <div className="p-2 border-b dark:border-gray-700">
-                             <h3 className="text-lg font-bold text-gray-800 dark:text-gray-100">{selectedTicket.subject}</h3>
-                             <p className="text-sm text-gray-500 dark:text-gray-400">Ticket #{selectedTicket.id} from {selectedTicket.userName}</p>
+                             <h3 className="text-lg font-bold text-brand-slate dark:text-brand-slate">{selectedTicket.subject}</h3>
+                             <p className="text-sm text-brand-slate dark:text-brand-slate">Ticket #{selectedTicket.id} from {selectedTicket.userName}</p>
                         </div>
                         <div className="flex-grow overflow-y-auto p-4 space-y-4 my-2">
                             {/* Original Message */}
-                             <div className="bg-gray-100 dark:bg-gray-700/50 p-3 rounded-lg">
-                                <p className="text-sm font-semibold text-gray-800 dark:text-gray-200">{selectedTicket.userName}</p>
-                                <p className="text-xs text-gray-500 dark:text-gray-400 mb-2">{new Date(selectedTicket.createdAt).toLocaleString()}</p>
-                                <p className="text-sm text-gray-700 dark:text-gray-300 whitespace-pre-wrap">{selectedTicket.message}</p>
+                             <div className="bg-brand-cream dark:bg-brand-cream/50 p-3 rounded-lg">
+                                <p className="text-sm font-semibold text-brand-slate dark:text-brand-slate">{selectedTicket.userName}</p>
+                                <p className="text-xs text-brand-slate dark:text-brand-slate mb-2">{new Date(selectedTicket.createdAt).toLocaleString()}</p>
+                                <p className="text-sm text-brand-slate dark:text-brand-slate whitespace-pre-wrap">{selectedTicket.message}</p>
                             </div>
                             {/* Replies */}
                             {selectedTicket.replies.map((reply, index) => (
-                                <div key={index} className={`p-3 rounded-lg ${reply.author === currentUser.email ? '' : 'bg-gray-100 dark:bg-gray-700/50'}`} style={reply.author === currentUser.email ? { backgroundColor: 'var(--brand-rose-pink-light)' } : undefined}>
-                                    <p className="text-sm font-semibold text-gray-800 dark:text-gray-200">{reply.author === currentUser.email ? 'You' : reply.author}</p>
-                                    <p className="text-xs text-gray-500 dark:text-gray-400 mb-2">{new Date(reply.timestamp).toLocaleString()}</p>
-                                    <p className="text-sm text-gray-700 dark:text-gray-300 whitespace-pre-wrap">{reply.message}</p>
+                                <div key={index} className={`p-3 rounded-lg ${reply.author === currentUser.email ? '' : 'bg-brand-cream dark:bg-brand-cream/50'}`} style={reply.author === currentUser.email ? { backgroundColor: 'var(--brand-gold-light)' } : undefined}>
+                                    <p className="text-sm font-semibold text-brand-slate dark:text-brand-slate">{reply.author === currentUser.email ? 'You' : reply.author}</p>
+                                    <p className="text-xs text-brand-slate dark:text-brand-slate mb-2">{new Date(reply.timestamp).toLocaleString()}</p>
+                                    <p className="text-sm text-brand-slate dark:text-brand-slate whitespace-pre-wrap">{reply.message}</p>
                                 </div>
                             ))}
                         </div>
@@ -713,28 +713,28 @@ const SupportTicketsView: React.FC<{
                                     onChange={e => setReplyText(e.target.value)}
                                     placeholder="Type your reply..."
                                     rows={3}
-                                    className="w-full p-2 border rounded-md dark:bg-gray-800 dark:border-gray-600"
+                                    className="w-full p-2 border rounded-md dark:bg-brand-cream dark:border-gray-600"
                                 />
                                 <div className="mt-2 flex justify-between items-center">
                                     <div>
-                                        <button type="button" onClick={() => handleStatusChange('Open')} className="text-xs font-semibold mr-3 transition-colors" style={{ color: 'var(--brand-deep-red)' }} onMouseEnter={(e) => e.currentTarget.style.color = 'var(--brand-orange)'} onMouseLeave={(e) => e.currentTarget.style.color = 'var(--brand-deep-red)'}>Set to Open</button>
-                                        <button type="button" onClick={() => handleStatusChange('In Progress')} className="text-xs font-semibold text-yellow-600 mr-3">Set to In Progress</button>
-                                        <button type="button" onClick={() => handleStatusChange('Closed')} className="text-xs font-semibold text-gray-600">Close Ticket</button>
+                                        <button type="button" onClick={() => handleStatusChange('Open')} className="text-xs font-semibold mr-3 transition-colors" style={{ color: 'var(--brand-teal)' }} onMouseEnter={(e) => e.currentTarget.style.color = 'var(--brand-gold)'} onMouseLeave={(e) => e.currentTarget.style.color = 'var(--brand-teal)'}>Set to Open</button>
+                                        <button type="button" onClick={() => handleStatusChange('In Progress')} className="text-xs font-semibold text-brand-slate mr-3">Set to In Progress</button>
+                                        <button type="button" onClick={() => handleStatusChange('Closed')} className="text-xs font-semibold text-brand-slate">Close Ticket</button>
                                     </div>
-                                    <button type="submit" className="px-4 py-2 btn-brand-primary text-white rounded-md text-sm font-semibold">Send Reply</button>
+                                    <button type="submit" className="px-4 py-2 btn-brand-primary text-brand-cream rounded-md text-sm font-semibold">Send Reply</button>
                                 </div>
                             </form>
                         )}
                         {selectedTicket.status === 'Closed' && (
                              <div className="p-4 border-t dark:border-gray-700 text-center">
-                                <p className="text-sm text-gray-500 italic">This ticket is closed.</p>
-                                <button onClick={() => handleStatusChange('Open')} className="mt-2 text-sm font-semibold transition-colors" style={{ color: 'var(--brand-deep-red)' }} onMouseEnter={(e) => e.currentTarget.style.color = 'var(--brand-orange)'} onMouseLeave={(e) => e.currentTarget.style.color = 'var(--brand-deep-red)'}>Re-open Ticket</button>
+                                <p className="text-sm text-brand-slate italic">This ticket is closed.</p>
+                                <button onClick={() => handleStatusChange('Open')} className="mt-2 text-sm font-semibold transition-colors" style={{ color: 'var(--brand-teal)' }} onMouseEnter={(e) => e.currentTarget.style.color = 'var(--brand-gold)'} onMouseLeave={(e) => e.currentTarget.style.color = 'var(--brand-teal)'}>Re-open Ticket</button>
                              </div>
                         )}
                     </>
                 ) : (
                     <div className="flex flex-col items-center justify-center h-full text-center">
-                        <svg xmlns="http://www.w3.org/2000/svg" className="h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" /></svg>
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-12 w-12 text-brand-slate" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" /></svg>
                         <p className="mt-2 font-semibold">Select a ticket to view details</p>
                     </div>
                 )}
@@ -780,7 +780,7 @@ const FAQEditorView: React.FC<{
 
     if (editingItem) {
         return (
-            <div className="bg-white dark:bg-brand-gray-dark p-6 rounded-lg shadow-md animate-fade-in">
+            <div className="bg-brand-cream dark:bg-brand-gray-dark p-6 rounded-lg shadow-md animate-fade-in">
                 <h2 className="text-xl font-bold mb-4">{'id' in editingItem ? 'Edit' : 'Add'} FAQ</h2>
                 <form onSubmit={handleSave} className="space-y-4">
                     <input type="text" placeholder="Question" value={editingItem.question} onChange={e => setEditingItem(p => ({...p, question: e.target.value}))} className="w-full p-2 border rounded" required />
@@ -790,8 +790,8 @@ const FAQEditorView: React.FC<{
                         {categories.map(cat => <option key={cat} value={cat} />)}
                     </datalist>
                     <div className="flex gap-4">
-                        <button type="submit" className="px-4 py-2 btn-brand-primary text-white rounded">Save</button>
-                        <button type="button" onClick={handleCancel} className="px-4 py-2 bg-gray-200 rounded">Cancel</button>
+                        <button type="submit" className="px-4 py-2 btn-brand-primary text-brand-cream rounded">Save</button>
+                        <button type="button" onClick={handleCancel} className="px-4 py-2 bg-brand-cream-dark rounded">Cancel</button>
                     </div>
                 </form>
             </div>
@@ -799,7 +799,7 @@ const FAQEditorView: React.FC<{
     }
 
     return (
-        <TableContainer title="Manage FAQs" actions={<button onClick={startAdding} className="bg-green-500 text-white font-bold py-2 px-4 rounded-lg">Add FAQ</button>}>
+        <TableContainer title="Manage FAQs" actions={<button onClick={startAdding} className="bg-brand-teal-light0 text-brand-cream font-bold py-2 px-4 rounded-lg">Add FAQ</button>}>
             <table className="min-w-full">
                 <thead><tr><th>Question</th><th>Category</th><th>Actions</th></tr></thead>
                 <tbody>
@@ -808,8 +808,8 @@ const FAQEditorView: React.FC<{
                             <td>{item.question}</td>
                             <td>{item.category}</td>
                             <td>
-                                <button onClick={() => startEditing(item)} className="mr-2 transition-colors" style={{ color: 'var(--brand-deep-red)' }} onMouseEnter={(e) => e.currentTarget.style.color = 'var(--brand-orange)'} onMouseLeave={(e) => e.currentTarget.style.color = 'var(--brand-deep-red)'}>Edit</button>
-                                <button onClick={() => onDelete(item.id)} className="text-red-500">Delete</button>
+                                <button onClick={() => startEditing(item)} className="mr-2 transition-colors" style={{ color: 'var(--brand-teal)' }} onMouseEnter={(e) => e.currentTarget.style.color = 'var(--brand-gold)'} onMouseLeave={(e) => e.currentTarget.style.color = 'var(--brand-teal)'}>Edit</button>
+                                <button onClick={() => onDelete(item.id)} className="text-brand-teal">Delete</button>
                             </td>
                         </tr>
                     ))}
@@ -921,30 +921,30 @@ const AdminPanel: React.FC<AdminPanelProps> = (props) => {
                 return (
                     <div className="space-y-6">
                         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                            <StatCard title="Total Users" value={analytics.totalUsers} icon={<svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" style={{ color: 'var(--brand-orange)' }} fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M15 21a6 6 0 00-9-5.197M15 21a6 6 0 00-9-5.197" /></svg>} onClick={() => setActiveView('users')} />
-                            <StatCard title="Active Listings" value={analytics.activeListings} icon={<svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" style={{ color: 'var(--brand-orange)' }} fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 17v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 17v-2a4 4 0 00-4-4h-1.5m1.5 4H13m-2 0a2 2 0 104 0 2 2 0 00-4 0z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 11V7a4 4 0 00-4-4H7a4 4 0 00-4 4v4" /></svg>} onClick={() => setActiveView('listings')} />
-                            <StatCard title="Total Sales" value={`₹${(analytics.totalSales / 100000).toFixed(2)}L`} icon={<svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" style={{ color: 'var(--brand-orange)' }} fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v.01" /></svg>} />
-                            <StatCard title="Flagged Content" value={analytics.flaggedContent} icon={<svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" style={{ color: 'var(--brand-orange)' }} fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 21v-4m0 0V5a2 2 0 012-2h6.5l1 1H21l-3 6 3 6H8.5l-1-1H5a2 2 0 00-2 2zm9-13.5V9" /></svg>} onClick={() => setActiveView('moderation')} />
-                            <StatCard title="Open Support Tickets" value={supportTickets.filter(t => t.status !== 'Closed').length} icon={<svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" style={{ color: 'var(--brand-orange)' }} fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M18.364 5.636l-3.536 3.536m0 5.656l3.536 3.536M9.172 9.172L5.636 5.636m3.536 9.192l-3.536 3.536M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-5 0a4 4 0 11-8 0 4 4 0 018 0z" /></svg>} onClick={() => setActiveView('support')} />
-                            <StatCard title="Certification Requests" value={analytics.certificationRequests} icon={<svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" style={{ color: 'var(--brand-orange)' }} viewBox="0 0 20 20" fill="currentColor"><path fillRule="evenodd" d="M6.267 3.455a3.066 3.066 0 001.745-.723 3.066 3.066 0 013.976 0 3.066 3.066 0 001.745.723 3.066 3.066 0 012.812 2.812c.051.643.304 1.254.723 1.745a3.066 3.066 0 010 3.976 3.066 3.066 0 00-.723 1.745 3.066 3.066 0 01-2.812 2.812 3.066 3.066 0 00-1.745.723 3.066 3.066 0 01-3.976 0 3.066 3.066 0 00-1.745-.723 3.066 3.066 0 01-2.812-2.812 3.066 3.066 0 00-.723-1.745 3.066 3.066 0 010-3.976 3.066 3.066 0 00.723-1.745 3.066 3.066 0 012.812-2.812z" clipRule="evenodd" /></svg>} onClick={() => setActiveView('certificationRequests')} />
+                            <StatCard title="Total Users" value={analytics.totalUsers} icon={<svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" style={{ color: 'var(--brand-gold)' }} fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M15 21a6 6 0 00-9-5.197M15 21a6 6 0 00-9-5.197" /></svg>} onClick={() => setActiveView('users')} />
+                            <StatCard title="Active Listings" value={analytics.activeListings} icon={<svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" style={{ color: 'var(--brand-gold)' }} fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 17v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 17v-2a4 4 0 00-4-4h-1.5m1.5 4H13m-2 0a2 2 0 104 0 2 2 0 00-4 0z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 11V7a4 4 0 00-4-4H7a4 4 0 00-4 4v4" /></svg>} onClick={() => setActiveView('listings')} />
+                            <StatCard title="Total Sales" value={`₹${(analytics.totalSales / 100000).toFixed(2)}L`} icon={<svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" style={{ color: 'var(--brand-gold)' }} fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v.01" /></svg>} />
+                            <StatCard title="Flagged Content" value={analytics.flaggedContent} icon={<svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" style={{ color: 'var(--brand-gold)' }} fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 21v-4m0 0V5a2 2 0 012-2h6.5l1 1H21l-3 6 3 6H8.5l-1-1H5a2 2 0 00-2 2zm9-13.5V9" /></svg>} onClick={() => setActiveView('moderation')} />
+                            <StatCard title="Open Support Tickets" value={supportTickets.filter(t => t.status !== 'Closed').length} icon={<svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" style={{ color: 'var(--brand-gold)' }} fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M18.364 5.636l-3.536 3.536m0 5.656l3.536 3.536M9.172 9.172L5.636 5.636m3.536 9.192l-3.536 3.536M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-5 0a4 4 0 11-8 0 4 4 0 018 0z" /></svg>} onClick={() => setActiveView('support')} />
+                            <StatCard title="Certification Requests" value={analytics.certificationRequests} icon={<svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" style={{ color: 'var(--brand-gold)' }} viewBox="0 0 20 20" fill="currentColor"><path fillRule="evenodd" d="M6.267 3.455a3.066 3.066 0 001.745-.723 3.066 3.066 0 013.976 0 3.066 3.066 0 001.745.723 3.066 3.066 0 012.812 2.812c.051.643.304 1.254.723 1.745a3.066 3.066 0 010 3.976 3.066 3.066 0 00-.723 1.745 3.066 3.066 0 01-2.812 2.812 3.066 3.066 0 00-1.745.723 3.066 3.066 0 01-3.976 0 3.066 3.066 0 00-1.745-.723 3.066 3.066 0 01-2.812-2.812 3.066 3.066 0 00-.723-1.745 3.066 3.066 0 010-3.976 3.066 3.066 0 00.723-1.745 3.066 3.066 0 012.812-2.812z" clipRule="evenodd" /></svg>} onClick={() => setActiveView('certificationRequests')} />
                         </div>
                          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                             <BarChart title="Top 10 Vehicle Makes" data={analytics.listingsByMakeChartData} />
                             <BarChart title="User Signups (Last 30 Days)" data={analytics.userSignupsChartData} />
                         </div>
-                        <div className="bg-white dark:bg-brand-gray-dark p-6 rounded-lg shadow-md">
+                        <div className="bg-brand-cream dark:bg-brand-gray-dark p-6 rounded-lg shadow-md">
                             <h3 className="text-lg font-bold mb-4">Export Data</h3>
                             <div className="flex flex-wrap gap-4">
-                                <button onClick={onExportUsers} className="bg-gray-200 dark:bg-gray-700 font-semibold py-2 px-4 rounded-lg">Export Users (CSV)</button>
-                                <button onClick={onExportVehicles} className="bg-gray-200 dark:bg-gray-700 font-semibold py-2 px-4 rounded-lg">Export Listings (CSV)</button>
-                                <button onClick={onExportSales} className="bg-gray-200 dark:bg-gray-700 font-semibold py-2 px-4 rounded-lg">Export Sales Report (CSV)</button>
+                                <button onClick={onExportUsers} className="bg-brand-cream-dark dark:bg-brand-cream font-semibold py-2 px-4 rounded-lg">Export Users (CSV)</button>
+                                <button onClick={onExportVehicles} className="bg-brand-cream-dark dark:bg-brand-cream font-semibold py-2 px-4 rounded-lg">Export Listings (CSV)</button>
+                                <button onClick={onExportSales} className="bg-brand-cream-dark dark:bg-brand-cream font-semibold py-2 px-4 rounded-lg">Export Sales Report (CSV)</button>
                             </div>
                         </div>
                     </div>
                 );
             case 'users':
                 const userFilterActions = (
-                     <select value={roleFilter} onChange={(e) => setRoleFilter(e.target.value as RoleFilter)} className="p-2 border border-brand-gray dark:border-gray-600 rounded-lg bg-white dark:bg-brand-gray-darker dark:text-gray-200">
+                     <select value={roleFilter} onChange={(e) => setRoleFilter(e.target.value as RoleFilter)} className="p-2 border border-brand-gray dark:border-gray-600 rounded-lg bg-brand-cream dark:bg-brand-gray-darker dark:text-brand-slate">
                         <option value="all">All Roles</option>
                         <option value="customer">Customers</option>
                         <option value="seller">Sellers</option>
@@ -954,7 +954,7 @@ const AdminPanel: React.FC<AdminPanelProps> = (props) => {
                 return (
                    <TableContainer title="User Management" actions={userFilterActions}>
                        <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
-                            <thead className="bg-gray-50 dark:bg-gray-800 text-gray-500 dark:text-gray-400"><tr>
+                            <thead className="bg-brand-cream dark:bg-brand-cream text-brand-slate dark:text-brand-slate"><tr>
                                 <SortableHeader title="Name" sortKey="name" sortConfig={sortConfig} requestSort={requestSort} />
                                 <th className="px-6 py-3 text-left text-xs font-medium uppercase">Email & Mobile</th>
                                 <th className="px-6 py-3 text-left text-xs font-medium uppercase">Role</th>
@@ -962,30 +962,30 @@ const AdminPanel: React.FC<AdminPanelProps> = (props) => {
                                 <th className="px-6 py-3 text-left text-xs font-medium uppercase">Verified</th>
                                 <th className="px-6 py-3 text-left text-xs font-medium uppercase">Actions</th>
                             </tr></thead>
-                            <tbody className="bg-white dark:bg-brand-gray-dark divide-y divide-gray-200 dark:divide-gray-700">
+                            <tbody className="bg-brand-cream dark:bg-brand-gray-dark divide-y divide-gray-200 dark:divide-gray-700">
                                 {filteredUsers.map(user => {
                                     const isCurrentUser = user.email === currentUser.email;
                                     return (
                                         <tr key={user.email}>
                                             <td className="px-6 py-4 whitespace-nowrap">{user.name}</td>
-                                            <td className="px-6 py-4 whitespace-nowrap text-sm"><p>{user.email}</p><p className="text-gray-500">{user.mobile}</p></td>
-                                            <td className="px-6 py-4 whitespace-nowrap"><span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${user.role === 'admin' ? 'bg-red-100 text-red-800' : user.role === 'seller' ? 'brand-badge-orange' : 'bg-green-100 text-green-800'}`}>{user.role}</span></td>
-                                            <td className="px-6 py-4 whitespace-nowrap"><span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${user.status === 'active' ? 'bg-green-100 text-green-800' : 'bg-gray-200 text-gray-800'}`}>{user.status}</span></td>
+                                            <td className="px-6 py-4 whitespace-nowrap text-sm"><p>{user.email}</p><p className="text-brand-slate">{user.mobile}</p></td>
+                                            <td className="px-6 py-4 whitespace-nowrap"><span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${user.role === 'admin' ? 'bg-brand-teal-light text-brand-teal' : user.role === 'seller' ? 'brand-badge-orange' : 'bg-brand-teal-light text-brand-teal'}`}>{user.role}</span></td>
+                                            <td className="px-6 py-4 whitespace-nowrap"><span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${user.status === 'active' ? 'bg-brand-teal-light text-brand-teal' : 'bg-brand-cream-dark text-brand-slate'}`}>{user.status}</span></td>
                                             <td className="px-6 py-4 whitespace-nowrap text-center">
                                                 {user.role === 'seller' && (
                                                     <input 
                                                         type="checkbox" 
                                                         checked={user.isVerified || false} 
                                                         onChange={() => onToggleVerifiedStatus(user.email)}
-                                                        className="h-4 w-4 border-gray-300 rounded" style={{ accentColor: 'var(--brand-deep-red)' }}
+                                                        className="h-4 w-4 border-brand-gold rounded" style={{ accentColor: 'var(--brand-teal)' }}
                                                         title={user.isVerified ? "Un-verify seller" : "Verify seller"}
                                                     />
                                                 )}
                                             </td>
                                             <td className="px-6 py-4 whitespace-nowrap text-sm font-medium space-x-3">
-                                                <button onClick={() => setEditingUser(user)} className="transition-colors" style={{ color: 'var(--brand-deep-red)' }} onMouseEnter={(e) => e.currentTarget.style.color = 'var(--brand-orange)'} onMouseLeave={(e) => e.currentTarget.style.color = 'var(--brand-deep-red)'}>Edit</button>
-                                                <button onClick={() => onToggleUserStatus(user.email)} disabled={isCurrentUser} className={`${user.status === 'active' ? 'text-yellow-600 hover:text-yellow-900' : 'text-green-600 hover:text-green-900'} disabled:opacity-50 disabled:cursor-not-allowed`}>{user.status === 'active' ? 'Deactivate' : 'Activate'}</button>
-                                                <button onClick={() => onDeleteUser(user.email)} disabled={isCurrentUser} className="text-red-600 hover:text-red-900 disabled:opacity-50 disabled:cursor-not-allowed">Delete</button>
+                                                <button onClick={() => setEditingUser(user)} className="transition-colors" style={{ color: 'var(--brand-teal)' }} onMouseEnter={(e) => e.currentTarget.style.color = 'var(--brand-gold)'} onMouseLeave={(e) => e.currentTarget.style.color = 'var(--brand-teal)'}>Edit</button>
+                                                <button onClick={() => onToggleUserStatus(user.email)} disabled={isCurrentUser} className={`${user.status === 'active' ? 'text-brand-slate hover:text-brand-slate' : 'text-brand-teal hover:text-brand-teal'} disabled:opacity-50 disabled:cursor-not-allowed`}>{user.status === 'active' ? 'Deactivate' : 'Activate'}</button>
+                                                <button onClick={() => onDeleteUser(user.email)} disabled={isCurrentUser} className="text-brand-teal hover:text-brand-teal disabled:opacity-50 disabled:cursor-not-allowed">Delete</button>
                                             </td>
                                         </tr>
                                     );
@@ -998,25 +998,25 @@ const AdminPanel: React.FC<AdminPanelProps> = (props) => {
                 return (
                    <TableContainer title="All Listings">
                        <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
-                            <thead className="bg-gray-50 dark:bg-gray-800"><tr>
+                            <thead className="bg-brand-cream dark:bg-brand-cream"><tr>
                                 <th className="px-6 py-3 text-left text-xs font-medium uppercase">Listing</th>
                                 <th className="px-6 py-3 text-left text-xs font-medium uppercase">Seller</th>
                                 <th className="px-6 py-3 text-left text-xs font-medium uppercase">Status</th>
                                 <th className="px-6 py-3 text-left text-xs font-medium uppercase">Featured</th>
                                 <th className="px-6 py-3 text-left text-xs font-medium uppercase">Actions</th>
                             </tr></thead>
-                            <tbody className="bg-white dark:bg-brand-gray-dark divide-y divide-gray-200 dark:divide-gray-700">
+                            <tbody className="bg-brand-cream dark:bg-brand-gray-dark divide-y divide-gray-200 dark:divide-gray-700">
                                 {vehicles.map(v => (
                                     <tr key={v.id}>
                                         <td className="px-6 py-4 whitespace-nowrap font-medium">{v.year} {v.make} {v.model}</td>
                                         <td className="px-6 py-4 text-sm">{v.sellerEmail}</td>
-                                        <td className="px-6 py-4"><span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${v.status === 'published' ? 'bg-green-100 text-green-800' : 'bg-gray-200 text-gray-800'}`}>{v.status}</span></td>
+                                        <td className="px-6 py-4"><span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${v.status === 'published' ? 'bg-brand-teal-light text-brand-teal' : 'bg-brand-cream-dark text-brand-slate'}`}>{v.status}</span></td>
                                         <td className="px-6 py-4">{v.isFeatured ? 'Yes' : 'No'}</td>
                                         <td className="px-6 py-4 whitespace-nowrap text-sm font-medium space-x-3">
-                                            <button onClick={() => setEditingVehicle(v)} className="transition-colors" style={{ color: 'var(--brand-deep-red)' }} onMouseEnter={(e) => e.currentTarget.style.color = 'var(--brand-orange)'} onMouseLeave={(e) => e.currentTarget.style.color = 'var(--brand-deep-red)'}>Edit</button>
-                                            <button onClick={() => onToggleVehicleStatus(v.id)} className="text-yellow-600 hover:text-yellow-900">{v.status === 'published' ? 'Unpublish' : 'Publish'}</button>
-                                            <button onClick={() => onToggleVehicleFeature(v.id)} className="text-purple-600 hover:text-purple-900">{v.isFeatured ? 'Un-feature' : 'Feature'}</button>
-                                            <button onClick={() => onDeleteVehicle(v.id)} className="text-red-600 hover:text-red-900">Delete</button>
+                                            <button onClick={() => setEditingVehicle(v)} className="transition-colors" style={{ color: 'var(--brand-teal)' }} onMouseEnter={(e) => e.currentTarget.style.color = 'var(--brand-gold)'} onMouseLeave={(e) => e.currentTarget.style.color = 'var(--brand-teal)'}>Edit</button>
+                                            <button onClick={() => onToggleVehicleStatus(v.id)} className="text-brand-slate hover:text-brand-slate">{v.status === 'published' ? 'Unpublish' : 'Publish'}</button>
+                                            <button onClick={() => onToggleVehicleFeature(v.id)} className="text-brand-teal hover:text-brand-teal">{v.isFeatured ? 'Un-feature' : 'Feature'}</button>
+                                            <button onClick={() => onDeleteVehicle(v.id)} className="text-brand-teal hover:text-brand-teal">Delete</button>
                                         </td>
                                     </tr>
                                 ))}
@@ -1047,20 +1047,20 @@ const AdminPanel: React.FC<AdminPanelProps> = (props) => {
         <li>
             <button
                 onClick={() => setActiveView(view)}
-                className={`w-full text-left px-4 py-2.5 rounded-lg transition-colors flex justify-between items-center ${activeView === view ? 'text-white shadow-md' : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700'}`} style={activeView === view ? { background: 'var(--gradient-primary)' } : undefined}
+                className={`w-full text-left px-4 py-2.5 rounded-lg transition-colors flex justify-between items-center ${activeView === view ? 'text-brand-cream shadow-md' : 'text-brand-slate dark:text-brand-slate hover:bg-brand-cream dark:hover:bg-brand-cream'}`} style={activeView === view ? { background: 'var(--gradient-primary)' } : undefined}
             >
                 <span className="font-semibold">{label}</span>
-                {count !== undefined && count > 0 && <span className={`text-xs font-bold rounded-full px-2 py-0.5 ${activeView === view ? 'bg-white' : 'bg-red-500 text-white'}`} style={activeView === view ? { color: 'var(--brand-deep-red)' } : undefined}>{count}</span>}
+                {count !== undefined && count > 0 && <span className={`text-xs font-bold rounded-full px-2 py-0.5 ${activeView === view ? 'bg-brand-cream' : 'bg-brand-teal-light0 text-brand-cream'}`} style={activeView === view ? { color: 'var(--brand-teal)' } : undefined}>{count}</span>}
             </button>
         </li>
     );
 
     return (
         <div className="container mx-auto py-8 animate-fade-in">
-            <h1 className="text-3xl font-extrabold text-gray-900 dark:text-gray-100 mb-6">Administrator Dashboard</h1>
+            <h1 className="text-3xl font-extrabold text-brand-slate dark:text-brand-slate mb-6">Administrator Dashboard</h1>
             <div className="grid grid-cols-1 md:grid-cols-[250px_1fr] gap-8">
                 <aside className="self-start md:sticky top-24">
-                    <div className="bg-white dark:bg-brand-gray-dark p-4 rounded-lg shadow-md">
+                    <div className="bg-brand-cream dark:bg-brand-gray-dark p-4 rounded-lg shadow-md">
                         <ul className="space-y-1">
                             <NavItem view="analytics" label="Analytics" />
                             <NavItem view="users" label="User Management" />

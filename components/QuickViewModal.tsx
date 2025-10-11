@@ -55,8 +55,8 @@ const QuickViewModal: React.FC<QuickViewModalProps> = ({ vehicle, onClose, onSel
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-[100] p-4 animate-fade-in" onClick={onClose}>
-      <div className="bg-white dark:bg-brand-gray-800 rounded-xl shadow-2xl w-full max-w-4xl max-h-[90vh] flex flex-col md:flex-row overflow-hidden relative" onClick={(e) => e.stopPropagation()}>
-        <button onClick={onClose} className="absolute top-2 right-2 text-white md:text-brand-gray-500 bg-black/30 md:bg-transparent rounded-full w-8 h-8 flex items-center justify-center hover:text-brand-gray-800 dark:hover:text-white z-10 text-2xl">&times;</button>
+      <div className="bg-brand-cream dark:bg-brand-gray-800 rounded-xl shadow-2xl w-full max-w-4xl max-h-[90vh] flex flex-col md:flex-row overflow-hidden relative" onClick={(e) => e.stopPropagation()}>
+        <button onClick={onClose} className="absolute top-2 right-2 text-brand-cream md:text-brand-gray-500 bg-black/30 md:bg-transparent rounded-full w-8 h-8 flex items-center justify-center hover:text-brand-gray-800 dark:hover:text-brand-cream z-10 text-2xl">&times;</button>
         
         {/* Image Section */}
         <div className="w-full md:w-1/2 p-4 flex flex-col">
@@ -67,7 +67,7 @@ const QuickViewModal: React.FC<QuickViewModalProps> = ({ vehicle, onClose, onSel
                 key={index}
                 src={img}
                 alt={`Thumbnail ${index + 1}`}
-                className={`cursor-pointer rounded-md border-2 h-16 w-full object-cover ${mainImage === img ? '' : 'border-transparent'} transition`} style={mainImage === img ? { borderColor: 'var(--brand-deep-red)' } : undefined} onMouseEnter={(e) => mainImage !== img && (e.currentTarget.style.borderColor = 'var(--brand-rose-pink)')} onMouseLeave={(e) => mainImage !== img && (e.currentTarget.style.borderColor = '')}
+                className={`cursor-pointer rounded-md border-2 h-16 w-full object-cover ${mainImage === img ? '' : 'border-transparent'} transition`} style={mainImage === img ? { borderColor: 'var(--brand-teal)' } : undefined} onMouseEnter={(e) => mainImage !== img && (e.currentTarget.style.borderColor = 'var(--brand-gold)')} onMouseLeave={(e) => mainImage !== img && (e.currentTarget.style.borderColor = '')}
                 onClick={() => setMainImage(img)}
               />
             ))}
@@ -79,7 +79,7 @@ const QuickViewModal: React.FC<QuickViewModalProps> = ({ vehicle, onClose, onSel
           <div>
             <h2 className="text-3xl font-bold text-brand-gray-900 dark:text-brand-gray-100">{vehicle.year} {vehicle.make} {vehicle.model}</h2>
             <p className="text-brand-gray-500 dark:text-brand-gray-400">{vehicle.variant || ''}</p>
-            <p className="text-3xl font-extrabold my-4" style={{ color: 'var(--brand-deep-red)' }}>₹{vehicle.price.toLocaleString('en-IN')}</p>
+            <p className="text-3xl font-extrabold my-4" style={{ color: 'var(--brand-teal)' }}>₹{vehicle.price.toLocaleString('en-IN')}</p>
           </div>
 
           <div className="space-y-2 my-4">
@@ -91,13 +91,13 @@ const QuickViewModal: React.FC<QuickViewModalProps> = ({ vehicle, onClose, onSel
           </div>
 
           <div className="mt-auto pt-6 space-y-3">
-             <button onClick={handleFullDetailsClick} className="w-full btn-brand-primary text-white font-bold py-3 px-6 rounded-lg text-lg transition-all transform hover:scale-105">
+             <button onClick={handleFullDetailsClick} className="w-full btn-brand-primary text-brand-cream font-bold py-3 px-6 rounded-lg text-lg transition-all transform hover:scale-105">
                 View Full Details
             </button>
             <div className="flex gap-3">
                 <button
                     onClick={() => onToggleWishlist(vehicle.id)}
-                    className={`w-full font-bold py-3 px-6 rounded-lg text-lg transition-all flex items-center justify-center gap-2 ${isInWishlist ? 'bg-pink-100 text-pink-600' : 'bg-brand-gray-200 dark:bg-brand-gray-700'}`}
+                    className={`w-full font-bold py-3 px-6 rounded-lg text-lg transition-all flex items-center justify-center gap-2 ${isInWishlist ? 'bg-brand-gold text-brand-teal' : 'bg-brand-gray-200 dark:bg-brand-gray-700'}`}
                 >
                     <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" viewBox="0 0 20 20" fill="currentColor"><path fillRule="evenodd" d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z" clipRule="evenodd" /></svg>
                     Wishlist
@@ -105,7 +105,7 @@ const QuickViewModal: React.FC<QuickViewModalProps> = ({ vehicle, onClose, onSel
                  <button
                     onClick={() => onToggleCompare(vehicle.id)}
                     disabled={isCompareDisabled}
-                    className={`w-full font-bold py-3 px-6 rounded-lg text-lg transition-all ${isComparing ? 'bg-indigo-100 text-indigo-600' : 'bg-brand-gray-200 dark:bg-brand-gray-700'} ${isCompareDisabled ? 'opacity-50 cursor-not-allowed' : ''}`}
+                    className={`w-full font-bold py-3 px-6 rounded-lg text-lg transition-all ${isComparing ? 'bg-brand-teal text-brand-teal' : 'bg-brand-gray-200 dark:bg-brand-gray-700'} ${isCompareDisabled ? 'opacity-50 cursor-not-allowed' : ''}`}
                 >
                     Compare
                 </button>

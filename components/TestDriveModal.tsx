@@ -27,12 +27,12 @@ const TestDriveModal: React.FC<TestDriveModalProps> = ({ onClose, onSubmit }) =>
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-[100] p-4 animate-fade-in" onClick={onClose}>
-      <div className="bg-white dark:bg-brand-gray-800 rounded-xl shadow-2xl w-full max-w-md" onClick={(e) => e.stopPropagation()}>
+      <div className="bg-brand-cream dark:bg-brand-gray-800 rounded-xl shadow-2xl w-full max-w-md" onClick={(e) => e.stopPropagation()}>
         <form onSubmit={handleSubmit}>
           <div className="p-6">
             <div className="flex justify-between items-center mb-4">
               <h2 className="text-2xl font-bold text-brand-gray-900 dark:text-brand-gray-100">Book a Test Drive</h2>
-              <button type="button" onClick={onClose} className="text-brand-gray-400 hover:text-brand-gray-800 dark:hover:text-white text-3xl">&times;</button>
+              <button type="button" onClick={onClose} className="text-brand-gray-400 hover:text-brand-gray-800 dark:hover:text-brand-cream text-3xl">&times;</button>
             </div>
             <p className="text-brand-gray-600 dark:text-brand-gray-400 mb-6">
               Select your preferred date and time. The seller will confirm your request via chat.
@@ -47,7 +47,7 @@ const TestDriveModal: React.FC<TestDriveModalProps> = ({ onClose, onSubmit }) =>
                   onChange={(e) => setDate(e.target.value)}
                   min={getTodayString()}
                   required
-                  className="mt-1 w-full p-3 border border-brand-gray-300 dark:border-brand-gray-600 rounded-lg bg-white dark:bg-brand-gray-700" onFocus={(e) => { e.currentTarget.style.borderColor = 'var(--brand-deep-red)'; e.currentTarget.style.boxShadow = '0 0 0 2px var(--brand-deep-red-light)'; }} onBlur={(e) => { e.currentTarget.style.borderColor = ''; e.currentTarget.style.boxShadow = ''; }}
+                  className="mt-1 w-full p-3 border border-brand-gray-300 dark:border-brand-gray-600 rounded-lg bg-brand-cream dark:bg-brand-gray-700" onFocus={(e) => { e.currentTarget.style.borderColor = 'var(--brand-teal)'; e.currentTarget.style.boxShadow = '0 0 0 2px var(--brand-teal-light)'; }} onBlur={(e) => { e.currentTarget.style.borderColor = ''; e.currentTarget.style.boxShadow = ''; }}
                 />
               </div>
               <div>
@@ -58,16 +58,16 @@ const TestDriveModal: React.FC<TestDriveModalProps> = ({ onClose, onSubmit }) =>
                   value={time}
                   onChange={(e) => setTime(e.target.value)}
                   required
-                  className="mt-1 w-full p-3 border border-brand-gray-300 dark:border-brand-gray-600 rounded-lg bg-white dark:bg-brand-gray-700" onFocus={(e) => { e.currentTarget.style.borderColor = 'var(--brand-deep-red)'; e.currentTarget.style.boxShadow = '0 0 0 2px var(--brand-deep-red-light)'; }} onBlur={(e) => { e.currentTarget.style.borderColor = ''; e.currentTarget.style.boxShadow = ''; }}
+                  className="mt-1 w-full p-3 border border-brand-gray-300 dark:border-brand-gray-600 rounded-lg bg-brand-cream dark:bg-brand-gray-700" onFocus={(e) => { e.currentTarget.style.borderColor = 'var(--brand-teal)'; e.currentTarget.style.boxShadow = '0 0 0 2px var(--brand-teal-light)'; }} onBlur={(e) => { e.currentTarget.style.borderColor = ''; e.currentTarget.style.boxShadow = ''; }}
                 />
               </div>
-              {error && <p className="text-sm text-red-500">{error}</p>}
+              {error && <p className="text-sm text-brand-teal">{error}</p>}
             </div>
           </div>
           <div className="bg-brand-gray-50 dark:bg-brand-gray-900/50 px-6 py-4 flex justify-end rounded-b-xl">
             <button
               type="submit"
-              className="px-6 py-2 btn-brand-primary text-white font-bold rounded-lg transition-colors"
+              className="px-6 py-2 btn-brand-primary text-brand-cream font-bold rounded-lg transition-colors"
             >
               Send Request
             </button>

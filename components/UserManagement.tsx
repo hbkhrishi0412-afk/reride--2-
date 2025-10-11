@@ -56,43 +56,43 @@ const CreateUserModal: React.FC<{
 
     return (
         <div className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50 p-4 animate-fade-in">
-            <div className="bg-white dark:bg-brand-gray-dark rounded-lg shadow-2xl w-full max-w-md">
+            <div className="bg-brand-cream dark:bg-brand-gray-dark rounded-lg shadow-2xl w-full max-w-md">
                 <form onSubmit={handleSubmit}>
                     <div className="p-6">
                         <div className="flex justify-between items-center mb-4">
-                           <h2 className="text-xl font-bold text-gray-800 dark:text-gray-100">Create New User</h2>
-                           <button type="button" onClick={onClose} className="text-gray-500 dark:text-gray-400 text-2xl hover:text-gray-800 dark:hover:text-gray-200">&times;</button>
+                           <h2 className="text-xl font-bold text-brand-slate dark:text-brand-slate">Create New User</h2>
+                           <button type="button" onClick={onClose} className="text-brand-slate dark:text-brand-slate text-2xl hover:text-brand-slate dark:hover:text-brand-slate">&times;</button>
                         </div>
                         <div className="space-y-4">
                             <div>
-                                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Full Name</label>
+                                <label className="block text-sm font-medium text-brand-slate dark:text-brand-slate">Full Name</label>
                                 <input type="text" name="name" value={formData.name} onChange={handleChange} required className="mt-1 block w-full p-2 border rounded-md" />
                             </div>
                             <div>
-                                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Email</label>
+                                <label className="block text-sm font-medium text-brand-slate dark:text-brand-slate">Email</label>
                                 <input type="email" name="email" value={formData.email} onChange={handleChange} required className="mt-1 block w-full p-2 border rounded-md" />
                             </div>
                              <div>
-                                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Mobile Number</label>
+                                <label className="block text-sm font-medium text-brand-slate dark:text-brand-slate">Mobile Number</label>
                                 <input type="tel" name="mobile" value={formData.mobile} onChange={handleChange} required className="mt-1 block w-full p-2 border rounded-md" />
                             </div>
                              <div>
-                                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Password</label>
+                                <label className="block text-sm font-medium text-brand-slate dark:text-brand-slate">Password</label>
                                 <input type="password" name="password" value={formData.password} onChange={handleChange} required className="mt-1 block w-full p-2 border rounded-md" />
                             </div>
                             <div>
-                                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Role</label>
+                                <label className="block text-sm font-medium text-brand-slate dark:text-brand-slate">Role</label>
                                 <select name="role" value={formData.role} onChange={handleChange} className="mt-1 block w-full p-2 border rounded-md">
                                     <option value="customer">Customer</option>
                                     <option value="seller">Seller</option>
                                 </select>
                             </div>
-                            {error && <p className="text-sm text-red-500">{error}</p>}
+                            {error && <p className="text-sm text-brand-teal">{error}</p>}
                         </div>
                     </div>
-                    <div className="bg-gray-50 dark:bg-brand-gray-darker px-6 py-3 flex justify-end gap-4 rounded-b-lg">
-                        <button type="button" onClick={onClose} className="px-4 py-2 bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300">Cancel</button>
-                        <button type="submit" className="px-4 py-2 btn-brand-primary text-white rounded-md">Create User</button>
+                    <div className="bg-brand-cream dark:bg-brand-gray-darker px-6 py-3 flex justify-end gap-4 rounded-b-lg">
+                        <button type="button" onClick={onClose} className="px-4 py-2 bg-brand-cream-dark text-brand-slate rounded-md hover:bg-brand-cream">Cancel</button>
+                        <button type="submit" className="px-4 py-2 btn-brand-primary text-brand-cream rounded-md">Create User</button>
                     </div>
                 </form>
             </div>
@@ -110,7 +110,7 @@ const UserManagement: React.FC<UserManagementProps> = ({ users, currentUser, onT
     }, [users, roleFilter]);
 
     const filterActions = (
-        <select value={roleFilter} onChange={(e) => setRoleFilter(e.target.value as RoleFilter)} className="p-2 border border-brand-gray dark:border-gray-600 rounded-lg bg-white dark:bg-brand-gray-darker dark:text-gray-200">
+        <select value={roleFilter} onChange={(e) => setRoleFilter(e.target.value as RoleFilter)} className="p-2 border border-brand-gray dark:border-gray-600 rounded-lg bg-brand-cream dark:bg-brand-gray-darker dark:text-brand-slate">
             <option value="all">All Users</option>
             <option value="customer">Customers</option>
             <option value="seller">Sellers</option>
@@ -121,22 +121,22 @@ const UserManagement: React.FC<UserManagementProps> = ({ users, currentUser, onT
         <div className="space-y-6 animate-fade-in">
             <div className="flex justify-between items-center">
                 <div>
-                     <button onClick={() => onNavigate(ViewEnum.ADMIN_PANEL)} className="text-sm hover:underline mb-2 transition-colors" style={{ color: 'var(--brand-deep-red)' }} onMouseEnter={(e) => e.currentTarget.style.color = 'var(--brand-orange)'} onMouseLeave={(e) => e.currentTarget.style.color = 'var(--brand-deep-red)'}>&larr; Back to Admin Dashboard</button>
-                     <h1 className="text-3xl font-extrabold text-gray-900 dark:text-gray-100">User Management</h1>
+                     <button onClick={() => onNavigate(ViewEnum.ADMIN_PANEL)} className="text-sm hover:underline mb-2 transition-colors" style={{ color: 'var(--brand-teal)' }} onMouseEnter={(e) => e.currentTarget.style.color = 'var(--brand-gold)'} onMouseLeave={(e) => e.currentTarget.style.color = 'var(--brand-teal)'}>&larr; Back to Admin Dashboard</button>
+                     <h1 className="text-3xl font-extrabold text-brand-slate dark:text-brand-slate">User Management</h1>
                 </div>
-                <button onClick={() => setIsCreateModalOpen(true)} className="bg-green-500 text-white font-bold py-2 px-4 rounded-lg hover:bg-green-600 transition-colors">
+                <button onClick={() => setIsCreateModalOpen(true)} className="bg-brand-teal-light0 text-brand-cream font-bold py-2 px-4 rounded-lg hover:bg-brand-teal transition-colors">
                     Create User
                 </button>
             </div>
             
-            <div className="bg-white dark:bg-brand-gray-dark p-6 rounded-lg shadow-md">
+            <div className="bg-brand-cream dark:bg-brand-gray-dark p-6 rounded-lg shadow-md">
                 <div className="flex justify-between items-center mb-4">
-                    <h2 className="text-xl font-bold text-gray-800 dark:text-gray-100">All Users</h2>
+                    <h2 className="text-xl font-bold text-brand-slate dark:text-brand-slate">All Users</h2>
                     <div>{filterActions}</div>
                 </div>
                 <div className="overflow-x-auto">
                    <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
-                        <thead className="bg-gray-50 dark:bg-gray-800">
+                        <thead className="bg-brand-cream dark:bg-brand-cream">
                             <tr>
                                 <th className="px-6 py-3 text-left text-xs font-medium uppercase">Name</th>
                                 <th className="px-6 py-3 text-left text-xs font-medium uppercase">Email</th>
@@ -145,26 +145,26 @@ const UserManagement: React.FC<UserManagementProps> = ({ users, currentUser, onT
                                 <th className="px-6 py-3 text-left text-xs font-medium uppercase">Actions</th>
                             </tr>
                         </thead>
-                        <tbody className="bg-white dark:bg-brand-gray-dark divide-y divide-gray-200 dark:divide-gray-700">
+                        <tbody className="bg-brand-cream dark:bg-brand-gray-dark divide-y divide-gray-200 dark:divide-gray-700">
                             {filteredUsers.map(user => {
                                 const isCurrentUser = user.email === currentUser.email;
                                 return (
                                     <tr key={user.email}>
                                         <td className="px-6 py-4">{user.name}</td>
                                         <td className="px-6 py-4">{user.email}</td>
-                                        <td className="px-6 py-4"><span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${user.role === 'admin' ? 'bg-red-100 text-red-800' : user.role === 'seller' ? 'brand-badge-orange' : 'bg-green-100 text-green-800'}`}>{user.role}</span></td>
-                                        <td className="px-6 py-4"><span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${user.status === 'active' ? 'bg-green-100 text-green-800' : 'bg-gray-200 text-gray-800'}`}>{user.status}</span></td>
+                                        <td className="px-6 py-4"><span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${user.role === 'admin' ? 'bg-brand-teal-light text-brand-teal' : user.role === 'seller' ? 'brand-badge-orange' : 'bg-brand-teal-light text-brand-teal'}`}>{user.role}</span></td>
+                                        <td className="px-6 py-4"><span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${user.status === 'active' ? 'bg-brand-teal-light text-brand-teal' : 'bg-brand-cream-dark text-brand-slate'}`}>{user.status}</span></td>
                                         <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                                             <button 
                                                 onClick={() => onToggleUserStatus(user.email)} 
                                                 disabled={isCurrentUser}
-                                                className={`mr-3 ${user.status === 'active' ? 'text-yellow-600 hover:text-yellow-900' : 'text-green-600 hover:text-green-900'} disabled:opacity-50 disabled:cursor-not-allowed`}>
+                                                className={`mr-3 ${user.status === 'active' ? 'text-brand-slate hover:text-brand-slate' : 'text-brand-teal hover:text-brand-teal'} disabled:opacity-50 disabled:cursor-not-allowed`}>
                                                 {user.status === 'active' ? 'Deactivate' : 'Reactivate'}
                                             </button>
                                             <button 
                                                 onClick={() => onDeleteUser(user.email)} 
                                                 disabled={isCurrentUser}
-                                                className="text-red-600 hover:text-red-900 disabled:opacity-50 disabled:cursor-not-allowed">
+                                                className="text-brand-teal hover:text-brand-teal disabled:opacity-50 disabled:cursor-not-allowed">
                                                 Delete
                                             </button>
                                         </td>

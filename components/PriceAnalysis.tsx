@@ -40,7 +40,7 @@ const PriceAnalysis: React.FC<PriceAnalysisProps> = ({ vehicle, similarVehicles 
   }, [vehicle, similarVehicles]);
 
   return (
-    <div className="bg-white dark:bg-brand-gray-800 rounded-xl shadow-soft-lg p-6">
+    <div className="bg-brand-cream dark:bg-brand-gray-800 rounded-xl shadow-soft-lg p-6">
       <h3 className="text-lg font-semibold text-brand-gray-800 dark:text-brand-gray-100 mb-4">AI Price Analysis</h3>
       
       {!analysis && !isLoading && !error && (
@@ -50,7 +50,7 @@ const PriceAnalysis: React.FC<PriceAnalysisProps> = ({ vehicle, similarVehicles 
           </p>
           <button
             onClick={handleAnalyzePrice}
-            className="w-full bg-indigo-600 text-white font-bold py-3 px-6 rounded-lg text-lg hover:bg-indigo-700 transition-all transform hover:scale-105 flex items-center justify-center gap-2"
+            className="w-full bg-brand-teal text-brand-cream font-bold py-3 px-6 rounded-lg text-lg hover:bg-brand-teal transition-all transform hover:scale-105 flex items-center justify-center gap-2"
           >
             <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" /></svg>
             Analyze Price
@@ -60,16 +60,16 @@ const PriceAnalysis: React.FC<PriceAnalysisProps> = ({ vehicle, similarVehicles 
 
       {isLoading && (
         <div className="text-center py-8">
-            <div className="w-8 h-8 border-4 border-dashed rounded-full animate-spin mx-auto" style={{ borderColor: 'var(--brand-deep-red)' }}></div>
+            <div className="w-8 h-8 border-4 border-dashed rounded-full animate-spin mx-auto" style={{ borderColor: 'var(--brand-teal)' }}></div>
             <p className="mt-3 text-sm font-semibold text-brand-gray-600 dark:text-brand-gray-400">Analyzing market data...</p>
         </div>
       )}
 
       {error && (
-        <div className="text-center p-4 bg-red-50 dark:bg-red-900/20 text-red-700 dark:text-red-300 rounded-lg">
+        <div className="text-center p-4 bg-brand-teal-light dark:bg-brand-teal/20 text-brand-teal dark:text-brand-teal rounded-lg">
             <p className="font-semibold">Analysis Failed</p>
             <p className="text-sm">{error}</p>
-            <button onClick={handleAnalyzePrice} className="mt-2 text-sm font-bold text-indigo-600 hover:underline">Try Again</button>
+            <button onClick={handleAnalyzePrice} className="mt-2 text-sm font-bold text-brand-teal hover:underline">Try Again</button>
         </div>
       )}
 
@@ -77,7 +77,7 @@ const PriceAnalysis: React.FC<PriceAnalysisProps> = ({ vehicle, similarVehicles 
         <div className="animate-fade-in space-y-4">
             <div>
                 <p className="text-sm text-brand-gray-600 dark:text-brand-gray-400">Fair Market Value (est.)</p>
-                <p className="text-2xl font-extrabold text-green-600 dark:text-green-400">
+                <p className="text-2xl font-extrabold text-brand-teal dark:text-brand-teal">
                     {formatCurrency(analysis.min)} - {formatCurrency(analysis.max)}
                 </p>
             </div>
@@ -87,7 +87,7 @@ const PriceAnalysis: React.FC<PriceAnalysisProps> = ({ vehicle, similarVehicles 
                     "{analysis.summary}"
                 </p>
             </div>
-            <button onClick={handleAnalyzePrice} className="text-xs font-bold hover:underline transition-colors" style={{ color: 'var(--brand-deep-red)' }} onMouseEnter={(e) => e.currentTarget.style.color = 'var(--brand-orange)'} onMouseLeave={(e) => e.currentTarget.style.color = 'var(--brand-deep-red)'}>Re-analyze</button>
+            <button onClick={handleAnalyzePrice} className="text-xs font-bold hover:underline transition-colors" style={{ color: 'var(--brand-teal)' }} onMouseEnter={(e) => e.currentTarget.style.color = 'var(--brand-gold)'} onMouseLeave={(e) => e.currentTarget.style.color = 'var(--brand-teal)'}>Re-analyze</button>
         </div>
       )}
     </div>

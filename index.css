@@ -43,7 +43,7 @@ code {
 
 .skeleton {
   animation: shimmer 2s infinite linear;
-  background: linear-gradient(to right, #f0f0f0 4%, #e0e0e0 25%, #f0f0f0 36%);
+  background: linear-gradient(to right, #FAF8F1 4%, #FAEAB1 25%, #FAF8F1 36%);
   background-size: 1000px 100%;
 }
 
@@ -69,7 +69,7 @@ code {
 
 /* Focus Visible Styles */
 *:focus-visible {
-  outline: 2px solid var(--brand-deep-red);
+  outline: 2px solid var(--brand-teal);
   outline-offset: 2px;
 }
 
@@ -80,8 +80,8 @@ html {
 
 /* Selection Styles */
 ::selection {
-  background-color: var(--brand-rose-pink-light);
-  color: var(--brand-blackcurrant);
+  background-color: var(--brand-gold-light);
+  color: var(--brand-slate);
 }
 
 /* Prevent Text Overflow */
@@ -96,9 +96,9 @@ html {
   display: inline-block;
   width: 20px;
   height: 20px;
-  border: 3px solid var(--brand-rose-pink-light);
+  border: 3px solid var(--brand-gold-light);
   border-radius: 50%;
-  border-top-color: var(--brand-deep-red);
+  border-top-color: var(--brand-teal);
   animation: spin 1s ease-in-out infinite;
 }
 
@@ -115,11 +115,6 @@ img {
   display: block;
 }
 
-/* Dark Mode Support (if needed in future) */
-@media (prefers-color-scheme: dark) {
-  /* Add dark mode styles here if needed */
-}
-
 /* Custom Focus Ring */
 button:focus,
 a:focus,
@@ -134,7 +129,7 @@ a:focus-visible,
 input:focus-visible,
 textarea:focus-visible,
 select:focus-visible {
-  outline: 2px solid var(--brand-deep-red);
+  outline: 2px solid var(--brand-teal);
   outline-offset: 2px;
 }
 
@@ -154,89 +149,59 @@ button:disabled {
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-/* Inside the Head - Bold Color Scheme */
+/* ONLY 4 Colors - User Palette */
 :root {
-  /* Primary Brand Colors - User-Focused Professional Palette */
-  --brand-teal: #34656D;
-  --brand-teal-hover: #4A7C85;
-  --brand-teal-light: rgba(52, 101, 109, 0.1);
-  --brand-teal-dark: #2A5159;
+  /* Primary Brand Colors */
+  --brand-cream: #FAF8F1;
+  --brand-cream-hover: #FCFAF6;
+  --brand-cream-light: rgba(250, 248, 241, 0.5);
+  --brand-cream-dark: #F5F3EB;
   
   --brand-gold: #FAEAB1;
   --brand-gold-hover: #FBF0C8;
   --brand-gold-light: rgba(250, 234, 177, 0.3);
   --brand-gold-dark: #F5DF8D;
   
-  --brand-cream: #FAF8F1;
-  --brand-cream-hover: #FCFAF6;
-  --brand-cream-light: rgba(250, 248, 241, 0.5);
-  --brand-cream-dark: #F5F3EB;
+  --brand-teal: #34656D;
+  --brand-teal-hover: #4A7C85;
+  --brand-teal-light: rgba(52, 101, 109, 0.1);
+  --brand-teal-dark: #2A5159;
   
   --brand-slate: #334443;
   --brand-slate-hover: #4A5E5C;
   --brand-slate-light: rgba(51, 68, 67, 0.1);
   --brand-slate-dark: #1F2928;
   
-  /* Neutral Colors - Clear and Accessible */
-  --brand-white: #FFFFFF;
-  --brand-off-white: #FAF8F1;
-  --brand-light-gray: #E8E6E0;
-  --brand-gray: #D0CEC8;
-  --brand-medium-gray: #8A8884;
-  --brand-dark-gray: #5A5956;
-  --brand-text-dark: #334443;
-  --brand-text-gray: #6B7170;
-  
-  /* Legacy Spinny variable mappings - Professional UX Palette */
-  --spinny-orange: #FAEAB1;
-  --spinny-orange-hover: #FBF0C8;
-  --spinny-orange-light: rgba(250, 234, 177, 0.3);
-  --spinny-orange-dark: #F5DF8D;
-  --spinny-white: #FFFFFF;
-  --spinny-off-white: #FAF8F1;
-  --spinny-light-gray: #E8E6E0;
-  --spinny-gray: #D0CEC8;
-  --spinny-medium-gray: #8A8884;
-  --spinny-dark-gray: #5A5956;
-  --spinny-text-dark: #334443;
-  --spinny-text-gray: #6B7170;
-  
-  /* Accent Colors - Clear User Feedback */
-  --spinny-success: #34656D;
-  --spinny-info: #34656D;
-  --spinny-warning: #FAEAB1;
-  --spinny-error: #334443;
-  
-  /* Gradients - Professional and Accessible */
+  /* Gradients */
   --gradient-primary: linear-gradient(135deg, #34656D 0%, #4A7C85 100%);
   --gradient-warm: linear-gradient(135deg, #FAEAB1 0%, #34656D 100%);
   --gradient-soft: linear-gradient(135deg, #FAF8F1 0%, #FAEAB1 100%);
   --gradient-dark: linear-gradient(135deg, #334443 0%, #1F2928 100%);
   
-  /* Shadows - Subtle and Professional */
-  --spinny-shadow-sm: 0 2px 8px rgba(51, 68, 67, 0.08);
-  --spinny-shadow-md: 0 4px 16px rgba(51, 68, 67, 0.12);
-  --spinny-shadow-lg: 0 8px 32px rgba(51, 68, 67, 0.16);
+  /* Shadows */
+  --shadow-sm: 0 2px 8px rgba(51, 68, 67, 0.08);
+  --shadow-md: 0 4px 16px rgba(51, 68, 67, 0.12);
+  --shadow-lg: 0 8px 32px rgba(51, 68, 67, 0.16);
   --shadow-teal: 0 4px 20px rgba(52, 101, 109, 0.25);
   --shadow-gold: 0 4px 20px rgba(250, 234, 177, 0.4);
   --shadow-slate: 0 4px 20px rgba(51, 68, 67, 0.2);
   
   /* Border Radius */
-  --spinny-radius-sm: 8px;
-  --spinny-radius-md: 12px;
-  --spinny-radius-lg: 16px;
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
 }
 
 /* Brand Component Styles */
 
-/* Header - Clean and Professional */
-.spinny-header {
-  background: var(--brand-white);
-  box-shadow: var(--spinny-shadow-sm);
+/* Header */
+.brand-header {
+  background: #FAF8F1;
+  box-shadow: var(--shadow-sm);
   border-bottom: 2px solid var(--brand-gold);
 }
 
-.spinny-header-top {
+.brand-header-top {
   background: var(--gradient-dark);
   padding: 8px 0;
   font-size: 13px;
@@ -244,12 +209,12 @@ button:disabled {
   border-bottom: 1px solid var(--brand-slate-light);
 }
 
-/* Buttons - Clear Visual Hierarchy for User Actions */
-.spinny-button-primary {
+/* Buttons */
+.btn-primary {
   background: var(--gradient-primary);
-  color: var(--brand-white);
+  color: #FAF8F1;
   padding: 14px 28px;
-  border-radius: var(--spinny-radius-sm);
+  border-radius: var(--radius-sm);
   font-weight: 600;
   border: none;
   cursor: pointer;
@@ -259,56 +224,56 @@ button:disabled {
   letter-spacing: 0.3px;
 }
 
-.spinny-button-primary:hover {
+.btn-primary:hover {
   background: var(--brand-teal-hover);
-  box-shadow: var(--spinny-shadow-md);
+  box-shadow: var(--shadow-md);
   transform: translateY(-2px);
 }
 
-.spinny-button-primary:disabled {
+.btn-primary:disabled {
   opacity: 0.5;
   cursor: not-allowed;
   transform: none;
-  background: var(--brand-gray);
+  background: var(--brand-slate-light);
 }
 
-.spinny-button-secondary {
+.btn-secondary {
   background: var(--brand-gold);
   color: var(--brand-slate);
   border: 2px solid var(--brand-gold-dark);
   padding: 12px 24px;
-  border-radius: var(--spinny-radius-sm);
+  border-radius: var(--radius-sm);
   font-weight: 600;
   cursor: pointer;
   transition: all 0.3s ease;
 }
 
-.spinny-button-secondary:hover {
+.btn-secondary:hover {
   background: var(--brand-gold-hover);
   border-color: var(--brand-teal);
   transform: translateY(-1px);
 }
 
-/* Cards - Clean and Inviting Design */
-.spinny-card {
-  background: var(--brand-white);
-  border-radius: var(--spinny-radius-md);
-  box-shadow: var(--spinny-shadow-sm);
+/* Cards */
+.brand-card {
+  background: #FAF8F1;
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-sm);
   overflow: hidden;
   transition: all 0.3s ease;
   border: 2px solid var(--brand-cream-dark);
 }
 
-.spinny-card:hover {
+.brand-card:hover {
   box-shadow: var(--shadow-teal);
   transform: translateY(-4px);
   border-color: var(--brand-gold);
 }
 
-/* Badges - Clear Status Indicators */
-.spinny-badge {
+/* Badges */
+.brand-badge {
   background: var(--brand-teal);
-  color: var(--brand-white);
+  color: #FAF8F1;
   padding: 6px 14px;
   border-radius: 6px;
   font-size: 12px;
@@ -318,36 +283,36 @@ button:disabled {
   text-transform: uppercase;
 }
 
-.spinny-badge-success {
+.brand-badge-success {
   background: var(--brand-teal);
-  color: var(--brand-white);
+  color: #FAF8F1;
 }
 
-.spinny-badge-info {
+.brand-badge-info {
   background: var(--brand-gold);
   color: var(--brand-slate);
 }
 
 /* Search Bar */
-.spinny-search {
-  background: var(--spinny-white);
-  border: 2px solid var(--spinny-gray);
-  border-radius: var(--spinny-radius-md);
+.brand-search {
+  background: #FAF8F1;
+  border: 2px solid var(--brand-gold);
+  border-radius: var(--radius-md);
   padding: 12px 20px;
   font-size: 16px;
   transition: all 0.3s ease;
   width: 100%;
 }
 
-.spinny-search:focus {
+.brand-search:focus {
   outline: none;
   border-color: var(--brand-teal);
   box-shadow: 0 0 0 3px var(--brand-teal-light);
-  background: var(--brand-white);
+  background: #FAF8F1;
 }
 
-/* Hero Section - Inviting and Professional */
-.spinny-hero {
+/* Hero Section */
+.brand-hero {
   background: var(--gradient-warm);
   padding: 80px 0;
   color: var(--brand-slate);
@@ -355,30 +320,30 @@ button:disabled {
 }
 
 /* Vehicle Card */
-.spinny-vehicle-card {
-  background: var(--spinny-white);
-  border-radius: var(--spinny-radius-md);
-  box-shadow: var(--spinny-shadow-sm);
+.vehicle-card {
+  background: #FAF8F1;
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-sm);
   overflow: hidden;
   transition: all 0.3s ease;
-  border: 1px solid var(--spinny-gray);
+  border: 1px solid var(--brand-gold);
 }
 
-.spinny-vehicle-card:hover {
-  box-shadow: var(--spinny-shadow-lg);
+.vehicle-card:hover {
+  box-shadow: var(--shadow-lg);
   transform: translateY(-4px);
 }
 
-.spinny-price {
+.vehicle-price {
   color: var(--brand-teal);
   font-size: 26px;
   font-weight: 700;
   letter-spacing: -0.5px;
 }
 
-.spinny-verified {
+.vehicle-verified {
   background: var(--brand-teal);
-  color: var(--brand-white);
+  color: #FAF8F1;
   padding: 5px 10px;
   border-radius: 6px;
   font-size: 11px;
@@ -389,173 +354,49 @@ button:disabled {
   letter-spacing: 0.3px;
 }
 
-/* Trust Indicators */
-.spinny-trust-badge {
-  background: var(--spinny-light-gray);
-  border: 1px solid var(--spinny-gray);
-  padding: 12px 20px;
-  border-radius: var(--spinny-radius-sm);
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  font-size: 14px;
-  color: var(--spinny-text-dark);
-  font-weight: 500;
-  transition: all 0.3s ease;
-}
-
-.spinny-trust-badge:hover {
-  background: var(--brand-gold-light);
-  border-color: var(--brand-teal);
-  transform: scale(1.05);
-}
-
-/* Navigation Links - Clear Visual Feedback */
-.spinny-nav-link {
+/* Navigation Links */
+.nav-link {
   color: var(--brand-slate);
   text-decoration: none;
   padding: 10px 18px;
-  border-radius: var(--spinny-radius-sm);
+  border-radius: var(--radius-sm);
   transition: all 0.3s ease;
   font-weight: 500;
   font-size: 15px;
   letter-spacing: 0.2px;
 }
 
-.spinny-nav-link:hover {
+.nav-link:hover {
   background: var(--brand-gold-light);
   color: var(--brand-teal);
   transform: translateY(-1px);
 }
 
-.spinny-nav-link.active {
+.nav-link.active {
   background: var(--brand-teal);
-  color: var(--brand-white);
+  color: #FAF8F1;
   box-shadow: var(--shadow-teal);
 }
 
 /* Feature Pills */
-.spinny-feature-pill {
-  background: var(--spinny-off-white);
-  border: 1px solid var(--spinny-gray);
+.feature-pill {
+  background: #FAF8F1;
+  border: 1px solid var(--brand-gold);
   padding: 6px 12px;
   border-radius: 20px;
   font-size: 13px;
-  color: var(--spinny-text-gray);
+  color: var(--brand-slate);
   display: inline-flex;
   align-items: center;
   gap: 4px;
 }
 
 /* Section Headers */
-.spinny-section-header {
+.section-header {
   font-size: 32px;
   font-weight: 700;
-  color: var(--spinny-text-dark);
+  color: var(--brand-slate);
   margin-bottom: 24px;
-}
-
-/* Brand Theme Card Styling */
-.carandbike-card {
-  background-color: var(--brand-white);
-  border: 1px solid var(--brand-rose-pink-light);
-  border-radius: 8px;
-  overflow: hidden;
-  transition: all 0.3s ease;
-  box-shadow: 0 1px 3px rgba(29, 24, 66, 0.1);
-}
-
-.carandbike-card:hover {
-  border-color: var(--brand-deep-red);
-  box-shadow: var(--shadow-red);
-  transform: translateY(-2px);
-}
-
-.carandbike-button {
-  background: var(--gradient-primary);
-  color: var(--brand-white);
-  padding: 12px 24px;
-  border-radius: 6px;
-  font-weight: 500;
-  border: none;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  box-shadow: var(--shadow-red);
-}
-
-.carandbike-button:hover {
-  background: var(--gradient-dark);
-  transform: translateY(-2px);
-  box-shadow: var(--spinny-shadow-lg);
-}
-
-.carandbike-button-orange {
-  background: var(--gradient-warm);
-  color: var(--brand-white);
-  padding: 12px 24px;
-  border-radius: 6px;
-  font-weight: 500;
-  border: none;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  box-shadow: var(--shadow-orange);
-}
-
-.carandbike-button-orange:hover {
-  background: var(--brand-orange-dark);
-  transform: translateY(-2px);
-  box-shadow: var(--spinny-shadow-lg);
-}
-
-.carandbike-search {
-  background-color: var(--brand-white);
-  border: 1px solid var(--brand-rose-pink-light);
-  border-radius: 8px;
-  padding: 8px;
-  box-shadow: var(--spinny-shadow-sm);
-}
-
-.carandbike-hero {
-  background: var(--gradient-primary);
-  color: var(--brand-white);
-  padding: 80px 0;
-}
-
-.carandbike-filter-sidebar {
-  background: var(--gradient-dark);
-  color: var(--brand-white);
-  padding: 24px;
-  border-radius: 8px;
-}
-
-.carandbike-top-bar {
-  background: var(--brand-blackcurrant);
-  color: var(--brand-white);
-  padding: 8px 0;
-  font-size: 13px;
-  font-weight: 500;
-}
-
-.carandbike-main-nav {
-  background-color: var(--brand-white);
-  border-bottom: 1px solid var(--brand-rose-pink-light);
-  padding: 16px 0;
-  box-shadow: var(--spinny-shadow-sm);
-}
-
-.carandbike-nav-link {
-  color: var(--brand-text-dark);
-  font-weight: 600;
-  padding: 10px 16px;
-  border-radius: 6px;
-  transition: all 0.3s ease;
-  font-size: 15px;
-}
-
-.carandbike-nav-link:hover {
-  color: var(--brand-deep-red);
-  background-color: var(--brand-rose-pink-light);
-  transform: translateY(-1px);
 }
 
 /* Premium Animations and Effects */
@@ -610,30 +451,21 @@ button:disabled {
   }
 }
 
-@keyframes shimmer {
-  0% {
-    background-position: -200% 0;
-  }
-  100% {
-    background-position: 200% 0;
-  }
-}
-
 @keyframes glow {
   0%, 100% {
-    box-shadow: 0 0 20px rgba(142, 13, 60, 0.4);
+    box-shadow: 0 0 20px rgba(52, 101, 109, 0.4);
   }
   50% {
-    box-shadow: 0 0 40px rgba(142, 13, 60, 0.8);
+    box-shadow: 0 0 40px rgba(52, 101, 109, 0.8);
   }
 }
 
-/* Premium Components - User-Friendly Design */
+/* Premium Components */
 .premium-card {
-  background: var(--brand-white);
+  background: #FAF8F1;
   border: 2px solid var(--brand-cream-dark);
   border-radius: 16px;
-  box-shadow: var(--spinny-shadow-sm);
+  box-shadow: var(--shadow-sm);
   transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
   position: relative;
   overflow: hidden;
@@ -646,7 +478,7 @@ button:disabled {
   left: -100%;
   width: 100%;
   height: 100%;
-  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+  background: linear-gradient(90deg, transparent, rgba(250, 234, 177, 0.4), transparent);
   transition: left 0.5s;
 }
 
@@ -666,28 +498,9 @@ button:disabled {
   overflow: hidden;
 }
 
-.premium-hero::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grain" width="100" height="100" patternUnits="userSpaceOnUse"><circle cx="50" cy="50" r="1" fill="white" opacity="0.1"/></pattern></defs><rect width="100" height="100" fill="url(%23grain)"/></svg>');
-  animation: float 6s ease-in-out infinite;
-}
-
-.glass-morphism {
-  background: var(--glass-bg);
-  backdrop-filter: blur(20px);
-  border: 1px solid var(--glass-border);
-  border-radius: 16px;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
-}
-
 .premium-button {
   background: var(--gradient-warm);
-  color: white;
+  color: #334443;
   padding: 16px 32px;
   border-radius: 12px;
   font-weight: 600;
@@ -696,7 +509,7 @@ button:disabled {
   transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
   position: relative;
   overflow: hidden;
-  box-shadow: var(--shadow-orange);
+  box-shadow: var(--shadow-gold);
 }
 
 .premium-button::before {
@@ -706,7 +519,7 @@ button:disabled {
   left: -100%;
   width: 100%;
   height: 100%;
-  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+  background: linear-gradient(90deg, transparent, rgba(250, 248, 241, 0.3), transparent);
   transition: left 0.5s;
 }
 
@@ -716,7 +529,7 @@ button:disabled {
 
 .premium-button:hover {
   transform: translateY(-2px) scale(1.05);
-  box-shadow: var(--spinny-shadow-lg);
+  box-shadow: var(--shadow-lg);
 }
 
 .premium-text-gradient {
@@ -751,346 +564,30 @@ button:disabled {
   animation: glow 2s ease-in-out infinite;
 }
 
-/* Enhanced vehicle card styles */
-.vehicle-card {
-  background: var(--brand-white);
-  border: 1px solid var(--brand-rose-pink-light);
-  border-radius: 12px;
-  overflow: hidden;
-  transition: all 0.3s ease;
-}
-
-.vehicle-card:hover {
-  border-color: var(--brand-deep-red);
-  box-shadow: var(--shadow-red);
-  transform: translateY(-4px);
-}
-
-/* Price styling */
-.price-highlight {
-  font-size: 1.25rem;
-  font-weight: 700;
-  color: var(--brand-deep-red);
-}
-
-/* Category button styles */
-.category-button {
-  padding: 1.5rem;
-  background: var(--brand-off-white);
-  border: 1px solid var(--brand-rose-pink-light);
-  border-radius: 12px;
-  text-align: center;
-  transition: all 0.3s ease;
-}
-
-.category-button:hover {
-  border-color: var(--brand-orange);
-  box-shadow: var(--shadow-orange);
-  transform: translateY(-4px);
-  background: var(--gradient-soft);
-  color: var(--brand-white);
-}
-
-/* Search bar styles */
-.search-container {
-  background: var(--brand-white);
-  border-radius: 12px;
-  padding: 0.5rem;
-  box-shadow: var(--spinny-shadow-lg);
-}
-
-/* Hero section styles */
-.hero-section {
-  background: var(--gradient-primary);
-  color: var(--brand-white);
-  padding: 5rem 0;
-}
-
-/* Brand Theme Utility Classes */
-
 /* Background Colors */
-.bg-brand-deep-red { background-color: var(--brand-deep-red); }
-.bg-brand-blackcurrant { background-color: var(--brand-blackcurrant); }
-.bg-brand-orange { background-color: var(--brand-orange); }
-.bg-brand-rose-pink { background-color: var(--brand-rose-pink); }
+.bg-brand-cream { background-color: #FAF8F1; }
+.bg-brand-gold { background-color: #FAEAB1; }
+.bg-brand-teal { background-color: #34656D; }
+.bg-brand-slate { background-color: #334443; }
 .bg-gradient-primary { background: var(--gradient-primary); }
 .bg-gradient-warm { background: var(--gradient-warm); }
 .bg-gradient-soft { background: var(--gradient-soft); }
 .bg-gradient-dark { background: var(--gradient-dark); }
 
 /* Text Colors */
-.text-brand-deep-red { color: var(--brand-deep-red); }
-.text-brand-blackcurrant { color: var(--brand-blackcurrant); }
-.text-brand-orange { color: var(--brand-orange); }
-.text-brand-rose-pink { color: var(--brand-rose-pink); }
-.text-brand-white { color: var(--brand-white); }
+.text-brand-cream { color: #FAF8F1; }
+.text-brand-gold { color: #FAEAB1; }
+.text-brand-teal { color: #34656D; }
+.text-brand-slate { color: #334443; }
 
 /* Border Colors */
-.border-brand-deep-red { border-color: var(--brand-deep-red); }
-.border-brand-blackcurrant { border-color: var(--brand-blackcurrant); }
-.border-brand-orange { border-color: var(--brand-orange); }
-.border-brand-rose-pink { border-color: var(--brand-rose-pink); }
+.border-brand-cream { border-color: #FAF8F1; }
+.border-brand-gold { border-color: #FAEAB1; }
+.border-brand-teal { border-color: #34656D; }
+.border-brand-slate { border-color: #334443; }
 
 /* Hover States */
-.hover-deep-red:hover { color: var(--brand-deep-red); }
-.hover-bg-deep-red:hover { background-color: var(--brand-deep-red); }
-.hover-orange:hover { color: var(--brand-orange); }
-.hover-bg-orange:hover { background-color: var(--brand-orange); }
-.hover-rose-pink:hover { color: var(--brand-rose-pink); }
-.hover-bg-rose-pink:hover { background-color: var(--brand-rose-pink-light); }
-
-/* Branded Buttons */
-.btn-brand-primary {
-  background: var(--gradient-primary);
-  color: var(--brand-white);
-  padding: 12px 24px;
-  border-radius: var(--spinny-radius-sm);
-  font-weight: 600;
-  border: none;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  box-shadow: var(--shadow-red);
-}
-
-.btn-brand-primary:hover {
-  background: var(--gradient-dark);
-  transform: translateY(-2px);
-  box-shadow: var(--spinny-shadow-lg);
-}
-
-.btn-brand-secondary {
-  background: var(--brand-white);
-  color: var(--brand-deep-red);
-  border: 2px solid var(--brand-deep-red);
-  padding: 12px 24px;
-  border-radius: var(--spinny-radius-sm);
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.3s ease;
-}
-
-.btn-brand-secondary:hover {
-  background: var(--brand-deep-red);
-  color: var(--brand-white);
-  transform: translateY(-2px);
-}
-
-.btn-brand-orange {
-  background: var(--gradient-warm);
-  color: var(--brand-white);
-  padding: 12px 24px;
-  border-radius: var(--spinny-radius-sm);
-  font-weight: 600;
-  border: none;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  box-shadow: var(--shadow-orange);
-}
-
-.btn-brand-orange:hover {
-  background: var(--brand-orange-dark);
-  transform: translateY(-2px);
-  box-shadow: var(--spinny-shadow-lg);
-}
-
-.btn-brand-soft {
-  background: var(--gradient-soft);
-  color: var(--brand-white);
-  padding: 12px 24px;
-  border-radius: var(--spinny-radius-sm);
-  font-weight: 600;
-  border: none;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  box-shadow: var(--shadow-pink);
-}
-
-.btn-brand-soft:hover {
-  background: var(--brand-rose-pink-dark);
-  transform: translateY(-2px);
-  box-shadow: var(--spinny-shadow-lg);
-}
-
-/* Brand Cards */
-.brand-card {
-  background: var(--brand-white);
-  border: 1px solid var(--brand-rose-pink-light);
-  border-radius: var(--spinny-radius-md);
-  padding: 1.5rem;
-  transition: all 0.3s ease;
-  box-shadow: var(--spinny-shadow-sm);
-}
-
-.brand-card:hover {
-  border-color: var(--brand-deep-red);
-  box-shadow: var(--shadow-red);
-  transform: translateY(-4px);
-}
-
-.brand-card-dark {
-  background: var(--gradient-dark);
-  color: var(--brand-white);
-  border: 1px solid var(--brand-blackcurrant-light);
-  border-radius: var(--spinny-radius-md);
-  padding: 1.5rem;
-  transition: all 0.3s ease;
-  box-shadow: var(--spinny-shadow-md);
-}
-
-.brand-card-dark:hover {
-  border-color: var(--brand-rose-pink);
-  box-shadow: var(--spinny-shadow-lg);
-  transform: translateY(-4px);
-}
-
-/* Brand Badges */
-.brand-badge {
-  display: inline-block;
-  padding: 6px 12px;
-  border-radius: 4px;
-  font-size: 0.875rem;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-}
-
-.brand-badge-red {
-  background: var(--brand-deep-red);
-  color: var(--brand-white);
-}
-
-.brand-badge-orange {
-  background: var(--brand-orange);
-  color: var(--brand-white);
-}
-
-.brand-badge-pink {
-  background: var(--brand-rose-pink);
-  color: var(--brand-blackcurrant);
-}
-
-.brand-badge-dark {
-  background: var(--brand-blackcurrant);
-  color: var(--brand-white);
-}
-
-/* Brand Dividers */
-.brand-divider {
-  height: 1px;
-  background: linear-gradient(90deg, transparent, var(--brand-rose-pink), transparent);
-  margin: 2rem 0;
-}
-
-.brand-divider-thick {
-  height: 3px;
-  background: var(--gradient-warm);
-  margin: 2rem 0;
-  border-radius: 3px;
-}
-
-/* Accent Lines */
-.brand-accent-left {
-  border-left: 4px solid var(--brand-deep-red);
-  padding-left: 1rem;
-}
-
-.brand-accent-top {
-  border-top: 4px solid var(--brand-orange);
-  padding-top: 1rem;
-}
-
-/* Custom Element Styles - Black text on White background */
-.filters,
-.intelligent-search,
-.seller-dashboard-login,
-.new-cars,
-.dealers,
-.support,
-.used-cars-page {
-  color: black !important;
-  background-color: white !important;
-}
-
-/* Apply to all child elements as well */
-.filters *,
-.intelligent-search *,
-.seller-dashboard-login *,
-.new-cars *,
-.dealers *,
-.support *,
-.used-cars-page * {
-  color: black !important;
-  background-color: white !important;
-}
-
-/* Specific rules for text elements to ensure black text */
-.filters h1, .filters h2, .filters h3, .filters h4, .filters h5, .filters h6,
-.intelligent-search h1, .intelligent-search h2, .intelligent-search h3, .intelligent-search h4, .intelligent-search h5, .intelligent-search h6,
-.seller-dashboard-login h1, .seller-dashboard-login h2, .seller-dashboard-login h3, .seller-dashboard-login h4, .seller-dashboard-login h5, .seller-dashboard-login h6,
-.new-cars h1, .new-cars h2, .new-cars h3, .new-cars h4, .new-cars h5, .new-cars h6,
-.dealers h1, .dealers h2, .dealers h3, .dealers h4, .dealers h5, .dealers h6,
-.support h1, .support h2, .support h3, .support h4, .support h5, .support h6,
-.used-cars-page h1, .used-cars-page h2, .used-cars-page h3, .used-cars-page h4, .used-cars-page h5, .used-cars-page h6,
-.filters p, .filters span, .filters label, .filters div, .filters a,
-.intelligent-search p, .intelligent-search span, .intelligent-search label, .intelligent-search div, .intelligent-search a,
-.seller-dashboard-login p, .seller-dashboard-login span, .seller-dashboard-login label, .seller-dashboard-login div, .seller-dashboard-login a,
-.new-cars p, .new-cars span, .new-cars label, .new-cars div, .new-cars a,
-.dealers p, .dealers span, .dealers label, .dealers div, .dealers a,
-.support p, .support span, .support label, .support div, .support a,
-.used-cars-page p, .used-cars-page span, .used-cars-page label, .used-cars-page div, .used-cars-page a {
-  color: black !important;
-}
-
-/* Ensure buttons and inputs remain styled properly */
-.filters button,
-.intelligent-search button,
-.seller-dashboard-login button,
-.new-cars button,
-.dealers button,
-.support button,
-.used-cars-page button {
-  background: var(--brand-teal) !important;
-  color: white !important;
-  border: none !important;
-  box-shadow: var(--shadow-teal) !important;
-  font-weight: 600 !important;
-  letter-spacing: 0.3px !important;
-}
-
-.filters button:hover,
-.intelligent-search button:hover,
-.seller-dashboard-login button:hover,
-.new-cars button:hover,
-.dealers button:hover,
-.support button:hover,
-.used-cars-page button:hover {
-  background: var(--brand-teal-hover) !important;
-  transform: translateY(-2px) !important;
-}
-
-.filters input,
-.intelligent-search input,
-.seller-dashboard-login input,
-.new-cars input,
-.dealers input,
-.support input,
-.used-cars-page input,
-.filters select,
-.intelligent-search select,
-.seller-dashboard-login select,
-.new-cars select,
-.dealers select,
-.support select,
-.used-cars-page select,
-.filters textarea,
-.intelligent-search textarea,
-.seller-dashboard-login textarea,
-.new-cars textarea,
-.dealers textarea,
-.support textarea,
-.used-cars-page textarea {
-  color: black !important;
-  background-color: white !important;
-  border-color: #ccc !important;
-}
-
+.hover-teal:hover { color: var(--brand-teal); }
+.hover-bg-teal:hover { background-color: var(--brand-teal); }
+.hover-gold:hover { color: var(--brand-gold); }
+.hover-bg-gold:hover { background-color: var(--brand-gold); }

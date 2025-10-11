@@ -1,7 +1,7 @@
 import React from 'react';
 
 const VehicleTileSkeleton: React.FC = () => (
-    <div className="bg-white dark:bg-brand-gray-800 rounded-xl shadow-soft overflow-hidden flex">
+    <div className="bg-brand-cream dark:bg-brand-gray-800 rounded-xl shadow-soft overflow-hidden flex">
       <div className="w-32 sm:w-48 h-full bg-brand-gray-200 dark:bg-brand-gray-700 animate-pulse flex-shrink-0"></div>
       <div className="p-4 flex flex-col flex-grow">
         <div className="flex justify-between items-start">

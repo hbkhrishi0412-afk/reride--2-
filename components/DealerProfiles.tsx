@@ -11,7 +11,7 @@ interface DealerProfilesProps {
 const DealerCard: React.FC<{ seller: User; onViewProfile: (sellerEmail: string) => void; }> = ({ seller, onViewProfile }) => (
     <div
         onClick={() => onViewProfile(seller.email)}
-        className="bg-white dark:bg-brand-gray-800 rounded-xl shadow-soft-lg p-6 flex flex-col items-center text-center cursor-pointer transform hover:-translate-y-1 hover:shadow-soft-xl transition-all duration-300"
+        className="bg-brand-cream dark:bg-brand-gray-800 rounded-xl shadow-soft-lg p-6 flex flex-col items-center text-center cursor-pointer transform hover:-translate-y-1 hover:shadow-soft-xl transition-all duration-300"
     >
         <img
             src={seller.logoUrl || `https://i.pravatar.cc/100?u=${seller.email}`}
@@ -27,7 +27,7 @@ const DealerCard: React.FC<{ seller: User; onViewProfile: (sellerEmail: string) 
             <span className="text-xs text-brand-gray-500 dark:text-brand-gray-400">({seller.ratingCount || 0} reviews)</span>
         </div>
         <p className="text-sm text-brand-gray-600 dark:text-brand-gray-400 mt-3 flex-grow line-clamp-3">{seller.bio}</p>
-        <button className="mt-4 w-full btn-brand-primary text-white font-bold py-2 px-4 rounded-lg transition-colors">
+        <button className="mt-4 w-full btn-brand-primary text-brand-cream font-bold py-2 px-4 rounded-lg transition-colors">
             View Profile & Listings
         </button>
     </div>

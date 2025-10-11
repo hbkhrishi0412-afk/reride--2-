@@ -97,7 +97,7 @@ const Header: React.FC<HeaderProps> = memo(({
                     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex justify-between items-center">
                         <div className="flex items-center gap-6">
                             <span className="flex items-center gap-2">
-                                <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20" style={{ color: 'var(--brand-rose-pink)' }}>
+                                <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20" style={{ color: 'var(--brand-gold)' }}>
                                     <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" />
                                 </svg>
                                 <span className="font-medium">Trusted by 50,000+ Happy Customers</span>
@@ -106,7 +106,7 @@ const Header: React.FC<HeaderProps> = memo(({
                         <div className="flex items-center gap-4">
                             <button 
                                 onClick={() => setIsLocationModalOpen(true)} 
-                                className="flex items-center gap-1 transition-colors font-medium" style={{ color: 'var(--brand-rose-pink)' }}
+                                className="flex items-center gap-1 transition-colors font-medium" style={{ color: 'var(--brand-gold)' }}
                             >
                                 <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
@@ -119,7 +119,7 @@ const Header: React.FC<HeaderProps> = memo(({
                 </div>
 
                 {/* Main Navigation */}
-                <div className="bg-white border-b border-gray-200">
+                <div className="bg-brand-cream border-b border-brand-gold">
                     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                         <div className="flex justify-between items-center h-20">
                             {/* Logo */}
@@ -157,29 +157,29 @@ const Header: React.FC<HeaderProps> = memo(({
 
                             {/* Right Side Actions */}
                             <div className="hidden md:flex items-center gap-3">
-                                <button onClick={onOpenCommandPalette} className="p-2 hover:bg-gray-100 rounded-full transition-colors">
-                                    <svg className="h-6 w-6 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <button onClick={onOpenCommandPalette} className="p-2 hover:bg-brand-cream rounded-full transition-colors">
+                                    <svg className="h-6 w-6 text-brand-slate" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                                     </svg>
                                 </button>
                                 
-                                <button onClick={() => handleNavigate(ViewEnum.WISHLIST)} className="relative p-2 rounded-full transition-colors" style={{ backgroundColor: 'transparent' }} onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'var(--brand-rose-pink-light)'} onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}>
-                                    <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" style={{ color: 'var(--brand-blackcurrant)' }}>
+                                <button onClick={() => handleNavigate(ViewEnum.WISHLIST)} className="relative p-2 rounded-full transition-colors" style={{ backgroundColor: 'transparent' }} onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'var(--brand-gold-light)'} onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}>
+                                    <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" style={{ color: 'var(--brand-slate)' }}>
                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 016.364 0L12 7.636l1.318-1.318a4.5 4.5 0 116.364 6.364L12 20.364l-7.682-7.682a4.5 4.5 0 010-6.364z" />
                                     </svg>
                                     {wishlistCount > 0 && (
-                                        <span className="absolute -top-1 -right-1 text-white text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center" style={{ backgroundColor: 'var(--brand-deep-red)' }}>
+                                        <span className="absolute -top-1 -right-1 text-brand-cream text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center" style={{ backgroundColor: 'var(--brand-teal)' }}>
                                             {wishlistCount}
                                         </span>
                                     )}
                                 </button>
 
-                                <button onClick={() => handleNavigate(ViewEnum.COMPARISON)} className="relative p-2 rounded-full transition-colors" style={{ backgroundColor: 'transparent' }} onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'var(--brand-rose-pink-light)'} onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}>
-                                    <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" style={{ color: 'var(--brand-blackcurrant)' }}>
+                                <button onClick={() => handleNavigate(ViewEnum.COMPARISON)} className="relative p-2 rounded-full transition-colors" style={{ backgroundColor: 'transparent' }} onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'var(--brand-gold-light)'} onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}>
+                                    <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" style={{ color: 'var(--brand-slate)' }}>
                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
                                     </svg>
                                     {compareCount > 0 && (
-                                        <span className="absolute -top-1 -right-1 text-white text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center" style={{ backgroundColor: 'var(--brand-orange)' }}>
+                                        <span className="absolute -top-1 -right-1 text-brand-cream text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center" style={{ backgroundColor: 'var(--brand-gold)' }}>
                                             {compareCount}
                                         </span>
                                     )}
@@ -187,12 +187,12 @@ const Header: React.FC<HeaderProps> = memo(({
 
                                 {currentUser && (
                                     <div className="relative" ref={notificationsRef}>
-                                        <button onClick={() => setIsNotificationsOpen(p => !p)} className="relative p-2 rounded-full transition-colors" style={{ backgroundColor: 'transparent' }} onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'var(--brand-rose-pink-light)'} onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}>
-                                            <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" style={{ color: 'var(--brand-blackcurrant)' }}>
+                                        <button onClick={() => setIsNotificationsOpen(p => !p)} className="relative p-2 rounded-full transition-colors" style={{ backgroundColor: 'transparent' }} onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'var(--brand-gold-light)'} onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}>
+                                            <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" style={{ color: 'var(--brand-slate)' }}>
                                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6 6 0 10-12 0v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
                                             </svg>
                                             {unreadNotifications.length > 0 && (
-                                                <span className="absolute -top-1 -right-1 text-white text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center" style={{ backgroundColor: 'var(--brand-deep-red)' }}>
+                                                <span className="absolute -top-1 -right-1 text-brand-cream text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center" style={{ backgroundColor: 'var(--brand-teal)' }}>
                                                     {unreadNotifications.length}
                                                 </span>
                                             )}
@@ -209,7 +209,7 @@ const Header: React.FC<HeaderProps> = memo(({
 
                                 {currentUser ? (
                                     <div className="relative" ref={userMenuRef}>
-                                        <button onClick={() => setIsUserMenuOpen(p => !p)} className="flex items-center gap-2 p-2 hover:bg-gray-100 rounded-lg transition-colors">
+                                        <button onClick={() => setIsUserMenuOpen(p => !p)} className="flex items-center gap-2 p-2 hover:bg-brand-cream rounded-lg transition-colors">
                                             <img 
                                                 src={currentUser.avatarUrl || `https://i.pravatar.cc/40?u=${currentUser.email}`} 
                                                 alt="User" 
@@ -217,9 +217,9 @@ const Header: React.FC<HeaderProps> = memo(({
                                             />
                                         </button>
                                         {isUserMenuOpen && (
-                                            <div className="absolute top-full right-0 mt-2 w-48 bg-white dark:bg-brand-gray-800 rounded-md shadow-lg border dark:border-brand-gray-700 animate-fade-in z-20">
+                                            <div className="absolute top-full right-0 mt-2 w-48 bg-brand-cream dark:bg-brand-gray-800 rounded-md shadow-lg border dark:border-brand-gray-700 animate-fade-in z-20">
                                                 <div className="p-4 border-b dark:border-brand-gray-700">
-                                                    <p className="font-semibold text-sm text-brand-gray-900 dark:text-white">
+                                                    <p className="font-semibold text-sm text-brand-gray-900 dark:text-brand-cream">
                                                         Hi, {currentUser.name ? currentUser.name.split(' ')[0] : ''}
                                                     </p>
                                                 </div>
@@ -245,7 +245,7 @@ const Header: React.FC<HeaderProps> = memo(({
 
                             {/* Mobile Menu Button */}
                             <div className="md:hidden">
-                                <button onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)} className="p-2 text-gray-700">
+                                <button onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)} className="p-2 text-brand-slate">
                                     <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16m-7 6h7" />
                                     </svg>
@@ -257,28 +257,28 @@ const Header: React.FC<HeaderProps> = memo(({
 
                 {/* Mobile Menu */}
                 {isMobileMenuOpen && (
-                    <div ref={mobileMenuRef} className="md:hidden absolute top-full left-0 w-full bg-white shadow-lg animate-fade-in z-40">
+                    <div ref={mobileMenuRef} className="md:hidden absolute top-full left-0 w-full bg-brand-cream shadow-lg animate-fade-in z-40">
                         <nav className="p-4 space-y-2">
-                            <button onClick={() => handleNavigate(ViewEnum.USED_CARS)} className="block w-full text-left font-semibold text-gray-700 py-2 px-4 rounded-lg hover:bg-gray-100">Buy Car</button>
-                            <button onClick={() => handleNavigate(ViewEnum.SELLER_LOGIN)} className="block w-full text-left font-semibold text-gray-700 py-2 px-4 rounded-lg hover:bg-gray-100">Sell Car</button>
-                            <button onClick={() => handleNavigate(ViewEnum.NEW_CARS)} className="block w-full text-left font-semibold text-gray-700 py-2 px-4 rounded-lg hover:bg-gray-100">New Cars</button>
-                            <button onClick={() => handleNavigate(ViewEnum.DEALER_PROFILES)} className="block w-full text-left font-semibold text-gray-700 py-2 px-4 rounded-lg hover:bg-gray-100">Dealers</button>
-                            <hr className="border-gray-200"/>
-                            <button onClick={() => handleNavigate(ViewEnum.COMPARISON)} className="block w-full text-left font-semibold text-gray-700 py-2 px-4 rounded-lg hover:bg-gray-100">Compare ({compareCount})</button>
-                            <button onClick={() => handleNavigate(ViewEnum.WISHLIST)} className="block w-full text-left font-semibold text-gray-700 py-2 px-4 rounded-lg hover:bg-gray-100">Wishlist ({wishlistCount})</button>
+                            <button onClick={() => handleNavigate(ViewEnum.USED_CARS)} className="block w-full text-left font-semibold text-brand-slate py-2 px-4 rounded-lg hover:bg-brand-cream">Buy Car</button>
+                            <button onClick={() => handleNavigate(ViewEnum.SELLER_LOGIN)} className="block w-full text-left font-semibold text-brand-slate py-2 px-4 rounded-lg hover:bg-brand-cream">Sell Car</button>
+                            <button onClick={() => handleNavigate(ViewEnum.NEW_CARS)} className="block w-full text-left font-semibold text-brand-slate py-2 px-4 rounded-lg hover:bg-brand-cream">New Cars</button>
+                            <button onClick={() => handleNavigate(ViewEnum.DEALER_PROFILES)} className="block w-full text-left font-semibold text-brand-slate py-2 px-4 rounded-lg hover:bg-brand-cream">Dealers</button>
+                            <hr className="border-brand-gold"/>
+                            <button onClick={() => handleNavigate(ViewEnum.COMPARISON)} className="block w-full text-left font-semibold text-brand-slate py-2 px-4 rounded-lg hover:bg-brand-cream">Compare ({compareCount})</button>
+                            <button onClick={() => handleNavigate(ViewEnum.WISHLIST)} className="block w-full text-left font-semibold text-brand-slate py-2 px-4 rounded-lg hover:bg-brand-cream">Wishlist ({wishlistCount})</button>
                             {currentUser && currentUser.role === 'customer' && (
-                                <button onClick={() => handleNavigate(ViewEnum.INBOX)} className="block w-full text-left font-semibold text-gray-700 py-2 px-4 rounded-lg hover:bg-gray-100">Inbox ({inboxCount})</button>
+                                <button onClick={() => handleNavigate(ViewEnum.INBOX)} className="block w-full text-left font-semibold text-brand-slate py-2 px-4 rounded-lg hover:bg-brand-cream">Inbox ({inboxCount})</button>
                             )}
-                            <hr className="border-gray-200"/>
+                            <hr className="border-brand-gold"/>
                             {currentUser ? (
                                 <>
-                                    {currentUser.role === 'seller' && <button onClick={() => handleNavigate(ViewEnum.SELLER_DASHBOARD)} className="block w-full text-left font-semibold text-gray-700 py-2 px-4 rounded-lg hover:bg-gray-100">Dashboard</button>}
-                                    {currentUser.role === 'admin' && <button onClick={() => handleNavigate(ViewEnum.ADMIN_PANEL)} className="block w-full text-left font-semibold text-gray-700 py-2 px-4 rounded-lg hover:bg-gray-100">Admin Panel</button>}
-                                    <button onClick={() => handleNavigate(ViewEnum.PROFILE)} className="block w-full text-left font-semibold text-gray-700 py-2 px-4 rounded-lg hover:bg-gray-100">My Profile</button>
-                                    <button onClick={onLogout} className="block w-full text-left font-semibold text-gray-700 py-2 px-4 rounded-lg hover:bg-gray-100">Logout</button>
+                                    {currentUser.role === 'seller' && <button onClick={() => handleNavigate(ViewEnum.SELLER_DASHBOARD)} className="block w-full text-left font-semibold text-brand-slate py-2 px-4 rounded-lg hover:bg-brand-cream">Dashboard</button>}
+                                    {currentUser.role === 'admin' && <button onClick={() => handleNavigate(ViewEnum.ADMIN_PANEL)} className="block w-full text-left font-semibold text-brand-slate py-2 px-4 rounded-lg hover:bg-brand-cream">Admin Panel</button>}
+                                    <button onClick={() => handleNavigate(ViewEnum.PROFILE)} className="block w-full text-left font-semibold text-brand-slate py-2 px-4 rounded-lg hover:bg-brand-cream">My Profile</button>
+                                    <button onClick={onLogout} className="block w-full text-left font-semibold text-brand-slate py-2 px-4 rounded-lg hover:bg-brand-cream">Logout</button>
                                 </>
                             ) : (
-                                <button onClick={() => handleNavigate(ViewEnum.LOGIN_PORTAL)} className="block w-full text-left font-semibold text-gray-700 py-2 px-4 rounded-lg hover:bg-gray-100">Login / Register</button>
+                                <button onClick={() => handleNavigate(ViewEnum.LOGIN_PORTAL)} className="block w-full text-left font-semibold text-brand-slate py-2 px-4 rounded-lg hover:bg-brand-cream">Login / Register</button>
                             )}
                         </nav>
                     </div>

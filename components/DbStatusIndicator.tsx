@@ -34,17 +34,17 @@ const DbStatusIndicator: React.FC = () => {
 
     const statusConfig = {
         checking: {
-            color: 'bg-yellow-400 animate-pulse',
+            color: 'bg-brand-gold animate-pulse',
             text: 'Checking DB...',
             title: 'Checking database connection status.',
         },
         connected: {
-            color: 'bg-green-500',
+            color: 'bg-brand-teal-light0',
             text: 'DB Connected',
             title: 'Database connection is healthy.',
         },
         error: {
-            color: 'bg-red-500',
+            color: 'bg-brand-teal-light0',
             text: 'DB Error',
             title: 'Could not connect to the database.',
         },

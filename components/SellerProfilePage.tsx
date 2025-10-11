@@ -36,15 +36,15 @@ const SellerProfilePage: React.FC<SellerProfilePageProps> = ({ seller, vehicles,
 
     return (
         <div className="animate-fade-in container mx-auto px-4 py-8">
-            <button onClick={onBack} className="mb-6 bg-white dark:bg-brand-gray-800 text-brand-gray-700 dark:text-brand-gray-200 font-bold py-2 px-4 rounded-lg hover:bg-brand-gray-100 dark:hover:bg-brand-gray-700 transition-colors shadow-soft">
+            <button onClick={onBack} className="mb-6 bg-brand-cream dark:bg-brand-gray-800 text-brand-gray-700 dark:text-brand-gray-200 font-bold py-2 px-4 rounded-lg hover:bg-brand-gray-100 dark:hover:bg-brand-gray-700 transition-colors shadow-soft">
                 &larr; Back
             </button>
             
-            <header className="bg-white dark:bg-brand-gray-800 p-8 rounded-xl shadow-soft-lg mb-8 flex flex-col md:flex-row items-center gap-8">
+            <header className="bg-brand-cream dark:bg-brand-gray-800 p-8 rounded-xl shadow-soft-lg mb-8 flex flex-col md:flex-row items-center gap-8">
                 <img 
                     src={seller.logoUrl || `https://i.pravatar.cc/150?u=${seller.email}`} 
                     alt={`${seller.dealershipName || seller.name} logo`} 
-                    className="w-32 h-32 rounded-full object-cover border-4 shadow-lg" style={{ borderColor: 'var(--brand-rose-pink)' }}
+                    className="w-32 h-32 rounded-full object-cover border-4 shadow-lg" style={{ borderColor: 'var(--brand-gold)' }}
                 />
                 <div>
                     <h1 className="text-4xl font-extrabold text-brand-gray-800 dark:text-brand-gray-100">{seller.dealershipName || seller.name}</h1>
@@ -69,7 +69,7 @@ const SellerProfilePage: React.FC<SellerProfilePageProps> = ({ seller, vehicles,
                         placeholder="Search this seller's listings..."
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
-                        className="w-full p-3 border border-brand-gray-300 dark:border-brand-gray-600 rounded-lg focus:outline-none bg-white dark:bg-brand-gray-700" onFocus={(e) => { e.currentTarget.style.borderColor = 'var(--brand-deep-red)'; e.currentTarget.style.boxShadow = '0 0 0 2px var(--brand-deep-red-light)'; }} onBlur={(e) => { e.currentTarget.style.borderColor = ''; e.currentTarget.style.boxShadow = ''; }}
+                        className="w-full p-3 border border-brand-gray-300 dark:border-brand-gray-600 rounded-lg focus:outline-none bg-brand-cream dark:bg-brand-gray-700" onFocus={(e) => { e.currentTarget.style.borderColor = 'var(--brand-teal)'; e.currentTarget.style.boxShadow = '0 0 0 2px var(--brand-teal-light)'; }} onBlur={(e) => { e.currentTarget.style.borderColor = ''; e.currentTarget.style.boxShadow = ''; }}
                     />
                 </div>
             </div>
@@ -91,12 +91,12 @@ const SellerProfilePage: React.FC<SellerProfilePageProps> = ({ seller, vehicles,
                         />
                     ))
                 ) : vehicles.length > 0 ? (
-                    <div className="col-span-full text-center py-16 bg-white dark:bg-brand-gray-800 rounded-xl shadow-soft-lg">
+                    <div className="col-span-full text-center py-16 bg-brand-cream dark:bg-brand-gray-800 rounded-xl shadow-soft-lg">
                         <h3 className="text-xl font-semibold text-brand-gray-700 dark:text-brand-gray-200">No listings match your search</h3>
                         <p className="text-brand-gray-500 dark:text-brand-gray-400 mt-2">Try a different keyword.</p>
                     </div>
                 ) : (
-                    <div className="col-span-full text-center py-16 bg-white dark:bg-brand-gray-800 rounded-xl shadow-soft-lg">
+                    <div className="col-span-full text-center py-16 bg-brand-cream dark:bg-brand-gray-800 rounded-xl shadow-soft-lg">
                         <h3 className="text-xl font-semibold text-brand-gray-700 dark:text-brand-gray-200">No active listings</h3>
                         <p className="text-brand-gray-500 dark:text-brand-gray-400 mt-2">This seller currently has no vehicles for sale.</p>
                     </div>
