@@ -166,11 +166,14 @@ const Home: React.FC<HomeProps> = ({ onSearch, onSelectCategory, featuredVehicle
     const handleAiSearch = async () => {
         if (!aiSearchQuery.trim()) return;
         setIsAiSearching(true);
-        // Simulate a quick AI processing feel before navigating
-        setTimeout(() => {
+        try {
+            // Navigate to vehicle list with the search query
             onSearch(aiSearchQuery);
             setIsAiSearching(false);
-        }, 300);
+        } catch (error) {
+            console.error('AI search failed:', error);
+            setIsAiSearching(false);
+        }
     };
 
     return (

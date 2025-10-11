@@ -18,17 +18,17 @@ const VehicleTile: React.FC<VehicleTileProps> = ({ vehicle, onSelect, onToggleCo
     e.stopPropagation();
     if (isCompareDisabled) return;
     onToggleCompare(vehicle.id);
-  }
+  };
 
   const handleWishlistClick = (e: React.MouseEvent) => {
     e.stopPropagation();
     onToggleWishlist(vehicle.id);
-  }
+  };
 
   const handleSellerClick = (e: React.MouseEvent) => {
     e.stopPropagation();
     onViewSellerProfile(vehicle.sellerEmail);
-  }
+  };
 
   return (
     <div 

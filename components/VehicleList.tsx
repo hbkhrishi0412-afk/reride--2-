@@ -109,7 +109,17 @@ const VehicleList: React.FC<VehicleListProps> = ({ vehicles, onSelectVehicle, is
   // Mobile modal state
   const [isFilterModalOpen, setIsFilterModalOpen] = useState(false);
   const [tempFilters, setTempFilters] = useState({
-    categoryFilter, makeFilter, modelFilter, priceRange, yearFilter, colorFilter, stateFilter, selectedFeatures, featureSearch: '', mileageRange, fuelTypeFilter
+    categoryFilter: initialCategory,
+    makeFilter: '',
+    modelFilter: '',
+    priceRange: { min: MIN_PRICE, max: MAX_PRICE },
+    mileageRange: { min: MIN_MILEAGE, max: MAX_MILEAGE },
+    fuelTypeFilter: '',
+    yearFilter: '0',
+    colorFilter: '',
+    stateFilter: '',
+    selectedFeatures: [],
+    featureSearch: ''
   });
   const [isMobileFeaturesOpen, setIsMobileFeaturesOpen] = useState(false);
 
@@ -214,7 +224,17 @@ const VehicleList: React.FC<VehicleListProps> = ({ vehicles, onSelectVehicle, is
   // Mobile Modal Filter Logic
   const handleOpenFilterModal = () => {
     setTempFilters({
-      categoryFilter, makeFilter, modelFilter, priceRange, yearFilter, colorFilter, stateFilter, selectedFeatures, featureSearch: '', mileageRange, fuelTypeFilter
+      categoryFilter,
+      makeFilter,
+      modelFilter,
+      priceRange,
+      mileageRange,
+      fuelTypeFilter,
+      yearFilter,
+      colorFilter,
+      stateFilter,
+      selectedFeatures,
+      featureSearch: ''
     });
     setIsFilterModalOpen(true);
   };
@@ -234,6 +254,8 @@ const VehicleList: React.FC<VehicleListProps> = ({ vehicles, onSelectVehicle, is
     setColorFilter(tempFilters.colorFilter);
     setStateFilter(tempFilters.stateFilter);
     setSelectedFeatures(tempFilters.selectedFeatures);
+    setFeatureSearch(tempFilters.featureSearch);
+    setCurrentPage(1); // Reset to first page when filters are applied
     setIsFilterModalOpen(false);
   };
   
@@ -530,7 +552,7 @@ const VehicleList: React.FC<VehicleListProps> = ({ vehicles, onSelectVehicle, is
                 </button>
                 {(isMobile ? isMobileFeaturesOpen : isFeaturesOpen) && (
                     <div className="absolute top-full mt-2 w-full bg-white dark:bg-brand-gray-700 rounded-lg shadow-soft-xl border border-brand-gray-200 dark:border-brand-gray-600 z-20 overflow-hidden animate-fade-in">
-                        <div className="p-2"><input ref={featuresSearchInputRef} type="text" placeholder="Search features..." value={state.featureSearch} onChange={e => { isMobile ? setTempFilters(p => ({...p, featureSearch: e.target.value})) : setFeatureSearch(e.target.value) }} className="block w-full p-2 border border-brand-gray-300 dark:border-brand-gray-500 rounded-md bg-white dark:bg-brand-gray-800 text-sm focus:ring-2 focus:ring-brand-blue focus:outline-none" /></div>
+                        <div className="p-2"><input ref={featuresSearchInputRef} type="text" placeholder="Search features..." value={isMobile ? tempFilters.featureSearch : featureSearch} onChange={e => { isMobile ? setTempFilters(p => ({...p, featureSearch: e.target.value})) : setFeatureSearch(e.target.value) }} className="block w-full p-2 border border-brand-gray-300 dark:border-brand-gray-500 rounded-md bg-white dark:bg-brand-gray-800 text-sm focus:ring-2 focus:ring-brand-blue focus:outline-none" /></div>
                         <div className="max-h-48 overflow-y-auto">
                             {(isMobile ? tempFilteredFeatures : filteredFeatures).map(feature => ( <label key={feature} className="flex items-center space-x-3 cursor-pointer group p-3 transition-colors hover:bg-brand-gray-100 dark:hover:bg-brand-gray-600"><input type="checkbox" checked={state.selectedFeatures.includes(feature)} onChange={() => handleFeatureToggleLocal(feature)} className="h-4 w-4 text-brand-blue rounded border-brand-gray-300 dark:border-brand-gray-500 focus:ring-brand-blue bg-transparent" /><span className="text-sm text-brand-gray-800 dark:text-brand-gray-200">{feature}</span></label> ))}
                             {(isMobile ? tempFilteredFeatures.length === 0 : filteredFeatures.length === 0) && ( <p className="p-3 text-sm text-center text-brand-gray-500 dark:text-brand-gray-400">No features found.</p> )}
