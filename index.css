@@ -156,26 +156,26 @@ button:disabled {
   --spinny-orange-light: #FFE0B2;
   --spinny-orange-dark: #E65100;
   
-  /* Neutral Colors */
+  /* Neutral Colors - White Theme */
   --spinny-white: #FFFFFF;
-  --spinny-off-white: #FAFAFA;
-  --spinny-light-gray: #F5F5F5;
-  --spinny-gray: #E0E0E0;
-  --spinny-medium-gray: #9E9E9E;
-  --spinny-dark-gray: #424242;
-  --spinny-text-dark: #2C2C2C;
-  --spinny-text-gray: #616161;
+  --spinny-off-white: #FFFFFF;
+  --spinny-light-gray: #F8F9FA;
+  --spinny-gray: #E9ECEF;
+  --spinny-medium-gray: #6C757D;
+  --spinny-dark-gray: #343A40;
+  --spinny-text-dark: #000000;
+  --spinny-text-gray: #495057;
   
   /* Accent Colors */
-  --spinny-success: #4CAF50;
-  --spinny-info: #2196F3;
+  --spinny-success: #28A745;
+  --spinny-info: #007BFF;
   --spinny-warning: #FFC107;
-  --spinny-error: #F44336;
+  --spinny-error: #DC3545;
   
   /* Shadows */
-  --spinny-shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.08);
-  --spinny-shadow-md: 0 4px 12px rgba(0, 0, 0, 0.12);
-  --spinny-shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.15);
+  --spinny-shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.1);
+  --spinny-shadow-md: 0 4px 12px rgba(0, 0, 0, 0.15);
+  --spinny-shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.2);
   
   /* Border Radius */
   --spinny-radius-sm: 8px;
@@ -193,10 +193,11 @@ button:disabled {
 }
 
 .spinny-header-top {
-  background: var(--spinny-off-white);
+  background: var(--spinny-white);
   padding: 8px 0;
   font-size: 13px;
   color: var(--spinny-text-gray);
+  border-bottom: 1px solid var(--spinny-gray);
 }
 
 /* Buttons */
@@ -293,9 +294,10 @@ button:disabled {
 
 /* Hero Section */
 .spinny-hero {
-  background: linear-gradient(135deg, var(--spinny-orange) 0%, var(--spinny-orange-dark) 100%);
+  background: var(--spinny-white);
   padding: 80px 0;
-  color: var(--spinny-white);
+  color: var(--spinny-text-dark);
+  border-bottom: 1px solid var(--spinny-gray);
 }
 
 /* Vehicle Card */
@@ -334,6 +336,7 @@ button:disabled {
 /* Trust Indicators */
 .spinny-trust-badge {
   background: var(--spinny-light-gray);
+  border: 1px solid var(--spinny-gray);
   padding: 12px 20px;
   border-radius: var(--spinny-radius-sm);
   display: inline-flex;
@@ -347,6 +350,7 @@ button:disabled {
 
 .spinny-trust-badge:hover {
   background: var(--spinny-gray);
+  border-color: var(--spinny-orange);
   transform: scale(1.05);
 }
 
