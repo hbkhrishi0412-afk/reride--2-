@@ -16,13 +16,31 @@ export default async function handler(
         return res.status(200).json(vehicles);
       }
       case 'POST': {
+        console.log('📥 POST /api/vehicles - Received vehicle data');
         const newVehicleData = req.body;
+        console.log('📦 Vehicle data:', JSON.stringify(newVehicleData, null, 2));
+        
+        // Validate required fields
+        if (!newVehicleData.sellerEmail) {
+          console.error('❌ Missing sellerEmail in request');
+          return res.status(400).json({ error: 'sellerEmail is required' });
+        }
+        
+        if (!newVehicleData.make || !newVehicleData.model) {
+          console.error('❌ Missing required fields:', { make: newVehicleData.make, model: newVehicleData.model });
+          return res.status(400).json({ error: 'make and model are required' });
+        }
+        
         // Replicate frontend logic for ID generation if not provided.
         // A more robust unique ID generator is recommended for production.
         if (!newVehicleData.id) {
             newVehicleData.id = Date.now();
+            console.log('🔢 Generated ID:', newVehicleData.id);
         }
+        
+        console.log('💾 Creating vehicle in MongoDB...');
         const vehicle = await Vehicle.create(newVehicleData);
+        console.log('✅ Vehicle created successfully:', vehicle.id);
         return res.status(201).json(vehicle);
       }
       case 'PUT': {

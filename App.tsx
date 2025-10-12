@@ -228,22 +228,36 @@ const App: React.FC = () => {
   }, [platformSettings.siteAnnouncement]);
 
   useEffect(() => {
+    // This effect should only run once on initial load
+    console.log('🔄 Initial load effect running');
+    
     // Try localStorage first for persistent login, fallback to sessionStorage
     const localUserJson = localStorage.getItem('reRideCurrentUser');
     const sessionUserJson = sessionStorage.getItem('currentUser');
     const userJson = localUserJson || sessionUserJson;
     if (userJson) {
       const user = JSON.parse(userJson);
+      console.log('✅ Restored user from storage:', user.email);
       setCurrentUser(user);
       // Migrate sessionStorage to localStorage for persistence
       if (!localUserJson && sessionUserJson) {
         localStorage.setItem('reRideCurrentUser', sessionUserJson);
+        console.log('🔄 Migrated session to localStorage');
       }
+    } else {
+      console.log('ℹ️ No saved user session found');
     }
+    
     const savedWishlist = localStorage.getItem('wishlist');
     if (savedWishlist) setWishlist(JSON.parse(savedWishlist));
+    
     const loadedConversations = getConversations();
     setConversations(loadedConversations.map(c => ({ ...c, isReadByCustomer: c.isReadByCustomer ?? true, messages: c.messages.map(m => ({ ...m, isRead: m.isRead ?? true })), isFlagged: c.isFlagged || false, flagReason: c.flagReason || undefined, flaggedAt: c.flaggedAt || undefined })));
+    
+  }, []); // Run only once on mount
+  
+  // Handle seller profile URL parameter separately
+  useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
     const sellerEmail = urlParams.get('seller');
     if (sellerEmail && users.length > 0) {
@@ -274,25 +288,43 @@ const App: React.FC = () => {
   }, [addToast]);
 
   useEffect(() => {
+    // Don't run this watchdog effect until users have loaded
+    // This prevents logging out users during the initial load
+    if (isLoading) {
+        console.log('⏳ Skipping user watchdog - still loading users');
+        return;
+    }
+    
     if (currentUser) {
+        console.log('👀 User watchdog checking:', currentUser.email);
         const updatedUserInState = users.find(u => u.email === currentUser.email);
+        
         if (updatedUserInState && JSON.stringify(updatedUserInState) !== JSON.stringify(currentUser)) {
+            console.log('🔄 Syncing user state with updated data');
             setCurrentUser(updatedUserInState);
             const userJson = JSON.stringify(updatedUserInState);
             sessionStorage.setItem('currentUser', userJson);
             localStorage.setItem('reRideCurrentUser', userJson);
         }
+        
         // Don't logout users with hardcoded test credentials
         const testEmails = ['admin@test.com', 'seller@test.com', 'customer@test.com'];
         const isTestUser = testEmails.includes(currentUser.email);
         
+        if (!updatedUserInState) {
+            console.log('⚠️ User not found in users array:', currentUser.email);
+        }
+        
         // Only logout if user is not a test user AND (not found in users list OR is inactive)
         if (!isTestUser && (!updatedUserInState || updatedUserInState.status === 'inactive')) {
+            console.log('❌ Logging out user:', currentUser.email, 'Reason:', !updatedUserInState ? 'not found' : 'inactive');
             handleLogout();
             if (updatedUserInState?.status === 'inactive') addToast("Your account has been deactivated by an administrator.", "error");
+        } else {
+            console.log('✅ User validated successfully');
         }
     }
-  }, [users, currentUser, handleLogout, addToast]);
+  }, [users, currentUser, handleLogout, addToast, isLoading]);
 
   useEffect(() => {
     if (!prevConversationsRef.current || !currentUser) { prevConversationsRef.current = conversations; return; }
@@ -456,14 +488,59 @@ const App: React.FC = () => {
   }), [vehicles, ratings, usersWithRatingsAndBadges]);
   
   const handleAddVehicle = useCallback(async (vehicleData: Omit<Vehicle, 'id' | 'averageRating' | 'ratingCount'>, isFeaturing: boolean) => {
-    if (!currentUser || currentUser.role !== 'seller') { addToast('You must be logged in as a seller.', 'error'); return; }
-    if (isFeaturing && (currentUser.featuredCredits || 0) <= 0) { addToast('You have no featured credits left.', 'error'); isFeaturing = false; }
+    console.log('🚗 handleAddVehicle called with vehicleData:', vehicleData);
     
-    const newVehicle: Vehicle = { ...vehicleData, id: Date.now(), images: vehicleData.images && vehicleData.images.length > 0 ? vehicleData.images : [getPlaceholderImage(vehicleData.make, vehicleData.model), getPlaceholderImage(vehicleData.make, `${vehicleData.model}-2`)], sellerEmail: currentUser.email, status: 'published', isFeatured: isFeaturing, views: 0, inquiriesCount: 0, certificationStatus: 'none' };
+    if (!currentUser || currentUser.role !== 'seller') { 
+      console.error('❌ User not logged in as seller:', currentUser);
+      addToast('You must be logged in as a seller.', 'error'); 
+      return; 
+    }
+    
+    // Validate required fields
+    if (!vehicleData.sellerEmail) {
+      console.error('❌ Missing sellerEmail, using currentUser.email:', currentUser.email);
+      vehicleData.sellerEmail = currentUser.email;
+    }
+    
+    if (!vehicleData.make || !vehicleData.model) {
+      console.error('❌ Missing required fields:', { make: vehicleData.make, model: vehicleData.model });
+      addToast('Please fill in all required fields (Make, Model)', 'error');
+      return;
+    }
+    
+    if (vehicleData.price <= 0) {
+      console.error('❌ Invalid price:', vehicleData.price);
+      addToast('Please enter a valid price greater than 0', 'error');
+      return;
+    }
+    
+    if (isFeaturing && (currentUser.featuredCredits || 0) <= 0) { 
+      console.warn('⚠️ No featured credits, listing as regular');
+      addToast('You have no featured credits left.', 'error'); 
+      isFeaturing = false; 
+    }
+    
+    const newVehicle: Vehicle = { 
+      ...vehicleData, 
+      id: Date.now(), 
+      images: vehicleData.images && vehicleData.images.length > 0 ? vehicleData.images : [getPlaceholderImage(vehicleData.make, vehicleData.model), getPlaceholderImage(vehicleData.make, `${vehicleData.model}-2`)], 
+      sellerEmail: vehicleData.sellerEmail || currentUser.email, // Double-check seller email
+      status: 'published', 
+      isFeatured: isFeaturing, 
+      views: 0, 
+      inquiriesCount: 0, 
+      certificationStatus: 'none' 
+    };
+    
+    console.log('✅ Vehicle object to be saved:', newVehicle);
 
     try {
+        console.log('📡 Calling vehicleService.addVehicle...');
         const addedVehicle = await vehicleService.addVehicle(newVehicle);
+        console.log('✅ Vehicle added successfully:', addedVehicle);
+        
         setVehicles(prev => [addedVehicle, ...prev]);
+        
         if (isFeaturing) {
             const updatedUser = { ...currentUser, featuredCredits: (currentUser.featuredCredits || 0) - 1 };
             const savedUser = await userService.updateUser(updatedUser);
@@ -477,7 +554,13 @@ const App: React.FC = () => {
         }
         addToast(`Vehicle listed successfully!${isFeaturing ? ' It has been featured.' : ''}`, 'success');
     } catch (error) {
-        console.error("Failed to add vehicle:", error);
+        console.error("❌ Failed to add vehicle:", error);
+        if (error instanceof Error) {
+          console.error('Error details:', {
+            message: error.message,
+            stack: error.stack
+          });
+        }
         addToast(`Error: ${error instanceof Error ? error.message : 'Could not add vehicle.'}`, 'error');
     }
   }, [currentUser, addToast]);

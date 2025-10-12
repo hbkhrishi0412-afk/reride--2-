@@ -430,12 +430,19 @@ const VehicleForm: React.FC<VehicleFormProps> = memo(({ editingVehicle, onAddVeh
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
+        console.log('📝 Dashboard form submitted');
+        console.log('📋 Form data:', formData);
+        console.log('⭐ Is featuring:', isFeaturing);
+        console.log('✉️ Seller email in form:', formData.sellerEmail);
+        
         if (editingVehicle) {
+            console.log('✏️ Editing existing vehicle:', editingVehicle.id);
             onUpdateVehicle({ ...editingVehicle, ...formData });
             if (isFeaturing && !editingVehicle.isFeatured) {
                 onFeatureListing(editingVehicle.id);
             }
         } else {
+            console.log('➕ Adding new vehicle');
             onAddVehicle(formData, isFeaturing);
         }
         onCancel();

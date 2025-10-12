@@ -136,18 +136,28 @@ export const getVehicles = async (): Promise<Vehicle[]> => {
   }
 };
 export const addVehicle = async (vehicleData: Vehicle): Promise<Vehicle> => {
+  console.log('🔧 vehicleService.addVehicle called');
+  console.log('📍 Environment - isDevelopment:', isDevelopment);
+  console.log('📦 Vehicle data received:', vehicleData);
+  
   // Always try API first for production, with fallback to local
   if (!isDevelopment) {
     try {
-      return await addVehicleApi(vehicleData);
+      console.log('🌐 Attempting API call to /api/vehicles');
+      const result = await addVehicleApi(vehicleData);
+      console.log('✅ API call successful:', result);
+      return result;
     } catch (error) {
-      console.warn('API addVehicle failed, falling back to local storage:', error);
+      console.warn('⚠️ API addVehicle failed, falling back to local storage:', error);
       // Fallback to local storage if API fails
       return await addVehicleLocal(vehicleData);
     }
   } else {
     // Development mode - use local storage
-    return await addVehicleLocal(vehicleData);
+    console.log('💻 Development mode - using local storage');
+    const result = await addVehicleLocal(vehicleData);
+    console.log('✅ Local storage save successful:', result);
+    return result;
   }
 };
 
