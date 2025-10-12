@@ -1,24 +1,60 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
+import { resolve } from 'path'
 
 // https://vitejs.dev/config/
 export default defineConfig({
-  plugins: [react()],
+  plugins: [
+    react({
+      // Enable React Fast Refresh
+      fastRefresh: true,
+      // Optimize JSX runtime
+      jsxRuntime: 'automatic',
+      // Enable babel plugins for better optimization
+      babel: {
+        plugins: [
+          // Remove console.log in production
+          process.env.NODE_ENV === 'production' && ['transform-remove-console', { exclude: ['error', 'warn'] }]
+        ].filter(Boolean)
+      }
+    })
+  ],
+  resolve: {
+    alias: {
+      '@': resolve(__dirname, './'),
+      '@components': resolve(__dirname, './components'),
+      '@services': resolve(__dirname, './services'),
+      '@utils': resolve(__dirname, './utils'),
+      '@types': resolve(__dirname, './types.ts')
+    }
+  },
   build: {
     // Optimize chunk size
-    chunkSizeWarningLimit: 1000,
+    chunkSizeWarningLimit: 500,
     rollupOptions: {
       output: {
         // Aggressive code splitting for faster initial load
         manualChunks: (id) => {
           if (id.includes('node_modules')) {
-            // React core
+            // React core - most critical
             if (id.includes('react') || id.includes('react-dom')) {
               return 'react-vendor';
             }
-            // Chart.js
+            // Chart.js - only loaded when needed
             if (id.includes('chart.js') || id.includes('react-chartjs')) {
               return 'charts';
+            }
+            // Firebase - large library
+            if (id.includes('firebase')) {
+              return 'firebase';
+            }
+            // Mongoose - backend only
+            if (id.includes('mongoose')) {
+              return 'mongoose';
+            }
+            // Google AI - only when needed
+            if (id.includes('@google/genai')) {
+              return 'ai';
             }
             // Other vendors
             return 'vendor';
@@ -33,24 +69,58 @@ export default defineConfig({
           if (id.includes('/components/VehicleList') || id.includes('/components/VehicleDetail')) {
             return 'vehicles';
           }
+          if (id.includes('/components/Home')) {
+            return 'home';
+          }
+          if (id.includes('/components/Profile') || id.includes('/components/CustomerInbox')) {
+            return 'user';
+          }
+        },
+        // Optimize chunk naming
+        chunkFileNames: (chunkInfo) => {
+          const facadeModuleId = chunkInfo.facadeModuleId ? chunkInfo.facadeModuleId.split('/').pop() : 'chunk';
+          return `assets/js/[name]-[hash].js`;
+        },
+        entryFileNames: 'assets/js/[name]-[hash].js',
+        assetFileNames: (assetInfo) => {
+          const info = assetInfo.name.split('.');
+          const ext = info[info.length - 1];
+          if (/\.(css)$/.test(assetInfo.name)) {
+            return `assets/css/[name]-[hash].${ext}`;
+          }
+          if (/\.(png|jpe?g|svg|gif|tiff|bmp|ico)$/i.test(assetInfo.name)) {
+            return `assets/images/[name]-[hash].${ext}`;
+          }
+          return `assets/[name]-[hash].${ext}`;
         }
       }
     },
-    // Enable minification with esbuild (faster)
+    // Enable minification with esbuild (faster than terser)
     minify: 'esbuild',
-    // Keep console logs temporarily for debugging login issues
     esbuild: {
-      drop: ['debugger'],
-      legalComments: 'none'
+      drop: ['console', 'debugger'],
+      legalComments: 'none',
+      // Optimize for modern browsers
+      target: 'es2020'
     },
     // Optimize CSS
     cssMinify: true,
     // Disable source maps for production
     sourcemap: false,
     // Enable compression
-    target: 'esnext',
+    target: 'es2020',
     // Reduce chunk size
-    cssCodeSplit: true
+    cssCodeSplit: true,
+    // Enable tree shaking
+    treeshake: {
+      moduleSideEffects: false
+    },
+    // Optimize assets
+    assetsInlineLimit: 4096, // 4kb
+    // Enable compression
+    reportCompressedSize: false, // Disable to speed up build
+    // Optimize for production
+    emptyOutDir: true
   },
   server: {
     proxy: {
@@ -59,11 +129,39 @@ export default defineConfig({
         changeOrigin: true,
         rewrite: (path) => path.replace(/^\/api/, '/api')
       }
+    },
+    // Enable HMR
+    hmr: true,
+    // Optimize server performance
+    fs: {
+      strict: false
     }
   },
   // Optimize dependencies
   optimizeDeps: {
-    include: ['react', 'react-dom'],
-    exclude: ['@google/genai']
+    include: [
+      'react', 
+      'react-dom',
+      'react/jsx-runtime',
+      'react/jsx-dev-runtime'
+    ],
+    exclude: ['@google/genai', 'mongoose'],
+    // Force pre-bundling of common dependencies
+    force: true
+  },
+  // Enable experimental features for better performance
+  experimental: {
+    renderBuiltUrl(filename, { hostType }) {
+      if (hostType === 'js') {
+        return { js: `/${filename}` }
+      } else {
+        return { relative: true }
+      }
+    }
+  },
+  // Define global constants
+  define: {
+    __DEV__: JSON.stringify(process.env.NODE_ENV === 'development'),
+    __VERSION__: JSON.stringify(process.env.npm_package_version || '1.0.0')
   }
 })

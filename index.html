@@ -4,15 +4,27 @@
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    
-    <!-- Prevent caching issues -->
-    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
-    <meta http-equiv="Pragma" content="no-cache" />
-    <meta http-equiv="Expires" content="0" />
+    <link rel="manifest" href="/manifest.json" />
     
     <!-- Performance optimizations -->
     <meta name="theme-color" content="#FF6B35" />
     <meta name="description" content="ReRide - Buy and sell quality used vehicles with confidence. AI-powered recommendations and certified inspections." />
+    <meta name="keywords" content="used cars, car marketplace, vehicle sales, car buying, car selling, automotive" />
+    <meta name="author" content="ReRide" />
+    
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://reride.co/" />
+    <meta property="og:title" content="ReRide - Buy & Sell Quality Used Vehicles" />
+    <meta property="og:description" content="Buy and sell quality used vehicles with confidence. AI-powered recommendations and certified inspections." />
+    <meta property="og:image" content="/og-image.jpg" />
+    
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image" />
+    <meta property="twitter:url" content="https://reride.co/" />
+    <meta property="twitter:title" content="ReRide - Buy & Sell Quality Used Vehicles" />
+    <meta property="twitter:description" content="Buy and sell quality used vehicles with confidence. AI-powered recommendations and certified inspections." />
+    <meta property="twitter:image" content="/og-image.jpg" />
     
     <!-- Preconnect to external domains for faster loading -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -21,22 +33,64 @@
     <link rel="dns-prefetch" href="https://i.pravatar.cc" />
     
     <!-- Load fonts with display=swap and media=print trick for async loading -->
-    <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@600;700;800&display=swap" onload="this.onload=null;this.rel='stylesheet'">
-    <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@600;700;800&display=swap"></noscript>
+    <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@400;500;600;700;800&display=swap" onload="this.onload=null;this.rel='stylesheet'">
+    <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@400;500;600;700;800&display=swap"></noscript>
+    
+    <!-- Critical CSS inline for above-the-fold content -->
+    <style>
+      /* Critical CSS for initial render */
+      *{margin:0;padding:0;box-sizing:border-box}
+      body{font-family:'Nunito Sans',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;background:#FFFFFF;color:#2C2C2C}
+      #root{min-height:100vh}
+      .loading-container{display:flex;align-items:center;justify-content:center;min-height:100vh;background:#FFFFFF}
+      .loading-content{text-align:center}
+      .loading-spinner{width:50px;height:50px;border:4px solid #F5F5F5;border-top-color:#FF6B35;border-radius:50%;animation:spin 1s linear infinite;margin:0 auto 16px}
+      .loading-text{color:#2C2C2C;font-size:16px;font-weight:600}
+      @keyframes spin{to{transform:rotate(360deg)}}
+      /* Hide loading when React takes over */
+      .react-loaded .loading-container{display:none}
+    </style>
     
     <title>ReRide - Buy & Sell Quality Used Vehicles</title>
   </head>
   <body class="antialiased transition-colors duration-300" style="background-color: #FFFFFF; color: #2C2C2C;">
     <!-- Loading indicator -->
     <div id="root">
-      <div style="display:flex;align-items:center;justify-content:center;min-height:100vh;background:#FFFFFF;">
-        <div style="text-align:center;">
-          <div style="width:50px;height:50px;border:4px solid #F5F5F5;border-top-color:#FF6B35;border-radius:50%;animation:spin 1s linear infinite;margin:0 auto 16px;"></div>
-          <p style="color:#2C2C2C;font-size:16px;font-weight:600;">Loading ReRide...</p>
+      <div class="loading-container">
+        <div class="loading-content">
+          <div class="loading-spinner"></div>
+          <p class="loading-text">Loading ReRide...</p>
         </div>
       </div>
     </div>
-    <style>@keyframes spin{to{transform:rotate(360deg)}}</style>
+    
+    <!-- Service Worker Registration -->
+    <script>
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+          navigator.serviceWorker.register('/sw.js')
+            .then((registration) => {
+              console.log('SW registered: ', registration);
+            })
+            .catch((registrationError) => {
+              console.log('SW registration failed: ', registrationError);
+            });
+        });
+      }
+    </script>
+    
+    <!-- Performance monitoring -->
+    <script>
+      // Mark when React takes over
+      window.addEventListener('load', () => {
+        setTimeout(() => {
+          document.body.classList.add('react-loaded');
+        }, 100);
+      });
+      
+      // Core Web Vitals monitoring will be handled by React components
+    </script>
+    
     <script type="module" src="/index.tsx"></script>
   </body>
 </html>
