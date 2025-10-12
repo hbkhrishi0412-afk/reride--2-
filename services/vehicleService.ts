@@ -105,7 +105,9 @@ const deleteVehicleApi = async (vehicleId: number): Promise<{ success: boolean, 
 
 
 // --- Environment Detection ---
-const isDevelopment = import.meta.env.DEV || window.location.hostname === 'localhost' || window.location.hostname.includes('localhost');
+// FORCE PRODUCTION MODE: Always use MongoDB/API, never localStorage
+// This ensures all users see the same data from the database
+const isDevelopment = false; // import.meta.env.DEV || window.location.hostname === 'localhost' || window.location.hostname.includes('localhost');
 
 // --- Exported Environment-Aware Service Functions ---
 
