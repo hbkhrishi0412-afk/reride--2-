@@ -5,7 +5,8 @@ import type { User } from '../types';
 // --- API Helpers ---
 const getAuthHeader = () => {
   try {
-    const userJson = sessionStorage.getItem('currentUser');
+    // Try localStorage first for persistent login, fallback to sessionStorage
+    const userJson = localStorage.getItem('reRideCurrentUser') || sessionStorage.getItem('currentUser');
     if (!userJson) return {};
     const user: User = JSON.parse(userJson);
     return { 'Authorization': user.email };
@@ -222,7 +223,21 @@ export const getUsers = async (): Promise<User[]> => {
     return MOCK_USERS;
   }
 };
-export const updateUser = isDevelopment ? updateUserLocal : updateUserApi;
+export const updateUser = async (userData: Partial<User> & { email: string }): Promise<User> => {
+  // Always try API first for production, with fallback to local
+  if (!isDevelopment) {
+    try {
+      return await updateUserApi(userData);
+    } catch (error) {
+      console.warn('API updateUser failed, falling back to local storage:', error);
+      // Fallback to local storage if API fails
+      return await updateUserLocal(userData);
+    }
+  } else {
+    // Development mode - use local storage
+    return await updateUserLocal(userData);
+  }
+};
 export const deleteUser = isDevelopment ? deleteUserLocal : deleteUserApi;
 export const login = async (credentials: any): Promise<{ success: boolean, user?: User, reason?: string }> => {
   console.log('🚀 Login attempt:', { email: credentials.email, role: credentials.role, isDevelopment });

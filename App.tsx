@@ -463,8 +463,14 @@ const App: React.FC = () => {
         setVehicles(prev => [addedVehicle, ...prev]);
         if (isFeaturing) {
             const updatedUser = { ...currentUser, featuredCredits: (currentUser.featuredCredits || 0) - 1 };
-            await userService.updateUser(updatedUser);
-            setUsers(prev => prev.map(u => u.email === currentUser.email ? updatedUser : u));
+            const savedUser = await userService.updateUser(updatedUser);
+            // Update both users state and currentUser to prevent logout
+            setUsers(prev => prev.map(u => u.email === currentUser.email ? savedUser : u));
+            setCurrentUser(savedUser);
+            // Sync to both storage locations
+            const userJson = JSON.stringify(savedUser);
+            sessionStorage.setItem('currentUser', userJson);
+            localStorage.setItem('reRideCurrentUser', userJson);
         }
         addToast(`Vehicle listed successfully!${isFeaturing ? ' It has been featured.' : ''}`, 'success');
     } catch (error) {
@@ -549,9 +555,14 @@ const App: React.FC = () => {
 
     try {
         const updatedUser = { ...currentUser, featuredCredits: (currentUser.featuredCredits || 0) - 1 };
-        await userService.updateUser(updatedUser);
+        const savedUser = await userService.updateUser(updatedUser);
         await handleUpdateVehicle({ ...vehicle, isFeatured: true });
-        setUsers(prev => prev.map(u => u.email === currentUser.email ? updatedUser : u));
+        // Update all state and storage to prevent logout
+        setUsers(prev => prev.map(u => u.email === currentUser.email ? savedUser : u));
+        setCurrentUser(savedUser);
+        const userJson = JSON.stringify(savedUser);
+        sessionStorage.setItem('currentUser', userJson);
+        localStorage.setItem('reRideCurrentUser', userJson);
         addToast('Listing successfully featured!', 'success');
     } catch(error) {
         addToast('Failed to feature listing.', 'error');
@@ -663,7 +674,12 @@ const App: React.FC = () => {
     try {
         const updatedUser = await userService.updateUser({ email: currentUser.email, ...updatedDetails });
         if (updatedUser) {
+            // Update all state and storage to prevent logout
             setUsers(prev => prev.map(u => u.email === currentUser.email ? updatedUser : u));
+            setCurrentUser(updatedUser);
+            const userJson = JSON.stringify(updatedUser);
+            sessionStorage.setItem('currentUser', userJson);
+            localStorage.setItem('reRideCurrentUser', userJson);
             addToast('Profile updated!', 'success');
         } else {
             throw new Error('Failed to retrieve updated user profile from server.');
@@ -678,7 +694,12 @@ const App: React.FC = () => {
      try {
         const updatedUser = await userService.updateUser({ email: currentUser.email, ...updatedDetails });
         if (updatedUser) {
+            // Update all state and storage to prevent logout
             setUsers(prev => prev.map(u => u.email === currentUser.email ? updatedUser : u));
+            setCurrentUser(updatedUser);
+            const userJson = JSON.stringify(updatedUser);
+            sessionStorage.setItem('currentUser', userJson);
+            localStorage.setItem('reRideCurrentUser', userJson);
             addToast('Seller profile updated!', 'success');
         } else {
              throw new Error('Failed to retrieve updated seller profile from server.');
@@ -739,8 +760,13 @@ const App: React.FC = () => {
       const planDetails = PLAN_DETAILS[planId];
       try {
         const updatedUser = { ...currentUser, subscriptionPlan: planId, featuredCredits: (currentUser.featuredCredits || 0) + planDetails.featuredCredits };
-        await userService.updateUser(updatedUser);
-        setUsers(prev => prev.map(u => u.email === currentUser.email ? updatedUser : u));
+        const savedUser = await userService.updateUser(updatedUser);
+        // Update all state and storage to prevent logout
+        setUsers(prev => prev.map(u => u.email === currentUser.email ? savedUser : u));
+        setCurrentUser(savedUser);
+        const userJson = JSON.stringify(savedUser);
+        sessionStorage.setItem('currentUser', userJson);
+        localStorage.setItem('reRideCurrentUser', userJson);
         addToast(`Successfully upgraded to the ${planDetails.name} plan!`, 'success');
         navigate(View.SELLER_DASHBOARD);
       } catch(error) {

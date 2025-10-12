@@ -5,7 +5,8 @@ import type { Vehicle, User } from '../types';
 // --- API Helpers ---
 const getAuthHeader = () => {
   try {
-    const userJson = sessionStorage.getItem('currentUser');
+    // Try localStorage first for persistent login, fallback to sessionStorage
+    const userJson = localStorage.getItem('reRideCurrentUser') || sessionStorage.getItem('currentUser');
     if (!userJson) return {};
     const user: User = JSON.parse(userJson);
     return { 'Authorization': user.email };
