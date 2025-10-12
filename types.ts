@@ -102,6 +102,49 @@ export interface Vehicle {
   serviceRecords?: ServiceRecord[];
   accidentHistory?: AccidentRecord[];
   documents?: VehicleDocument[];
+  
+  // NEW: Contact & Communication for Listing Platform
+  sellerPhone?: string;
+  sellerWhatsApp?: string;
+  showPhoneNumber?: boolean;
+  preferredContactMethod?: 'chat' | 'phone' | 'both';
+  
+  // NEW: Listing Lifecycle Management
+  createdAt?: string; // ISO String
+  updatedAt?: string; // ISO String
+  expiresAt?: string; // ISO String
+  lastRefreshedAt?: string; // ISO String
+  listingStatus?: 'active' | 'expired' | 'sold' | 'suspended' | 'draft';
+  autoRenew?: boolean;
+  daysActive?: number;
+  
+  // NEW: Visibility & Promotion
+  isPremiumListing?: boolean;
+  isUrgentSale?: boolean;
+  isBestPrice?: boolean;
+  boostExpiresAt?: string;
+  
+  // NEW: Performance Tracking
+  viewsLast7Days?: number;
+  viewsLast30Days?: number;
+  uniqueViewers?: number;
+  phoneViews?: number;
+  shareCount?: number;
+  
+  // NEW: Search & Discovery
+  keywords?: string[];
+  nearbyLandmarks?: string[];
+  exactLocation?: {
+    lat: number;
+    lng: number;
+    showExact: boolean;
+  };
+  distanceFromUser?: number;
+  
+  // NEW: Quality Indicators
+  photoQuality?: 'low' | 'medium' | 'high';
+  hasMinimumPhotos?: boolean;
+  descriptionQuality?: number; // 0-100 score
 }
 
 export type SubscriptionPlan = 'free' | 'pro' | 'premium';
@@ -142,6 +185,31 @@ export interface User {
   subscriptionPlan?: SubscriptionPlan;
   featuredCredits?: number;
   usedCertifications?: number;
+  
+  // NEW: Trust & Verification for Listing Platform
+  phoneVerified?: boolean;
+  emailVerified?: boolean;
+  govtIdVerified?: boolean;
+  verificationDate?: string; // ISO String
+  
+  // NEW: Activity & Reputation
+  responseTime?: number; // in minutes
+  responseRate?: number; // percentage 0-100
+  joinedDate?: string; // ISO String
+  lastActiveAt?: string; // ISO String
+  activeListings?: number;
+  soldListings?: number;
+  totalViews?: number;
+  
+  // NEW: Safety
+  reportedCount?: number;
+  isBanned?: boolean;
+  trustScore?: number; // 0-100
+  
+  // NEW: Contact Preferences
+  alternatePhone?: string;
+  preferredContactHours?: string;
+  showEmailPublicly?: boolean;
 }
 
 export interface ChatMessage {
