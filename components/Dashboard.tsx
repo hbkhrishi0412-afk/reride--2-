@@ -196,7 +196,7 @@ interface VehicleFormProps {
 }
 
 const VehicleForm: React.FC<VehicleFormProps> = memo(({ editingVehicle, onAddVehicle, onUpdateVehicle, onCancel, vehicleData, seller, onFeatureListing, allVehicles }) => {
-    const [formData, setFormData] = useState(editingVehicle ? { ...initialFormState, ...editingVehicle, sellerEmail: editingVehicle.sellerEmail } : initialFormState);
+    const [formData, setFormData] = useState(editingVehicle ? { ...initialFormState, ...editingVehicle, sellerEmail: editingVehicle.sellerEmail } : { ...initialFormState, sellerEmail: seller.email });
     const [featureInput, setFeatureInput] = useState('');
     const [fixInput, setFixInput] = useState('');
     const [isGeneratingDesc, setIsGeneratingDesc] = useState(false);
@@ -209,6 +209,13 @@ const VehicleForm: React.FC<VehicleFormProps> = memo(({ editingVehicle, onAddVeh
         featureSuggestions: Record<string, string[]>;
     } | null>(null);
     const [isGeneratingSuggestions, setIsGeneratingSuggestions] = useState(false);
+
+    // Ensure seller email is always set in form data
+    useEffect(() => {
+        if (!formData.sellerEmail && seller.email) {
+            setFormData(prev => ({ ...prev, sellerEmail: seller.email }));
+        }
+    }, [seller.email, formData.sellerEmail]);
 
     const availableMakes = useMemo(() => {
         if (!formData.category || !vehicleData[formData.category]) return [];
