@@ -223,6 +223,7 @@ const Header: React.FC<HeaderProps> = memo(({
                                                         Hi, {currentUser.name ? currentUser.name.split(' ')[0] : ''}
                                                     </p>
                                                 </div>
+                                                {currentUser.role === 'customer' && <DropdownLink onClick={() => handleNavigate(ViewEnum.BUYER_DASHBOARD)}>My Dashboard</DropdownLink>}
                                                 {currentUser.role === 'customer' && <DropdownLink onClick={() => handleNavigate(ViewEnum.INBOX)}>Inbox {inboxCount > 0 && `(${inboxCount})`}</DropdownLink>}
                                                 {currentUser.role === 'seller' && <DropdownLink onClick={() => handleNavigate(ViewEnum.SELLER_DASHBOARD)}>Dashboard</DropdownLink>}
                                                 {currentUser.role === 'admin' && <DropdownLink onClick={() => handleNavigate(ViewEnum.ADMIN_PANEL)}>Admin Panel</DropdownLink>}
@@ -267,7 +268,10 @@ const Header: React.FC<HeaderProps> = memo(({
                             <button onClick={() => handleNavigate(ViewEnum.COMPARISON)} className="block w-full text-left font-semibold text-spinny-text-dark py-2 px-4 rounded-lg hover:bg-white">Compare ({compareCount})</button>
                             <button onClick={() => handleNavigate(ViewEnum.WISHLIST)} className="block w-full text-left font-semibold text-spinny-text-dark py-2 px-4 rounded-lg hover:bg-white">Wishlist ({wishlistCount})</button>
                             {currentUser && currentUser.role === 'customer' && (
-                                <button onClick={() => handleNavigate(ViewEnum.INBOX)} className="block w-full text-left font-semibold text-spinny-text-dark py-2 px-4 rounded-lg hover:bg-white">Inbox ({inboxCount})</button>
+                                <>
+                                    <button onClick={() => handleNavigate(ViewEnum.BUYER_DASHBOARD)} className="block w-full text-left font-semibold text-spinny-text-dark py-2 px-4 rounded-lg hover:bg-white">My Dashboard</button>
+                                    <button onClick={() => handleNavigate(ViewEnum.INBOX)} className="block w-full text-left font-semibold text-spinny-text-dark py-2 px-4 rounded-lg hover:bg-white">Inbox ({inboxCount})</button>
+                                </>
                             )}
                             <hr className="border-gray-200"/>
                             {currentUser ? (

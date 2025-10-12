@@ -275,6 +275,7 @@ export enum View {
   PRICING = 'PRICING',
   SUPPORT = 'SUPPORT',
   FAQ = 'FAQ',
+  BUYER_DASHBOARD = 'BUYER_DASHBOARD',
 }
 
 export interface ProsAndCons {
@@ -356,4 +357,71 @@ export interface FAQItem {
   question: string;
   answer: string;
   category: string;
+}
+
+// NEW: Listing Platform Specific Interfaces
+
+export interface ListingBoost {
+  id: string;
+  vehicleId: number;
+  type: 'top_search' | 'homepage_spotlight' | 'featured_badge';
+  startDate: string;
+  expiresAt: string;
+  price: number;
+  isActive: boolean;
+}
+
+export interface SavedSearch {
+  id: number;
+  userId: string;
+  name: string;
+  filters: {
+    make?: string;
+    model?: string;
+    minPrice?: number;
+    maxPrice?: number;
+    minYear?: number;
+    maxYear?: number;
+    category?: VehicleCategory;
+    fuelType?: string;
+    transmission?: string;
+    location?: string;
+    radius?: number; // km
+  };
+  emailAlerts: boolean;
+  createdAt: string;
+}
+
+export interface BuyerActivity {
+  userId: string;
+  recentlyViewed: number[]; // vehicle IDs
+  savedSearches: SavedSearch[];
+  notifications: {
+    priceDrops: number[];
+    newMatches: number[];
+  };
+}
+
+export interface ListingStats {
+  vehicleId: number;
+  date: string;
+  views: number;
+  uniqueViews: number;
+  phoneViews: number;
+  chatStarts: number;
+  shares: number;
+  favorites: number;
+}
+
+export interface SafetyWarning {
+  id: number;
+  title: string;
+  message: string;
+  icon: string;
+  severity: 'info' | 'warning' | 'critical';
+}
+
+export interface SortOption {
+  label: string;
+  value: 'newest' | 'oldest' | 'price_low' | 'price_high' | 'most_viewed';
 }

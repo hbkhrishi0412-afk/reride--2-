@@ -30,6 +30,8 @@ import CommandPalette from './components/CommandPalette';
 import { getFaqs, saveFaqs } from './services/faqService';
 import { getSupportTickets, saveSupportTickets } from './services/supportTicketService';
 import { getPlaceholderImage } from './components/vehicleData';
+import * as listingService from './services/listingService';
+import * as buyerService from './services/buyerService';
 
 
 // Lazy-loaded components
@@ -48,6 +50,7 @@ const DealerProfiles = lazy(() => import('./components/DealerProfiles'));
 const PricingPage = lazy(() => import('./components/PricingPage'));
 const SupportPage = lazy(() => import('./components/SupportPage'));
 const FAQPage = lazy(() => import('./components/FAQPage'));
+const BuyerDashboard = lazy(() => import('./components/BuyerDashboard'));
 
 
 
@@ -600,11 +603,24 @@ const App: React.FC = () => {
   const handleClearCompare = useCallback(() => setComparisonList([]), []);
   const handleSelectVehicle = useCallback((vehicle: Vehicle) => {
     logViewedVehicle(vehicle.id);
+    // Track for buyer activity
+    if (currentUser && currentUser.role === 'customer') {
+      buyerService.addToRecentlyViewed(currentUser.email, vehicle.id);
+    }
     setSelectedVehicle(vehicle);
     setCurrentView(View.DETAIL);
     handleUpdateVehicle({ ...vehicle, views: (vehicle.views || 0) + 1 });
-  }, [handleUpdateVehicle]);
+  }, [handleUpdateVehicle, currentUser]);
   const handleBackToHome = useCallback(() => { setSelectedVehicle(null); setCurrentView(View.HOME); }, []);
+
+  // NEW: Handle phone view tracking
+  const handlePhoneView = useCallback((vehicleId: number) => {
+    listingService.trackPhoneView(vehicleId);
+    const vehicle = vehicles.find(v => v.id === vehicleId);
+    if (vehicle) {
+      handleUpdateVehicle({ ...vehicle, phoneViews: (vehicle.phoneViews || 0) + 1 });
+    }
+  }, [vehicles, handleUpdateVehicle]);
 
   const loginUser = useCallback((user: User) => {
       setCurrentUser(user);
@@ -870,6 +886,7 @@ const App: React.FC = () => {
       case View.COMPARISON: return <Comparison vehicles={vehiclesToCompare} onBack={() => navigate(View.USED_CARS)} onToggleCompare={handleToggleCompare} />;
       case View.PROFILE: return currentUser && <Profile currentUser={currentUser} onUpdateProfile={handleUpdateUserProfile} onUpdatePassword={handleUpdateUserPassword} />;
       case View.INBOX: return currentUser && <CustomerInbox conversations={conversations.filter(c => c.customerId === currentUser.email)} onSendMessage={handleCustomerSendMessage} onMarkAsRead={handleMarkConversationAsReadByCustomer} users={users} typingStatus={typingStatus} onUserTyping={handleUserTyping} onMarkMessagesAsRead={handleMarkMessagesAsRead} onFlagContent={handleFlagContent} onOfferResponse={handleOfferResponse} />;
+      case View.BUYER_DASHBOARD: return currentUser?.role === 'customer' ? <BuyerDashboard currentUser={currentUser} vehicles={allPublishedVehicles} wishlist={wishlist} conversations={conversations.filter(c => c.customerId === currentUser.email)} onNavigate={navigate} onSelectVehicle={handleSelectVehicle} onToggleWishlist={handleToggleWishlist} onToggleCompare={handleToggleCompare} comparisonList={comparisonList} onViewSellerProfile={handleViewSellerProfile} /> : <LoadingSpinner />;
       case View.USED_CARS: return <VehicleList vehicles={allPublishedVehicles} isLoading={isLoading} onSelectVehicle={handleSelectVehicle} comparisonList={comparisonList} onToggleCompare={handleToggleCompare} onClearCompare={handleClearCompare} wishlist={wishlist} onToggleWishlist={handleToggleWishlist} categoryTitle="All Used Cars" initialCategory={selectedCategory} initialSearchQuery={initialSearchQuery} onViewSellerProfile={handleViewSellerProfile} userLocation={userLocation} />;
       case View.NEW_CARS: return <NewCars />;
       case View.DEALER_PROFILES: return <DealerProfiles sellers={usersWithRatingsAndBadges.filter(u => u.role === 'seller')} onViewProfile={handleViewSellerProfile} />;
