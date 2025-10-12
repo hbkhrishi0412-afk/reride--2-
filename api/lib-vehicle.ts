@@ -13,7 +13,7 @@ export enum VehicleCategory {
 
 const vehicleSchema = new mongoose.Schema({
   id: { type: Number, required: true, unique: true, index: true },
-  category: { type: String, enum: Object.values(VehicleCategory), required: true },
+  category: { type: String, enum: Object.values(VehicleCategory), required: true, default: VehicleCategory.FOUR_WHEELER },
   make: { type: String, required: true },
   model: { type: String, required: true },
   variant: String,
@@ -29,7 +29,7 @@ const vehicleSchema = new mongoose.Schema({
   fuelType: String,
   fuelEfficiency: String,
   color: String,
-  status: { type: String, enum: ['published', 'unpublished', 'sold'], default: 'published' },
+  status: { type: String, enum: ['published', 'unpublished', 'sold'], default: 'published', required: true },
   isFeatured: { type: Boolean, default: false },
   views: { type: Number, default: 0 },
   inquiriesCount: { type: Number, default: 0 },

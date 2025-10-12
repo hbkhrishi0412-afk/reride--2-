@@ -39,9 +39,38 @@ export default async function handler(
         }
         
         console.log('💾 Creating vehicle in MongoDB...');
-        const vehicle = await Vehicle.create(newVehicleData);
-        console.log('✅ Vehicle created successfully:', vehicle.id);
-        return res.status(201).json(vehicle);
+        console.log('📋 Vehicle data being saved:', JSON.stringify(newVehicleData, null, 2));
+        
+        try {
+          const vehicle = await Vehicle.create(newVehicleData);
+          console.log('✅ Vehicle created successfully:', vehicle.id);
+          return res.status(201).json(vehicle);
+        } catch (createError) {
+          console.error('❌ Vehicle creation failed:', createError);
+          
+          // Handle validation errors
+          if (createError.name === 'ValidationError') {
+            console.error('Validation errors:', createError.errors);
+            return res.status(400).json({
+              error: 'Validation failed',
+              details: createError.errors,
+              provided: newVehicleData
+            });
+          }
+          
+          // Handle duplicate key errors
+          if (createError.code === 11000) {
+            console.error('Duplicate key error:', createError.keyValue);
+            // Generate new ID and retry
+            newVehicleData.id = Date.now() + Math.floor(Math.random() * 1000);
+            console.log('🔄 Retrying with new ID:', newVehicleData.id);
+            const vehicle = await Vehicle.create(newVehicleData);
+            console.log('✅ Vehicle created successfully on retry:', vehicle.id);
+            return res.status(201).json(vehicle);
+          }
+          
+          throw createError;
+        }
       }
       case 'PUT': {
         const { id, ...updateData } = req.body;
