@@ -1,23 +1,13 @@
 /* ReRide - Spinny-Inspired Global Styles */
 
+/* Import critical CSS first */
+@import './styles/critical.css';
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-/* Reset and Base Styles */
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
-
-body {
-  font-family: 'Nunito Sans', 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  background-color: #FFFFFF;
-  color: #2C2C2C;
-}
+/* Non-critical styles below */
 
 code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New', monospace;
