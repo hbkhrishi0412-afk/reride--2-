@@ -5,12 +5,10 @@ import React from 'react';
 import type { VehicleCategoryData } from './components/vehicleData';
 
 export enum VehicleCategory {
-  FOUR_WHEELER = 'Four Wheeler',
-  TWO_WHEELER = 'Two Wheeler',
-  THREE_WHEELER = 'Three Wheeler',
-  FARM = 'Farm Vehicle',
-  COMMERCIAL = 'Commercial Vehicle',
-  CONSTRUCTION = 'Construction Vehicle',
+  FOUR_WHEELER = 'four-wheeler',
+  TWO_WHEELER = 'two-wheeler',
+  THREE_WHEELER = 'three-wheeler',
+  COMMERCIAL = 'commercial'
 }
 
 export type BadgeType = 'verified' | 'top_seller' | 'high_rating';

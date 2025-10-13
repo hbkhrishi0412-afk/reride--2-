@@ -28,8 +28,8 @@ const parseCSV = (csvText: string): Record<string, string>[] => {
 
 // CSV Template Content
 const CSV_TEMPLATE = `category,make,model,variant,year,price,mileage,fuelType,transmission,color,noOfOwners,city,state,rto,registrationYear,insuranceValidity,insuranceType,features,description
-Four Wheeler,Tata,Nexon,XZ+,2022,950000,22000,Petrol,Manual,Red,1,Pune,MH,MH12,2022,Aug 2025,Comprehensive,"Sunroof|Alloy Wheels","Excellent condition Nexon with low mileage."
-Two Wheeler,Royal Enfield,Classic 350,Halcyon,2023,210000,5000,Petrol,Manual,Black,1,Jaipur,RJ,RJ14,2023,Mar 2026,Comprehensive,ABS,"Almost new, single owner bike."
+four-wheeler,Tata,Nexon,XZ+,2022,950000,22000,Petrol,Manual,Red,1,Pune,MH,MH12,2022,Aug 2025,Comprehensive,"Sunroof|Alloy Wheels","Excellent condition Nexon with low mileage."
+two-wheeler,Royal Enfield,Classic 350,Halcyon,2023,210000,5000,Petrol,Manual,Black,1,Jaipur,RJ,RJ14,2023,Mar 2026,Comprehensive,ABS,"Almost new, single owner bike."
 `;
 
 const REQUIRED_FIELDS: (keyof Vehicle)[] = ['category', 'make', 'model', 'year', 'price', 'mileage', 'fuelType', 'transmission', 'city', 'state'];

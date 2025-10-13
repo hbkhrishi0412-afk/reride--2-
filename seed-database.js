@@ -110,7 +110,7 @@ const generateMockVehicles = (count) => {
         
         vehicles.push({
             id: i,
-            category: 'Four Wheeler',
+            category: 'four-wheeler',
             make,
             model,
             variant: `${model} ${['ZX', 'VX', 'SX', 'LX'][Math.floor(Math.random() * 4)]}`,
