@@ -154,7 +154,7 @@ const deleteUserApi = async (email: string): Promise<{ success: boolean, email: 
 };
 
 const authApi = async (body: any): Promise<any> => {
-    const response = await fetch('/api/auth', {
+    const response = await fetch('/api/users', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(body),

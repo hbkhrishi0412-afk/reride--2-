@@ -8,7 +8,7 @@ const DbStatusIndicator: React.FC = () => {
     useEffect(() => {
         const checkDbStatus = async () => {
             try {
-                const response = await fetch('/api/db-health');
+                const response = await fetch('/api/admin?action=health');
                 if (response.ok) {
                     const data = await response.json();
                     if (data.status === 'ok') {

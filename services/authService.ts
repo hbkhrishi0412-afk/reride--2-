@@ -150,7 +150,7 @@ export const syncWithBackend = async (
   authProvider: 'google' | 'phone'
 ): Promise<{ success: boolean; user?: User; reason?: string }> => {
   try {
-    const response = await fetch('/api/auth', {
+    const response = await fetch('/api/users', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
