@@ -20,6 +20,13 @@ export default async function handler(
         const newVehicleData = req.body;
         console.log('📦 Vehicle data:', JSON.stringify(newVehicleData, null, 2));
         
+        // Log critical field types for debugging
+        console.log('🔍 Field type check:', {
+          price: { value: newVehicleData.price, type: typeof newVehicleData.price },
+          year: { value: newVehicleData.year, type: typeof newVehicleData.year },
+          mileage: { value: newVehicleData.mileage, type: typeof newVehicleData.mileage }
+        });
+        
         // Validate required fields
         if (!newVehicleData.sellerEmail) {
           console.error('❌ Missing sellerEmail in request');
@@ -29,6 +36,22 @@ export default async function handler(
         if (!newVehicleData.make || !newVehicleData.model) {
           console.error('❌ Missing required fields:', { make: newVehicleData.make, model: newVehicleData.model });
           return res.status(400).json({ error: 'make and model are required' });
+        }
+        
+        // CRITICAL: Validate numeric fields
+        if (!newVehicleData.price || typeof newVehicleData.price !== 'number' || newVehicleData.price <= 0) {
+          console.error('❌ Invalid price:', newVehicleData.price, 'Type:', typeof newVehicleData.price);
+          return res.status(400).json({ error: 'Valid price (number > 0) is required' });
+        }
+        
+        if (typeof newVehicleData.year !== 'number' || newVehicleData.year < 1900) {
+          console.error('❌ Invalid year:', newVehicleData.year, 'Type:', typeof newVehicleData.year);
+          return res.status(400).json({ error: 'Valid year (number) is required' });
+        }
+        
+        if (typeof newVehicleData.mileage !== 'number' || newVehicleData.mileage < 0) {
+          console.error('❌ Invalid mileage:', newVehicleData.mileage, 'Type:', typeof newVehicleData.mileage);
+          return res.status(400).json({ error: 'Valid mileage (number >= 0) is required' });
         }
         
         // Replicate frontend logic for ID generation if not provided.

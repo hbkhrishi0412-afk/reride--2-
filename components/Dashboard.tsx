@@ -144,7 +144,7 @@ const PlanStatusCard: React.FC<{
 });
 
 const initialFormState: Omit<Vehicle, 'id' | 'averageRating' | 'ratingCount'> = {
-  make: '', model: '', variant: '', year: new Date().getFullYear(), price: '' as any, mileage: '' as any,
+  make: '', model: '', variant: '', year: new Date().getFullYear(), price: 0, mileage: 0,
   description: '', engine: '', transmission: 'Automatic', fuelType: 'Petrol', fuelEfficiency: '',
   color: '', features: [], images: [], documents: [],
   sellerEmail: '',
@@ -277,9 +277,18 @@ const VehicleForm: React.FC<VehicleFormProps> = memo(({ editingVehicle, onAddVeh
     const validateField = (name: keyof Omit<Vehicle, 'id' | 'averageRating' | 'ratingCount'>, value: any): string => {
       switch(name) {
           case 'make': case 'model': return value.trim().length < 2 ? `${name} must be at least 2 characters long.` : '';
-          case 'year': return value < 1900 || value > new Date().getFullYear() + 1 ? 'Please enter a valid year.' : '';
-          case 'price': return value <= 0 ? 'Price must be greater than 0.' : '';
-          case 'mileage': return value < 0 ? 'Mileage cannot be negative.' : '';
+          case 'year': {
+              const numValue = typeof value === 'string' ? parseInt(value, 10) : value;
+              return isNaN(numValue) || numValue < 1900 || numValue > new Date().getFullYear() + 1 ? 'Please enter a valid year.' : '';
+          }
+          case 'price': {
+              const numValue = typeof value === 'string' ? parseFloat(value) : value;
+              return isNaN(numValue) || numValue <= 0 ? 'Price must be greater than 0.' : '';
+          }
+          case 'mileage': {
+              const numValue = typeof value === 'string' ? parseInt(value, 10) : value;
+              return isNaN(numValue) || numValue < 0 ? 'Mileage cannot be negative.' : '';
+          }
           default: return '';
       }
     };
@@ -448,17 +457,34 @@ const VehicleForm: React.FC<VehicleFormProps> = memo(({ editingVehicle, onAddVeh
         console.log('⭐ Is featuring:', isFeaturing);
         console.log('✉️ Seller email in form:', formData.sellerEmail);
         
+        // CRITICAL FIX: Validate required numeric fields BEFORE sanitization
+        const priceValue = typeof formData.price === 'string' ? parseFloat(formData.price) : formData.price;
+        const mileageValue = typeof formData.mileage === 'string' ? parseInt(formData.mileage, 10) : formData.mileage;
+        
+        if (!priceValue || isNaN(priceValue) || priceValue <= 0) {
+            alert('Please enter a valid price greater than 0');
+            console.error('❌ Invalid price:', formData.price, '→', priceValue);
+            return;
+        }
+        
+        if (isNaN(mileageValue) || mileageValue < 0) {
+            alert('Please enter a valid mileage (km driven)');
+            console.error('❌ Invalid mileage:', formData.mileage, '→', mileageValue);
+            return;
+        }
+        
         // FIX: Ensure all numeric fields are actual numbers before submission
         const sanitizedFormData = {
             ...formData,
-            year: typeof formData.year === 'string' ? parseInt(formData.year, 10) || new Date().getFullYear() : formData.year,
-            price: typeof formData.price === 'string' ? parseFloat(formData.price) || 0 : formData.price,
-            mileage: typeof formData.mileage === 'string' ? parseInt(formData.mileage, 10) || 0 : formData.mileage,
-            registrationYear: typeof formData.registrationYear === 'string' ? parseInt(formData.registrationYear, 10) || new Date().getFullYear() : formData.registrationYear,
-            noOfOwners: typeof formData.noOfOwners === 'string' ? parseInt(formData.noOfOwners, 10) || 1 : formData.noOfOwners,
+            year: typeof formData.year === 'string' ? parseInt(formData.year, 10) : formData.year,
+            price: priceValue,
+            mileage: mileageValue,
+            registrationYear: typeof formData.registrationYear === 'string' ? parseInt(formData.registrationYear, 10) : formData.registrationYear,
+            noOfOwners: typeof formData.noOfOwners === 'string' ? parseInt(formData.noOfOwners, 10) : formData.noOfOwners,
         };
         
         console.log('🔄 Sanitized form data:', sanitizedFormData);
+        console.log('💰 Price check:', { original: formData.price, sanitized: sanitizedFormData.price, type: typeof sanitizedFormData.price });
         
         if (editingVehicle) {
             console.log('✏️ Editing existing vehicle:', editingVehicle.id);
