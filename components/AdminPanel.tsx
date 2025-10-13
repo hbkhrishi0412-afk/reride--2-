@@ -185,6 +185,7 @@ const VehicleDataEditor: React.FC<{ vehicleData: VehicleData, onUpdate: (newData
     const [addingAt, setAddingAt] = useState<{ path: string[], type: string } | null>(null);
     const [newItemValue, setNewItemValue] = useState('');
     const [isBulkUploadOpen, setIsBulkUploadOpen] = useState(false);
+    const [showPreview, setShowPreview] = useState(false);
 
     useEffect(() => {
         if (selectedCategory && !vehicleData[selectedCategory]) setSelectedCategory(null);
@@ -293,6 +294,14 @@ const VehicleDataEditor: React.FC<{ vehicleData: VehicleData, onUpdate: (newData
     const models = selectedCategory && selectedMake ? (vehicleData[selectedCategory]?.find(m => m.name === selectedMake)?.models || []).map(mo => mo.name).sort() : [];
     const variants = selectedCategory && selectedMake && selectedModel ? (vehicleData[selectedCategory]?.find(m => m.name === selectedMake)?.models.find(mo => mo.name === selectedModel)?.variants || []).sort() : [];
 
+    // Preview data for seller form
+    const previewData = {
+        categories: categories.map(cat => ({ value: cat, label: cat.replace('-', ' ').replace(/\b\w/g, l => l.toUpperCase()) })),
+        makes: makes.map(make => ({ value: make, label: make })),
+        models: models.map(model => ({ value: model, label: model })),
+        variants: variants.map(variant => ({ value: variant, label: variant }))
+    };
+
     const renderColumn = (title: string, items: string[], pathPrefix: string[], selectedItem: string | null, onSelect: (item: string | null) => void, itemType: string, disabled: boolean = false) => (
         <div className={`bg-white dark:bg-white p-3 rounded-lg border dark:border-gray-200-200 flex flex-col transition-opacity ${disabled ? 'opacity-50' : ''}`}>
             <h3 className="text-md font-bold text-spinny-text-dark dark:text-spinny-text-dark mb-2 px-1">{title}</h3>
@@ -340,10 +349,111 @@ const VehicleDataEditor: React.FC<{ vehicleData: VehicleData, onUpdate: (newData
                     <h2 className="text-xl font-bold text-spinny-text-dark dark:text-spinny-text-dark">Manage Vehicle Data</h2>
                     <p className="text-sm text-spinny-text-dark dark:text-spinny-text-dark">Manage dropdown options for the vehicle creation form.</p>
                 </div>
-                <button onClick={() => setIsBulkUploadOpen(true)} className="bg-spinny-orange text-white font-bold py-2 px-4 rounded-lg hover:bg-spinny-orange">
-                    Bulk Upload
-                </button>
+                <div className="flex gap-2">
+                    <button 
+                        onClick={() => setShowPreview(!showPreview)} 
+                        className={`px-4 py-2 rounded-lg font-bold transition-colors ${
+                            showPreview 
+                                ? 'bg-spinny-blue text-white hover:bg-spinny-blue/90' 
+                                : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                        }`}
+                    >
+                        {showPreview ? 'Hide Preview' : 'Show Seller Form Preview'}
+                    </button>
+                    <button onClick={() => setIsBulkUploadOpen(true)} className="bg-spinny-orange text-white font-bold py-2 px-4 rounded-lg hover:bg-spinny-orange">
+                        Bulk Upload
+                    </button>
+                </div>
             </div>
+
+            {/* Preview Section */}
+            {showPreview && (
+                <div className="mb-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+                    <h3 className="text-lg font-semibold text-blue-800 mb-3">📋 Seller Form Preview</h3>
+                    <p className="text-blue-700 mb-4">This shows how the vehicle data will appear in the seller's "List New Vehicle" form:</p>
+                    
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                        {/* Category Preview */}
+                        <div className="bg-white p-3 rounded border">
+                            <h4 className="font-semibold text-gray-700 mb-2">Category Dropdown</h4>
+                            <div className="space-y-1">
+                                {previewData.categories.slice(0, 3).map(cat => (
+                                    <div key={cat.value} className="text-sm text-gray-600 px-2 py-1 bg-gray-50 rounded">
+                                        {cat.label}
+                                    </div>
+                                ))}
+                                {previewData.categories.length > 3 && (
+                                    <div className="text-xs text-gray-500">+{previewData.categories.length - 3} more...</div>
+                                )}
+                            </div>
+                        </div>
+
+                        {/* Make Preview */}
+                        <div className="bg-white p-3 rounded border">
+                            <h4 className="font-semibold text-gray-700 mb-2">Make Dropdown</h4>
+                            <div className="space-y-1">
+                                {previewData.makes.length > 0 ? (
+                                    previewData.makes.slice(0, 3).map(make => (
+                                        <div key={make.value} className="text-sm text-gray-600 px-2 py-1 bg-gray-50 rounded">
+                                            {make.label}
+                                        </div>
+                                    ))
+                                ) : (
+                                    <div className="text-sm text-gray-400 italic">Select a category first</div>
+                                )}
+                                {previewData.makes.length > 3 && (
+                                    <div className="text-xs text-gray-500">+{previewData.makes.length - 3} more...</div>
+                                )}
+                            </div>
+                        </div>
+
+                        {/* Model Preview */}
+                        <div className="bg-white p-3 rounded border">
+                            <h4 className="font-semibold text-gray-700 mb-2">Model Dropdown</h4>
+                            <div className="space-y-1">
+                                {previewData.models.length > 0 ? (
+                                    previewData.models.slice(0, 3).map(model => (
+                                        <div key={model.value} className="text-sm text-gray-600 px-2 py-1 bg-gray-50 rounded">
+                                            {model.label}
+                                        </div>
+                                    ))
+                                ) : (
+                                    <div className="text-sm text-gray-400 italic">Select a make first</div>
+                                )}
+                                {previewData.models.length > 3 && (
+                                    <div className="text-xs text-gray-500">+{previewData.models.length - 3} more...</div>
+                                )}
+                            </div>
+                        </div>
+
+                        {/* Variant Preview */}
+                        <div className="bg-white p-3 rounded border">
+                            <h4 className="font-semibold text-gray-700 mb-2">Variant Dropdown</h4>
+                            <div className="space-y-1">
+                                {previewData.variants.length > 0 ? (
+                                    previewData.variants.slice(0, 3).map(variant => (
+                                        <div key={variant.value} className="text-sm text-gray-600 px-2 py-1 bg-gray-50 rounded">
+                                            {variant.label}
+                                        </div>
+                                    ))
+                                ) : (
+                                    <div className="text-sm text-gray-400 italic">Select a model first</div>
+                                )}
+                                {previewData.variants.length > 3 && (
+                                    <div className="text-xs text-gray-500">+{previewData.variants.length - 3} more...</div>
+                                )}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div className="mt-4 p-3 bg-green-50 border border-green-200 rounded">
+                        <p className="text-green-800 text-sm">
+                            <strong>✅ Live Connection:</strong> Any changes you make here will immediately reflect in the seller's vehicle listing form.
+                            Sellers will see the updated options when they create new listings.
+                        </p>
+                    </div>
+                </div>
+            )}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                 {renderColumn("Categories", categories, [], selectedCategory, handleSelectCategory, "Category")}
                 {renderColumn("Makes", makes, selectedCategory ? [selectedCategory] : [], selectedMake, handleSelectMake, "Make", !selectedCategory)}

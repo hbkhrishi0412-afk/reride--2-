@@ -240,6 +240,11 @@ const VehicleForm: React.FC<VehicleFormProps> = memo(({ editingVehicle, onAddVeh
         return CITIES_BY_STATE[formData.state].sort();
     }, [formData.state]);
 
+    // Check if vehicle data is available for the selected category
+    const hasVehicleData = useMemo(() => {
+        return formData.category && vehicleData[formData.category] && vehicleData[formData.category].length > 0;
+    }, [formData.category, vehicleData]);
+
     const handleGetAiSuggestions = async () => {
         const { make, model, year, variant } = formData;
         if (!make || !model || !year) {
@@ -522,7 +527,15 @@ const VehicleForm: React.FC<VehicleFormProps> = memo(({ editingVehicle, onAddVeh
           <form onSubmit={handleSubmit} className="space-y-6">
             <FormFieldset title="Vehicle Overview">
                 <div className="flex justify-between items-center mb-4 -mt-4">
-                    <p className="text-xs text-spinny-text-dark dark:text-spinny-text-dark">Enter core details about your vehicle.</p>
+                    <div className="flex items-center gap-2">
+                        <p className="text-xs text-spinny-text-dark dark:text-spinny-text-dark">Enter core details about your vehicle.</p>
+                        {hasVehicleData && (
+                            <span className="inline-flex items-center gap-1 px-2 py-1 bg-green-100 text-green-800 text-xs font-medium rounded-full">
+                                <span className="w-2 h-2 bg-green-500 rounded-full"></span>
+                                Admin Managed
+                            </span>
+                        )}
+                    </div>
                     <button type="button" onClick={handleGetAiSuggestions} disabled={isGeneratingSuggestions || !formData.make || !formData.model || !formData.year} className="text-sm font-semibold text-spinny-orange disabled:opacity-50 flex items-center gap-1">
                         {isGeneratingSuggestions ? (<><div className="w-4 h-4 border-2 border-dashed rounded-full animate-spin border-current"></div><span>Generating...</span></>) : '✨ Auto-fill with AI'}
                     </button>
