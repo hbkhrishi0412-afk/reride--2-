@@ -143,6 +143,14 @@ export interface Vehicle {
   photoQuality?: 'low' | 'medium' | 'high';
   hasMinimumPhotos?: boolean;
   descriptionQuality?: number; // 0-100 score
+  
+  // ENHANCED: Additional Fields (from new features)
+  activeBoosts?: ActiveBoost[];
+  hideExactLocation?: boolean;
+  listingExpiresAt?: string;
+  listingAutoRenew?: boolean;
+  listingRenewalCount?: number;
+  listingLastRefreshed?: string;
 }
 
 export type SubscriptionPlan = 'free' | 'pro' | 'premium';
@@ -208,6 +216,12 @@ export interface User {
   alternatePhone?: string;
   preferredContactHours?: string;
   showEmailPublicly?: boolean;
+  
+  // ENHANCED: Trust & Safety
+  verificationStatus?: VerificationStatus;
+  trustScore?: number; // 0-100
+  responseTimeMinutes?: number;
+  responseRate?: number; // 0-100
 }
 
 export interface ChatMessage {
@@ -422,4 +436,256 @@ export interface SafetyWarning {
 export interface SortOption {
   label: string;
   value: 'newest' | 'oldest' | 'price_low' | 'price_high' | 'most_viewed';
+}
+
+// ============================================
+// LOCATION & DISCOVERY FEATURES
+// ============================================
+export interface LocationCoordinates {
+  lat: number;
+  lng: number;
+}
+
+export interface PopularSearch {
+  id: number;
+  query: string;
+  count: number;
+  city?: string;
+  state?: string;
+  category?: VehicleCategory;
+  createdAt: string;
+}
+
+export interface NearbyLandmark {
+  id: number;
+  name: string;
+  type: 'metro' | 'railway' | 'airport' | 'mall' | 'landmark';
+  location: LocationCoordinates;
+  city: string;
+  state: string;
+}
+
+export interface CityStats {
+  cityName: string;
+  stateCode: string;
+  totalListings: number;
+  averagePrice: number;
+  popularMakes: string[];
+  popularCategories: VehicleCategory[];
+}
+
+export interface RadiusSearchParams {
+  center: LocationCoordinates;
+  radiusKm: number;
+  filters?: SearchFilters;
+}
+
+// ============================================
+// LISTING LIFECYCLE MANAGEMENT
+// ============================================
+export interface ListingLifecycle {
+  vehicleId: number;
+  createdAt: string;
+  expiresAt: string;
+  lastRefreshedAt?: string;
+  autoRenew: boolean;
+  renewalCount: number;
+  status: 'active' | 'expired' | 'suspended';
+}
+
+export interface ListingRefresh {
+  vehicleId: number;
+  refreshedAt: string;
+  refreshType: 'manual' | 'auto' | 'boost';
+  cost?: number;
+}
+
+// ============================================
+// BUYER ENGAGEMENT TOOLS
+// ============================================
+export interface SavedSearch {
+  id: string;
+  userId: string;
+  name: string;
+  filters: SearchFilters;
+  emailAlerts: boolean;
+  smsAlerts: boolean;
+  notificationFrequency: 'instant' | 'daily' | 'weekly';
+  createdAt: string;
+  lastNotifiedAt?: string;
+}
+
+export interface PriceDropAlert {
+  id: string;
+  userId: string;
+  vehicleId: number;
+  originalPrice: number;
+  currentPrice: number;
+  percentageDropped: number;
+  notified: boolean;
+  createdAt: string;
+}
+
+export interface FollowedSeller {
+  id: string;
+  userId: string;
+  sellerEmail: string;
+  followedAt: string;
+  notifyOnNewListing: boolean;
+}
+
+export interface VehicleView {
+  vehicleId: number;
+  userId?: string;
+  viewedAt: string;
+  sessionId: string;
+  source?: string;
+}
+
+// ============================================
+// TRUST & SAFETY
+// ============================================
+export interface VerificationStatus {
+  phoneVerified: boolean;
+  phoneVerifiedAt?: string;
+  emailVerified: boolean;
+  emailVerifiedAt?: string;
+  govtIdVerified: boolean;
+  govtIdVerifiedAt?: string;
+  govtIdType?: 'aadhaar' | 'pan' | 'driving_license';
+  govtIdNumber?: string; // Encrypted/hashed
+}
+
+export interface TrustScore {
+  userId: string;
+  score: number; // 0-100
+  factors: {
+    verificationsComplete: number;
+    responseRate: number;
+    positiveReviews: number;
+    accountAge: number;
+    successfulDeals: number;
+  };
+  lastCalculated: string;
+}
+
+export interface SafetyReport {
+  id: string;
+  reportedBy: string;
+  targetType: 'vehicle' | 'user' | 'conversation';
+  targetId: string | number;
+  reason: 'scam' | 'fake_listing' | 'inappropriate' | 'spam' | 'other';
+  description: string;
+  status: 'pending' | 'reviewed' | 'resolved' | 'dismissed';
+  createdAt: string;
+  resolvedAt?: string;
+  action?: string;
+}
+
+export interface ResponseTimeStats {
+  userId: string;
+  averageResponseMinutes: number;
+  responseRate: number; // percentage 0-100
+  totalQueries: number;
+  respondedQueries: number;
+  lastCalculated: string;
+}
+
+// ============================================
+// ENHANCED SELLER FEATURES
+// ============================================
+export interface ListingAnalytics {
+  vehicleId: number;
+  views: number;
+  uniqueViews: number;
+  phoneReveals: number;
+  chatStarts: number;
+  testDriveRequests: number;
+  offers: number;
+  shares: number;
+  favorites: number;
+  viewsByHour: Record<string, number>;
+  viewsByDay: Record<string, number>;
+  viewsBySource: Record<string, number>;
+}
+
+export interface CompetitorPricing {
+  vehicleId: number;
+  yourPrice: number;
+  marketAverage: number;
+  lowestPrice: number;
+  highestPrice: number;
+  competitorCount: number;
+  pricePosition: 'low' | 'average' | 'high';
+  suggestedPrice?: number;
+}
+
+export interface ListingQualityScore {
+  vehicleId: number;
+  overallScore: number; // 0-100
+  photoQuality: number;
+  photoCount: number;
+  descriptionLength: number;
+  descriptionQuality: number;
+  responseTime: number;
+  priceCompetitiveness: number;
+  suggestions: string[];
+}
+
+// ============================================
+// MONETIZATION FEATURES
+// ============================================
+export interface BoostPackage {
+  id: string;
+  name: string;
+  type: 'top_search' | 'homepage_spotlight' | 'featured_badge' | 'multi_city';
+  durationDays: number;
+  price: number;
+  features: string[];
+}
+
+export interface ActiveBoost {
+  id: string;
+  vehicleId: number;
+  packageId: string;
+  type: 'top_search' | 'homepage_spotlight' | 'featured_badge' | 'multi_city';
+  startDate: string;
+  expiresAt: string;
+  isActive: boolean;
+  impressions?: number;
+  clicks?: number;
+}
+
+export interface ListingPromotion {
+  vehicleId: number;
+  isPremium: boolean;
+  isUrgentSale: boolean;
+  isBestPrice: boolean;
+  promotionExpiresAt?: string;
+}
+
+// ============================================
+// MOBILE FEATURES
+// ============================================
+export interface CallMaskingSession {
+  id: string;
+  buyerId: string;
+  sellerId: string;
+  vehicleId: number;
+  maskedNumber: string;
+  actualNumber: string;
+  createdAt: string;
+  expiresAt: string;
+  callCount: number;
+}
+
+export interface SMSAlert {
+  id: string;
+  userId: string;
+  type: 'price_drop' | 'new_match' | 'message' | 'offer';
+  message: string;
+  vehicleId?: number;
+  sent: boolean;
+  sentAt?: string;
+  createdAt: string;
 }

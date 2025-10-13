@@ -208,3 +208,116 @@ const generateMockVehicles = (count: number): Vehicle[] => {
 };
 
 export const MOCK_VEHICLES: Vehicle[] = generateMockVehicles(50);
+
+// ============================================
+// LOCATION & DISCOVERY CONSTANTS
+// ============================================
+export const INDIAN_LANDMARKS: import('./types').NearbyLandmark[] = [
+  // Mumbai
+  { id: 1, name: 'Andheri Metro Station', type: 'metro', location: { lat: 19.1197, lng: 72.8464 }, city: 'Mumbai', state: 'MH' },
+  { id: 2, name: 'CST Railway Station', type: 'railway', location: { lat: 18.9398, lng: 72.8355 }, city: 'Mumbai', state: 'MH' },
+  { id: 3, name: 'Phoenix Marketcity', type: 'mall', location: { lat: 19.0874, lng: 72.8886 }, city: 'Mumbai', state: 'MH' },
+  { id: 4, name: 'Mumbai Airport', type: 'airport', location: { lat: 19.0896, lng: 72.8656 }, city: 'Mumbai', state: 'MH' },
+  // Delhi
+  { id: 5, name: 'Rajiv Chowk Metro', type: 'metro', location: { lat: 28.6328, lng: 77.2197 }, city: 'New Delhi', state: 'DL' },
+  { id: 6, name: 'New Delhi Railway Station', type: 'railway', location: { lat: 28.6431, lng: 77.2197 }, city: 'New Delhi', state: 'DL' },
+  { id: 7, name: 'IGI Airport', type: 'airport', location: { lat: 28.5562, lng: 77.1000 }, city: 'New Delhi', state: 'DL' },
+  // Bangalore
+  { id: 8, name: 'MG Road Metro', type: 'metro', location: { lat: 12.9758, lng: 77.6065 }, city: 'Bengaluru', state: 'KA' },
+  { id: 9, name: 'Bangalore Railway Station', type: 'railway', location: { lat: 12.9775, lng: 77.5718 }, city: 'Bengaluru', state: 'KA' },
+  { id: 10, name: 'Kempegowda Airport', type: 'airport', location: { lat: 13.1979, lng: 77.7068 }, city: 'Bengaluru', state: 'KA' },
+  // Hyderabad
+  { id: 11, name: 'Ameerpet Metro', type: 'metro', location: { lat: 17.4374, lng: 78.4482 }, city: 'Hyderabad', state: 'TS' },
+  { id: 12, name: 'Secunderabad Railway', type: 'railway', location: { lat: 17.4342, lng: 78.5025 }, city: 'Hyderabad', state: 'TS' },
+];
+
+export const CITY_COORDINATES: Record<string, import('./types').LocationCoordinates> = {
+  'Mumbai': { lat: 19.0760, lng: 72.8777 },
+  'New Delhi': { lat: 28.6139, lng: 77.2090 },
+  'Bengaluru': { lat: 12.9716, lng: 77.5946 },
+  'Hyderabad': { lat: 17.3850, lng: 78.4867 },
+  'Chennai': { lat: 13.0827, lng: 80.2707 },
+  'Pune': { lat: 18.5204, lng: 73.8567 },
+  'Ahmedabad': { lat: 23.0225, lng: 72.5714 },
+  'Kolkata': { lat: 22.5726, lng: 88.3639 },
+};
+
+export const POPULAR_SEARCHES_BY_CITY: Record<string, import('./types').PopularSearch[]> = {
+  'Mumbai': [
+    { id: 1, query: 'Maruti Swift under 5 lakhs', count: 1250, city: 'Mumbai', state: 'MH', createdAt: new Date().toISOString() },
+    { id: 2, query: 'Hyundai Creta 2020', count: 980, city: 'Mumbai', state: 'MH', createdAt: new Date().toISOString() },
+    { id: 3, query: 'Honda City automatic', count: 756, city: 'Mumbai', state: 'MH', createdAt: new Date().toISOString() },
+  ],
+  'New Delhi': [
+    { id: 4, query: 'Toyota Fortuner diesel', count: 1150, city: 'New Delhi', state: 'DL', createdAt: new Date().toISOString() },
+    { id: 5, query: 'Tata Nexon EV', count: 890, city: 'New Delhi', state: 'DL', createdAt: new Date().toISOString() },
+  ],
+  'Bengaluru': [
+    { id: 6, query: 'Mercedes E-Class', count: 980, city: 'Bengaluru', state: 'KA', createdAt: new Date().toISOString() },
+    { id: 7, query: 'Mahindra XUV700', count: 650, city: 'Bengaluru', state: 'KA', createdAt: new Date().toISOString() },
+  ],
+};
+
+// ============================================
+// MONETIZATION CONSTANTS
+// ============================================
+export const BOOST_PACKAGES: import('./types').BoostPackage[] = [
+  {
+    id: 'top_search_3',
+    name: 'Top Search - 3 Days',
+    type: 'top_search',
+    durationDays: 3,
+    price: 299,
+    features: ['Top of search results', '3x more visibility', 'Priority placement'],
+  },
+  {
+    id: 'top_search_7',
+    name: 'Top Search - 7 Days',
+    type: 'top_search',
+    durationDays: 7,
+    price: 599,
+    features: ['Top of search results', '3x more visibility', 'Priority placement', 'Best Value'],
+  },
+  {
+    id: 'homepage_spot',
+    name: 'Homepage Spotlight',
+    type: 'homepage_spotlight',
+    durationDays: 7,
+    price: 999,
+    features: ['Featured on homepage', 'Maximum visibility', 'Premium badge', 'Guaranteed views'],
+  },
+  {
+    id: 'featured_badge',
+    name: 'Featured Badge',
+    type: 'featured_badge',
+    durationDays: 15,
+    price: 499,
+    features: ['Featured badge', 'Stand out from crowd', 'Trust indicator'],
+  },
+  {
+    id: 'multi_city',
+    name: 'Multi-City Promotion',
+    type: 'multi_city',
+    durationDays: 7,
+    price: 1499,
+    features: ['Visible in 3 cities', 'Maximum reach', 'Best for dealers', 'Top placement'],
+  },
+];
+
+// ============================================
+// TRUST & SAFETY CONSTANTS
+// ============================================
+export const SAFETY_TIPS = [
+  'Always meet in a public place during daylight hours',
+  'Never share bank details or OTP with anyone',
+  'Verify vehicle documents before making payment',
+  'Test drive with seller present and valid documents',
+  'Check vehicle history and registration details',
+  'Avoid advance payments without proper agreement',
+  'Report suspicious listings immediately',
+];
+
+export const LISTING_EXPIRY_DAYS = 30; // Listings expire after 30 days
+export const AUTO_REFRESH_DAYS = 7; // Auto-refresh every 7 days
+export const MAX_FREE_LISTINGS = 1;
+export const MAX_PRO_LISTINGS = 10;

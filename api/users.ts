@@ -106,6 +106,86 @@ export default async function handler(
       return res.status(400).json({ success: false, reason: 'Invalid action specified.' });
     }
 
+    // TRUST SCORE ENDPOINT
+    if (req.method === 'GET') {
+      const { action: queryAction, email: queryEmail } = req.query;
+      
+      if (queryAction === 'trust-score' && queryEmail && typeof queryEmail === 'string') {
+        const user = await User.findOne({ email: queryEmail }).lean();
+        if (!user) {
+          return res.status(404).json({ error: 'User not found' });
+        }
+
+        // Calculate trust score
+        let score = 0;
+        
+        // Verification points (max 30)
+        const verificationStatus = (user as any).verificationStatus || {};
+        let verificationCount = 0;
+        if (verificationStatus.phoneVerified) verificationCount++;
+        if (verificationStatus.emailVerified) verificationCount++;
+        if (verificationStatus.govtIdVerified) verificationCount++;
+        score += verificationCount * 10;
+        
+        // Response rate points (max 25)
+        const responseRate = (user as any).responseRate || 0;
+        score += (responseRate / 100) * 25;
+        
+        // Positive reviews points (max 20)
+        const averageRating = (user as any).averageRating || 0;
+        const ratingCount = (user as any).ratingCount || 0;
+        if (ratingCount > 0) {
+          score += (averageRating / 5) * 20;
+        }
+        
+        // Account age points (max 15)
+        if ((user as any).createdAt) {
+          const accountAgeDays = Math.floor(
+            (Date.now() - new Date((user as any).createdAt).getTime()) / (1000 * 60 * 60 * 24)
+          );
+          score += Math.min((accountAgeDays / 30) * 1, 15);
+        }
+        
+        // Successful deals points (max 10)
+        const soldListings = (user as any).soldListings || 0;
+        score += Math.min(soldListings, 10);
+        
+        const trustScore = Math.min(Math.round(score), 100);
+
+        const trustScoreData = {
+          userId: queryEmail,
+          score: trustScore,
+          factors: {
+            verificationsComplete: verificationCount,
+            responseRate: Math.round(responseRate),
+            positiveReviews: ratingCount,
+            accountAge: (user as any).createdAt ? Math.floor(
+              (Date.now() - new Date((user as any).createdAt).getTime()) / (1000 * 60 * 60 * 24)
+            ) : 0,
+            successfulDeals: soldListings,
+          },
+          lastCalculated: new Date().toISOString(),
+        };
+
+        // Get trust badge
+        let badge;
+        if (trustScore >= 90) {
+          badge = { label: 'Highly Trusted', color: '#10B981', icon: '✓✓✓' };
+        } else if (trustScore >= 70) {
+          badge = { label: 'Trusted', color: '#3B82F6', icon: '✓✓' };
+        } else if (trustScore >= 50) {
+          badge = { label: 'Verified', color: '#F59E0B', icon: '✓' };
+        } else {
+          badge = { label: 'New Seller', color: '#6B7280', icon: '○' };
+        }
+
+        return res.status(200).json({ 
+          trustScore: trustScoreData,
+          badge
+        });
+      }
+    }
+
     // Handle user management (GET, PUT, DELETE)
     switch (req.method) {
       case 'GET': {
