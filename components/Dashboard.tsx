@@ -144,7 +144,7 @@ const PlanStatusCard: React.FC<{
 });
 
 const initialFormState: Omit<Vehicle, 'id' | 'averageRating' | 'ratingCount'> = {
-  make: '', model: '', variant: '', year: new Date().getFullYear(), price: 0, mileage: 0,
+  make: '', model: '', variant: '', year: new Date().getFullYear(), price: '' as any, mileage: '' as any,
   description: '', engine: '', transmission: 'Automatic', fuelType: 'Petrol', fuelEfficiency: '',
   color: '', features: [], images: [], documents: [],
   sellerEmail: '',
@@ -288,7 +288,15 @@ const VehicleForm: React.FC<VehicleFormProps> = memo(({ editingVehicle, onAddVeh
       const { name, value } = e.target as { name: keyof typeof initialFormState; value: string };
       
       const isNumeric = ['year', 'price', 'mileage', 'noOfOwners', 'registrationYear'].includes(name);
-      const parsedValue = isNumeric ? parseInt(value, 10) || 0 : value;
+      
+      // FIX: Properly handle numeric conversions - only parse if value is not empty
+      let parsedValue: any = value;
+      if (isNumeric && value !== '') {
+        const num = name === 'price' ? parseFloat(value) : parseInt(value, 10);
+        parsedValue = isNaN(num) ? value : num;
+      } else if (!isNumeric) {
+        parsedValue = value;
+      }
 
       setFormData(prev => {
         const newState = { ...prev, [name]: parsedValue };
@@ -321,7 +329,12 @@ const VehicleForm: React.FC<VehicleFormProps> = memo(({ editingVehicle, onAddVeh
     
     const handleBlur = (e: React.FocusEvent<HTMLInputElement>) => {
         const { name, value } = e.target as { name: keyof typeof initialFormState; value: string };
-        const parsedValue = ['year', 'price', 'mileage'].includes(name) ? parseInt(value) || 0 : value;
+        let parsedValue: any = value;
+        if (['year', 'mileage', 'noOfOwners', 'registrationYear'].includes(name)) {
+            parsedValue = parseInt(value, 10) || 0;
+        } else if (name === 'price') {
+            parsedValue = parseFloat(value) || 0;
+        }
         const error = validateField(name, parsedValue);
         setErrors(prev => ({...prev, [name]: error}));
     };
@@ -435,15 +448,27 @@ const VehicleForm: React.FC<VehicleFormProps> = memo(({ editingVehicle, onAddVeh
         console.log('⭐ Is featuring:', isFeaturing);
         console.log('✉️ Seller email in form:', formData.sellerEmail);
         
+        // FIX: Ensure all numeric fields are actual numbers before submission
+        const sanitizedFormData = {
+            ...formData,
+            year: typeof formData.year === 'string' ? parseInt(formData.year, 10) || new Date().getFullYear() : formData.year,
+            price: typeof formData.price === 'string' ? parseFloat(formData.price) || 0 : formData.price,
+            mileage: typeof formData.mileage === 'string' ? parseInt(formData.mileage, 10) || 0 : formData.mileage,
+            registrationYear: typeof formData.registrationYear === 'string' ? parseInt(formData.registrationYear, 10) || new Date().getFullYear() : formData.registrationYear,
+            noOfOwners: typeof formData.noOfOwners === 'string' ? parseInt(formData.noOfOwners, 10) || 1 : formData.noOfOwners,
+        };
+        
+        console.log('🔄 Sanitized form data:', sanitizedFormData);
+        
         if (editingVehicle) {
             console.log('✏️ Editing existing vehicle:', editingVehicle.id);
-            onUpdateVehicle({ ...editingVehicle, ...formData });
+            onUpdateVehicle({ ...editingVehicle, ...sanitizedFormData });
             if (isFeaturing && !editingVehicle.isFeatured) {
                 onFeatureListing(editingVehicle.id);
             }
         } else {
             console.log('➕ Adding new vehicle');
-            onAddVehicle(formData, isFeaturing);
+            onAddVehicle(sanitizedFormData, isFeaturing);
         }
         onCancel();
     };
