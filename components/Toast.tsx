@@ -25,8 +25,8 @@ const ICONS = {
 };
 
 const BG_COLORS = {
-    success: 'bg-spinny-orange-light0',
-    error: 'bg-spinny-orange-light0',
+    success: 'bg-green-500',
+    error: 'bg-red-500',
     info: 'bg-gradient-primary',
 };
 
