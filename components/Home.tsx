@@ -211,7 +211,7 @@ const Home: React.FC<HomeProps> = ({ onSearch, onSelectCategory, featuredVehicle
                     <h1 className="text-4xl md:text-5xl font-bold mb-4" style={{ color: 'white' }}>
                         Buy Quality Used Cars
                     </h1>
-                    <p className="text-xl mb-8" style={{ color: '#1E88E5' }}>
+                    <p className="text-xl mb-8" style={{ color: 'white' }}>
                         200+ Quality Checks • Fixed Price • 5-Day Money Back
                     </p>
                     

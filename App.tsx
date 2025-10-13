@@ -22,7 +22,7 @@ import { getSettings, saveSettings } from './services/settingsService';
 import { getAuditLog, logAction, saveAuditLog } from './services/auditLogService';
 import { exportToCsv } from './services/exportService';
 import { showNotification } from './services/notificationService';
-import { getVehicleData, saveVehicleData } from './services/vehicleDataService';
+import { getVehicleData, getVehicleDataSync, saveVehicleData } from './services/vehicleDataService';
 import { ChatWidget } from './components/ChatWidget';
 import { getVehicleRecommendations } from './services/geminiService';
 import { getSellerBadges } from './services/badgeService';
@@ -94,7 +94,7 @@ const App: React.FC = () => {
   
   const [platformSettings, setPlatformSettings] = useState<PlatformSettings>(() => getSettings());
   const [auditLog, setAuditLog] = useState<AuditLogEntry[]>(() => getAuditLog());
-  const [vehicleData, setVehicleData] = useState<VehicleData>(() => getVehicleData());
+  const [vehicleData, setVehicleData] = useState<VehicleData>(() => getVehicleDataSync());
   const [faqItems, setFaqItems] = useState<FAQItem[]>(() => getFaqs() || MOCK_FAQS);
   const [supportTickets, setSupportTickets] = useState<SupportTicket[]>(() => getSupportTickets() || MOCK_SUPPORT_TICKETS);
 
@@ -119,13 +119,15 @@ const App: React.FC = () => {
         setIsLoading(true);
         try {
             console.log("Loading initial data...");
-            const [vehiclesData, usersData] = await Promise.all([
+            const [vehiclesData, usersData, vehicleDataFromAPI] = await Promise.all([
                 vehicleService.getVehicles(),
-                userService.getUsers()
+                userService.getUsers(),
+                getVehicleData()
             ]);
             console.log("Successfully loaded data:", { vehicles: vehiclesData.length, users: usersData.length });
             setVehicles(vehiclesData);
             setUsers(usersData);
+            setVehicleData(vehicleDataFromAPI);
         } catch (error) {
             console.error("Failed to load initial data:", error);
             // The service functions now have built-in fallback, so this should rarely happen
@@ -839,7 +841,15 @@ const App: React.FC = () => {
     else addToast("No sales data to export.", 'info');
   }, [vehicles, addToast, getFormattedDate]);
 
-  const handleUpdateVehicleData = useCallback((newData: VehicleData) => { setVehicleData(newData); saveVehicleData(newData); addToast('Vehicle data updated.', 'success'); }, [addToast]);
+  const handleUpdateVehicleData = useCallback(async (newData: VehicleData) => { 
+    setVehicleData(newData); 
+    const success = await saveVehicleData(newData); 
+    if (success) {
+      addToast('Vehicle data updated successfully!', 'success'); 
+    } else {
+      addToast('Vehicle data saved locally. API update failed.', 'info');
+    }
+  }, [addToast]);
   
   const handleToggleVerifiedStatus = useCallback(async (userEmail: string) => {
     const user = users.find(u => u.email === userEmail);

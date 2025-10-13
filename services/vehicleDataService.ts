@@ -2,38 +2,90 @@ import type { VehicleData } from '../types';
 import { VEHICLE_DATA } from '../components/vehicleData';
 
 const VEHICLE_DATA_STORAGE_KEY = 'reRideVehicleData';
+const API_BASE_URL = '/api';
 
 /**
- * Retrieves vehicle data (categories, makes, models, variants) from localStorage.
- * If no data is found, it initializes the storage with default data.
- * @returns The structured vehicle data object.
+ * Fetches vehicle data from the API.
+ * Falls back to localStorage and then default data if API fails.
  */
-export const getVehicleData = (): VehicleData => {
+export const getVehicleData = async (): Promise<VehicleData> => {
+  try {
+    // Try to fetch from API first
+    const response = await fetch(`${API_BASE_URL}/vehicle-data`);
+    if (response.ok) {
+      const data = await response.json();
+      // Cache in localStorage
+      localStorage.setItem(VEHICLE_DATA_STORAGE_KEY, JSON.stringify(data));
+      return data;
+    }
+  } catch (error) {
+    console.warn("Failed to fetch vehicle data from API, falling back to localStorage", error);
+  }
+
+  // Fallback to localStorage
   try {
     const dataJson = localStorage.getItem(VEHICLE_DATA_STORAGE_KEY);
     if (dataJson) {
       return JSON.parse(dataJson);
-    } else {
-      // If no data in localStorage, seed it with the default data and return it.
-      const defaultData = VEHICLE_DATA;
-      localStorage.setItem(VEHICLE_DATA_STORAGE_KEY, JSON.stringify(defaultData));
-      return defaultData;
     }
   } catch (error) {
     console.error("Failed to parse vehicle data from localStorage", error);
-    // Fallback to default data in case of parsing error
-    return VEHICLE_DATA;
   }
+
+  // Final fallback to default data
+  const defaultData = VEHICLE_DATA;
+  localStorage.setItem(VEHICLE_DATA_STORAGE_KEY, JSON.stringify(defaultData));
+  return defaultData;
 };
 
 /**
- * Saves the provided vehicle data object to localStorage.
- * @param data The vehicle data object to save.
+ * Synchronous version for backward compatibility.
+ * Returns cached data from localStorage immediately.
  */
-export const saveVehicleData = (data: VehicleData) => {
+export const getVehicleDataSync = (): VehicleData => {
   try {
-    localStorage.setItem(VEHICLE_DATA_STORAGE_KEY, JSON.stringify(data));
+    const dataJson = localStorage.getItem(VEHICLE_DATA_STORAGE_KEY);
+    if (dataJson) {
+      return JSON.parse(dataJson);
+    }
   } catch (error) {
-    console.error("Failed to save vehicle data to localStorage", error);
+    console.error("Failed to parse vehicle data from localStorage", error);
+  }
+  
+  // Fallback to default data
+  const defaultData = VEHICLE_DATA;
+  localStorage.setItem(VEHICLE_DATA_STORAGE_KEY, JSON.stringify(defaultData));
+  return defaultData;
+};
+
+/**
+ * Saves vehicle data to both API and localStorage.
+ */
+export const saveVehicleData = async (data: VehicleData): Promise<boolean> => {
+  try {
+    // Save to API
+    const response = await fetch(`${API_BASE_URL}/vehicle-data`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data)
+    });
+
+    if (response.ok) {
+      // Also save to localStorage as cache
+      localStorage.setItem(VEHICLE_DATA_STORAGE_KEY, JSON.stringify(data));
+      return true;
+    } else {
+      console.error("Failed to save vehicle data to API");
+      return false;
+    }
+  } catch (error) {
+    console.error("Failed to save vehicle data:", error);
+    // Still save to localStorage as fallback
+    try {
+      localStorage.setItem(VEHICLE_DATA_STORAGE_KEY, JSON.stringify(data));
+    } catch (e) {
+      console.error("Failed to save vehicle data to localStorage", e);
+    }
+    return false;
   }
 };
