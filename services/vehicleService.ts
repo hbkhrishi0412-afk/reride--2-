@@ -48,10 +48,23 @@ export const getVehiclesLocal = async (): Promise<Vehicle[]> => {
 };
 
 const addVehicleLocal = async (vehicleData: Vehicle): Promise<Vehicle> => {
-    const vehicles = await getVehiclesLocal();
-    vehicles.unshift(vehicleData);
-    localStorage.setItem('reRideVehicles', JSON.stringify(vehicles));
-    return vehicleData;
+    try {
+        const vehicles = await getVehiclesLocal();
+        vehicles.unshift(vehicleData);
+        localStorage.setItem('reRideVehicles', JSON.stringify(vehicles));
+        return vehicleData;
+    } catch (error) {
+        // Handle quota exceeded error
+        if (error instanceof Error && error.name === 'QuotaExceededError') {
+            console.warn('⚠️ LocalStorage quota exceeded, clearing old data...');
+            // Clear old vehicles and try again
+            localStorage.removeItem('reRideVehicles');
+            const freshVehicles = [vehicleData];
+            localStorage.setItem('reRideVehicles', JSON.stringify(freshVehicles));
+            return vehicleData;
+        }
+        throw error;
+    }
 };
 
 const updateVehicleLocal = async (vehicleData: Vehicle): Promise<Vehicle> => {

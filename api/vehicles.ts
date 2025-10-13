@@ -73,9 +73,12 @@ export default async function handler(
           
           // Handle validation errors
           if (createError.name === 'ValidationError') {
-            console.error('Validation errors:', createError.errors);
+            console.error('MongoDB Validation errors:', createError.errors);
+            const errorMessages = Object.keys(createError.errors).map(key => 
+              `${key}: ${createError.errors[key].message}`
+            ).join(', ');
             return res.status(400).json({
-              error: 'Validation failed',
+              error: `Validation failed: ${errorMessages}`,
               details: createError.errors,
               provided: newVehicleData
             });
