@@ -436,6 +436,33 @@ const Home: React.FC<HomeProps> = ({ onSearch, onSelectCategory, featuredVehicle
                 </section>
             )}
             
+            {/* Browse by City Section - NEW FEATURE */}
+            <section className="py-16 bg-gray-50">
+                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                    <h2 className="text-3xl font-bold text-center mb-8 text-spinny-text-dark">Browse by City</h2>
+                    <p className="text-center text-gray-600 mb-8">Find quality used cars in your city</p>
+                    <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
+                        {['Mumbai', 'New Delhi', 'Bengaluru', 'Hyderabad', 'Chennai', 'Pune', 'Ahmedabad', 'Kolkata'].map(city => {
+                            const cityVehicles = allVehicles.filter(v => v.city === city && v.status === 'published');
+                            return (
+                                <button
+                                    key={city}
+                                    onClick={() => {
+                                        // Navigate to city landing page
+                                        onNavigate(ViewEnum.CITY_LANDING as any, { city } as any);
+                                    }}
+                                    className="p-4 bg-white rounded-lg shadow hover:shadow-lg transition-all text-center group hover:border-2 hover:border-spinny-orange"
+                                >
+                                    <h3 className="font-semibold text-gray-900 group-hover:text-spinny-orange transition-colors">{city}</h3>
+                                    <p className="text-sm text-gray-600 mt-1">{cityVehicles.length} cars</p>
+                                    <p className="text-xs text-spinny-orange font-semibold mt-1">View All →</p>
+                                </button>
+                            );
+                        })}
+                    </div>
+                </div>
+            </section>
+            
              {/* Seller CTA */}
             <section style={{ background: 'linear-gradient(to right, rgba(30, 136, 229, 0.1), var(--brand-gray))' }} className="dark:bg-gradient-dark">
                 <div className="container mx-auto px-4 py-20 text-center scroll-animate">

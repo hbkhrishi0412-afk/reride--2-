@@ -51,6 +51,8 @@ const PricingPage = lazy(() => import('./components/PricingPage'));
 const SupportPage = lazy(() => import('./components/SupportPage'));
 const FAQPage = lazy(() => import('./components/FAQPage'));
 const BuyerDashboard = lazy(() => import('./components/BuyerDashboard'));
+// NEW FEATURES: City landing page
+const CityLandingPage = lazy(() => import('./components/CityLandingPage'));
 
 
 
@@ -89,6 +91,7 @@ const App: React.FC = () => {
   const [initialSearchQuery, setInitialSearchQuery] = useState<string>('');
   const [isCommandPaletteOpen, setIsCommandPaletteOpen] = useState(false);
   const [userLocation, setUserLocation] = useState<string>('Mumbai'); // Default location
+  const [selectedCity, setSelectedCity] = useState<string>(''); // NEW: For city landing pages
 
   const [users, setUsers] = useState<User[]>([]);
   
@@ -883,7 +886,7 @@ const App: React.FC = () => {
       }
   }, [currentUser, addToast]);
 
-  const navigate = useCallback((view: View) => {
+  const navigate = useCallback((view: View, params?: { city?: string }) => {
     const isNavigatingAwayFromSellerProfile = currentView === View.SELLER_PROFILE && view !== View.SELLER_PROFILE;
     if (isNavigatingAwayFromSellerProfile) { window.history.pushState({}, '', window.location.pathname); setPublicSellerProfile(null); }
     setInitialSearchQuery('');
@@ -892,6 +895,10 @@ const App: React.FC = () => {
     // Only reset category to 'ALL' if navigating from non-category sources (like header "Buy Car" button)
     // Don't reset if category was just selected from homepage
     if (view === View.USED_CARS && currentView !== View.HOME) setSelectedCategory('ALL');
+    // NEW: Handle city landing page navigation
+    if (view === View.CITY_LANDING && params?.city) {
+      setSelectedCity(params.city);
+    }
     if (view === View.SELLER_DASHBOARD && currentUser?.role !== 'seller') setCurrentView(View.LOGIN_PORTAL);
     else if (view === View.ADMIN_PANEL && currentUser?.role !== 'admin') setCurrentView(View.ADMIN_LOGIN);
     else if ((view === View.PROFILE || view === View.INBOX) && !currentUser) setCurrentView(View.LOGIN_PORTAL);
@@ -997,6 +1004,7 @@ const App: React.FC = () => {
       case View.NEW_CARS: return <NewCars />;
       case View.DEALER_PROFILES: return <DealerProfiles sellers={usersWithRatingsAndBadges.filter(u => u.role === 'seller')} onViewProfile={handleViewSellerProfile} />;
       case View.WISHLIST: return <VehicleList vehicles={vehiclesInWishlist} isLoading={isLoading} onSelectVehicle={handleSelectVehicle} comparisonList={comparisonList} onToggleCompare={handleToggleCompare} onClearCompare={handleClearCompare} wishlist={wishlist} onToggleWishlist={handleToggleWishlist} categoryTitle="My Wishlist" isWishlistMode={true} onViewSellerProfile={handleViewSellerProfile} userLocation={userLocation} />;
+      case View.CITY_LANDING: return selectedCity && <CityLandingPage city={selectedCity} vehicles={allPublishedVehicles} onSelectVehicle={handleSelectVehicle} onToggleWishlist={handleToggleWishlist} onToggleCompare={handleToggleCompare} wishlist={wishlist} comparisonList={comparisonList} onViewSellerProfile={handleViewSellerProfile} />;
       case View.HOME:
       default: return <Home onSearch={handleHomeSearch} onSelectCategory={handleSelectCategoryFromHome} featuredVehicles={featuredVehicles} onSelectVehicle={handleSelectVehicle} onToggleCompare={handleToggleCompare} comparisonList={comparisonList} onToggleWishlist={handleToggleWishlist} wishlist={wishlist} onViewSellerProfile={handleViewSellerProfile} recommendations={recommendations} allVehicles={allPublishedVehicles} onNavigate={navigate} />;
     }

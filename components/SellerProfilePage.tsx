@@ -4,6 +4,7 @@ import VehicleCard from './VehicleCard';
 import StarRating from './StarRating';
 import QuickViewModal from './QuickViewModal';
 import BadgeDisplay from './BadgeDisplay';
+import TrustBadgeDisplay from './TrustBadgeDisplay';
 
 interface SellerProfilePageProps {
     seller: User;
@@ -48,8 +49,9 @@ const SellerProfilePage: React.FC<SellerProfilePageProps> = ({ seller, vehicles,
                 />
                 <div>
                     <h1 className="text-4xl font-extrabold text-spinny-text-dark dark:text-spinny-text-dark">{seller.dealershipName || seller.name}</h1>
-                    <div className="mt-2">
+                    <div className="mt-2 flex items-center gap-3 flex-wrap">
                         <BadgeDisplay badges={seller.badges || []} />
+                        <TrustBadgeDisplay user={seller} showDetails={true} />
                     </div>
                     {seller.bio && <p className="mt-4 text-brand-gray-600 dark:text-spinny-text-dark max-w-2xl">{seller.bio}</p>}
                     <div className="flex items-center gap-2 mt-4">
