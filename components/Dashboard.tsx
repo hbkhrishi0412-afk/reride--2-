@@ -14,6 +14,9 @@ import BulkUploadModal from './BulkUploadModal';
 import { getPlaceholderImage } from './vehicleData';
 import PricingGuidance from './PricingGuidance';
 import { OfferModal, OfferMessage } from './ReadReceiptIcon';
+// NEW FEATURES
+import BoostListingModal from './BoostListingModal';
+import ListingLifecycleIndicator from './ListingLifecycleIndicator';
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend, PointElement, LineElement, LineController, BarController);
 
@@ -1008,6 +1011,9 @@ const Dashboard: React.FC<DashboardProps> = ({ seller, sellerVehicles, reportedV
   const [editingVehicle, setEditingVehicle] = useState<Vehicle | null>(null);
   const [selectedConv, setSelectedConv] = useState<Conversation | null>(null);
   const [isBulkUploadOpen, setIsBulkUploadOpen] = useState(false);
+  // NEW: Boost listing feature
+  const [showBoostModal, setShowBoostModal] = useState(false);
+  const [vehicleToBoost, setVehicleToBoost] = useState<Vehicle | null>(null);
 
   useEffect(() => {
     if (selectedConv) {
@@ -1198,13 +1204,15 @@ const Dashboard: React.FC<DashboardProps> = ({ seller, sellerVehicles, reportedV
             {activeListings.length > 0 ? (
               <div className="overflow-x-auto">
                 <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
-                  <thead className="bg-white dark:bg-white"><tr><th className="px-6 py-3 text-left text-xs font-medium uppercase">Vehicle</th><th className="px-6 py-3 text-left text-xs font-medium uppercase">Price</th><th className="relative px-6 py-3 text-right text-xs font-medium uppercase">Actions</th></tr></thead>
+                  <thead className="bg-white dark:bg-white"><tr><th className="px-6 py-3 text-left text-xs font-medium uppercase">Vehicle</th><th className="px-6 py-3 text-left text-xs font-medium uppercase">Price</th><th className="px-6 py-3 text-left text-xs font-medium uppercase">Status</th><th className="relative px-6 py-3 text-right text-xs font-medium uppercase">Actions</th></tr></thead>
                   <tbody className="bg-white divide-y divide-gray-200 dark:divide-gray-700">
                     {activeListings.map((v) => (
                       <tr key={v.id}>
                         <td className="px-6 py-4 font-medium">{v.year} {v.make} {v.model} {v.variant || ''}</td>
                         <td className="px-6 py-4">₹{v.price.toLocaleString('en-IN')}</td>
-                        <td className="px-6 py-4 text-right whitespace-nowrap text-sm font-semibold space-x-3">
+                        <td className="px-6 py-4"><ListingLifecycleIndicator vehicle={v} compact={true} onRefresh={async () => { await fetch('/api/vehicles?action=refresh', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ vehicleId: v.id, refreshAction: 'refresh', sellerEmail: seller.email }) }); window.location.reload(); }} onRenew={async () => { await fetch('/api/vehicles?action=refresh', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ vehicleId: v.id, refreshAction: 'renew', sellerEmail: seller.email }) }); window.location.reload(); }} /></td>
+                        <td className="px-6 py-4 text-right whitespace-nowrap text-sm font-semibold space-x-2">
+                          <button onClick={() => { setVehicleToBoost(v); setShowBoostModal(true); }} className="px-3 py-1 bg-spinny-orange text-white rounded hover:bg-orange-600 text-xs" title="Boost for more visibility">🚀 Boost</button>
                           {!v.isFeatured && (seller.featuredCredits ?? 0) > 0 && (
                               <button onClick={() => onFeatureListing(v.id)} className="text-spinny-orange hover:text-spinny-orange" title="Use a credit to feature this listing">Feature</button>
                           )}
@@ -1328,11 +1336,27 @@ const Dashboard: React.FC<DashboardProps> = ({ seller, sellerVehicles, reportedV
                     onOfferResponse={onOfferResponse}
                 />
             )}
-             {isBulkUploadOpen && (
-                <BulkUploadModal 
+            {isBulkUploadOpen && (
+                <BulkUploadModal
                     onClose={() => setIsBulkUploadOpen(false)}
                     onAddMultipleVehicles={onAddMultipleVehicles}
                     sellerEmail={seller.email}
+                />
+            )}
+            {showBoostModal && vehicleToBoost && (
+                <BoostListingModal
+                    vehicle={vehicleToBoost}
+                    onClose={() => { setShowBoostModal(false); setVehicleToBoost(null); }}
+                    onBoost={async (vehicleId, packageId) => {
+                        await fetch('/api/vehicles?action=boost', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ vehicleId, packageId, sellerEmail: seller.email })
+                        });
+                        setShowBoostModal(false);
+                        setVehicleToBoost(null);
+                        window.location.reload();
+                    }}
                 />
             )}
         </div>

@@ -5,6 +5,7 @@ import StarRating from './StarRating';
 import QuickViewModal from './QuickViewModal';
 import BadgeDisplay from './BadgeDisplay';
 import TrustBadgeDisplay from './TrustBadgeDisplay';
+import { followSeller, unfollowSeller, isFollowingSeller } from '../services/buyerEngagementService';
 
 interface SellerProfilePageProps {
     seller: User;
@@ -21,6 +22,19 @@ interface SellerProfilePageProps {
 const SellerProfilePage: React.FC<SellerProfilePageProps> = ({ seller, vehicles, onSelectVehicle, comparisonList, onToggleCompare, wishlist, onToggleWishlist, onBack, onViewSellerProfile }) => {
     const [quickViewVehicle, setQuickViewVehicle] = useState<Vehicle | null>(null);
     const [searchQuery, setSearchQuery] = useState('');
+    // NEW: Follow seller feature
+    const currentUserId = localStorage.getItem('currentUserEmail') || 'guest';
+    const [isFollowing, setIsFollowing] = useState(() => isFollowingSeller(currentUserId, seller.email));
+    
+    const handleFollowToggle = () => {
+        if (isFollowing) {
+            unfollowSeller(currentUserId, seller.email);
+            setIsFollowing(false);
+        } else {
+            followSeller(currentUserId, seller.email, true);
+            setIsFollowing(true);
+        }
+    };
 
     const filteredVehicles = useMemo(() => {
         if (!searchQuery.trim()) {
@@ -54,11 +68,37 @@ const SellerProfilePage: React.FC<SellerProfilePageProps> = ({ seller, vehicles,
                         <TrustBadgeDisplay user={seller} showDetails={true} />
                     </div>
                     {seller.bio && <p className="mt-4 text-brand-gray-600 dark:text-spinny-text-dark max-w-2xl">{seller.bio}</p>}
-                    <div className="flex items-center gap-2 mt-4">
-                        <StarRating rating={seller.averageRating || 0} readOnly />
-                        <span className="text-brand-gray-600 dark:text-spinny-text font-semibold">
-                            {seller.averageRating?.toFixed(1) || 'No Rating'} ({seller.ratingCount || 0} ratings)
-                        </span>
+                    <div className="flex items-center gap-4 mt-4 flex-wrap">
+                        <div className="flex items-center gap-2">
+                            <StarRating rating={seller.averageRating || 0} readOnly />
+                            <span className="text-brand-gray-600 dark:text-spinny-text font-semibold">
+                                {seller.averageRating?.toFixed(1) || 'No Rating'} ({seller.ratingCount || 0} ratings)
+                            </span>
+                        </div>
+                        <button
+                            onClick={handleFollowToggle}
+                            className={`px-4 py-2 rounded-lg font-semibold transition-all flex items-center gap-2 ${
+                                isFollowing 
+                                    ? 'bg-gray-200 text-gray-700 hover:bg-gray-300' 
+                                    : 'bg-spinny-orange text-white hover:bg-orange-600'
+                            }`}
+                        >
+                            {isFollowing ? (
+                                <>
+                                    <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                                        <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" />
+                                    </svg>
+                                    Following
+                                </>
+                            ) : (
+                                <>
+                                    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                                    </svg>
+                                    Follow Seller
+                                </>
+                            )}
+                        </button>
                     </div>
                 </div>
             </header>
