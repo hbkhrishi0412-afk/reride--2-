@@ -162,7 +162,7 @@ const CustomerInbox: React.FC<CustomerInboxProps> = ({ conversations, onSendMess
                                               {!conv.isReadByCustomer && <div className="w-2.5 h-2.5 rounded-full flex-shrink-0 ml-2" style={{ backgroundcolor: '#FF6B35' }}></div>}
                                           </div>
                                           <p className="text-sm text-brand-gray-600 dark:text-spinny-text-dark">With {getSellerName(conv.sellerId)}</p>
-                                          <p className="text-xs text-spinny-text dark:text-spinny-text truncate mt-1">
+                                          <p className="text-xs text-gray-600 dark:text-gray-400 truncate mt-1">
                                               {lastMessage && (
                                                   lastMessage.sender === 'user' ? (
                                                       <span><span className="font-semibold">You: </span>{lastMessage.type === 'test_drive_request' ? 'Test Drive Request' : messageText}</span>
@@ -179,7 +179,7 @@ const CustomerInbox: React.FC<CustomerInboxProps> = ({ conversations, onSendMess
                           })}
                       </ul>
                   ) : (
-                      <p className="p-4 text-center text-spinny-text dark:text-spinny-text">You have no messages yet. Inquire about a vehicle to start a conversation.</p>
+                      <p className="p-4 text-center text-gray-600 dark:text-gray-400">You have no messages yet. Inquire about a vehicle to start a conversation.</p>
                   )}
             </div>
           </aside>
@@ -191,7 +191,7 @@ const CustomerInbox: React.FC<CustomerInboxProps> = ({ conversations, onSendMess
                       <div className="p-4 border-b border-gray-200-200 dark:border-gray-200-200 flex justify-between items-center">
                           <div>
                               <h3 className="font-bold text-lg text-spinny-text-dark dark:text-spinny-text-dark">{selectedConv.vehicleName}</h3>
-                              <p className="text-sm text-spinny-text dark:text-spinny-text">Conversation with {getSellerName(selectedConv.sellerId)}</p>
+                              <p className="text-sm text-gray-600 dark:text-gray-400">Conversation with {getSellerName(selectedConv.sellerId)}</p>
                           </div>
                           <button onClick={handleFlagClick} disabled={selectedConv.isFlagged} className="disabled:opacity-50 flex items-center gap-1 text-xs text-spinny-text hover:text-spinny-orange" title={selectedConv.isFlagged ? "This conversation has been reported" : "Report conversation"}>
                               {selectedConv.isFlagged ? (
@@ -211,10 +211,10 @@ const CustomerInbox: React.FC<CustomerInboxProps> = ({ conversations, onSendMess
                           {selectedConv.messages.map(msg => (
                             <div key={msg.id} className={`flex flex-col animate-fade-in ${msg.sender === 'user' ? 'items-end' : 'items-start'}`}>
                                   {msg.sender === 'seller' && <span className="text-xs font-bold text-spinny-text-dark dark:text-spinny-text-dark mb-1 ml-2">{getSellerName(selectedConv.sellerId)}</span>}
-                                  {msg.sender === 'system' && <div className="text-center text-xs text-spinny-text dark:text-spinny-text italic py-2 w-full">{msg.text}</div>}
+                                  {msg.sender === 'system' && <div className="text-center text-xs text-gray-600 dark:text-gray-400 italic py-2 w-full">{msg.text}</div>}
                                   {msg.sender !== 'system' && (
                                       <>
-                                          <div className={`px-4 py-3 max-w-lg ${ msg.sender === 'user' ? 'text-white rounded-l-xl rounded-t-xl' : 'bg-spinny-light-gray dark:bg-brand-gray-700 text-spinny-text-dark dark:text-brand-gray-200 rounded-r-xl rounded-t-xl'}`} style={msg.sender === 'user' ? { background: 'var(--gradient-primary)' } : undefined}>
+                                          <div className={`px-4 py-3 max-w-lg ${ msg.sender === 'user' ? 'text-white rounded-l-xl rounded-t-xl' : 'bg-spinny-light-gray dark:bg-brand-gray-700 text-spinny-text-dark dark:text-white rounded-r-xl rounded-t-xl'}`} style={msg.sender === 'user' ? { background: 'var(--gradient-primary)' } : undefined}>
                                               {msg.type === 'test_drive_request' ? <TestDriveRequestMessage msg={msg} /> : msg.type === 'offer' ? <OfferMessage msg={msg} currentUserRole="customer" listingPrice={selectedConv.vehiclePrice} onRespond={(messageId, response, counterPrice) => { if (selectedConv) { onOfferResponse(selectedConv.id, messageId, response, counterPrice); }}} /> : <p className="text-sm">{msg.text}</p>}
                                           </div>
                                           <div className="text-xs text-gray-400 mt-1 px-1 flex items-center">
@@ -242,7 +242,7 @@ const CustomerInbox: React.FC<CustomerInboxProps> = ({ conversations, onSendMess
                   <div className="flex flex-col items-center justify-center h-full text-center p-8">
                       <svg xmlns="http://www.w3.org/2000/svg" className="h-16 w-16 text-brand-gray-300 dark:text-brand-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" /></svg>
                       <h3 className="mt-4 text-xl font-semibold text-spinny-text-dark dark:text-brand-gray-200">Select a Conversation</h3>
-                      <p className="text-spinny-text dark:text-spinny-text mt-1">Choose a conversation from the left to view messages.</p>
+                      <p className="text-gray-600 dark:text-gray-400 mt-1">Choose a conversation from the left to view messages.</p>
                   </div>
               )}
           </main>

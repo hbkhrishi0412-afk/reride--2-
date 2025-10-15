@@ -126,7 +126,7 @@ export const ChatWidget: React.FC<ChatWidgetProps> = memo(({ conversation, curre
         <div className="p-3 border-b border-gray-200-200 dark:border-gray-200-200 flex justify-between items-center bg-white dark:bg-white rounded-t-lg">
             <div onClick={() => setIsMinimized(true)} className="cursor-pointer flex-grow">
                 <h3 className="text-sm font-bold text-spinny-text-dark dark:text-spinny-text-dark truncate">{conversation.vehicleName}</h3>
-                <p className="text-xs text-spinny-text dark:text-spinny-text">Chat with {otherUserName}</p>
+                <p className="text-xs text-gray-600 dark:text-gray-400">Chat with {otherUserName}</p>
             </div>
             <div className="flex items-center gap-2">
                 <button onClick={handleFlagClick} disabled={conversation.isFlagged} className="disabled:opacity-50 p-1 text-spinny-text hover:bg-black/10 dark:hover:bg-white/10 rounded-full" aria-label="Report conversation" title={conversation.isFlagged ? "This conversation has been reported" : "Report conversation"}>
@@ -145,10 +145,10 @@ export const ChatWidget: React.FC<ChatWidgetProps> = memo(({ conversation, curre
         <div className="flex-grow p-4 overflow-y-auto bg-spinny-off-white dark:bg-white space-y-4">
             {conversation.messages.map((msg) => (
                 <div key={msg.id} className={`flex flex-col ${msg.sender === senderType ? 'items-end' : 'items-start'}`}>
-                    {msg.sender === 'system' && <div className="text-center text-xs text-spinny-text dark:text-spinny-text italic py-2 w-full">{msg.text}</div>}
+                    {msg.sender === 'system' && <div className="text-center text-xs text-gray-600 dark:text-gray-400 italic py-2 w-full">{msg.text}</div>}
                     {msg.sender !== 'system' && (
                         <>
-                            <div className={`px-4 py-3 max-w-xs ${ msg.sender === senderType ? 'text-white rounded-l-xl rounded-t-xl' : 'bg-white dark:bg-brand-gray-700 text-spinny-text-dark dark:text-brand-gray-200 rounded-r-xl rounded-t-xl'}`} style={msg.sender === senderType ? { background: 'var(--gradient-primary)' } : undefined}>
+                            <div className={`px-4 py-3 max-w-xs ${ msg.sender === senderType ? 'text-white rounded-l-xl rounded-t-xl' : 'bg-white dark:bg-brand-gray-700 text-spinny-text-dark dark:text-white rounded-r-xl rounded-t-xl'}`} style={msg.sender === senderType ? { background: 'var(--gradient-primary)' } : undefined}>
                                 {msg.type === 'offer' ? <OfferMessage msg={msg} currentUserRole={currentUserRole} listingPrice={conversation.vehiclePrice} onRespond={(messageId, response, counterPrice) => onOfferResponse(conversation.id, messageId, response, counterPrice)} /> : <p className="text-sm break-words">{msg.text}</p>}
                             </div>
                             <div className="text-xs text-gray-400 mt-1 px-1 flex items-center">

@@ -3,8 +3,8 @@
 import React, { useState, useEffect, useMemo, useRef, useCallback, lazy, Suspense } from 'react';
 import Header from './components/Header';
 import Footer from './components/Footer';
-import { PLAN_DETAILS, MOCK_SUPPORT_TICKETS, MOCK_FAQS } from './constants';
-import type { Vehicle, User, Conversation, ChatMessage, Toast as ToastType, PlatformSettings, AuditLogEntry, VehicleData, Notification, VehicleCategory, Badge, Command, SubscriptionPlan, CertifiedInspection, SupportTicket, FAQItem } from './types';
+// Optimized: Lazy load heavy static data to reduce initial bundle size
+import type { Vehicle, User, Conversation, ChatMessage, Toast as ToastType, PlatformSettings, AuditLogEntry, VehicleData, Notification, VehicleCategory, Badge, Command, SubscriptionPlan, CertifiedInspection, SupportTicket, FAQItem, PlanDetails } from './types';
 import { View, VehicleCategory as CategoryEnum } from './types';
 import { getRatings, addRating, getSellerRatings, addSellerRating } from './services/ratingService';
 import { getConversations, saveConversations } from './services/chatService';
@@ -29,7 +29,6 @@ import { getSellerBadges } from './services/badgeService';
 import CommandPalette from './components/CommandPalette';
 import { getFaqs, saveFaqs } from './services/faqService';
 import { getSupportTickets, saveSupportTickets } from './services/supportTicketService';
-import { getPlaceholderImage } from './components/vehicleData';
 import * as listingService from './services/listingService';
 import * as buyerService from './services/buyerService';
 
@@ -40,7 +39,7 @@ const VehicleList = lazy(() => import('./components/VehicleList'));
 const VehicleDetail = lazy(() => import('./components/VehicleDetail').then(module => ({ default: module.VehicleDetail })));
 // FIX: The lazy import for Dashboard was failing. Corrected to handle module resolution issue by explicitly returning the default export.
 const Dashboard = lazy(() => import('./components/Dashboard').then(module => ({ default: module.default })));
-const AdminPanel = lazy(() => import('./components/AdminPanel'));
+const AdminPanel = lazy(() => import('./components/AdminPanel').then(module => ({ default: module.default })));
 const Comparison = lazy(() => import('./components/Comparison'));
 const Profile = lazy(() => import('./components/Profile'));
 const CustomerInbox = lazy(() => import('./components/CustomerInbox'));
@@ -98,11 +97,31 @@ const App: React.FC = () => {
   const [platformSettings, setPlatformSettings] = useState<PlatformSettings>(() => getSettings());
   const [auditLog, setAuditLog] = useState<AuditLogEntry[]>(() => getAuditLog());
   const [vehicleData, setVehicleData] = useState<VehicleData>(() => getVehicleDataSync());
-  const [faqItems, setFaqItems] = useState<FAQItem[]>(() => getFaqs() || MOCK_FAQS);
-  const [supportTickets, setSupportTickets] = useState<SupportTicket[]>(() => getSupportTickets() || MOCK_SUPPORT_TICKETS);
+  const [faqItems, setFaqItems] = useState<FAQItem[]>(() => getFaqs() || []);
+  const [supportTickets, setSupportTickets] = useState<SupportTicket[]>(() => getSupportTickets() || []);
 
   const addToast = useCallback((message: string, type: ToastType['type']) => {
     setToasts(prev => [...prev, { id: Date.now(), message, type }]);
+  }, []);
+
+  // Lazy load mock data when needed (reduces initial bundle size)
+  useEffect(() => {
+    const loadMockData = async () => {
+      try {
+        const { MOCK_FAQS, MOCK_SUPPORT_TICKETS } = await import('./constants');
+        if (faqItems.length === 0) {
+          setFaqItems(MOCK_FAQS);
+        }
+        if (supportTickets.length === 0) {
+          setSupportTickets(MOCK_SUPPORT_TICKETS);
+        }
+      } catch (error) {
+        console.error("Failed to load mock data", error);
+      }
+    };
+    if (faqItems.length === 0 || supportTickets.length === 0) {
+      loadMockData();
+    }
   }, []);
 
   // Load location from localStorage on initial load
@@ -525,10 +544,17 @@ const App: React.FC = () => {
       isFeaturing = false; 
     }
     
+    // Lazy load placeholder helper if images are missing
+    let images = vehicleData.images && vehicleData.images.length > 0 ? vehicleData.images : [];
+    if (images.length === 0) {
+      const { getPlaceholderImage } = await import('./components/vehicleData');
+      images = [getPlaceholderImage(vehicleData.make, vehicleData.model), getPlaceholderImage(vehicleData.make, `${vehicleData.model}-2`)];
+    }
+    
     const newVehicle: Vehicle = { 
       ...vehicleData, 
       id: Date.now(), 
-      images: vehicleData.images && vehicleData.images.length > 0 ? vehicleData.images : [getPlaceholderImage(vehicleData.make, vehicleData.model), getPlaceholderImage(vehicleData.make, `${vehicleData.model}-2`)], 
+      images, 
       sellerEmail: vehicleData.sellerEmail || currentUser.email, // Double-check seller email
       status: 'published', 
       isFeatured: isFeaturing, 
@@ -588,12 +614,14 @@ const App: React.FC = () => {
     }
   }, [addToast, currentUser]);
   
-  const handleUpdateVehicle = useCallback(async (updatedVehicle: Vehicle) => {
+  const handleUpdateVehicle = useCallback(async (updatedVehicle: Vehicle, showToast: boolean = true) => {
     try {
         const result = await vehicleService.updateVehicle(updatedVehicle);
         setVehicles(prev => prev.map(v => v.id === result.id ? result : v));
         addLogEntry('Updated Vehicle', String(result.id), `${result.year} ${result.make} ${result.model}`);
-        addToast('Vehicle updated successfully!', 'success');
+        if (showToast) {
+            addToast('Vehicle updated successfully!', 'success');
+        }
     } catch (error) {
         console.error("Failed to update vehicle:", error);
         addToast(`Error: ${error instanceof Error ? error.message : 'Could not update vehicle.'}`, 'error');
@@ -697,7 +725,8 @@ const App: React.FC = () => {
     }
     setSelectedVehicle(vehicle);
     setCurrentView(View.DETAIL);
-    handleUpdateVehicle({ ...vehicle, views: (vehicle.views || 0) + 1 });
+    // Suppress toast for view tracking
+    handleUpdateVehicle({ ...vehicle, views: (vehicle.views || 0) + 1 }, false);
   }, [handleUpdateVehicle, currentUser]);
   const handleBackToHome = useCallback(() => { setSelectedVehicle(null); setCurrentView(View.HOME); }, []);
 
@@ -706,7 +735,8 @@ const App: React.FC = () => {
     listingService.trackPhoneView(vehicleId);
     const vehicle = vehicles.find(v => v.id === vehicleId);
     if (vehicle) {
-      handleUpdateVehicle({ ...vehicle, phoneViews: (vehicle.phoneViews || 0) + 1 });
+      // Suppress toast for view tracking
+      handleUpdateVehicle({ ...vehicle, phoneViews: (vehicle.phoneViews || 0) + 1 }, false);
     }
   }, [vehicles, handleUpdateVehicle]);
 
@@ -770,6 +800,16 @@ const App: React.FC = () => {
         addToast("User updated.", "success");
     } catch(error) {
         addToast('Failed to update user.', 'error');
+    }
+  }, [addToast]);
+
+  const handleUpdateUserPlan = useCallback(async (email: string, plan: SubscriptionPlan) => {
+    try {
+        await userService.updateUser({ email, subscriptionPlan: plan });
+        setUsers(prev => prev.map(u => u.email === email ? { ...u, subscriptionPlan: plan } : u));
+        addToast("User plan updated.", "success");
+    } catch(error) {
+        addToast('Failed to update user plan.', 'error');
     }
   }, [addToast]);
 
@@ -869,20 +909,38 @@ const App: React.FC = () => {
   
   const handlePlanChange = useCallback(async (planId: SubscriptionPlan) => {
       if (!currentUser || currentUser.role !== 'seller') return;
+      
+      // Lazy load plan details and payment service
+      const { PLAN_DETAILS } = await import('./constants');
+      const { createPaymentRequest } = await import('./services/paymentService');
       const planDetails = PLAN_DETAILS[planId];
+      
+      // For free plan - immediate upgrade
+      if (planId === 'free') {
+        try {
+          const updatedUser = { ...currentUser, subscriptionPlan: planId };
+          const savedUser = await userService.updateUser(updatedUser);
+          // Update all state and storage to prevent logout
+          setUsers(prev => prev.map(u => u.email === currentUser.email ? savedUser : u));
+          setCurrentUser(savedUser);
+          const userJson = JSON.stringify(savedUser);
+          sessionStorage.setItem('currentUser', userJson);
+          localStorage.setItem('reRideCurrentUser', userJson);
+          addToast(`Successfully switched to the ${planDetails.name} plan!`, 'success');
+          setCurrentView(View.SELLER_DASHBOARD);
+        } catch(error) {
+          addToast('Failed to switch plan.', 'error');
+        }
+        return;
+      }
+      
+      // For paid plans - create payment request
       try {
-        const updatedUser = { ...currentUser, subscriptionPlan: planId, featuredCredits: (currentUser.featuredCredits || 0) + planDetails.featuredCredits };
-        const savedUser = await userService.updateUser(updatedUser);
-        // Update all state and storage to prevent logout
-        setUsers(prev => prev.map(u => u.email === currentUser.email ? savedUser : u));
-        setCurrentUser(savedUser);
-        const userJson = JSON.stringify(savedUser);
-        sessionStorage.setItem('currentUser', userJson);
-        localStorage.setItem('reRideCurrentUser', userJson);
-        addToast(`Successfully upgraded to the ${planDetails.name} plan!`, 'success');
-        navigate(View.SELLER_DASHBOARD);
+        await createPaymentRequest(currentUser.email, planId, planDetails.price);
+        addToast(`Payment request submitted for ${planDetails.name} plan (₹${planDetails.price.toLocaleString('en-IN')}/month). Your plan will be activated after admin approval.`, 'info');
+        setCurrentView(View.SELLER_DASHBOARD);
       } catch(error) {
-          addToast('Failed to upgrade plan.', 'error');
+        addToast('Failed to submit payment request. Please try again.', 'error');
       }
   }, [currentUser, addToast]);
 
@@ -995,7 +1053,7 @@ const App: React.FC = () => {
         }
         return <Dashboard seller={usersWithRatingsAndBadges.find(u => u.email === currentUser.email)!} sellerVehicles={vehiclesWithRatings.filter(v => v.sellerEmail === currentUser.email)} reportedVehicles={vehicles.filter(v => v.sellerEmail === currentUser.email && v.isFlagged)} onAddVehicle={handleAddVehicle} onAddMultipleVehicles={handleAddMultipleVehicles} onUpdateVehicle={handleUpdateVehicle} onDeleteVehicle={handleDeleteVehicle} onMarkAsSold={handleMarkAsSold} conversations={conversations.filter(c => c.sellerId === currentUser.email)} onSellerSendMessage={handleSellerSendMessage} onMarkConversationAsReadBySeller={handleMarkConversationAsReadBySeller} typingStatus={typingStatus} onUserTyping={handleUserTyping} onMarkMessagesAsRead={handleMarkMessagesAsRead} onUpdateSellerProfile={handleUpdateSellerProfile} vehicleData={vehicleData} onFeatureListing={handleFeatureListing} onRequestCertification={handleRequestCertification} onNavigate={navigate} allVehicles={allPublishedVehicles} onOfferResponse={handleOfferResponse} />;
       }
-      case View.ADMIN_PANEL: return currentUser?.role === 'admin' ? <AdminPanel users={users} currentUser={currentUser} vehicles={vehicles} conversations={conversations} onToggleUserStatus={handleToggleUserStatus} onDeleteUser={handleDeleteUser} onAdminUpdateUser={handleAdminUpdateUser} onUpdateVehicle={handleUpdateVehicle} onDeleteVehicle={handleDeleteVehicle} onToggleVehicleStatus={handleToggleVehicleStatus} onToggleVehicleFeature={handleToggleVehicleFeature} onResolveFlag={handleResolveFlag} platformSettings={platformSettings} onUpdateSettings={handleAdminUpdateSettings} onSendBroadcast={handleAdminSendBroadcast} auditLog={auditLog} onExportUsers={handleExportUsers} onExportVehicles={handleExportVehicles} onExportSales={handleExportSales} vehicleData={vehicleData} onUpdateVehicleData={handleUpdateVehicleData} onToggleVerifiedStatus={handleToggleVerifiedStatus} supportTickets={supportTickets} onUpdateSupportTicket={handleUpdateSupportTicket} faqItems={faqItems} onAddFaq={handleAddFaq} onUpdateFaq={handleUpdateFaq} onDeleteFaq={handleDeleteFaq} onCertificationApproval={handleCertificationApproval} /> : <LoadingSpinner />;
+      case View.ADMIN_PANEL: return currentUser?.role === 'admin' ? <AdminPanel users={users} currentUser={currentUser} vehicles={vehicles} conversations={conversations} onToggleUserStatus={handleToggleUserStatus} onDeleteUser={handleDeleteUser} onAdminUpdateUser={handleAdminUpdateUser} onUpdateUserPlan={handleUpdateUserPlan} onUpdateVehicle={handleUpdateVehicle} onDeleteVehicle={handleDeleteVehicle} onToggleVehicleStatus={handleToggleVehicleStatus} onToggleVehicleFeature={handleToggleVehicleFeature} onResolveFlag={handleResolveFlag} platformSettings={platformSettings} onUpdateSettings={handleAdminUpdateSettings} onSendBroadcast={handleAdminSendBroadcast} auditLog={auditLog} onExportUsers={handleExportUsers} onExportVehicles={handleExportVehicles} onExportSales={handleExportSales} vehicleData={vehicleData} onUpdateVehicleData={handleUpdateVehicleData} onToggleVerifiedStatus={handleToggleVerifiedStatus} supportTickets={supportTickets} onUpdateSupportTicket={handleUpdateSupportTicket} faqItems={faqItems} onAddFaq={handleAddFaq} onUpdateFaq={handleUpdateFaq} onDeleteFaq={handleDeleteFaq} onCertificationApproval={handleCertificationApproval} /> : <LoadingSpinner />;
       case View.COMPARISON: return <Comparison vehicles={vehiclesToCompare} onBack={() => navigate(View.USED_CARS)} onToggleCompare={handleToggleCompare} />;
       case View.PROFILE: return currentUser && <Profile currentUser={currentUser} onUpdateProfile={handleUpdateUserProfile} onUpdatePassword={handleUpdateUserPassword} />;
       case View.INBOX: return currentUser && <CustomerInbox conversations={conversations.filter(c => c.customerId === currentUser.email)} onSendMessage={handleCustomerSendMessage} onMarkAsRead={handleMarkConversationAsReadByCustomer} users={users} typingStatus={typingStatus} onUserTyping={handleUserTyping} onMarkMessagesAsRead={handleMarkMessagesAsRead} onFlagContent={handleFlagContent} onOfferResponse={handleOfferResponse} />;

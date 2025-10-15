@@ -1,6 +1,28 @@
 
-import { MOCK_VEHICLES } from '../constants';
 import type { Vehicle, User } from '../types';
+
+// Fallback mock vehicles to prevent loading issues
+const FALLBACK_VEHICLES: Vehicle[] = [
+  {
+    id: 1,
+    make: "Maruti Suzuki",
+    model: "Swift",
+    year: 2022,
+    price: 650000,
+    mileage: 18000,
+    fuelType: "Petrol",
+    transmission: "Manual",
+    location: "Mumbai",
+    sellerEmail: "demo@reride.com",
+    images: ["https://via.placeholder.com/800x600/E5E7EB/4B5563?text=Swift"],
+    description: "Well maintained Swift in excellent condition",
+    status: "published",
+    isFeatured: true,
+    views: 150,
+    inquiriesCount: 8,
+    certificationStatus: "none"
+  }
+];
 
 // --- API Helpers ---
 const getAuthHeader = () => {
@@ -30,7 +52,9 @@ export const getVehiclesLocal = async (): Promise<Vehicle[]> => {
         console.log('getVehiclesLocal: Starting...');
         let vehiclesJson = localStorage.getItem('reRideVehicles');
         if (!vehiclesJson) {
-            console.log('getVehiclesLocal: No cached data, using MOCK_VEHICLES');
+            console.log('getVehiclesLocal: No cached data, loading MOCK_VEHICLES...');
+            // Dynamically import MOCK_VEHICLES to avoid blocking initial load
+            const { MOCK_VEHICLES } = await import('../constants');
             localStorage.setItem('reRideVehicles', JSON.stringify(MOCK_VEHICLES));
             vehiclesJson = JSON.stringify(MOCK_VEHICLES);
         } else {
@@ -41,9 +65,9 @@ export const getVehiclesLocal = async (): Promise<Vehicle[]> => {
         return vehicles;
     } catch (error) {
         console.error('getVehiclesLocal: Error loading vehicles:', error);
-        // Return MOCK_VEHICLES as fallback
-        console.log('getVehiclesLocal: Returning MOCK_VEHICLES as fallback');
-        return MOCK_VEHICLES;
+        // Return FALLBACK_VEHICLES as final fallback
+        console.log('getVehiclesLocal: Returning FALLBACK_VEHICLES as fallback');
+        return FALLBACK_VEHICLES;
     }
 };
 
@@ -145,9 +169,9 @@ export const getVehicles = async (): Promise<Vehicle[]> => {
       return await getVehiclesLocal();
     }
   } catch (error) {
-    console.error('getVehicles: Critical error, returning empty array:', error);
+    console.error('getVehicles: Critical error, returning fallback:', error);
     // Last resort fallback
-    return MOCK_VEHICLES;
+    return FALLBACK_VEHICLES;
   }
 };
 export const addVehicle = async (vehicleData: Vehicle): Promise<Vehicle> => {

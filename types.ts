@@ -110,10 +110,11 @@ export interface Vehicle {
   // NEW: Listing Lifecycle Management
   createdAt?: string; // ISO String
   updatedAt?: string; // ISO String
-  expiresAt?: string; // ISO String
-  lastRefreshedAt?: string; // ISO String
+  listingExpiresAt?: string; // ISO String
+  listingLastRefreshed?: string; // ISO String
   listingStatus?: 'active' | 'expired' | 'sold' | 'suspended' | 'draft';
-  autoRenew?: boolean;
+  listingAutoRenew?: boolean;
+  listingRenewalCount?: number;
   daysActive?: number;
   
   // NEW: Visibility & Promotion
@@ -197,6 +198,9 @@ export interface User {
   emailVerified?: boolean;
   govtIdVerified?: boolean;
   verificationDate?: string; // ISO String
+  
+  // NEW: Payment Request System
+  pendingPlanUpgrade?: PaymentRequest;
   
   // NEW: Activity & Reputation
   responseTime?: number; // in minutes
@@ -437,6 +441,27 @@ export interface SafetyWarning {
 export interface SortOption {
   label: string;
   value: 'newest' | 'oldest' | 'price_low' | 'price_high' | 'most_viewed';
+}
+
+// ============================================
+// PAYMENT REQUEST SYSTEM
+// ============================================
+export interface PaymentRequest {
+  id: string;
+  sellerEmail: string;
+  planId: SubscriptionPlan;
+  amount: number;
+  status: 'pending' | 'approved' | 'rejected';
+  paymentProof?: string; // Screenshot URL, UPI reference, etc.
+  paymentMethod?: 'upi' | 'bank_transfer' | 'card' | 'other';
+  transactionId?: string; // UPI reference, transaction ID, etc.
+  requestedAt: string;
+  approvedAt?: string;
+  approvedBy?: string; // Admin email
+  rejectedAt?: string;
+  rejectedBy?: string; // Admin email
+  rejectionReason?: string;
+  notes?: string;
 }
 
 // ============================================

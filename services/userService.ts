@@ -1,6 +1,22 @@
 
-import { MOCK_USERS } from '../constants';
 import type { User } from '../types';
+
+// Fallback mock users to prevent loading issues
+const FALLBACK_USERS: User[] = [
+  {
+    email: "admin@reride.com",
+    password: "admin123",
+    name: "Admin User",
+    role: "admin",
+    mobile: "9876543210",
+    location: "Mumbai",
+    status: "active",
+    isVerified: true,
+    createdAt: new Date().toISOString(),
+    subscriptionPlan: "free",
+    featuredCredits: 0
+  }
+];
 
 // --- API Helpers ---
 const getAuthHeader = () => {
@@ -30,7 +46,9 @@ export const getUsersLocal = async (): Promise<User[]> => {
         console.log('getUsersLocal: Starting...');
         let usersJson = localStorage.getItem('reRideUsers');
         if (!usersJson) {
-            console.log('getUsersLocal: No cached data, using MOCK_USERS');
+            console.log('getUsersLocal: No cached data, loading MOCK_USERS...');
+            // Dynamically import MOCK_USERS to avoid blocking initial load
+            const { MOCK_USERS } = await import('../constants');
             localStorage.setItem('reRideUsers', JSON.stringify(MOCK_USERS));
             usersJson = JSON.stringify(MOCK_USERS);
             console.log(`✅ Populated local storage with ${MOCK_USERS.length} users`);
@@ -42,9 +60,9 @@ export const getUsersLocal = async (): Promise<User[]> => {
         return users;
     } catch (error) {
         console.error('getUsersLocal: Error loading users:', error);
-        // Return MOCK_USERS as fallback
-        console.log('getUsersLocal: Returning MOCK_USERS as fallback');
-        return MOCK_USERS;
+        // Return FALLBACK_USERS as fallback
+        console.log('getUsersLocal: Returning FALLBACK_USERS as fallback');
+        return FALLBACK_USERS;
     }
 };
 
@@ -220,9 +238,9 @@ export const getUsers = async (): Promise<User[]> => {
       return await getUsersLocal();
     }
   } catch (error) {
-    console.error('getUsers: Critical error, returning MOCK_USERS:', error);
+    console.error('getUsers: Critical error, returning FALLBACK_USERS:', error);
     // Last resort fallback
-    return MOCK_USERS;
+    return FALLBACK_USERS;
   }
 };
 export const updateUser = async (userData: Partial<User> & { email: string }): Promise<User> => {

@@ -11,10 +11,14 @@ if (!rootElement) {
 }
 
 const root = ReactDOM.createRoot(rootElement);
+
+// Disable StrictMode in development for faster loading
+// StrictMode causes intentional double-renders which slows down initial load
+// Re-enable for production builds or when debugging
+const isDev = import.meta.env.DEV;
+
 root.render(
-  <React.StrictMode>
-    <App />
-  </React.StrictMode>
+  isDev ? <App /> : <React.StrictMode><App /></React.StrictMode>
 );
 
 // Service worker disabled to prevent caching issues

@@ -76,7 +76,7 @@ const SocialShareButtons: React.FC<SocialShareButtonsProps> = ({ vehicle }) => {
             <div className="flex justify-center items-center gap-3">
                 <button onClick={() => handleShare('facebook')} aria-label="Share on Facebook" className="p-2 rounded-full text-white transition-colors" style={{ background: '#FF6B35' }} onMouseEnter={(e) => e.currentTarget.style.background = 'var(--spinny-orange-hover)'} onMouseLeave={(e) => e.currentTarget.style.background = 'var(--spinny-orange)'}>{ICONS.facebook}</button>
                 <button onClick={() => handleShare('twitter')} aria-label="Share on Twitter" className="p-2 rounded-full bg-sky-500 text-white hover:bg-sky-600 transition-colors">{ICONS.twitter}</button>
-                <button onClick={() => handleShare('whatsapp')} aria-label="Share on WhatsApp" className="p-2 rounded-full bg-spinny-orange-light0 text-white hover:bg-spinny-orange transition-colors">{ICONS.whatsapp}</button>
+                <button onClick={() => handleShare('whatsapp')} aria-label="Share on WhatsApp" className="p-2 rounded-full bg-blue-500 text-white hover:bg-blue-600 transition-colors">{ICONS.whatsapp}</button>
                 <button 
                     onClick={handleCopyLink} 
                     className="flex items-center gap-2 text-sm font-semibold bg-spinny-light-gray dark:bg-brand-gray-700 text-spinny-text-dark dark:text-brand-gray-200 px-3 py-2 rounded-full hover:bg-brand-gray-300 dark:hover:bg-brand-gray-600 transition-colors"

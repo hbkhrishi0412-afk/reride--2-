@@ -367,8 +367,35 @@ const VehicleList: React.FC<VehicleListProps> = ({ vehicles, onSelectVehicle, is
     });
 
     return [...filtered].sort((a, b) => {
-        if (a.isFeatured && !b.isFeatured) return -1;
-        if (!a.isFeatured && b.isFeatured) return 1;
+        // Priority 1: Homepage Spotlight (highest priority)
+        const aHasSpotlight = a.activeBoosts?.some(boost => boost.type === 'homepage_spotlight' && boost.isActive && new Date(boost.expiresAt) > new Date()) || false;
+        const bHasSpotlight = b.activeBoosts?.some(boost => boost.type === 'homepage_spotlight' && boost.isActive && new Date(boost.expiresAt) > new Date()) || false;
+        if (aHasSpotlight && !bHasSpotlight) return -1;
+        if (!aHasSpotlight && bHasSpotlight) return 1;
+        
+        // Priority 2: Top Search Boost
+        const aHasTopSearch = a.activeBoosts?.some(boost => boost.type === 'top_search' && boost.isActive && new Date(boost.expiresAt) > new Date()) || false;
+        const bHasTopSearch = b.activeBoosts?.some(boost => boost.type === 'top_search' && boost.isActive && new Date(boost.expiresAt) > new Date()) || false;
+        if (aHasTopSearch && !bHasTopSearch) return -1;
+        if (!aHasTopSearch && bHasTopSearch) return 1;
+        
+        // Priority 3: Featured Badge Boost
+        const aHasFeaturedBadge = a.activeBoosts?.some(boost => boost.type === 'featured_badge' && boost.isActive && new Date(boost.expiresAt) > new Date()) || a.isFeatured;
+        const bHasFeaturedBadge = b.activeBoosts?.some(boost => boost.type === 'featured_badge' && boost.isActive && new Date(boost.expiresAt) > new Date()) || b.isFeatured;
+        if (aHasFeaturedBadge && !bHasFeaturedBadge) return -1;
+        if (!aHasFeaturedBadge && bHasFeaturedBadge) return 1;
+        
+        // Priority 4: Premium Listing
+        if (a.isPremiumListing && !b.isPremiumListing) return -1;
+        if (!a.isPremiumListing && b.isPremiumListing) return 1;
+        
+        // Priority 5: Any active boost
+        const aHasAnyBoost = a.activeBoosts?.some(boost => boost.isActive && new Date(boost.expiresAt) > new Date()) || false;
+        const bHasAnyBoost = b.activeBoosts?.some(boost => boost.isActive && new Date(boost.expiresAt) > new Date()) || false;
+        if (aHasAnyBoost && !bHasAnyBoost) return -1;
+        if (!aHasAnyBoost && bHasAnyBoost) return 1;
+        
+        // Then apply regular sorting
         switch (sortOrder) {
             case 'RATING_DESC': return (b.averageRating || 0) - (a.averageRating || 0);
             case 'PRICE_ASC': return a.price - b.price;

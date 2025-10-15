@@ -261,6 +261,33 @@ export default async function handler(
     switch (req.method) {
       case 'GET': {
         const vehicles = await Vehicle.find({}).sort({ createdAt: -1 });
+        
+        // Update vehicles that don't have expiry dates
+        const vehiclesToUpdate = vehicles.filter(v => !v.listingExpiresAt);
+        if (vehiclesToUpdate.length > 0) {
+          console.log(`🔄 Updating ${vehiclesToUpdate.length} vehicles with expiry dates`);
+          
+          for (const vehicle of vehiclesToUpdate) {
+            const expiryDate = new Date();
+            expiryDate.setDate(expiryDate.getDate() + LISTING_EXPIRY_DAYS);
+            
+            await Vehicle.findOneAndUpdate(
+              { id: vehicle.id },
+              {
+                listingExpiresAt: expiryDate.toISOString(),
+                listingRenewalCount: 0,
+                listingAutoRenew: false,
+                createdAt: vehicle.createdAt || new Date().toISOString(),
+                updatedAt: new Date().toISOString()
+              }
+            );
+          }
+          
+          // Fetch updated vehicles
+          const updatedVehicles = await Vehicle.find({}).sort({ createdAt: -1 });
+          return res.status(200).json(updatedVehicles);
+        }
+        
         return res.status(200).json(vehicles);
       }
 
@@ -304,6 +331,20 @@ export default async function handler(
           newVehicleData.id = Date.now();
           console.log('🔢 Generated ID:', newVehicleData.id);
         }
+        
+        // Set listing lifecycle fields for new vehicles
+        const now = new Date();
+        newVehicleData.createdAt = now.toISOString();
+        newVehicleData.updatedAt = now.toISOString();
+        
+        // Set expiry date (30 days from now)
+        const expiryDate = new Date();
+        expiryDate.setDate(expiryDate.getDate() + LISTING_EXPIRY_DAYS);
+        newVehicleData.listingExpiresAt = expiryDate.toISOString();
+        
+        // Initialize lifecycle fields
+        newVehicleData.listingRenewalCount = 0;
+        newVehicleData.listingAutoRenew = false;
         
         console.log('💾 Creating vehicle in MongoDB...');
         console.log('📋 Vehicle data being saved:', JSON.stringify(newVehicleData, null, 2));

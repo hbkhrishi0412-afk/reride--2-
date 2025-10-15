@@ -4,6 +4,17 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Hide number input spinners */
+input[type="number"] {
+  -moz-appearance: textfield;
+}
+
+input[type="number"]::-webkit-outer-spin-button,
+input[type="number"]::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
 /* Reset and Base Styles */
 * {
   margin: 0;
@@ -44,6 +55,11 @@ code {
   --spinny-blue: #1E88E5;
   --spinny-blue-hover: #42A5F5;
   --spinny-blue-light: rgba(30, 136, 229, 0.1);
+  
+  /* Success Green */
+  --spinny-green: #10B981;
+  --spinny-green-hover: #059669;
+  --spinny-green-light: rgba(16, 185, 129, 0.1);
   
   /* Neutral Colors */
   --spinny-white: #FFFFFF;
@@ -512,6 +528,38 @@ a:hover {
 /* Utility Classes */
 .text-spinny-orange {
   color: var(--spinny-orange);
+}
+
+.text-spinny-blue {
+  color: var(--spinny-blue);
+}
+
+.text-spinny-green {
+  color: var(--spinny-green);
+}
+
+.border-spinny-blue {
+  border-color: var(--spinny-blue);
+}
+
+.border-spinny-green {
+  border-color: var(--spinny-green);
+}
+
+.border-spinny-orange {
+  border-color: var(--spinny-orange);
+}
+
+.hover\:bg-spinny-blue-light:hover {
+  background-color: var(--spinny-blue-light);
+}
+
+.hover\:bg-spinny-green-light:hover {
+  background-color: var(--spinny-green-light);
+}
+
+.hover\:bg-spinny-orange-light:hover {
+  background-color: var(--spinny-orange-light);
 }
 
 .text-spinny-white {

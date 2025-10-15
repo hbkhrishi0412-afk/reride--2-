@@ -1,6 +1,8 @@
-import React from 'react';
-import type { User, PlanDetails } from '../types';
+import React, { useState, useEffect } from 'react';
+import type { User, PlanDetails, SubscriptionPlan } from '../types';
 import { PLAN_DETAILS } from '../constants';
+import { planService } from '../services/planService';
+import PaymentRequestModal from './PaymentRequestModal';
 
 interface PricingPageProps {
     currentUser: User | null;
@@ -8,8 +10,33 @@ interface PricingPageProps {
 }
 
 const PricingPage: React.FC<PricingPageProps> = ({ currentUser, onSelectPlan }) => {
-    const plans: PlanDetails[] = Object.values(PLAN_DETAILS);
+    const [plans, setPlans] = useState<PlanDetails[]>([]);
     const currentPlanId = currentUser?.subscriptionPlan;
+    const [showPaymentModal, setShowPaymentModal] = useState(false);
+    const [selectedPlan, setSelectedPlan] = useState<SubscriptionPlan>('pro');
+    const [selectedAmount, setSelectedAmount] = useState(0);
+
+    // Load plans from service
+    useEffect(() => {
+        setPlans(planService.getAllPlans());
+    }, []);
+
+    const handlePlanSelect = (planId: SubscriptionPlan) => {
+        if (planId === 'free') {
+            // Free plan - direct selection
+            onSelectPlan(planId);
+        } else {
+            // Paid plan - show payment modal
+            setSelectedPlan(planId);
+            const planDetails = planService.getPlanDetails(planId);
+            setSelectedAmount(planDetails.price);
+            setShowPaymentModal(true);
+        }
+    };
+
+    const handlePaymentSuccess = () => {
+        onSelectPlan(selectedPlan);
+    };
 
     return (
         <div className="bg-white dark:bg-white py-12 sm:py-20 animate-fade-in">
@@ -57,22 +84,30 @@ const PricingPage: React.FC<PricingPageProps> = ({ currentUser, onSelectPlan }) 
                             </ul>
 
                             <button
-                                onClick={() => onSelectPlan(plan.id)}
+                                onClick={() => handlePlanSelect(plan.id)}
                                 disabled={currentPlanId === plan.id}
                                 className={`mt-10 w-full font-bold py-3 px-6 rounded-lg text-lg transition-colors disabled:opacity-70 disabled:cursor-not-allowed
                                     ${currentPlanId === plan.id
-                                        ? 'bg-spinny-light-gray dark:bg-brand-gray-700 text-spinny-text'
-                                        : plan.isMostPopular
-                                            ? 'btn-brand-primary text-white'
-                                            : 'btn-brand-soft text-white'
+                                        ? 'bg-gray-300 text-gray-600'
+                                        : 'bg-blue-600 text-white hover:bg-blue-700 shadow-lg hover:shadow-xl transform hover:-translate-y-1'
                                     }`}
                             >
-                                {currentPlanId === plan.id ? 'Current Plan' : 'Choose Plan'}
+                                {currentPlanId === plan.id ? 'Current Plan' : plan.id === 'free' ? 'Choose Plan' : 'Pay & Upgrade'}
                             </button>
                         </div>
                     ))}
                 </div>
             </div>
+
+            {/* Payment Request Modal */}
+            <PaymentRequestModal
+                isOpen={showPaymentModal}
+                onClose={() => setShowPaymentModal(false)}
+                planId={selectedPlan}
+                amount={selectedAmount}
+                sellerEmail={currentUser?.email || ''}
+                onSuccess={handlePaymentSuccess}
+            />
         </div>
     );
 };

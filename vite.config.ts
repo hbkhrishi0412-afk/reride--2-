@@ -5,20 +5,28 @@ import react from '@vitejs/plugin-react'
 export default defineConfig({
   plugins: [react()],
   build: {
-    // Optimize chunk size
-    chunkSizeWarningLimit: 1000,
+    // Optimize chunk size - lower threshold to catch bloat earlier
+    chunkSizeWarningLimit: 500,
     rollupOptions: {
       output: {
         // Aggressive code splitting for faster initial load
         manualChunks: (id) => {
           if (id.includes('node_modules')) {
+            // Separate Firebase into its own chunk (heavy library)
+            if (id.includes('firebase')) {
+              return 'firebase';
+            }
             // React core
             if (id.includes('react') || id.includes('react-dom')) {
               return 'react-vendor';
             }
-            // Chart.js
+            // Chart.js - heavy library, separate it
             if (id.includes('chart.js') || id.includes('react-chartjs')) {
               return 'charts';
+            }
+            // Google Gemini AI
+            if (id.includes('@google/genai')) {
+              return 'gemini';
             }
             // Other vendors
             return 'vendor';
@@ -33,26 +41,42 @@ export default defineConfig({
           if (id.includes('/components/VehicleList') || id.includes('/components/VehicleDetail')) {
             return 'vehicles';
           }
+          // Split static data into separate chunks
+          if (id.includes('/constants') || id.includes('/data/')) {
+            return 'static-data';
+          }
         }
       }
     },
     // Enable minification with esbuild (faster)
     minify: 'esbuild',
-    // Keep console logs temporarily for debugging login issues
+    // Remove console logs and debugger in production for smaller bundle
     esbuild: {
-      drop: ['debugger'],
+      drop: ['console', 'debugger'],
       legalComments: 'none'
     },
     // Optimize CSS
     cssMinify: true,
     // Disable source maps for production
     sourcemap: false,
-    // Enable compression
-    target: 'esnext',
+    // Better browser support
+    target: 'es2020',
     // Reduce chunk size
-    cssCodeSplit: true
+    cssCodeSplit: true,
+    // Enable asset inlining for small files
+    assetsInlineLimit: 4096,
   },
   server: {
+    port: 5174,
+    // Development server optimizations
+    hmr: {
+      overlay: true
+    },
+    // Enable file system caching for faster rebuilds
+    fs: {
+      cachedChecks: true
+    },
+    // Proxy configuration
     proxy: {
       '/api': {
         target: 'http://localhost:3000',
@@ -64,6 +88,11 @@ export default defineConfig({
   // Optimize dependencies
   optimizeDeps: {
     include: ['react', 'react-dom'],
+    // Exclude heavy dependencies from pre-bundling
     exclude: ['@google/genai']
+  },
+  // Enable esbuild optimizations in dev mode
+  esbuild: {
+    logOverride: { 'this-is-undefined-in-esm': 'silent' }
   }
 })

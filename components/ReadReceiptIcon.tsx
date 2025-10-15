@@ -39,6 +39,20 @@ export const OfferModal: React.FC<{
     const [price, setPrice] = useState('');
     const [error, setError] = useState('');
 
+    const formatNumberWithCommas = (value: string) => {
+        // Remove all non-numeric characters
+        const numericValue = value.replace(/\D/g, '');
+        // Add commas for Indian number format
+        return numericValue.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+    };
+
+    const handlePriceChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const inputValue = e.target.value;
+        // Remove commas and non-numeric characters for storage
+        const numericValue = inputValue.replace(/\D/g, '');
+        setPrice(numericValue);
+    };
+
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
         const offerPrice = parseInt(price, 10);
@@ -63,18 +77,20 @@ export const OfferModal: React.FC<{
                         <div>
                             <label htmlFor="offer-price" className="block text-sm font-medium mb-1 text-spinny-text-dark dark:text-spinny-text-dark">Your Offer Amount (₹)</label>
                             <input
-                                type="number"
+                                type="text"
                                 id="offer-price"
-                                value={price}
-                                onChange={e => setPrice(e.target.value)}
+                                value={formatNumberWithCommas(price)}
+                                onChange={handlePriceChange}
+                                placeholder="Enter amount"
+                                style={{ colorScheme: 'light dark' }}
                                 autoFocus
                                 required
-                                className="w-full p-3 border border-gray-200-300 dark:border-gray-200-300 rounded-lg bg-white dark:bg-brand-gray-700 text-lg focus:outline-none" onFocus={(e) => { e.currentTarget.style.borderColor = 'var(--spinny-orange)'; e.currentTarget.style.boxShadow = '0 0 0 2px rgba(255, 107, 53, 0.1)'; }} onBlur={(e) => { e.currentTarget.style.borderColor = ''; e.currentTarget.style.boxShadow = ''; }}
+                                className="w-full p-3 border border-gray-200-300 dark:border-gray-200-300 rounded-lg bg-white dark:bg-brand-gray-700 text-lg text-gray-900 dark:text-white focus:outline-none" onFocus={(e) => { e.currentTarget.style.borderColor = 'var(--spinny-orange)'; e.currentTarget.style.boxShadow = '0 0 0 2px rgba(255, 107, 53, 0.1)'; }} onBlur={(e) => { e.currentTarget.style.borderColor = ''; e.currentTarget.style.boxShadow = ''; }}
                             />
                         </div>
                         {error && <p className="text-sm text-spinny-orange mt-2">{error}</p>}
                     </div>
-                    <div className="bg-white dark:bg-white px-6 py-4 flex justify-end rounded-b-xl">
+                    <div className="bg-white dark:bg-gray-800 px-6 py-4 flex justify-end rounded-b-xl">
                         <button type="submit" className="px-6 py-2 btn-brand-primary text-white font-bold rounded-lg transition-colors">Submit Offer</button>
                     </div>
                 </form>
@@ -114,9 +130,9 @@ export const OfferMessage: React.FC<{
                 <div className="flex justify-between items-start">
                     <div>
                         <p className="font-semibold text-spinny-text-dark dark:text-spinny-text-dark">{msg.sender === 'user' ? 'Offer Made' : 'Counter-Offer'}</p>
-                        <p className="text-xl font-bold text-spinny-text-dark dark:text-brand-gray-50">{formatCurrency(offerPrice || 0)}</p>
+                        <p className="text-xl font-bold text-spinny-text-dark dark:text-white">{formatCurrency(offerPrice || 0)}</p>
                         {counterPrice && (
-                            <p className="text-xs text-spinny-text dark:text-spinny-text line-through">
+                            <p className="text-xs text-spinny-text dark:text-gray-300 line-through">
                                 Original: {formatCurrency(counterPrice)}
                             </p>
                         )}
@@ -127,10 +143,10 @@ export const OfferMessage: React.FC<{
                 </div>
                 {showActions && (
                     <div className="mt-3 pt-3 border-t border-gray-200-200 dark:border-gray-200-300 flex gap-2">
-                        <button onClick={() => onRespond(msg.id, 'accepted')} className="flex-1 text-sm bg-spinny-orange-light0 text-white font-bold py-1.5 px-3 rounded-md hover:bg-spinny-orange transition-colors">Accept</button>
-                        <button onClick={() => onRespond(msg.id, 'rejected')} className="flex-1 text-sm bg-spinny-orange-light0 text-white font-bold py-1.5 px-3 rounded-md hover:bg-spinny-orange transition-colors">Reject</button>
+                        <button onClick={() => onRespond(msg.id, 'accepted')} className="flex-1 text-sm bg-green-500 text-white font-bold py-1.5 px-3 rounded-md hover:bg-green-600 transition-colors">Accept</button>
+                        <button onClick={() => onRespond(msg.id, 'rejected')} className="flex-1 text-sm bg-red-500 text-white font-bold py-1.5 px-3 rounded-md hover:bg-red-600 transition-colors">Reject</button>
                         {currentUserRole === 'seller' && (
-                            <button onClick={() => setIsCounterModalOpen(true)} className="flex-1 text-sm bg-white text-white font-bold py-1.5 px-3 rounded-md hover:bg-white transition-colors">Counter</button>
+                            <button onClick={() => setIsCounterModalOpen(true)} className="flex-1 text-sm bg-blue-500 text-white font-bold py-1.5 px-3 rounded-md hover:bg-blue-600 transition-colors">Counter</button>
                         )}
                     </div>
                 )}

@@ -1,0 +1,110 @@
+import type { PlanDetails, SubscriptionPlan } from '../types';
+import { PLAN_DETAILS } from '../constants';
+
+// In-memory storage for plan updates (in a real app, this would be a database)
+let planUpdates: Partial<Record<SubscriptionPlan, Partial<PlanDetails>>> = {};
+
+// Custom plan type to support additional plans beyond the base 3
+type CustomPlanId = SubscriptionPlan | string;
+
+export const planService = {
+    // Get plan details with any updates applied
+    getPlanDetails: (planId: SubscriptionPlan): PlanDetails => {
+        const basePlan = PLAN_DETAILS[planId];
+        const updates = planUpdates[planId] || {};
+        return { ...basePlan, ...updates };
+    },
+
+    // Get custom plan details
+    getCustomPlanDetails: (planId: string): PlanDetails | null => {
+        const updates = planUpdates[planId];
+        return updates ? { ...updates, id: planId } as PlanDetails : null;
+    },
+
+    // Get all plan details with updates applied (max 4 plans)
+    getAllPlans: (): PlanDetails[] => {
+        const basePlans = Object.keys(PLAN_DETAILS).map(planId => 
+            planService.getPlanDetails(planId as SubscriptionPlan)
+        );
+        
+        // Add custom plans (excluding base plans from custom updates)
+        const customPlans = Object.keys(planUpdates)
+            .filter(planId => !PLAN_DETAILS[planId as SubscriptionPlan])
+            .map(planId => planService.getCustomPlanDetails(planId)!)
+            .filter(plan => plan !== null);
+        
+        return [...basePlans, ...customPlans].slice(0, 4); // Max 4 plans
+    },
+
+    // Update plan details
+    updatePlan: (planId: SubscriptionPlan | string, updates: Partial<PlanDetails>): void => {
+        planUpdates[planId] = { ...planUpdates[planId], ...updates };
+        
+        // Save to localStorage for persistence
+        localStorage.setItem('planUpdates', JSON.stringify(planUpdates));
+    },
+
+    // Create new plan
+    createPlan: (planData: Omit<PlanDetails, 'id'>): string => {
+        const planId = `custom_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+        const newPlan = { ...planData, id: planId };
+        
+        planUpdates[planId] = newPlan;
+        localStorage.setItem('planUpdates', JSON.stringify(planUpdates));
+        
+        return planId;
+    },
+
+    // Delete custom plan
+    deletePlan: (planId: string): boolean => {
+        if (PLAN_DETAILS[planId as SubscriptionPlan]) {
+            // Cannot delete base plans
+            return false;
+        }
+        
+        delete planUpdates[planId];
+        localStorage.setItem('planUpdates', JSON.stringify(planUpdates));
+        return true;
+    },
+
+    // Load plan updates from localStorage
+    loadPlanUpdates: (): void => {
+        try {
+            const saved = localStorage.getItem('planUpdates');
+            if (saved) {
+                planUpdates = JSON.parse(saved);
+            }
+        } catch (error) {
+            console.error('Failed to load plan updates:', error);
+        }
+    },
+
+    // Reset plan updates (for testing)
+    resetPlanUpdates: (): void => {
+        planUpdates = {};
+        localStorage.removeItem('planUpdates');
+    },
+
+    // Get original plan details without updates
+    getOriginalPlanDetails: (planId: SubscriptionPlan): PlanDetails => {
+        return PLAN_DETAILS[planId];
+    },
+
+    // Check if plan has been modified
+    isPlanModified: (planId: SubscriptionPlan): boolean => {
+        return planUpdates[planId] !== undefined;
+    },
+
+    // Check if plan limit is reached
+    canAddNewPlan: (): boolean => {
+        return planService.getAllPlans().length < 4;
+    },
+
+    // Get plan count
+    getPlanCount: (): number => {
+        return planService.getAllPlans().length;
+    }
+};
+
+// Load plan updates on service initialization
+planService.loadPlanUpdates();

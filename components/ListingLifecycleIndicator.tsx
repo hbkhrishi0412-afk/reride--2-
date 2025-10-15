@@ -20,6 +20,7 @@ const ListingLifecycleIndicator: React.FC<ListingLifecycleIndicatorProps> = ({
   const isExpiringSoon = daysUntilExpiry > 0 && daysUntilExpiry <= 7;
 
   const getStatusColor = () => {
+    if (daysUntilExpiry === -1) return { bg: '#E0F2FE', text: '#0277BD', border: '#81D4FA' };
     if (isExpired) return { bg: '#FEE2E2', text: '#991B1B', border: '#FCA5A5' };
     if (isExpiringSoon) return { bg: '#FEF3C7', text: '#92400E', border: '#FCD34D' };
     return { bg: '#D1FAE5', text: '#065F46', border: '#6EE7B7' };
@@ -28,12 +29,14 @@ const ListingLifecycleIndicator: React.FC<ListingLifecycleIndicatorProps> = ({
   const colors = getStatusColor();
 
   const getStatusIcon = () => {
+    if (daysUntilExpiry === -1) return '🔵';
     if (isExpired) return '🔴';
     if (isExpiringSoon) return '⚠️';
     return '✅';
   };
 
   const getStatusText = () => {
+    if (daysUntilExpiry === -1) return 'Active (No expiry)';
     if (isExpired) return 'Expired';
     if (isExpiringSoon) return `Expires in ${daysUntilExpiry} days`;
     return `Active (${daysUntilExpiry} days left)`;

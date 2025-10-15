@@ -9,7 +9,8 @@ import { Bar, Line } from 'react-chartjs-2';
 import AiAssistant from './AiAssistant';
 // FIX: ChatWidget is a named export, not a default. Corrected the import syntax.
 import { ChatWidget } from './ChatWidget';
-import { INDIAN_STATES, CITIES_BY_STATE, PLAN_DETAILS } from '../constants';
+import { INDIAN_STATES, CITIES_BY_STATE } from '../constants';
+import { planService } from '../services/planService';
 import BulkUploadModal from './BulkUploadModal';
 import { getPlaceholderImage } from './vehicleData';
 import PricingGuidance from './PricingGuidance';
@@ -17,6 +18,7 @@ import { OfferModal, OfferMessage } from './ReadReceiptIcon';
 // NEW FEATURES
 import BoostListingModal from './BoostListingModal';
 import ListingLifecycleIndicator from './ListingLifecycleIndicator';
+import PaymentStatusCard from './PaymentStatusCard';
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend, PointElement, LineElement, LineController, BarController);
 
@@ -91,7 +93,7 @@ const PlanStatusCard: React.FC<{
     activeListingsCount: number;
     onNavigate: (view: View) => void;
 }> = memo(({ seller, activeListingsCount, onNavigate }) => {
-    const plan = PLAN_DETAILS[seller.subscriptionPlan || 'free'];
+    const plan = planService.getPlanDetails(seller.subscriptionPlan || 'free');
     const listingLimit = plan.listingLimit === 'unlimited' ? Infinity : plan.listingLimit;
     const usagePercentage = listingLimit === Infinity ? 0 : (activeListingsCount / listingLimit) * 100;
 
@@ -715,11 +717,11 @@ const VehicleForm: React.FC<VehicleFormProps> = memo(({ editingVehicle, onAddVeh
                     <div className="p-4 bg-spinny-orange dark:bg-spinny-orange/20 border border-spinny-orange dark:border-spinny-orange rounded-lg">
                         <div className="flex items-center justify-between">
                             <div>
-                                <label htmlFor="feature-listing" className="font-bold text-spinny-orange dark:text-spinny-orange flex items-center gap-2">
+                                <label htmlFor="feature-listing" className="font-bold text-white dark:text-white flex items-center gap-2">
                                     <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" /></svg>
                                     Feature this Listing
                                 </label>
-                                <p className="text-xs text-spinny-orange dark:text-spinny-orange mt-1">
+                                <p className="text-xs text-white dark:text-white mt-1">
                                     Use 1 of your {seller.featuredCredits || 0} available credits.
                                 </p>
                             </div>
@@ -1105,14 +1107,14 @@ const Dashboard: React.FC<DashboardProps> = ({ seller, sellerVehicles, reportedV
       const status = vehicle.certificationStatus || 'none';
       switch (status) {
           case 'requested':
-              return <button disabled className="text-spinny-text-dark text-sm font-semibold">Pending Approval</button>;
+              return <button disabled className="px-1.5 py-0.5 text-spinny-text-dark text-xs border border-gray-300 rounded opacity-50" title="Certification pending approval">🔄 Pending</button>;
           case 'approved':
-              return <span className="text-spinny-orange text-sm font-semibold">Certified</span>;
+              return <span className="px-1.5 py-0.5 text-spinny-green text-xs border border-spinny-green rounded bg-spinny-green-light" title="Vehicle is certified">✅ Certified</span>;
           case 'rejected':
-              return <button onClick={() => onRequestCertification(vehicle.id)} className="text-spinny-orange hover:text-spinny-orange" title="Certification was rejected, you can request again.">Request Again</button>;
+              return <button onClick={() => onRequestCertification(vehicle.id)} className="px-1.5 py-0.5 text-spinny-orange hover:text-spinny-orange text-xs border border-spinny-orange rounded hover:bg-spinny-orange-light" title="Certification was rejected, you can request again.">🔄 Retry</button>;
           case 'none':
           default:
-              return <button onClick={() => onRequestCertification(vehicle.id)} className="text-teal-600 hover:text-teal-800" title="Request a certified inspection report">Get Certified</button>;
+              return <button onClick={() => onRequestCertification(vehicle.id)} className="px-1.5 py-0.5 text-teal-600 hover:text-teal-800 text-xs border border-teal-600 rounded hover:bg-teal-50" title="Request a certified inspection report">🛡️ Certify</button>;
       }
   };
 
@@ -1127,6 +1129,7 @@ const Dashboard: React.FC<DashboardProps> = ({ seller, sellerVehicles, reportedV
               <StatCard title="Your Seller Rating" value={`${seller.averageRating?.toFixed(1) || 'N/A'} (${seller.ratingCount || 0})`} icon={<svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.522 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.522 4.674c.3.921-.755 1.688-1.54 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.784.57-1.838-.197-1.539-1.118l1.522-4.674a1 1 0 00-.363-1.118L2.98 8.11c-.783-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.522-4.674z" /></svg>} />
               <PlanStatusCard seller={seller} activeListingsCount={activeListings.length} onNavigate={onNavigate} />
             </div>
+            <PaymentStatusCard currentUser={seller} />
             <AiAssistant
               vehicles={activeListings}
               conversations={conversations}
@@ -1144,6 +1147,64 @@ const Dashboard: React.FC<DashboardProps> = ({ seller, sellerVehicles, reportedV
                     <StatCard title="Total Views" value={analyticsData.totalViews.toLocaleString('en-IN')} icon={<svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057 5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" /></svg>} />
                     <StatCard title="Total Inquiries" value={analyticsData.totalInquiries.toLocaleString('en-IN')} icon={<svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" /></svg>} />
                 </div>
+                
+                {/* Boost Analytics */}
+                {(() => {
+                  const activeBoosts = sellerVehicles.flatMap(v => 
+                    v.activeBoosts?.filter(boost => boost.isActive && new Date(boost.expiresAt) > new Date()) || []
+                  );
+                  
+                  if (activeBoosts.length > 0) {
+                    return (
+                      <div className="bg-gradient-to-r from-purple-50 to-blue-50 rounded-xl p-6 mb-8">
+                        <div className="flex items-center justify-between mb-4">
+                          <h3 className="text-xl font-bold text-gray-900 flex items-center gap-2">
+                            <span>🚀</span>
+                            Active Boost Campaigns
+                          </h3>
+                          <span className="bg-gradient-to-r from-purple-500 to-blue-500 text-white px-3 py-1 rounded-full text-sm font-semibold">
+                            {activeBoosts.length} Active
+                          </span>
+                        </div>
+                        
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                          {activeBoosts.map(boost => {
+                            const vehicle = sellerVehicles.find(v => v.activeBoosts?.some(b => b.id === boost.id));
+                            const daysLeft = Math.ceil((new Date(boost.expiresAt).getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24));
+                            
+                            return (
+                              <div key={boost.id} className="bg-white rounded-lg p-4 shadow-sm border border-gray-200">
+                                <div className="flex items-center gap-2 mb-2">
+                                  <span className="text-lg">
+                                    {boost.type === 'homepage_spotlight' ? '⭐' : 
+                                     boost.type === 'top_search' ? '🔝' : 
+                                     boost.type === 'featured_badge' ? '🏆' : 
+                                     boost.type === 'multi_city' ? '🌍' : '🚀'}
+                                  </span>
+                                  <span className="font-semibold text-sm capitalize">{boost.type.replace('_', ' ')}</span>
+                                </div>
+                                <p className="text-xs text-gray-600 mb-1">
+                                  {vehicle?.year} {vehicle?.make} {vehicle?.model}
+                                </p>
+                                <div className="flex items-center justify-between">
+                                  <span className="text-xs text-gray-500">{daysLeft} days left</span>
+                                  <div className="w-16 h-1 bg-gray-200 rounded-full overflow-hidden">
+                                    <div 
+                                      className="h-full bg-gradient-to-r from-purple-500 to-blue-500 transition-all duration-300"
+                                      style={{ width: `${Math.max(0, Math.min(100, (daysLeft / 30) * 100))}%` }}
+                                    ></div>
+                                  </div>
+                                </div>
+                              </div>
+                            );
+                          })}
+                        </div>
+                      </div>
+                    );
+                  }
+                  return null;
+                })()}
+                
                 <div className="bg-white p-6 sm:p-8 rounded-lg shadow-md">
                     <h2 className="text-2xl font-bold text-spinny-text-dark dark:text-spinny-text-dark mb-6">Listing Performance</h2>
                     {activeListings.length > 0 ? (
@@ -1204,22 +1265,212 @@ const Dashboard: React.FC<DashboardProps> = ({ seller, sellerVehicles, reportedV
             {activeListings.length > 0 ? (
               <div className="overflow-x-auto">
                 <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
-                  <thead className="bg-white dark:bg-white"><tr><th className="px-6 py-3 text-left text-xs font-medium uppercase">Vehicle</th><th className="px-6 py-3 text-left text-xs font-medium uppercase">Price</th><th className="px-6 py-3 text-left text-xs font-medium uppercase">Status</th><th className="relative px-6 py-3 text-right text-xs font-medium uppercase">Actions</th></tr></thead>
+                  <thead className="bg-white dark:bg-white">
+                    <tr>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Vehicle</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Price</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                    </tr>
+                  </thead>
                   <tbody className="bg-white divide-y divide-gray-200 dark:divide-gray-700">
                     {activeListings.map((v) => (
                       <tr key={v.id}>
                         <td className="px-6 py-4 font-medium">{v.year} {v.make} {v.model} {v.variant || ''}</td>
                         <td className="px-6 py-4">₹{v.price.toLocaleString('en-IN')}</td>
-                        <td className="px-6 py-4"><ListingLifecycleIndicator vehicle={v} compact={true} onRefresh={async () => { await fetch('/api/vehicles?action=refresh', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ vehicleId: v.id, refreshAction: 'refresh', sellerEmail: seller.email }) }); window.location.reload(); }} onRenew={async () => { await fetch('/api/vehicles?action=refresh', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ vehicleId: v.id, refreshAction: 'renew', sellerEmail: seller.email }) }); window.location.reload(); }} /></td>
-                        <td className="px-6 py-4 text-right whitespace-nowrap text-sm font-semibold space-x-2">
-                          <button onClick={() => { setVehicleToBoost(v); setShowBoostModal(true); }} className="px-3 py-1 bg-spinny-orange text-white rounded hover:bg-orange-600 text-xs" title="Boost for more visibility">🚀 Boost</button>
-                          {!v.isFeatured && (seller.featuredCredits ?? 0) > 0 && (
-                              <button onClick={() => onFeatureListing(v.id)} className="text-spinny-orange hover:text-spinny-orange" title="Use a credit to feature this listing">Feature</button>
-                          )}
-                          {getCertificationButton(v)}
-                          <button onClick={() => onMarkAsSold(v.id)} className="text-spinny-orange hover:text-spinny-orange">Sold</button>
-                          <button onClick={() => handleEditClick(v)} className="transition-colors" style={{ color: '#FF6B35' }} onMouseEnter={(e) => e.currentTarget.style.color = 'var(--spinny-blue)'} onMouseLeave={(e) => e.currentTarget.style.color = 'var(--spinny-orange)'}>Edit</button>
-                          <button onClick={() => onDeleteVehicle(v.id)} className="text-spinny-orange hover:text-spinny-orange">Delete</button>
+                        <td className="px-6 py-4">
+                          <div className="flex flex-col gap-1">
+                            <ListingLifecycleIndicator vehicle={v} compact={true} onRefresh={async () => { await fetch('/api/vehicles?action=refresh', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ vehicleId: v.id, refreshAction: 'refresh', sellerEmail: seller.email }) }); window.location.reload(); }} onRenew={async () => { await fetch('/api/vehicles?action=refresh', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ vehicleId: v.id, refreshAction: 'renew', sellerEmail: seller.email }) }); window.location.reload(); }} />
+                            
+                            {/* Boost Status Indicators */}
+                            {v.activeBoosts?.filter(boost => boost.isActive && new Date(boost.expiresAt) > new Date()).map(boost => {
+                              const getBoostIcon = (type: string) => {
+                                switch (type) {
+                                  case 'homepage_spotlight': return '⭐';
+                                  case 'top_search': return '🔝';
+                                  case 'featured_badge': return '🏆';
+                                  case 'multi_city': return '🌍';
+                                  default: return '🚀';
+                                }
+                              };
+                              
+                              const getBoostColor = (type: string) => {
+                                switch (type) {
+                                  case 'homepage_spotlight': return 'from-yellow-500 to-orange-500';
+                                  case 'top_search': return 'from-blue-500 to-purple-500';
+                                  case 'featured_badge': return 'from-green-500 to-teal-500';
+                                  case 'multi_city': return 'from-indigo-500 to-blue-500';
+                                  default: return 'from-gray-500 to-gray-600';
+                                }
+                              };
+                              
+                              const daysLeft = Math.ceil((new Date(boost.expiresAt).getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24));
+                              
+                              return (
+                                <div key={boost.id} className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium text-white bg-gradient-to-r ${getBoostColor(boost.type)}`}>
+                                  <span>{getBoostIcon(boost.type)}</span>
+                                  <span className="capitalize">{boost.type.replace('_', ' ')}</span>
+                                  <span>({daysLeft}d)</span>
+                                </div>
+                              );
+                            })}
+                          </div>
+                        </td>
+                        <td className="px-6 py-4">
+                          {/* Desktop Layout - 4+4 Grid */}
+                          <div className="hidden lg:flex flex-col space-y-1">
+                            {/* First Row - 4 buttons */}
+                            <div className="flex items-center space-x-1">
+                              <button 
+                                onClick={() => { setVehicleToBoost(v); setShowBoostModal(true); }} 
+                                className="px-2 py-0.5 bg-spinny-orange text-white rounded hover:bg-orange-600 text-xs font-medium" 
+                                title="Boost for more visibility"
+                              >
+                                🚀 Boost
+                              </button>
+                              {!v.isFeatured && (seller.featuredCredits ?? 0) > 0 ? (
+                                <button 
+                                  onClick={() => onFeatureListing(v.id)} 
+                                  className="px-1.5 py-0.5 text-spinny-orange hover:text-spinny-orange text-xs border border-spinny-orange rounded hover:bg-spinny-orange-light" 
+                                  title="Use a credit to feature this listing"
+                                >
+                                  ⭐ Feature
+                                </button>
+                              ) : (
+                                <div className="px-1.5 py-0.5 text-xs text-gray-400 border border-gray-300 rounded opacity-50">
+                                  ⭐ Feature
+                                </div>
+                              )}
+                              <button 
+                                onClick={async () => { 
+                                  await fetch('/api/vehicles?action=refresh', { 
+                                    method: 'POST', 
+                                    headers: { 'Content-Type': 'application/json' }, 
+                                    body: JSON.stringify({ vehicleId: v.id, refreshAction: 'refresh', sellerEmail: seller.email }) 
+                                  }); 
+                                  window.location.reload(); 
+                                }} 
+                                className="px-1.5 py-0.5 text-spinny-blue hover:text-spinny-blue text-xs border border-spinny-blue rounded hover:bg-spinny-blue-light" 
+                                title="Refresh listing"
+                              >
+                                🔄 Refresh
+                              </button>
+                              <button 
+                                onClick={async () => { 
+                                  await fetch('/api/vehicles?action=refresh', { 
+                                    method: 'POST', 
+                                    headers: { 'Content-Type': 'application/json' }, 
+                                    body: JSON.stringify({ vehicleId: v.id, refreshAction: 'renew', sellerEmail: seller.email }) 
+                                  }); 
+                                  window.location.reload(); 
+                                }} 
+                                className="px-1.5 py-0.5 text-spinny-green hover:text-spinny-green text-xs border border-spinny-green rounded hover:bg-spinny-green-light" 
+                                title="Renew listing"
+                              >
+                                ♻️ Renew
+                              </button>
+                            </div>
+                            
+                            {/* Second Row - 4 buttons */}
+                            <div className="flex items-center space-x-1">
+                              {getCertificationButton(v)}
+                              <button 
+                                onClick={() => onMarkAsSold(v.id)} 
+                                className="px-1.5 py-0.5 text-spinny-orange hover:text-spinny-orange text-xs border border-spinny-orange rounded hover:bg-spinny-orange-light"
+                              >
+                                ✅ Sold
+                              </button>
+                              <button 
+                                onClick={() => handleEditClick(v)} 
+                                className="px-1.5 py-0.5 text-spinny-blue hover:text-spinny-blue text-xs border border-spinny-blue rounded hover:bg-spinny-blue-light"
+                              >
+                                ✏️ Edit
+                              </button>
+                              <button 
+                                onClick={() => onDeleteVehicle(v.id)} 
+                                className="px-1.5 py-0.5 text-red-600 hover:text-red-700 text-xs border border-red-600 rounded hover:bg-red-50"
+                              >
+                                🗑️ Delete
+                              </button>
+                            </div>
+                          </div>
+                          
+                          {/* Mobile/Tablet Layout - 4+4 Grid */}
+                          <div className="lg:hidden">
+                            <div className="flex flex-col space-y-1">
+                              {/* First Row - 4 buttons */}
+                              <div className="flex items-center space-x-1">
+                                <button 
+                                  onClick={() => { setVehicleToBoost(v); setShowBoostModal(true); }} 
+                                  className="px-1.5 py-0.5 bg-spinny-orange text-white rounded text-xs"
+                                  title="Boost"
+                                >
+                                  🚀
+                                </button>
+                                <button 
+                                  onClick={() => onFeatureListing(v.id)} 
+                                  className="px-1.5 py-0.5 text-spinny-orange text-xs border border-spinny-orange rounded"
+                                  title="Feature"
+                                >
+                                  ⭐
+                                </button>
+                                <button 
+                                  onClick={async () => { 
+                                    await fetch('/api/vehicles?action=refresh', { 
+                                      method: 'POST', 
+                                      headers: { 'Content-Type': 'application/json' }, 
+                                      body: JSON.stringify({ vehicleId: v.id, refreshAction: 'refresh', sellerEmail: seller.email }) 
+                                    }); 
+                                    window.location.reload(); 
+                                  }} 
+                                  className="px-1.5 py-0.5 text-spinny-blue text-xs border border-spinny-blue rounded"
+                                  title="Refresh"
+                                >
+                                  🔄
+                                </button>
+                                <button 
+                                  onClick={async () => { 
+                                    await fetch('/api/vehicles?action=refresh', { 
+                                      method: 'POST', 
+                                      headers: { 'Content-Type': 'application/json' }, 
+                                      body: JSON.stringify({ vehicleId: v.id, refreshAction: 'renew', sellerEmail: seller.email }) 
+                                    }); 
+                                    window.location.reload(); 
+                                  }} 
+                                  className="px-1.5 py-0.5 text-spinny-green text-xs border border-spinny-green rounded"
+                                  title="Renew"
+                                >
+                                  ♻️
+                                </button>
+                              </div>
+                              
+                              {/* Second Row - 4 buttons */}
+                              <div className="flex items-center space-x-1">
+                                {getCertificationButton(v)}
+                                <button 
+                                  onClick={() => onMarkAsSold(v.id)} 
+                                  className="px-1.5 py-0.5 text-spinny-orange text-xs border border-spinny-orange rounded"
+                                  title="Sold"
+                                >
+                                  ✅
+                                </button>
+                                <button 
+                                  onClick={() => handleEditClick(v)} 
+                                  className="px-1.5 py-0.5 text-spinny-blue text-xs border border-spinny-blue rounded"
+                                  title="Edit"
+                                >
+                                  ✏️
+                                </button>
+                                <button 
+                                  onClick={() => onDeleteVehicle(v.id)} 
+                                  className="px-1.5 py-0.5 text-red-600 text-xs border border-red-600 rounded"
+                                  title="Delete"
+                                >
+                                  🗑️
+                                </button>
+                              </div>
+                            </div>
+                          </div>
                         </td>
                       </tr>
                     ))}
