@@ -34,7 +34,8 @@ async function callGeminiAPI(payload: any): Promise<string> {
             // Check if the expected response is an array or object
             return payload.config?.responseSchema?.type === Type.ARRAY ? "[]" : "{}";
         }
-        return `Error: ${error instanceof Error ? error.message : "Could not connect to AI service."}`;
+        // For non-JSON responses, return a user-friendly message
+        return "AI service is temporarily unavailable. Please try again later.";
     }
 }
 

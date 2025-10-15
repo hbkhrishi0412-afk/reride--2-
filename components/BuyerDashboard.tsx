@@ -32,8 +32,27 @@ const BuyerDashboard: React.FC<BuyerDashboardProps> = ({
   const [activeTab, setActiveTab] = useState<'overview' | 'searches' | 'activity' | 'alerts'>('overview');
   const [showSaveSearchModal, setShowSaveSearchModal] = useState(false);
   const [savedSearches, setSavedSearches] = useState<SavedSearch[]>(
-    () => buyerService.getSavedSearches(currentUser.email)
+    () => buyerService.getSavedSearches(currentUser?.email || '')
   );
+
+  // Add safety checks for currentUser
+  if (!currentUser) {
+    return (
+      <div className="min-h-screen bg-gray-50 dark:bg-brand-gray-900 flex items-center justify-center">
+        <div className="text-center">
+          <h2 className="text-2xl font-bold text-spinny-text-dark dark:text-spinny-text mb-4">
+            Please log in to view your dashboard
+          </h2>
+          <button
+            onClick={() => onNavigate(View.LOGIN)}
+            className="btn-brand-primary text-white px-6 py-2 rounded-lg"
+          >
+            Go to Login
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   // Get buyer activity
   const buyerActivity = useMemo(
@@ -43,13 +62,17 @@ const BuyerDashboard: React.FC<BuyerDashboardProps> = ({
 
   // Get recently viewed vehicles
   const recentlyViewed = useMemo(() => {
+    if (!vehicles || !Array.isArray(vehicles)) return [];
     const viewedIds = buyerActivity.recentlyViewed.slice(0, 6);
-    return vehicles.filter(v => viewedIds.includes(v.id));
+    return vehicles.filter(v => v && viewedIds.includes(v.id));
   }, [buyerActivity.recentlyViewed, vehicles]);
 
   // Get wishlist vehicles
   const wishlistVehicles = useMemo(
-    () => vehicles.filter(v => wishlist.includes(v.id)).slice(0, 6),
+    () => {
+      if (!vehicles || !Array.isArray(vehicles)) return [];
+      return vehicles.filter(v => v && wishlist.includes(v.id)).slice(0, 6);
+    },
     [vehicles, wishlist]
   );
 

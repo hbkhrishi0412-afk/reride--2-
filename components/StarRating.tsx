@@ -37,6 +37,9 @@ const Star: React.FC<{
 const StarRating: React.FC<StarRatingProps> = ({ rating, onRate, readOnly = false, size = 'md' }) => {
   const [hoverRating, setHoverRating] = useState(0);
 
+  // Ensure rating is a valid number
+  const safeRating = typeof rating === 'number' && !isNaN(rating) ? rating : 0;
+
   const handleRate = (rate: number) => {
     if (!readOnly && onRate) {
       onRate(rate);
@@ -64,7 +67,7 @@ const StarRating: React.FC<StarRatingProps> = ({ rating, onRate, readOnly = fals
   return (
     <div className="flex items-center">
       {[1, 2, 3, 4, 5].map((star) => {
-        const displayRating = hoverRating || rating;
+        const displayRating = hoverRating || safeRating;
         return (
           <Star
             key={star}

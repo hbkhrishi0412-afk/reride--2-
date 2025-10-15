@@ -150,8 +150,8 @@ const VehicleCard: React.FC<VehicleCardProps> = ({ vehicle, onSelect, onToggleCo
         <div className="mt-auto pt-3 sm:pt-4 flex justify-between items-center">
              <p className="text-xl sm:text-2xl font-extrabold" style={{ color: '#FF6B35' }}>₹{vehicle.price.toLocaleString('en-IN')}</p>
              <div className="flex items-center gap-2">
-                <StarRating rating={vehicle.averageRating || 0} readOnly size="sm"/>
-                <span className="text-xs text-spinny-text dark:text-spinny-text">({vehicle.ratingCount || 0})</span>
+                <StarRating rating={vehicle?.averageRating || 0} readOnly size="sm"/>
+                <span className="text-xs text-spinny-text dark:text-spinny-text">({vehicle?.ratingCount || 0})</span>
             </div>
         </div>
       </div>

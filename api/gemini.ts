@@ -28,7 +28,10 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         
         if (!process.env.GEMINI_API_KEY) {
             console.error("GEMINI_API_KEY not configured in Vercel environment variables.");
-            return res.status(500).json({ error: 'Server configuration error.' });
+            return res.status(500).json({ 
+                error: 'AI service temporarily unavailable. Please try again later.',
+                details: 'Server configuration error - AI features disabled'
+            });
         }
         
         // Initialize the AI client on the server with the secure API key
