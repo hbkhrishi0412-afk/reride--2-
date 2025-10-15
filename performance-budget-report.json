@@ -1,0 +1,31 @@
+{
+  "timestamp": "2025-10-15T16:34:52.642Z",
+  "budgets": {
+    "bundleSize": {
+      "index": 100,
+      "react-core": 50,
+      "vendor": 150,
+      "firebase": 100,
+      "charts": 50,
+      "total": 500
+    },
+    "assetSize": {
+      "css": 100,
+      "images": 200,
+      "fonts": 50
+    },
+    "performance": {
+      "fcp": 1500,
+      "lcp": 2500,
+      "fid": 100,
+      "cls": 0.1,
+      "tti": 3000
+    }
+  },
+  "violations": [],
+  "summary": {
+    "totalViolations": 0,
+    "criticalViolations": 0,
+    "warnings": 0
+  }
+}
