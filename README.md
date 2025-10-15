@@ -3,6 +3,7 @@
 </div>
 
 # ReRide - Vehicle Marketplace Platform
+<!-- Updated: Buyer dashboard fixes deployed -->
 
 A modern, AI-powered vehicle marketplace platform built with React, TypeScript, and Google Gemini AI.
 
