@@ -17,9 +17,16 @@ export const getVehicleData = async (): Promise<VehicleData> => {
       // Cache in localStorage
       localStorage.setItem(VEHICLE_DATA_STORAGE_KEY, JSON.stringify(data));
       return data;
+    } else {
+      console.warn(`API returned ${response.status}: ${response.statusText}`);
     }
   } catch (error) {
-    console.warn("Failed to fetch vehicle data from API, falling back to localStorage", error);
+    // Only log the error if it's not a network/connection issue
+    if (error instanceof TypeError && error.message.includes('fetch')) {
+      console.info("API endpoint not available, using cached data");
+    } else {
+      console.warn("Failed to fetch vehicle data from API, falling back to localStorage", error);
+    }
   }
 
   // Fallback to localStorage

@@ -6,7 +6,6 @@ import type {
   RadiusSearchParams,
   Vehicle,
 } from '../types';
-import { INDIAN_LANDMARKS, CITY_COORDINATES, POPULAR_SEARCHES_BY_CITY } from '../constants';
 
 // ============================================
 // DISTANCE CALCULATIONS
@@ -68,7 +67,8 @@ export async function getUserLocation(): Promise<LocationCoordinates | null> {
 }
 
 // Get city coordinates
-export function getCityCoordinates(city: string): LocationCoordinates | null {
+export async function getCityCoordinates(city: string): Promise<LocationCoordinates | null> {
+  const { CITY_COORDINATES } = await import('../constants');
   return CITY_COORDINATES[city] || null;
 }
 
@@ -77,11 +77,12 @@ export function getCityCoordinates(city: string): LocationCoordinates | null {
 // ============================================
 
 // Find nearby landmarks within a radius
-export function findNearbyLandmarks(
+export async function findNearbyLandmarks(
   userLocation: LocationCoordinates,
   radiusKm: number = 10,
   city?: string
-): Array<NearbyLandmark & { distance: number }> {
+): Promise<Array<NearbyLandmark & { distance: number }>> {
+  const { INDIAN_LANDMARKS } = await import('../constants');
   let landmarks = INDIAN_LANDMARKS;
   
   if (city) {
@@ -141,7 +142,8 @@ export function filterVehiclesByRadius(
 // ============================================
 
 // Get popular searches for a city
-export function getPopularSearchesByCity(city: string): PopularSearch[] {
+export async function getPopularSearchesByCity(city: string): Promise<PopularSearch[]> {
+  const { POPULAR_SEARCHES_BY_CITY } = await import('../constants');
   return POPULAR_SEARCHES_BY_CITY[city] || [];
 }
 

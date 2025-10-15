@@ -1,59 +1,42 @@
-
-
-import React, { useState, useEffect, useMemo, useRef, useCallback, lazy, Suspense } from 'react';
+import React, { Suspense, useEffect, useMemo } from 'react';
+import { AppProvider, useApp } from './components/AppProvider';
+import ErrorBoundary from './components/ErrorBoundary';
 import Header from './components/Header';
 import Footer from './components/Footer';
-// Optimized: Lazy load heavy static data to reduce initial bundle size
-import type { Vehicle, User, Conversation, ChatMessage, Toast as ToastType, PlatformSettings, AuditLogEntry, VehicleData, Notification, VehicleCategory, Badge, Command, SubscriptionPlan, CertifiedInspection, SupportTicket, FAQItem, PlanDetails } from './types';
-import { View, VehicleCategory as CategoryEnum } from './types';
-import { getRatings, addRating, getSellerRatings, addSellerRating } from './services/ratingService';
-import { getConversations, saveConversations } from './services/chatService';
-import * as vehicleService from './services/vehicleService';
-import { getVehiclesLocal } from './services/vehicleService';
-import * as userService from './services/userService';
-import { getUsersLocal } from './services/userService';
-import LoginPortal from './components/LoginPortal';
-import CustomerLogin from './CustomerLogin';
-import AdminLogin from './AdminLogin';
-import Login from './Login';
 import ToastContainer from './components/ToastContainer';
-import ForgotPassword from './components/ForgotPassword';
-import { getSettings, saveSettings } from './services/settingsService';
-import { getAuditLog, logAction, saveAuditLog } from './services/auditLogService';
-import { exportToCsv } from './services/exportService';
-import { showNotification } from './services/notificationService';
-import { getVehicleData, getVehicleDataSync, saveVehicleData } from './services/vehicleDataService';
-import { ChatWidget } from './components/ChatWidget';
-import { getVehicleRecommendations } from './services/geminiService';
-import { getSellerBadges } from './services/badgeService';
 import CommandPalette from './components/CommandPalette';
-import { getFaqs, saveFaqs } from './services/faqService';
-import { getSupportTickets, saveSupportTickets } from './services/supportTicketService';
-import * as listingService from './services/listingService';
-import * as buyerService from './services/buyerService';
-
+import { ChatWidget } from './components/ChatWidget';
+import { View, User, SupportTicket } from './types';
+import { getConversations, saveConversations } from './services/chatService';
+import { getRatings, getSellerRatings } from './services/ratingService';
+import { saveSettings } from './services/settingsService';
+import { saveAuditLog } from './services/auditLogService';
+import { saveFaqs } from './services/faqService';
+import { saveSupportTickets } from './services/supportTicketService';
+import { loadingManager, LOADING_OPERATIONS, withLoadingTimeout } from './utils/loadingManager';
 
 // Lazy-loaded components
-const Home = lazy(() => import('./components/Home'));
-const VehicleList = lazy(() => import('./components/VehicleList'));
-const VehicleDetail = lazy(() => import('./components/VehicleDetail').then(module => ({ default: module.VehicleDetail })));
-// FIX: The lazy import for Dashboard was failing. Corrected to handle module resolution issue by explicitly returning the default export.
-const Dashboard = lazy(() => import('./components/Dashboard').then(module => ({ default: module.default })));
-const AdminPanel = lazy(() => import('./components/AdminPanel').then(module => ({ default: module.default })));
-const Comparison = lazy(() => import('./components/Comparison'));
-const Profile = lazy(() => import('./components/Profile'));
-const CustomerInbox = lazy(() => import('./components/CustomerInbox'));
-const SellerProfilePage = lazy(() => import('./components/SellerProfilePage'));
-const NewCars = lazy(() => import('./components/NewCars'));
-const DealerProfiles = lazy(() => import('./components/DealerProfiles'));
-const PricingPage = lazy(() => import('./components/PricingPage'));
-const SupportPage = lazy(() => import('./components/SupportPage'));
-const FAQPage = lazy(() => import('./components/FAQPage'));
-const BuyerDashboard = lazy(() => import('./components/BuyerDashboard'));
-// NEW FEATURES: City landing page
-const CityLandingPage = lazy(() => import('./components/CityLandingPage'));
-
-
+const Home = React.lazy(() => import('./components/Home'));
+const VehicleList = React.lazy(() => import('./components/VehicleList'));
+const VehicleDetail = React.lazy(() => import('./components/VehicleDetail').then(module => ({ default: module.VehicleDetail })));
+const Dashboard = React.lazy(() => import('./components/Dashboard').then(module => ({ default: module.default })));
+const AdminPanel = React.lazy(() => import('./components/AdminPanel').then(module => ({ default: module.default })));
+const Comparison = React.lazy(() => import('./components/Comparison'));
+const Profile = React.lazy(() => import('./components/Profile'));
+const CustomerInbox = React.lazy(() => import('./components/CustomerInbox'));
+const SellerProfilePage = React.lazy(() => import('./components/SellerProfilePage'));
+const NewCars = React.lazy(() => import('./components/NewCars'));
+const DealerProfiles = React.lazy(() => import('./components/DealerProfiles'));
+const PricingPage = React.lazy(() => import('./components/PricingPage'));
+const SupportPage = React.lazy(() => import('./components/SupportPage'));
+const FAQPage = React.lazy(() => import('./components/FAQPage'));
+const BuyerDashboard = React.lazy(() => import('./components/BuyerDashboard'));
+const CityLandingPage = React.lazy(() => import('./components/CityLandingPage'));
+const LoginPortal = React.lazy(() => import('./components/LoginPortal'));
+const CustomerLogin = React.lazy(() => import('./CustomerLogin'));
+const AdminLogin = React.lazy(() => import('./AdminLogin'));
+const Login = React.lazy(() => import('./Login'));
+const ForgotPassword = React.lazy(() => import('./components/ForgotPassword'));
 
 const LoadingSpinner: React.FC = () => (
     <div className="min-h-[calc(100vh-140px)] flex items-center justify-center">
@@ -64,198 +47,110 @@ const LoadingSpinner: React.FC = () => (
     </div>
 );
 
+const AppContent: React.FC = () => {
+  const {
+    currentView,
+    selectedVehicle,
+    vehicles,
+    isLoading,
+    currentUser,
+    comparisonList,
+    wishlist,
+    conversations,
+    toasts,
+    activeChat,
+    users,
+    platformSettings,
+    auditLog,
+    vehicleData,
+    faqItems,
+    supportTickets,
+    notifications,
+    forgotPasswordRole,
+    selectedCategory,
+    initialSearchQuery,
+    userLocation,
+    selectedCity,
+    publicSellerProfile,
+    recommendations,
+    removeToast,
+    handleLogout,
+    navigate,
+    addToast,
+    setActiveChat,
+    setIsCommandPaletteOpen,
+    isCommandPaletteOpen,
+    setUserLocation,
+    setCurrentUser,
+    setUsers,
+    setVehicles,
+    setIsLoading,
+    setConversations,
+    setRatings,
+    setSellerRatings,
+    setWishlist,
+    setPlatformSettings,
+    setAuditLog,
+    setVehicleData,
+    setFaqItems,
+    setSupportTickets,
+    setNotifications,
+    setForgotPasswordRole,
+    setPublicSellerProfile,
+    setSelectedVehicle,
+    setPreviousView,
+    setSelectedCategory,
+    setInitialSearchQuery,
+    setRecommendations,
+  } = useApp();
 
-const App: React.FC = () => {
-  const [currentView, setCurrentView] = useState<View>(View.HOME);
-  const [previousView, setPreviousView] = useState<View>(View.HOME);
-  const [selectedVehicle, setSelectedVehicle] = useState<Vehicle | null>(null);
-  const [vehicles, setVehicles] = useState<Vehicle[]>([]);
-  const [isLoading, setIsLoading] = useState<boolean>(true);
-  const [currentUser, setCurrentUser] = useState<User | null>(null);
-  const [comparisonList, setComparisonList] = useState<number[]>([]);
-  const [ratings, setRatings] = useState<{ [key: string]: number[] }>({});
-  const [sellerRatings, setSellerRatings] = useState<{ [key: string]: number[] }>({});
-  const [wishlist, setWishlist] = useState<number[]>([]);
-  const [conversations, setConversations] = useState<Conversation[]>([]);
-  const [toasts, setToasts] = useState<ToastType[]>([]);
-  const [forgotPasswordRole, setForgotPasswordRole] = useState<'customer' | 'seller' | null>(null);
-  const [typingStatus, setTypingStatus] = useState<{ conversationId: string; userRole: 'customer' | 'seller' } | null>(null);
-  const typingTimeoutRef = useRef<number | null>(null);
-  const [selectedCategory, setSelectedCategory] = useState<VehicleCategory | 'ALL'>(CategoryEnum.FOUR_WHEELER);
-  const [publicSellerProfile, setPublicSellerProfile] = useState<User | null>(null);
-  const prevConversationsRef = useRef<Conversation[] | null>(null);
-  const [activeChat, setActiveChat] = useState<Conversation | null>(null);
-  const [isAnnouncementVisible, setIsAnnouncementVisible] = useState(true);
-  const [recommendations, setRecommendations] = useState<Vehicle[]>([]);
-  const [initialSearchQuery, setInitialSearchQuery] = useState<string>('');
-  const [isCommandPaletteOpen, setIsCommandPaletteOpen] = useState(false);
-  const [userLocation, setUserLocation] = useState<string>('Mumbai'); // Default location
-  const [selectedCity, setSelectedCity] = useState<string>(''); // NEW: For city landing pages
-
-  const [users, setUsers] = useState<User[]>([]);
-  
-  const [platformSettings, setPlatformSettings] = useState<PlatformSettings>(() => getSettings());
-  const [auditLog, setAuditLog] = useState<AuditLogEntry[]>(() => getAuditLog());
-  const [vehicleData, setVehicleData] = useState<VehicleData>(() => getVehicleDataSync());
-  const [faqItems, setFaqItems] = useState<FAQItem[]>(() => getFaqs() || []);
-  const [supportTickets, setSupportTickets] = useState<SupportTicket[]>(() => getSupportTickets() || []);
-
-  const addToast = useCallback((message: string, type: ToastType['type']) => {
-    setToasts(prev => [...prev, { id: Date.now(), message, type }]);
-  }, []);
-
-  // Lazy load mock data when needed (reduces initial bundle size)
-  useEffect(() => {
-    const loadMockData = async () => {
-      try {
-        const { MOCK_FAQS, MOCK_SUPPORT_TICKETS } = await import('./constants');
-        if (faqItems.length === 0) {
-          setFaqItems(MOCK_FAQS);
-        }
-        if (supportTickets.length === 0) {
-          setSupportTickets(MOCK_SUPPORT_TICKETS);
-        }
-      } catch (error) {
-        console.error("Failed to load mock data", error);
-      }
-    };
-    if (faqItems.length === 0 || supportTickets.length === 0) {
-      loadMockData();
-    }
-  }, []);
-
-  // Load location from localStorage on initial load
-  useEffect(() => {
-    try {
-      const savedLocation = localStorage.getItem('reRideUserLocation');
-      if (savedLocation) {
-        setUserLocation(savedLocation);
-      }
-    } catch (error) {
-      console.error("Failed to load user location from localStorage", error);
-    }
-  }, []);
-  
+  // Initialize data loading
   useEffect(() => {
     const loadInitialData = async () => {
-        setIsLoading(true);
+        setIsLoading(false);
+        
         try {
-            console.log("Loading initial data...");
-            const [vehiclesData, usersData, vehicleDataFromAPI] = await Promise.all([
-                vehicleService.getVehicles(),
-                userService.getUsers(),
-                getVehicleData()
+            console.log("Loading initial data in background...");
+            
+            // Lazy load services
+            const [vehicleService, userService, vehicleDataService] = await Promise.all([
+                import('./services/vehicleService'),
+                import('./services/userService'),
+                import('./services/vehicleDataService')
             ]);
-            console.log("Successfully loaded data:", { vehicles: vehiclesData.length, users: usersData.length });
+            
+            // Load critical data with timeout protection
+            const [vehiclesData, usersData] = await Promise.all([
+                withLoadingTimeout(LOADING_OPERATIONS.VEHICLES, vehicleService.getVehicles(), 10000),
+                withLoadingTimeout(LOADING_OPERATIONS.USERS, userService.getUsers(), 10000)
+            ]);
+            
+            console.log("Successfully loaded critical data:", { vehicles: vehiclesData.length, users: usersData.length });
             setVehicles(vehiclesData);
             setUsers(usersData);
-            setVehicleData(vehicleDataFromAPI);
+            
+            // Load non-critical data in background
+            vehicleDataService.getVehicleData().then(vehicleDataFromAPI => {
+                setVehicleData(vehicleDataFromAPI);
+                loadingManager.completeLoading(LOADING_OPERATIONS.VEHICLE_DATA);
+            }).catch(error => {
+                console.warn("Failed to load vehicle data:", error);
+                loadingManager.failLoading(LOADING_OPERATIONS.VEHICLE_DATA, error.message);
+            });
+            
         } catch (error) {
             console.error("Failed to load initial data:", error);
-            // The service functions now have built-in fallback, so this should rarely happen
-            // Only show error if both API and local fallback fail
-            addToast("Could not load application data. Please refresh the page.", "error");
-        } finally {
-            setIsLoading(false);
+            console.warn("Using fallback data due to loading error");
         }
     };
 
     loadInitialData();
-  }, [addToast]);
+  }, [setVehicles, setUsers, setIsLoading, setVehicleData]);
 
-  const [notifications, setNotifications] = useState<Notification[]>(() => {
-    try {
-        const notificationsJson = localStorage.getItem('reRideNotifications');
-        return notificationsJson ? JSON.parse(notificationsJson) : [];
-    } catch { return []; }
-  });
-
+  // Load user session
   useEffect(() => {
-    try {
-        localStorage.setItem('reRideNotifications', JSON.stringify(notifications));
-    } catch (error) { console.error("Failed to save notifications", error); }
-  }, [notifications]);
-
-  useEffect(() => {
-    saveFaqs(faqItems);
-  }, [faqItems]);
-
-  useEffect(() => {
-    saveSupportTickets(supportTickets);
-  }, [supportTickets]);
-
-  const addLogEntry = useCallback((action: string, target: string, details?: string) => {
-    if (!currentUser || currentUser.role !== 'admin') return;
-    const newLog = logAction(currentUser.email, action, target, details);
-    setAuditLog(prev => [newLog, ...prev]);
-  }, [currentUser]);
-  
-  const removeToast = useCallback((id: number) => {
-    setToasts(prev => prev.filter(toast => toast.id !== id));
-  }, []);
-  
-  const isHomePage = currentView === View.HOME;
-
-  const logViewedVehicle = (vehicleId: number) => {
-      try {
-          const viewedJson = localStorage.getItem('viewedVehicleIds');
-          let viewedIds: number[] = viewedJson ? JSON.parse(viewedJson) : [];
-          viewedIds = viewedIds.filter(id => id !== vehicleId);
-          viewedIds.unshift(vehicleId);
-          localStorage.setItem('viewedVehicleIds', JSON.stringify(viewedIds.slice(0, 20)));
-      } catch (error) { console.error("Failed to log viewed vehicle:", error); }
-  };
-  
-  const getViewedVehicles = (): number[] => {
-      try {
-          const viewedJson = localStorage.getItem('viewedVehicleIds');
-          return viewedJson ? JSON.parse(viewedJson) : [];
-      } catch (error) {
-          console.error("Failed to get viewed vehicles:", error);
-          return [];
-      }
-  };
-
-  useEffect(() => {
-    const fetchRecommendations = async () => {
-        if (!currentUser) { setRecommendations([]); return; }
-        const viewed = getViewedVehicles();
-        if (viewed.length === 0 && wishlist.length === 0 && comparisonList.length === 0) { setRecommendations([]); return; }
-        const cachedRecs = sessionStorage.getItem('vehicleRecommendations');
-        if (cachedRecs) {
-            const { ids, timestamp } = JSON.parse(cachedRecs);
-            if (Date.now() - timestamp < 1000 * 60 * 30) { // 30 min cache
-                setRecommendations(vehicles.filter(v => ids.includes(v.id)));
-                return;
-            }
-        }
-        const vehicleContext = vehicles.filter(v => v.status === 'published').map(v => ({ id: v.id, make: v.make, model: v.model, year: v.year, price: v.price, features: v.features.slice(0, 5), fuelType: v.fuelType }));
-        const recommendedIds = await getVehicleRecommendations({ viewed, wishlisted: wishlist, compared: comparisonList }, vehicleContext);
-        if (recommendedIds.length > 0) {
-            setRecommendations(vehicles.filter(v => recommendedIds.includes(v.id)));
-            sessionStorage.setItem('vehicleRecommendations', JSON.stringify({ ids: recommendedIds, timestamp: Date.now() }));
-        }
-    };
-    const debounceTimer = setTimeout(fetchRecommendations, 1000);
-    return () => clearTimeout(debounceTimer);
-  }, [currentUser, wishlist, comparisonList, vehicles]);
-
-
-  useEffect(() => {
-    if (isHomePage) document.body.classList.add('homepage-active');
-    else document.body.classList.remove('homepage-active');
-    return () => { document.body.classList.remove('homepage-active'); };
-  }, [isHomePage]);
-
-  useEffect(() => {
-    if (platformSettings.siteAnnouncement) setIsAnnouncementVisible(true);
-  }, [platformSettings.siteAnnouncement]);
-
-  useEffect(() => {
-    // This effect should only run once on initial load
     console.log('🔄 Initial load effect running');
     
-    // Try localStorage first for persistent login, fallback to sessionStorage
     const localUserJson = localStorage.getItem('reRideCurrentUser');
     const sessionUserJson = sessionStorage.getItem('currentUser');
     const userJson = localUserJson || sessionUserJson;
@@ -263,7 +158,6 @@ const App: React.FC = () => {
       const user = JSON.parse(userJson);
       console.log('✅ Restored user from storage:', user.email);
       setCurrentUser(user);
-      // Migrate sessionStorage to localStorage for persistence
       if (!localUserJson && sessionUserJson) {
         localStorage.setItem('reRideCurrentUser', sessionUserJson);
         console.log('🔄 Migrated session to localStorage');
@@ -276,811 +170,392 @@ const App: React.FC = () => {
     if (savedWishlist) setWishlist(JSON.parse(savedWishlist));
     
     const loadedConversations = getConversations();
-    setConversations(loadedConversations.map(c => ({ ...c, isReadByCustomer: c.isReadByCustomer ?? true, messages: c.messages.map(m => ({ ...m, isRead: m.isRead ?? true })), isFlagged: c.isFlagged || false, flagReason: c.flagReason || undefined, flaggedAt: c.flaggedAt || undefined })));
-    
-  }, []); // Run only once on mount
+    setConversations(loadedConversations.map(c => ({ 
+      ...c, 
+      isReadByCustomer: c.isReadByCustomer ?? true, 
+      messages: (c.messages || []).map(m => ({ ...m, isRead: m.isRead ?? true })), 
+      isFlagged: c.isFlagged || false, 
+      flagReason: c.flagReason || undefined, 
+      flaggedAt: c.flaggedAt || undefined 
+    })));
+  }, [setCurrentUser, setWishlist, setConversations]);
+
+  // Load ratings
+  useEffect(() => {
+    setRatings(getRatings());
+    setSellerRatings(getSellerRatings());
+  }, [setRatings, setSellerRatings]);
+
+  // Save data when it changes
+   useEffect(() => {
+    saveConversations(conversations);
+  }, [conversations]);
+
+  useEffect(() => {
+    saveSettings(platformSettings);
+  }, [platformSettings]);
+
+  useEffect(() => {
+    saveAuditLog(auditLog);
+  }, [auditLog]);
+
+  useEffect(() => {
+    saveFaqs(faqItems);
+  }, [faqItems]);
   
-  // Handle seller profile URL parameter separately
+  useEffect(() => {
+    saveSupportTickets(supportTickets);
+  }, [supportTickets]);
+
+  useEffect(() => {
+    try {
+      localStorage.setItem('reRideNotifications', JSON.stringify(notifications));
+    } catch (error) {
+      console.error("Failed to save notifications", error); 
+    }
+  }, [notifications]);
+
+  // Handle seller profile URL parameter
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
     const sellerEmail = urlParams.get('seller');
     if (sellerEmail && users.length > 0) {
-        const sellerUser = users.find(u => u.email === sellerEmail && u.role === 'seller');
-        if (sellerUser) {
-            setPublicSellerProfile(sellerUser);
-            setCurrentView(View.SELLER_PROFILE);
-        } else {
-            addToast('Seller profile not found.', 'error');
-            window.history.pushState({}, '', window.location.pathname);
-        }
+      const sellerUser = users.find(u => u.email === sellerEmail && u.role === 'seller');
+      if (sellerUser) {
+        setPublicSellerProfile(sellerUser);
+        navigate(View.SELLER_PROFILE);
+    } else {
+        addToast('Seller profile not found.', 'error');
+        window.history.pushState({}, '', window.location.pathname);
+      }
     }
-  }, [addToast, users]);
-  
-   useEffect(() => {
-    const handleKeyDown = (event: KeyboardEvent) => { if ((event.metaKey || event.ctrlKey) && event.key === 'k') { event.preventDefault(); setIsCommandPaletteOpen(prev => !prev); }};
+  }, [addToast, users, setPublicSellerProfile, navigate]);
+
+  // Handle keyboard shortcuts
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => { 
+      if ((event.metaKey || event.ctrlKey) && event.key === 'k') { 
+        event.preventDefault(); 
+        setIsCommandPaletteOpen(prev => !prev); 
+      }
+    };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, []);
-
-  const handleLogout = useCallback(() => {
-    setCurrentUser(null);
-    sessionStorage.removeItem('currentUser');
-    localStorage.removeItem('reRideCurrentUser');
-    setCurrentView(View.HOME);
-    setActiveChat(null);
-    addToast('You have been logged out.', 'info');
-  }, [addToast]);
-
-  useEffect(() => {
-    // Don't run this watchdog effect until users have loaded
-    // This prevents logging out users during the initial load
-    if (isLoading) {
-        console.log('⏳ Skipping user watchdog - still loading users');
-        return;
-    }
-    
-    if (currentUser) {
-        console.log('👀 User watchdog checking:', currentUser.email);
-        const updatedUserInState = users.find(u => u.email === currentUser.email);
-        
-        if (updatedUserInState && JSON.stringify(updatedUserInState) !== JSON.stringify(currentUser)) {
-            console.log('🔄 Syncing user state with updated data');
-            setCurrentUser(updatedUserInState);
-            const userJson = JSON.stringify(updatedUserInState);
-            sessionStorage.setItem('currentUser', userJson);
-            localStorage.setItem('reRideCurrentUser', userJson);
-        }
-        
-        // Don't logout users with hardcoded test credentials
-        const testEmails = ['admin@test.com', 'seller@test.com', 'customer@test.com'];
-        const isTestUser = testEmails.includes(currentUser.email);
-        
-        if (!updatedUserInState) {
-            console.log('⚠️ User not found in users array:', currentUser.email);
-        }
-        
-        // Only logout if user is not a test user AND (not found in users list OR is inactive)
-        if (!isTestUser && (!updatedUserInState || updatedUserInState.status === 'inactive')) {
-            console.log('❌ Logging out user:', currentUser.email, 'Reason:', !updatedUserInState ? 'not found' : 'inactive');
-            handleLogout();
-            if (updatedUserInState?.status === 'inactive') addToast("Your account has been deactivated by an administrator.", "error");
-        } else {
-            console.log('✅ User validated successfully');
-        }
-    }
-  }, [users, currentUser, handleLogout, addToast, isLoading]);
-
-  useEffect(() => {
-    if (!prevConversationsRef.current || !currentUser) { prevConversationsRef.current = conversations; return; }
-    conversations.forEach(currentConv => {
-      const prevConv = prevConversationsRef.current!.find(p => p.id === currentConv.id);
-      if (prevConv && currentConv.messages.length > prevConv.messages.length) {
-        const lastMessage = currentConv.messages[currentConv.messages.length - 1];
-        const isRecipient = (currentUser.role === 'customer' && lastMessage.sender === 'seller') || (currentUser.role === 'seller' && lastMessage.sender === 'user');
-        if (isRecipient && activeChat?.id !== currentConv.id) {
-          const senderName = currentUser.role === 'customer' ? users.find(u => u.email === currentConv.sellerId)?.name || 'The Seller' : currentConv.customerName;
-          showNotification(`New message from ${senderName}`, { body: lastMessage.text.length > 100 ? `${lastMessage.text.substring(0, 97)}...` : lastMessage.text, icon: `data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🚗</text></svg>` });
-        }
-      }
-    });
-    prevConversationsRef.current = conversations;
-  }, [conversations, currentUser, users, activeChat]);
-
-  useEffect(() => {
-    setRatings(getRatings());
-    setSellerRatings(getSellerRatings());
-  }, []);
-  
-  useEffect(() => {
-    saveConversations(conversations);
-    if(activeChat){
-      const updatedChat = conversations.find(c => c.id === activeChat.id);
-      if(updatedChat) setActiveChat(updatedChat);
-    }
-  }, [conversations, activeChat]);
-
-  useEffect(() => { saveSettings(platformSettings); }, [platformSettings]);
-  useEffect(() => { saveAuditLog(auditLog); }, [auditLog]);
-
-  const handleAddSellerRating = useCallback((sellerEmail: string, rating: number) => {
-    addSellerRating(sellerEmail, rating);
-    setSellerRatings(prevRatings => {
-        const newRatings = { ...prevRatings };
-        const sellerRatingsList = newRatings[sellerEmail] || [];
-        newRatings[sellerEmail] = [...sellerRatingsList, rating];
-        return newRatings;
-    });
-    addToast('Thank you for rating the seller!', 'success');
-  }, [addToast]);
-
-  const handleToggleWishlist = useCallback((vehicleId: number) => {
-    setWishlist(prev => {
-      const isAdding = !prev.includes(vehicleId);
-      const newWishlist = isAdding ? [...prev, vehicleId] : prev.filter(id => id !== vehicleId);
-      localStorage.setItem('wishlist', JSON.stringify(newWishlist));
-      addToast(isAdding ? 'Added to wishlist!' : 'Removed from wishlist.', 'info');
-      return newWishlist;
-    });
-  }, [addToast]);
-
-  const handleUserTyping = useCallback((conversationId: string, userRole: 'customer' | 'seller') => {
-    if (typingTimeoutRef.current) clearTimeout(typingTimeoutRef.current);
-    setTypingStatus({ conversationId, userRole });
-    typingTimeoutRef.current = window.setTimeout(() => { setTypingStatus(null); }, 2000);
-  }, []);
-
-  const handleMarkMessagesAsRead = useCallback((conversationId: string, readerRole: 'customer' | 'seller') => {
-    setConversations(prev => prev.map(conv => {
-            if (conv.id === conversationId) {
-                const updatedMessages = conv.messages.map(msg => {
-                    const readerSenderType = readerRole === 'customer' ? 'user' : 'seller';
-                    if (msg.sender !== readerSenderType && msg.sender !== 'system' && !msg.isRead) return { ...msg, isRead: true };
-                    return msg;
-                });
-                return { ...conv, messages: updatedMessages };
-            }
-            return conv;
-        })
-    );
-  }, []);
-
-  const handleStartChat = useCallback((vehicle: Vehicle) => {
-    if (!currentUser || currentUser.role !== 'customer') { addToast('Please log in as a customer to start a chat.', 'info'); navigate(View.CUSTOMER_LOGIN); return; }
-    const conversationId = `${currentUser.email}-${vehicle.id}`;
-    const existingConversation = conversations.find(c => c.id === conversationId);
-    if (existingConversation) setActiveChat(existingConversation);
-    else {
-        const placeholder: Conversation = { id: conversationId, customerId: currentUser.email, customerName: currentUser.name, sellerId: vehicle.sellerEmail, vehicleId: vehicle.id, vehicleName: `${vehicle.year} ${vehicle.make} ${vehicle.model} ${vehicle.variant || ''}`.trim(), vehiclePrice: vehicle.price, messages: [], lastMessageAt: new Date().toISOString(), isReadBySeller: false, isReadByCustomer: true };
-        setActiveChat(placeholder);
-    }
-  }, [currentUser, conversations, addToast]);
-
-  const handleCustomerSendMessage = useCallback((vehicleId: number, messageText: string, type: ChatMessage['type'] = 'text', payload?: ChatMessage['payload']) => {
-    if (!currentUser || currentUser.role !== 'customer') return;
-    const vehicle = vehicles.find(v => v.id === vehicleId);
-    if (!vehicle) { addToast("Could not find vehicle details.", "error"); return; }
-    
-    setVehicles(prev => prev.map(v => v.id === vehicleId ? { ...v, inquiriesCount: (v.inquiriesCount || 0) + 1 } : v));
-    const conversationId = `${currentUser.email}-${vehicle.id}`;
-    const userMessage: ChatMessage = { id: Date.now(), sender: 'user', text: messageText, timestamp: new Date().toISOString(), isRead: false, type, payload };
-    setConversations(prev => {
-        const existingConversationIndex = prev.findIndex(c => c.id === conversationId);
-        if (existingConversationIndex > -1) {
-            const updatedConversations = [...prev];
-            updatedConversations[existingConversationIndex] = { ...updatedConversations[existingConversationIndex], messages: [...updatedConversations[existingConversationIndex].messages, userMessage], lastMessageAt: userMessage.timestamp, isReadBySeller: false, isReadByCustomer: true };
-            return updatedConversations;
-        } else {
-            const newConversation: Conversation = { id: conversationId, customerId: currentUser.email, customerName: currentUser.name, sellerId: vehicle.sellerEmail, vehicleId: vehicle.id, vehicleName: `${vehicle.year} ${vehicle.make} ${vehicle.model} ${vehicle.variant || ''}`.trim(), vehiclePrice: vehicle.price, messages: [userMessage], lastMessageAt: userMessage.timestamp, isReadBySeller: false, isReadByCustomer: true };
-            return [...prev, newConversation];
-        }
-    });
-  }, [currentUser, vehicles, addToast]);
-  
-  const handleSellerSendMessage = useCallback((conversationId: string, messageText: string, type: ChatMessage['type'] = 'text', payload?: ChatMessage['payload']) => {
-    if (!currentUser || currentUser.role !== 'seller') return;
-    setConversations(prev => prev.map(conv => {
-        if (conv.id === conversationId) {
-            const sellerMessage: ChatMessage = { id: Date.now(), sender: 'seller', text: messageText, timestamp: new Date().toISOString(), isRead: false, type, payload };
-            return { ...conv, messages: [...conv.messages, sellerMessage], lastMessageAt: sellerMessage.timestamp, isReadByCustomer: false };
-        }
-        return conv;
-    }));
-  }, [currentUser]);
-
-  const handleOfferResponse = useCallback((conversationId: string, messageId: number, response: 'accepted' | 'rejected' | 'countered', counterPrice?: number) => {
-    setConversations(prevConvs => prevConvs.map(conv => {
-        if (conv.id !== conversationId) return conv;
-        const msgIndex = conv.messages.findIndex(m => m.id === messageId);
-        if (msgIndex === -1) return conv;
-        
-        const updatedMessages = [...conv.messages];
-        const originalMessage = { ...updatedMessages[msgIndex] };
-        if (!originalMessage.payload) return conv;
-        originalMessage.payload.status = response;
-        updatedMessages[msgIndex] = originalMessage;
-
-        const now = new Date().toISOString();
-        if (response === 'countered' && counterPrice && currentUser) {
-            updatedMessages.push({ id: Date.now(), sender: currentUser.role === 'customer' ? 'user' : 'seller', text: `Counter-offer: ${counterPrice}`, timestamp: now, isRead: false, type: 'offer', payload: { offerPrice: counterPrice, counterPrice: originalMessage.payload.offerPrice, status: 'pending' } });
-        } else {
-            updatedMessages.push({ id: Date.now(), sender: 'system', text: `Offer ${response}.`, timestamp: now, isRead: false });
-        }
-
-        return { ...conv, messages: updatedMessages, lastMessageAt: now, isReadBySeller: currentUser?.role === 'customer' ? false : conv.isReadBySeller, isReadByCustomer: currentUser?.role === 'seller' ? false : conv.isReadByCustomer };
-    }));
-  }, [currentUser]);
-  
-  const handleMarkConversationAsReadBySeller = useCallback((conversationId: string) => { setConversations(prev => prev.map(c => c.id === conversationId && !c.isReadBySeller ? { ...c, isReadBySeller: true } : c)); }, []);
-  const handleMarkConversationAsReadByCustomer = useCallback((conversationId: string) => { setConversations(prev => prev.map(c => c.id === conversationId && !c.isReadByCustomer ? { ...c, isReadByCustomer: true } : c)); }, []);
-
-  const usersWithRatingsAndBadges = useMemo(() => users.map(user => {
-      if (user.role !== 'seller') return user;
-      const sellerRatingsList = sellerRatings[user.email] || [];
-      const ratingCount = sellerRatingsList.length;
-      const averageRating = ratingCount > 0 ? sellerRatingsList.reduce((acc, curr) => acc + curr, 0) / ratingCount : 0;
-      const allSellerVehicles = vehicles.filter(v => v.sellerEmail === user.email);
-      const badges: Badge[] = getSellerBadges({ ...user, averageRating, ratingCount }, allSellerVehicles);
-      return { ...user, averageRating, ratingCount, badges };
-  }), [users, sellerRatings, vehicles]);
-
-  const vehiclesWithRatings = useMemo(() => vehicles.map(vehicle => {
-      const vehicleRatings = ratings[vehicle.id] || [];
-      const ratingCount = vehicleRatings.length;
-      const averageRating = ratingCount > 0 ? vehicleRatings.reduce((acc, curr) => acc + curr, 0) / ratingCount : 0;
-      const seller = usersWithRatingsAndBadges.find(u => u.email === vehicle.sellerEmail);
-      return { ...vehicle, averageRating, ratingCount, sellerName: seller?.dealershipName || seller?.name || 'Private Seller', sellerAverageRating: seller?.averageRating, sellerRatingCount: seller?.ratingCount, sellerBadges: seller?.badges };
-  }), [vehicles, ratings, usersWithRatingsAndBadges]);
-  
-  const handleAddVehicle = useCallback(async (vehicleData: Omit<Vehicle, 'id' | 'averageRating' | 'ratingCount'>, isFeaturing: boolean) => {
-    console.log('🚗 handleAddVehicle called with vehicleData:', vehicleData);
-    
-    if (!currentUser || currentUser.role !== 'seller') { 
-      console.error('❌ User not logged in as seller:', currentUser);
-      addToast('You must be logged in as a seller.', 'error'); 
-      return; 
-    }
-    
-    // Validate required fields
-    if (!vehicleData.sellerEmail) {
-      console.error('❌ Missing sellerEmail, using currentUser.email:', currentUser.email);
-      vehicleData.sellerEmail = currentUser.email;
-    }
-    
-    if (!vehicleData.make || !vehicleData.model) {
-      console.error('❌ Missing required fields:', { make: vehicleData.make, model: vehicleData.model });
-      addToast('Please fill in all required fields (Make, Model)', 'error');
-      return;
-    }
-    
-    if (vehicleData.price <= 0) {
-      console.error('❌ Invalid price:', vehicleData.price);
-      addToast('Please enter a valid price greater than 0', 'error');
-      return;
-    }
-    
-    if (isFeaturing && (currentUser.featuredCredits || 0) <= 0) { 
-      console.warn('⚠️ No featured credits, listing as regular');
-      addToast('You have no featured credits left.', 'error'); 
-      isFeaturing = false; 
-    }
-    
-    // Lazy load placeholder helper if images are missing
-    let images = vehicleData.images && vehicleData.images.length > 0 ? vehicleData.images : [];
-    if (images.length === 0) {
-      const { getPlaceholderImage } = await import('./components/vehicleData');
-      images = [getPlaceholderImage(vehicleData.make, vehicleData.model), getPlaceholderImage(vehicleData.make, `${vehicleData.model}-2`)];
-    }
-    
-    const newVehicle: Vehicle = { 
-      ...vehicleData, 
-      id: Date.now(), 
-      images, 
-      sellerEmail: vehicleData.sellerEmail || currentUser.email, // Double-check seller email
-      status: 'published', 
-      isFeatured: isFeaturing, 
-      views: 0, 
-      inquiriesCount: 0, 
-      certificationStatus: 'none' 
-    };
-    
-    console.log('✅ Vehicle object to be saved:', newVehicle);
-
-    try {
-        console.log('📡 Calling vehicleService.addVehicle...');
-        const addedVehicle = await vehicleService.addVehicle(newVehicle);
-        console.log('✅ Vehicle added successfully:', addedVehicle);
-        
-        setVehicles(prev => [addedVehicle, ...prev]);
-        
-        if (isFeaturing) {
-            const updatedUser = { ...currentUser, featuredCredits: (currentUser.featuredCredits || 0) - 1 };
-            const savedUser = await userService.updateUser(updatedUser);
-            // Update both users state and currentUser to prevent logout
-            setUsers(prev => prev.map(u => u.email === currentUser.email ? savedUser : u));
-            setCurrentUser(savedUser);
-            // Sync to both storage locations
-            const userJson = JSON.stringify(savedUser);
-            sessionStorage.setItem('currentUser', userJson);
-            localStorage.setItem('reRideCurrentUser', userJson);
-        }
-        addToast(`Vehicle listed successfully!${isFeaturing ? ' It has been featured.' : ''}`, 'success');
-    } catch (error) {
-        console.error("❌ Failed to add vehicle:", error);
-        if (error instanceof Error) {
-          console.error('Error details:', {
-            message: error.message,
-            stack: error.stack
-          });
-        }
-        addToast(`Error: ${error instanceof Error ? error.message : 'Could not add vehicle.'}`, 'error');
-    }
-  }, [currentUser, addToast]);
-
-  const handleAddMultipleVehicles = useCallback(async (newVehiclesData: Omit<Vehicle, 'id' | 'averageRating' | 'ratingCount'>[]) => {
-    if (!currentUser || currentUser.role !== 'seller') { addToast('You must be logged in as a seller.', 'error'); return; }
-    
-    try {
-        const addedVehicles: Vehicle[] = [];
-        for (const vehicleData of newVehiclesData) {
-            const newVehicle: Vehicle = { ...vehicleData, id: Date.now() + Math.random(), status: 'published', isFeatured: false, views: 0, inquiriesCount: 0, certificationStatus: 'none' };
-            const added = await vehicleService.addVehicle(newVehicle);
-            addedVehicles.push(added);
-        }
-        setVehicles(prev => [...addedVehicles, ...prev]);
-        addToast(`${addedVehicles.length} vehicles listed successfully via bulk upload!`, 'success');
-    } catch (error) {
-        console.error("Failed to add multiple vehicles:", error);
-        addToast(`Error: ${error instanceof Error ? error.message : 'Could not add vehicles.'}`, 'error');
-    }
-  }, [addToast, currentUser]);
-  
-  const handleUpdateVehicle = useCallback(async (updatedVehicle: Vehicle, showToast: boolean = true) => {
-    try {
-        const result = await vehicleService.updateVehicle(updatedVehicle);
-        setVehicles(prev => prev.map(v => v.id === result.id ? result : v));
-        addLogEntry('Updated Vehicle', String(result.id), `${result.year} ${result.make} ${result.model}`);
-        if (showToast) {
-            addToast('Vehicle updated successfully!', 'success');
-        }
-    } catch (error) {
-        console.error("Failed to update vehicle:", error);
-        addToast(`Error: ${error instanceof Error ? error.message : 'Could not update vehicle.'}`, 'error');
-    }
-  }, [addLogEntry, addToast]);
-
-  const handleDeleteVehicle = useCallback(async (vehicleId: number) => {
-    if(window.confirm('Are you sure you want to delete this vehicle listing? This action cannot be undone.')){
-        try {
-            await vehicleService.deleteVehicle(vehicleId);
-            const vehicle = vehicles.find(v => v.id === vehicleId);
-            if (vehicle) addLogEntry('Deleted Vehicle', String(vehicleId), `${vehicle.year} ${vehicle.make} ${vehicle.model}`);
-            setVehicles(prev => prev.filter(v => v.id !== vehicleId));
-            addToast('Vehicle listing has been deleted.', 'info');
-        } catch(error) {
-            console.error("Failed to delete vehicle:", error);
-            addToast(`Error: ${error instanceof Error ? error.message : 'Could not delete vehicle.'}`, 'error');
-        }
-    }
-  }, [vehicles, addLogEntry, addToast]);
-
-  const handleMarkAsSold = useCallback(async (vehicleId: number) => {
-    const vehicle = vehicles.find(v => v.id === vehicleId);
-    if (!vehicle) return;
-    await handleUpdateVehicle({ ...vehicle, status: 'sold' });
-    addToast('Vehicle marked as sold!', 'success');
-  }, [vehicles, handleUpdateVehicle, addToast]);
-
-  const handleToggleVehicleStatus = useCallback(async (vehicleId: number) => {
-    const vehicle = vehicles.find(v => v.id === vehicleId);
-    if (!vehicle) return;
-    const newStatus = vehicle.status === 'published' ? 'unpublished' : 'published';
-    await handleUpdateVehicle({ ...vehicle, status: newStatus });
-  }, [vehicles, handleUpdateVehicle]);
-
-  const handleToggleVehicleFeature = useCallback(async (vehicleId: number) => {
-    const vehicle = vehicles.find(v => v.id === vehicleId);
-    if (!vehicle) return;
-    const newIsFeatured = !vehicle.isFeatured;
-    await handleUpdateVehicle({ ...vehicle, isFeatured: newIsFeatured });
-  }, [vehicles, handleUpdateVehicle]);
-  
-  const handleFeatureListing = useCallback(async (vehicleId: number) => {
-    if (!currentUser || currentUser.role !== 'seller' || (currentUser.featuredCredits || 0) <= 0) {
-        addToast('You have no featured credits left.', 'error');
-        return;
-    }
-    const vehicle = vehicles.find(v => v.id === vehicleId);
-    if (!vehicle) return;
-
-    try {
-        const updatedUser = { ...currentUser, featuredCredits: (currentUser.featuredCredits || 0) - 1 };
-        const savedUser = await userService.updateUser(updatedUser);
-        await handleUpdateVehicle({ ...vehicle, isFeatured: true });
-        // Update all state and storage to prevent logout
-        setUsers(prev => prev.map(u => u.email === currentUser.email ? savedUser : u));
-        setCurrentUser(savedUser);
-        const userJson = JSON.stringify(savedUser);
-        sessionStorage.setItem('currentUser', userJson);
-        localStorage.setItem('reRideCurrentUser', userJson);
-        addToast('Listing successfully featured!', 'success');
-    } catch(error) {
-        addToast('Failed to feature listing.', 'error');
-    }
-  }, [currentUser, vehicles, handleUpdateVehicle, addToast]);
-
-  const handleRequestCertification = useCallback(async (vehicleId: number) => {
-    const vehicle = vehicles.find(v => v.id === vehicleId);
-    if (!vehicle) return;
-    await handleUpdateVehicle({ ...vehicle, certificationStatus: 'requested' });
-    addToast('Certification requested. An admin will review it shortly.', 'info');
-    // Notification logic remains client-side for now as there's no backend for it
-  }, [vehicles, handleUpdateVehicle, addToast]);
-
-  const handleCertificationApproval = useCallback(async (vehicleId: number, decision: 'approved' | 'rejected') => {
-    const vehicle = vehicles.find(v => v.id === vehicleId);
-    if (!vehicle) return;
-    // This function will likely need more backend logic for billing/credit deduction
-    let updatedVehicle = { ...vehicle, certificationStatus: decision };
-    if (decision === 'approved') {
-        updatedVehicle.certifiedInspection = { reportId: `RR-CERT-${Date.now()}-${vehicleId}`, summary: 'Passed comprehensive inspection.', date: new Date().toISOString(), inspector: 'ReRide Admin', scores: {}, details: {} };
-    } else {
-        updatedVehicle.certifiedInspection = null;
-    }
-    await handleUpdateVehicle(updatedVehicle);
-  }, [vehicles, handleUpdateVehicle]);
-
-  const handleToggleCompare = useCallback((vehicleId: number) => {
-    setComparisonList(prev => {
-      if (!prev.includes(vehicleId) && prev.length >= 4) { addToast("You can only compare up to 4 vehicles.", 'error'); return prev; }
-      return prev.includes(vehicleId) ? prev.filter(id => id !== vehicleId) : [...prev, vehicleId];
-    });
-  }, [addToast]);
-
-  const handleClearCompare = useCallback(() => setComparisonList([]), []);
-  const handleSelectVehicle = useCallback((vehicle: Vehicle) => {
-    logViewedVehicle(vehicle.id);
-    // Track for buyer activity
-    if (currentUser && currentUser.role === 'customer') {
-      buyerService.addToRecentlyViewed(currentUser.email, vehicle.id);
-    }
-    setSelectedVehicle(vehicle);
-    setCurrentView(View.DETAIL);
-    // Suppress toast for view tracking
-    handleUpdateVehicle({ ...vehicle, views: (vehicle.views || 0) + 1 }, false);
-  }, [handleUpdateVehicle, currentUser]);
-  const handleBackToHome = useCallback(() => { setSelectedVehicle(null); setCurrentView(View.HOME); }, []);
-
-  // NEW: Handle phone view tracking
-  const handlePhoneView = useCallback((vehicleId: number) => {
-    listingService.trackPhoneView(vehicleId);
-    const vehicle = vehicles.find(v => v.id === vehicleId);
-    if (vehicle) {
-      // Suppress toast for view tracking
-      handleUpdateVehicle({ ...vehicle, phoneViews: (vehicle.phoneViews || 0) + 1 }, false);
-    }
-  }, [vehicles, handleUpdateVehicle]);
-
-  const loginUser = useCallback((user: User) => {
-      setCurrentUser(user);
-      const userJson = JSON.stringify(user);
-      sessionStorage.setItem('currentUser', userJson);
-      localStorage.setItem('reRideCurrentUser', userJson);
-      const firstName = user.name ? user.name.split(' ')[0] : 'there';
-      addToast(`Welcome back, ${firstName}!`, 'success');
-  }, [addToast]);
-
-  const handleSellerLogin = useCallback((user: User) => { loginUser(user); setCurrentView(View.SELLER_DASHBOARD); }, [loginUser]);
-  const handleCustomerLogin = useCallback((user: User) => { loginUser(user); setCurrentView(View.HOME); }, [loginUser]);
-  const handleAdminLogin = useCallback((user: User) => { loginUser(user); setCurrentView(View.ADMIN_PANEL); }, [loginUser]);
-  
-  const handleSellerRegister = useCallback((user: User) => {
-    setUsers(prev => [...prev, user]);
-    loginUser(user);
-    setCurrentView(View.SELLER_DASHBOARD);
-    addToast('Registration successful!', 'success');
-  }, [loginUser, addToast]);
-
-  const handleCustomerRegister = useCallback((user: User) => {
-    setUsers(prev => [...prev, user]);
-    loginUser(user);
-    setCurrentView(View.HOME);
-    addToast('Registration successful!', 'success');
-  }, [loginUser, addToast]);
-  
-  const handleToggleUserStatus = useCallback(async (userEmail: string) => {
-    const user = users.find(u => u.email === userEmail);
-    if (!user) return;
-    try {
-        const newStatus = user.status === 'active' ? 'inactive' : 'active';
-        await userService.updateUser({ email: userEmail, status: newStatus });
-        setUsers(prev => prev.map(u => u.email === userEmail ? { ...u, status: newStatus } : u));
-        addToast(`User has been ${newStatus}.`, 'success');
-    } catch (error) {
-        addToast('Failed to update user status.', 'error');
-    }
-  }, [users, addToast]);
-  
-  const handleDeleteUser = useCallback(async (userEmail: string) => {
-    if (window.confirm('Are you sure you want to permanently delete this user?')) {
-        try {
-            await userService.deleteUser(userEmail);
-            setUsers(prev => prev.filter(user => user.email !== userEmail));
-            setVehicles(prev => prev.filter(v => v.sellerEmail !== userEmail));
-            addToast('User deleted.', 'info');
-        } catch(error) {
-            addToast('Failed to delete user.', 'error');
-        }
-    }
-  }, [addToast]);
-
-  const handleAdminUpdateUser = useCallback(async (email: string, details: Partial<User>) => {
-    try {
-        await userService.updateUser({ email, ...details });
-        setUsers(prev => prev.map(u => u.email === email ? { ...u, ...details } : u));
-        addToast("User updated.", "success");
-    } catch(error) {
-        addToast('Failed to update user.', 'error');
-    }
-  }, [addToast]);
-
-  const handleUpdateUserPlan = useCallback(async (email: string, plan: SubscriptionPlan) => {
-    try {
-        await userService.updateUser({ email, subscriptionPlan: plan });
-        setUsers(prev => prev.map(u => u.email === email ? { ...u, subscriptionPlan: plan } : u));
-        addToast("User plan updated.", "success");
-    } catch(error) {
-        addToast('Failed to update user plan.', 'error');
-    }
-  }, [addToast]);
-
-  const handleUpdateUserProfile = useCallback(async (updatedDetails: { name: string; mobile: string; avatarUrl?: string }) => {
-    if (!currentUser) return;
-    try {
-        const updatedUser = await userService.updateUser({ email: currentUser.email, ...updatedDetails });
-        if (updatedUser) {
-            // Update all state and storage to prevent logout
-            setUsers(prev => prev.map(u => u.email === currentUser.email ? updatedUser : u));
-            setCurrentUser(updatedUser);
-            const userJson = JSON.stringify(updatedUser);
-            sessionStorage.setItem('currentUser', userJson);
-            localStorage.setItem('reRideCurrentUser', userJson);
-            addToast('Profile updated!', 'success');
-        } else {
-            throw new Error('Failed to retrieve updated user profile from server.');
-        }
-    } catch(error) {
-        addToast(error instanceof Error ? error.message : 'Failed to update profile.', 'error');
-    }
-  }, [currentUser, addToast]);
-  
-  const handleUpdateSellerProfile = useCallback(async (updatedDetails: { dealershipName: string; bio: string; logoUrl: string; }) => {
-     if (!currentUser) return;
-     try {
-        const updatedUser = await userService.updateUser({ email: currentUser.email, ...updatedDetails });
-        if (updatedUser) {
-            // Update all state and storage to prevent logout
-            setUsers(prev => prev.map(u => u.email === currentUser.email ? updatedUser : u));
-            setCurrentUser(updatedUser);
-            const userJson = JSON.stringify(updatedUser);
-            sessionStorage.setItem('currentUser', userJson);
-            localStorage.setItem('reRideCurrentUser', userJson);
-            addToast('Seller profile updated!', 'success');
-        } else {
-             throw new Error('Failed to retrieve updated seller profile from server.');
-        }
-     } catch(error) {
-        addToast(error instanceof Error ? error.message : 'Failed to update profile.', 'error');
-     }
-  }, [currentUser, addToast]);
-
-  const handleUpdateUserPassword = useCallback(async (passwords: { current: string; new: string; }): Promise<boolean> => {
-    if (!currentUser) return false;
-    // Password change requires special handling on the backend, not implemented in this simplified API
-    addToast('Password change functionality not fully implemented.', 'info');
-    return false;
-  }, [currentUser, addToast]);
-
-  const handleForgotPasswordRequest = useCallback((email: string) => { console.log(`Password reset for ${email} as a ${forgotPasswordRole}.`); }, [forgotPasswordRole]);
-
-  const handleFlagContent = useCallback((type: 'vehicle' | 'conversation', id: number | string, reason: string) => {
-    addToast('Content has been reported for review. Thank you.', 'info');
-    // This would ideally be a backend call
-  }, [addToast]);
-
-  const handleResolveFlag = useCallback(async (type: 'vehicle' | 'conversation', id: number | string) => {
-      addToast('Flag has been resolved.', 'success');
-      // This would ideally be a backend call
-  }, [addToast]);
-
-  const handleAdminUpdateSettings = useCallback((newSettings: PlatformSettings) => { setPlatformSettings(newSettings); addToast('Platform settings updated.', 'success'); }, []);
-  const handleAdminSendBroadcast = useCallback((message: string) => { addToast('Broadcast message sent.', 'success'); }, []);
-  const getFormattedDate = useCallback(() => new Date().toISOString().split('T')[0], []);
-
-  const handleExportUsers = useCallback(() => exportToCsv(`users_${getFormattedDate()}.csv`, users.map(({ password, ...rest }) => rest)), [users, getFormattedDate]);
-  const handleExportVehicles = useCallback(() => exportToCsv(`vehicles_${getFormattedDate()}.csv`, vehicles), [vehicles, getFormattedDate]);
-  const handleExportSales = useCallback(() => {
-    const salesData = vehicles.filter(v => v.status === 'sold');
-    if (salesData.length > 0) exportToCsv(`sales_${getFormattedDate()}.csv`, salesData);
-    else addToast("No sales data to export.", 'info');
-  }, [vehicles, addToast, getFormattedDate]);
-
-  const handleUpdateVehicleData = useCallback(async (newData: VehicleData) => { 
-    setVehicleData(newData); 
-    const success = await saveVehicleData(newData); 
-    if (success) {
-      addToast('Vehicle data updated successfully!', 'success'); 
-    } else {
-      addToast('Vehicle data saved locally. API update failed.', 'info');
-    }
-  }, [addToast]);
-  
-  const handleToggleVerifiedStatus = useCallback(async (userEmail: string) => {
-    const user = users.find(u => u.email === userEmail);
-    if (!user) return;
-    try {
-        const newIsVerified = !user.isVerified;
-        await userService.updateUser({ email: userEmail, isVerified: newIsVerified });
-        setUsers(prev => prev.map(u => u.email === userEmail ? { ...u, isVerified: newIsVerified } : u));
-        addToast(`Seller has been ${newIsVerified ? 'verified' : 'un-verified'}.`, 'info');
-    } catch (error) {
-        addToast('Failed to update verification status.', 'error');
-    }
-  }, [users, addToast]);
-  
-  const handlePlanChange = useCallback(async (planId: SubscriptionPlan) => {
-      if (!currentUser || currentUser.role !== 'seller') return;
-      
-      // Lazy load plan details and payment service
-      const { PLAN_DETAILS } = await import('./constants');
-      const { createPaymentRequest } = await import('./services/paymentService');
-      const planDetails = PLAN_DETAILS[planId];
-      
-      // For free plan - immediate upgrade
-      if (planId === 'free') {
-        try {
-          const updatedUser = { ...currentUser, subscriptionPlan: planId };
-          const savedUser = await userService.updateUser(updatedUser);
-          // Update all state and storage to prevent logout
-          setUsers(prev => prev.map(u => u.email === currentUser.email ? savedUser : u));
-          setCurrentUser(savedUser);
-          const userJson = JSON.stringify(savedUser);
-          sessionStorage.setItem('currentUser', userJson);
-          localStorage.setItem('reRideCurrentUser', userJson);
-          addToast(`Successfully switched to the ${planDetails.name} plan!`, 'success');
-          setCurrentView(View.SELLER_DASHBOARD);
-        } catch(error) {
-          addToast('Failed to switch plan.', 'error');
-        }
-        return;
-      }
-      
-      // For paid plans - create payment request
-      try {
-        await createPaymentRequest(currentUser.email, planId, planDetails.price);
-        addToast(`Payment request submitted for ${planDetails.name} plan (₹${planDetails.price.toLocaleString('en-IN')}/month). Your plan will be activated after admin approval.`, 'info');
-        setCurrentView(View.SELLER_DASHBOARD);
-      } catch(error) {
-        addToast('Failed to submit payment request. Please try again.', 'error');
-      }
-  }, [currentUser, addToast]);
-
-  const navigate = useCallback((view: View, params?: { city?: string }) => {
-    const isNavigatingAwayFromSellerProfile = currentView === View.SELLER_PROFILE && view !== View.SELLER_PROFILE;
-    if (isNavigatingAwayFromSellerProfile) { window.history.pushState({}, '', window.location.pathname); setPublicSellerProfile(null); }
-    setInitialSearchQuery('');
-    const preserveSelectedVehicle = (view === View.SELLER_PROFILE && currentView === View.DETAIL) || (view === View.DETAIL && currentView === View.SELLER_PROFILE);
-    if (!preserveSelectedVehicle) setSelectedVehicle(null);
-    // Only reset category to 'ALL' if navigating from non-category sources (like header "Buy Car" button)
-    // Don't reset if category was just selected from homepage
-    if (view === View.USED_CARS && currentView !== View.HOME) setSelectedCategory('ALL');
-    // NEW: Handle city landing page navigation
-    if (view === View.CITY_LANDING && params?.city) {
-      setSelectedCity(params.city);
-    }
-    if (view === View.SELLER_DASHBOARD && currentUser?.role !== 'seller') setCurrentView(View.LOGIN_PORTAL);
-    else if (view === View.ADMIN_PANEL && currentUser?.role !== 'admin') setCurrentView(View.ADMIN_LOGIN);
-    else if ((view === View.PROFILE || view === View.INBOX) && !currentUser) setCurrentView(View.LOGIN_PORTAL);
-    else setCurrentView(view);
-  }, [currentView, currentUser]);
-  
-  const handleHomeSearch = useCallback((query: string) => { setInitialSearchQuery(query); setCurrentView(View.USED_CARS); }, []);
-
-  const handleSelectCategoryFromHome = useCallback((category: VehicleCategory) => {
-    setSelectedCategory(category);
-    navigate(View.USED_CARS);
-  }, [navigate]);
-
-  const handleMarkNotificationsAsRead = useCallback((ids: number[]) => { setNotifications(prev => prev.map(n => ids.includes(n.id) ? { ...n, isRead: true } : n)); }, []);
-  const handleNotificationClick = useCallback((notification: Notification) => {
-    handleMarkNotificationsAsRead([notification.id]);
-    if (currentUser?.role === 'admin') navigate(View.ADMIN_PANEL);
-    else if (currentUser?.role === 'seller') navigate(View.SELLER_DASHBOARD);
-  }, [currentUser, navigate, handleMarkNotificationsAsRead]);
-
-  const handleAddSupportTicket = useCallback((ticketData: Omit<SupportTicket, 'id' | 'createdAt' | 'updatedAt' | 'replies' | 'status'>) => {
-    const newTicket: SupportTicket = { ...ticketData, id: Date.now(), status: 'Open', createdAt: new Date().toISOString(), updatedAt: new Date().toISOString(), replies: [] };
-    setSupportTickets(prev => [newTicket, ...prev]);
-    addToast('Support ticket submitted!', 'success');
-    navigate(View.HOME);
-  }, [addToast, navigate]);
-
-  const handleUpdateSupportTicket = useCallback((updatedTicket: SupportTicket) => {
-    setSupportTickets(prev => prev.map(t => t.id === updatedTicket.id ? { ...updatedTicket, updatedAt: new Date().toISOString() } : t));
-    addToast('Support ticket updated!', 'info');
-  }, [addToast]);
-
-  const handleAddFaq = useCallback((faqData: Omit<FAQItem, 'id'>) => {
-    const newFaq: FAQItem = { ...faqData, id: Date.now() };
-    setFaqItems(prev => [...prev, newFaq]);
-    addToast('FAQ item added!', 'success');
-  }, [addToast]);
-
-  const handleUpdateFaq = useCallback((updatedFaq: FAQItem) => {
-    setFaqItems(prev => prev.map(f => f.id === updatedFaq.id ? updatedFaq : f));
-    addToast('FAQ item updated!', 'success');
-  }, [addToast]);
-
-  const handleDeleteFaq = useCallback((faqId: number) => { setFaqItems(prev => prev.filter(f => f.id !== faqId)); addToast('FAQ item deleted!', 'info'); }, [addToast]);
-  const handleLocationChange = useCallback((newLocation: string) => {
-    if (newLocation && newLocation !== userLocation) { setUserLocation(newLocation); try { localStorage.setItem('reRideUserLocation', newLocation); addToast(`Location set to ${newLocation}`, 'info'); } catch (error) { console.error("Failed to save location", error); addToast("Could not save location.", "error"); } }
-  }, [addToast, userLocation]);
-  
-  const handleViewSellerProfile = useCallback((sellerEmail: string) => {
-    const sellerUser = usersWithRatingsAndBadges.find(u => u.email === sellerEmail && u.role === 'seller');
-    if (sellerUser) { setPreviousView(currentView); setPublicSellerProfile(sellerUser); navigate(View.SELLER_PROFILE); window.history.pushState({}, '', `${window.location.pathname}?seller=${sellerEmail}`); }
-    else { addToast('Seller profile not found.', 'error'); }
-  }, [currentView, usersWithRatingsAndBadges, addToast, navigate]);
-
-  const vehiclesToCompare = useMemo(() => vehiclesWithRatings.filter(v => comparisonList.includes(v.id)), [vehiclesWithRatings, comparisonList]);
-  const vehiclesInWishlist = useMemo(() => vehiclesWithRatings.filter(v => wishlist.includes(v.id)), [vehiclesWithRatings, wishlist]);
-  const selectedVehicleWithRating = useMemo(() => { if (!selectedVehicle) return null; return vehiclesWithRatings.find(v => v.id === selectedVehicle.id) || selectedVehicle; }, [selectedVehicle, vehiclesWithRatings])
-  const allPublishedVehicles = useMemo(() => vehiclesWithRatings.filter(v => v.status === 'published'), [vehiclesWithRatings]);
-  const featuredVehicles = useMemo(() => vehiclesWithRatings.filter(v => v.isFeatured && v.status === 'published').slice(0, 4), [vehiclesWithRatings]);
-  const inboxUnreadCount = useMemo(() => { if (!currentUser || currentUser.role !== 'customer') return 0; return conversations.filter(c => c.customerId === currentUser.email && !c.isReadByCustomer).length; }, [conversations, currentUser]);
+  }, [setIsCommandPaletteOpen]);
 
   const renderContent = () => {
     if (isLoading && currentView === View.HOME) return <LoadingSpinner />;
     
     const authViews = [View.LOGIN_PORTAL, View.CUSTOMER_LOGIN, View.SELLER_LOGIN, View.ADMIN_LOGIN, View.FORGOT_PASSWORD];
     if (authViews.includes(currentView)) {
-      const AuthWrapper: React.FC<{children: React.ReactNode}> = ({ children }) => (<div className="min-h-[calc(100vh-140px)] flex items-center justify-center bg-gradient-main p-4">{children}</div>);
+      const AuthWrapper: React.FC<{children: React.ReactNode}> = ({ children }) => (
+        <div className="min-h-[calc(100vh-140px)] flex items-center justify-center bg-gradient-main p-4">
+          {children}
+        </div>
+      );
+      
       switch (currentView) {
-        case View.LOGIN_PORTAL: return <AuthWrapper><LoginPortal onNavigate={navigate} /></AuthWrapper>;
-        case View.CUSTOMER_LOGIN: return <AuthWrapper><CustomerLogin onLogin={handleCustomerLogin} onRegister={handleCustomerRegister} onNavigate={navigate} onForgotPassword={() => { setForgotPasswordRole('customer'); navigate(View.FORGOT_PASSWORD); }} /></AuthWrapper>;
-        case View.SELLER_LOGIN: return <AuthWrapper><Login onLogin={handleSellerLogin} onRegister={handleSellerRegister} onNavigate={navigate} onForgotPassword={() => { setForgotPasswordRole('seller'); navigate(View.FORGOT_PASSWORD); }}/></AuthWrapper>;
-        case View.ADMIN_LOGIN: return <AuthWrapper><AdminLogin onLogin={handleAdminLogin} onNavigate={navigate} /></AuthWrapper>;
-        case View.FORGOT_PASSWORD: return <AuthWrapper><ForgotPassword onResetRequest={handleForgotPasswordRequest} onBack={() => navigate(forgotPasswordRole === 'customer' ? View.CUSTOMER_LOGIN : View.SELLER_LOGIN)}/></AuthWrapper>;
+        case View.LOGIN_PORTAL: 
+          return <AuthWrapper><LoginPortal onNavigate={navigate} /></AuthWrapper>;
+        case View.CUSTOMER_LOGIN: 
+          return <AuthWrapper><CustomerLogin onLogin={(user) => { setCurrentUser(user); navigate(View.HOME); }} onRegister={(user) => { setUsers(prev => [...prev, user]); setCurrentUser(user); navigate(View.HOME); addToast('Registration successful!', 'success'); }} onNavigate={navigate} onForgotPassword={() => { setForgotPasswordRole('customer'); navigate(View.FORGOT_PASSWORD); }} /></AuthWrapper>;
+        case View.SELLER_LOGIN: 
+          return <AuthWrapper><Login onLogin={(user) => { setCurrentUser(user); navigate(View.SELLER_DASHBOARD); }} onRegister={(user) => { setUsers(prev => [...prev, user]); setCurrentUser(user); navigate(View.SELLER_DASHBOARD); addToast('Registration successful!', 'success'); }} onNavigate={navigate} onForgotPassword={() => { setForgotPasswordRole('seller'); navigate(View.FORGOT_PASSWORD); }}/></AuthWrapper>;
+        case View.ADMIN_LOGIN: 
+          return <AuthWrapper><AdminLogin onLogin={(user) => { setCurrentUser(user); navigate(View.ADMIN_PANEL); }} onNavigate={navigate} /></AuthWrapper>;
+        case View.FORGOT_PASSWORD: 
+          return <AuthWrapper><ForgotPassword onResetRequest={(email) => { console.log(`Password reset for ${email} as a ${forgotPasswordRole}.`); }} onBack={() => navigate(forgotPasswordRole === 'customer' ? View.CUSTOMER_LOGIN : View.SELLER_LOGIN)}/></AuthWrapper>;
       }
     }
     
     switch (currentView) {
-      case View.SUPPORT: return <SupportPage currentUser={currentUser} onSubmitTicket={handleAddSupportTicket} />;
-      case View.FAQ: return <FAQPage faqItems={faqItems} />;
-      case View.PRICING: return <PricingPage currentUser={currentUser} onSelectPlan={handlePlanChange} />;
-      case View.SELLER_PROFILE: return publicSellerProfile && <SellerProfilePage seller={usersWithRatingsAndBadges.find(u => u.email === publicSellerProfile.email)!} vehicles={vehiclesWithRatings.filter(v => v.sellerEmail === publicSellerProfile.email && v.status === 'published')} onSelectVehicle={handleSelectVehicle} comparisonList={comparisonList} onToggleCompare={handleToggleCompare} wishlist={wishlist} onToggleWishlist={handleToggleWishlist} onBack={() => navigate(previousView || View.HOME)} onViewSellerProfile={() => {}} />;
-      case View.DETAIL: return selectedVehicleWithRating && <VehicleDetail vehicle={selectedVehicleWithRating} onBack={() => navigate(View.USED_CARS)} comparisonList={comparisonList} onToggleCompare={handleToggleCompare} onAddSellerRating={handleAddSellerRating} wishlist={wishlist} onToggleWishlist={handleToggleWishlist} currentUser={currentUser} onFlagContent={handleFlagContent} users={usersWithRatingsAndBadges} onViewSellerProfile={handleViewSellerProfile} onStartChat={handleStartChat} recommendations={recommendations} onSelectVehicle={handleSelectVehicle} />;
+      case View.SUPPORT: 
+        return <SupportPage currentUser={currentUser} onSubmitTicket={(ticketData) => { 
+          const newTicket = { ...ticketData, id: Date.now(), status: 'Open' as const, createdAt: new Date().toISOString(), updatedAt: new Date().toISOString(), replies: [] };
+          setSupportTickets(prev => [newTicket, ...prev]);
+          addToast('Support ticket submitted!', 'success');
+          navigate(View.HOME);
+        }} />;
+      case View.FAQ: 
+        return <FAQPage faqItems={faqItems} />;
+      case View.PRICING: 
+        return <PricingPage currentUser={currentUser} onSelectPlan={async (planId) => {
+      if (!currentUser || currentUser.role !== 'seller') return;
+      const { PLAN_DETAILS } = await import('./constants');
+      const planDetails = PLAN_DETAILS[planId];
+      if (planId === 'free') {
+          const updatedUser = { ...currentUser, subscriptionPlan: planId };
+            const userService = await import('./services/userService');
+          const savedUser = await userService.updateUser(updatedUser);
+            setUsers(prev => prev.map(u => u.email === currentUser.email ? savedUser : u));
+          setCurrentUser(savedUser);
+          const userJson = JSON.stringify(savedUser);
+          sessionStorage.setItem('currentUser', userJson);
+          localStorage.setItem('reRideCurrentUser', userJson);
+          addToast(`Successfully switched to the ${planDetails.name} plan!`, 'success');
+            navigate(View.SELLER_DASHBOARD);
+          }
+        }} />;
+      case View.SELLER_PROFILE: 
+        return publicSellerProfile && <SellerProfilePage 
+          seller={users.find(u => u.email === publicSellerProfile.email)!} 
+          vehicles={vehicles.filter(v => v.sellerEmail === publicSellerProfile.email && v.status === 'published')} 
+          onSelectVehicle={setSelectedVehicle} 
+          comparisonList={comparisonList} 
+          onToggleCompare={() => {}} 
+          wishlist={wishlist} 
+          onToggleWishlist={() => {}} 
+          onBack={() => navigate(View.HOME)} 
+          onViewSellerProfile={() => {}} 
+        />;
+      case View.DETAIL: 
+        return selectedVehicle && <VehicleDetail 
+          vehicle={selectedVehicle} 
+          onBack={() => navigate(View.USED_CARS)} 
+          comparisonList={comparisonList} 
+          onToggleCompare={() => {}} 
+          onAddSellerRating={() => {}} 
+          wishlist={wishlist} 
+          onToggleWishlist={() => {}} 
+          currentUser={currentUser} 
+          onFlagContent={() => {}} 
+          users={users} 
+          onViewSellerProfile={() => {}} 
+          onStartChat={() => {}} 
+          recommendations={recommendations} 
+          onSelectVehicle={setSelectedVehicle} 
+        />;
       case View.SELLER_DASHBOARD: {
-        if (!currentUser) {
-          console.error('❌ No user logged in - redirecting to home');
+        if (!currentUser || currentUser.role !== 'seller') {
           navigate(View.HOME);
           return null;
         }
-        if (currentUser.role !== 'seller') {
-          console.error('❌ Access denied - User is not a seller:', currentUser.role);
-          addToast('Access denied. Only sellers can access the dashboard.', 'error');
-          navigate(currentUser.role === 'customer' ? View.BUYER_DASHBOARD : View.HOME);
-          return null;
-        }
-        return <Dashboard seller={usersWithRatingsAndBadges.find(u => u.email === currentUser.email)!} sellerVehicles={vehiclesWithRatings.filter(v => v.sellerEmail === currentUser.email)} reportedVehicles={vehicles.filter(v => v.sellerEmail === currentUser.email && v.isFlagged)} onAddVehicle={handleAddVehicle} onAddMultipleVehicles={handleAddMultipleVehicles} onUpdateVehicle={handleUpdateVehicle} onDeleteVehicle={handleDeleteVehicle} onMarkAsSold={handleMarkAsSold} conversations={conversations.filter(c => c.sellerId === currentUser.email)} onSellerSendMessage={handleSellerSendMessage} onMarkConversationAsReadBySeller={handleMarkConversationAsReadBySeller} typingStatus={typingStatus} onUserTyping={handleUserTyping} onMarkMessagesAsRead={handleMarkMessagesAsRead} onUpdateSellerProfile={handleUpdateSellerProfile} vehicleData={vehicleData} onFeatureListing={handleFeatureListing} onRequestCertification={handleRequestCertification} onNavigate={navigate} allVehicles={allPublishedVehicles} onOfferResponse={handleOfferResponse} />;
+        return <Dashboard 
+          seller={users.find(u => u.email === currentUser.email)!} 
+          sellerVehicles={vehicles.filter(v => v.sellerEmail === currentUser.email)} 
+          reportedVehicles={vehicles.filter(v => v.sellerEmail === currentUser.email && v.isFlagged)} 
+          onAddVehicle={() => {}} 
+          onAddMultipleVehicles={() => {}} 
+          onUpdateVehicle={() => {}} 
+          onDeleteVehicle={() => {}} 
+          onMarkAsSold={() => {}} 
+          conversations={conversations.filter(c => c.sellerId === currentUser.email)} 
+          onSellerSendMessage={() => {}} 
+          onMarkConversationAsReadBySeller={() => {}} 
+          typingStatus={null} 
+          onUserTyping={() => {}} 
+          onMarkMessagesAsRead={() => {}} 
+          onUpdateSellerProfile={() => {}} 
+          vehicleData={vehicleData} 
+          onFeatureListing={() => {}} 
+          onRequestCertification={() => {}} 
+          onNavigate={navigate} 
+          allVehicles={vehicles.filter(v => v.status === 'published')} 
+          onOfferResponse={() => {}} 
+        />;
       }
-      case View.ADMIN_PANEL: return currentUser?.role === 'admin' ? <AdminPanel users={users} currentUser={currentUser} vehicles={vehicles} conversations={conversations} onToggleUserStatus={handleToggleUserStatus} onDeleteUser={handleDeleteUser} onAdminUpdateUser={handleAdminUpdateUser} onUpdateUserPlan={handleUpdateUserPlan} onUpdateVehicle={handleUpdateVehicle} onDeleteVehicle={handleDeleteVehicle} onToggleVehicleStatus={handleToggleVehicleStatus} onToggleVehicleFeature={handleToggleVehicleFeature} onResolveFlag={handleResolveFlag} platformSettings={platformSettings} onUpdateSettings={handleAdminUpdateSettings} onSendBroadcast={handleAdminSendBroadcast} auditLog={auditLog} onExportUsers={handleExportUsers} onExportVehicles={handleExportVehicles} onExportSales={handleExportSales} vehicleData={vehicleData} onUpdateVehicleData={handleUpdateVehicleData} onToggleVerifiedStatus={handleToggleVerifiedStatus} supportTickets={supportTickets} onUpdateSupportTicket={handleUpdateSupportTicket} faqItems={faqItems} onAddFaq={handleAddFaq} onUpdateFaq={handleUpdateFaq} onDeleteFaq={handleDeleteFaq} onCertificationApproval={handleCertificationApproval} /> : <LoadingSpinner />;
-      case View.COMPARISON: return <Comparison vehicles={vehiclesToCompare} onBack={() => navigate(View.USED_CARS)} onToggleCompare={handleToggleCompare} />;
-      case View.PROFILE: return currentUser && <Profile currentUser={currentUser} onUpdateProfile={handleUpdateUserProfile} onUpdatePassword={handleUpdateUserPassword} />;
-      case View.INBOX: return currentUser && <CustomerInbox conversations={conversations.filter(c => c.customerId === currentUser.email)} onSendMessage={handleCustomerSendMessage} onMarkAsRead={handleMarkConversationAsReadByCustomer} users={users} typingStatus={typingStatus} onUserTyping={handleUserTyping} onMarkMessagesAsRead={handleMarkMessagesAsRead} onFlagContent={handleFlagContent} onOfferResponse={handleOfferResponse} />;
-      case View.BUYER_DASHBOARD: return currentUser?.role === 'customer' ? <BuyerDashboard currentUser={currentUser} vehicles={allPublishedVehicles} wishlist={wishlist} conversations={conversations.filter(c => c.customerId === currentUser.email)} onNavigate={navigate} onSelectVehicle={handleSelectVehicle} onToggleWishlist={handleToggleWishlist} onToggleCompare={handleToggleCompare} comparisonList={comparisonList} onViewSellerProfile={handleViewSellerProfile} /> : <LoadingSpinner />;
-      case View.USED_CARS: return <VehicleList vehicles={allPublishedVehicles} isLoading={isLoading} onSelectVehicle={handleSelectVehicle} comparisonList={comparisonList} onToggleCompare={handleToggleCompare} onClearCompare={handleClearCompare} wishlist={wishlist} onToggleWishlist={handleToggleWishlist} categoryTitle="All Used Cars" initialCategory={selectedCategory} initialSearchQuery={initialSearchQuery} onViewSellerProfile={handleViewSellerProfile} userLocation={userLocation} />;
-      case View.NEW_CARS: return <NewCars />;
-      case View.DEALER_PROFILES: return <DealerProfiles sellers={usersWithRatingsAndBadges.filter(u => u.role === 'seller')} onViewProfile={handleViewSellerProfile} />;
-      case View.WISHLIST: return <VehicleList vehicles={vehiclesInWishlist} isLoading={isLoading} onSelectVehicle={handleSelectVehicle} comparisonList={comparisonList} onToggleCompare={handleToggleCompare} onClearCompare={handleClearCompare} wishlist={wishlist} onToggleWishlist={handleToggleWishlist} categoryTitle="My Wishlist" isWishlistMode={true} onViewSellerProfile={handleViewSellerProfile} userLocation={userLocation} />;
-      case View.CITY_LANDING: return selectedCity && <CityLandingPage city={selectedCity} vehicles={allPublishedVehicles} onSelectVehicle={handleSelectVehicle} onToggleWishlist={handleToggleWishlist} onToggleCompare={handleToggleCompare} wishlist={wishlist} comparisonList={comparisonList} onViewSellerProfile={handleViewSellerProfile} />;
+      case View.ADMIN_PANEL: 
+        return currentUser?.role === 'admin' ? <AdminPanel 
+          users={users} 
+          currentUser={currentUser} 
+          vehicles={vehicles} 
+          conversations={conversations} 
+          onToggleUserStatus={() => {}} 
+          onDeleteUser={() => {}} 
+          onAdminUpdateUser={() => {}} 
+          onUpdateUserPlan={() => {}} 
+          onUpdateVehicle={() => {}} 
+          onDeleteVehicle={() => {}} 
+          onToggleVehicleStatus={() => {}} 
+          onToggleVehicleFeature={() => {}} 
+          onResolveFlag={() => {}} 
+          platformSettings={platformSettings} 
+          onUpdateSettings={setPlatformSettings} 
+          onSendBroadcast={() => {}} 
+          auditLog={auditLog} 
+          onExportUsers={() => {}} 
+          onExportVehicles={() => {}} 
+          onExportSales={() => {}} 
+          vehicleData={vehicleData} 
+          onUpdateVehicleData={setVehicleData} 
+          onToggleVerifiedStatus={() => {}} 
+          supportTickets={supportTickets} 
+          onUpdateSupportTicket={() => {}} 
+          faqItems={faqItems} 
+          onAddFaq={() => {}} 
+          onUpdateFaq={() => {}} 
+          onDeleteFaq={() => {}} 
+          onCertificationApproval={() => {}} 
+        /> : <LoadingSpinner />;
+      case View.COMPARISON: 
+        return <Comparison 
+          vehicles={vehicles.filter(v => comparisonList.includes(v.id))} 
+          onBack={() => navigate(View.USED_CARS)} 
+          onToggleCompare={() => {}} 
+        />;
+      case View.PROFILE: 
+        return currentUser && <Profile 
+          currentUser={currentUser} 
+          onUpdateProfile={() => {}} 
+          onUpdatePassword={() => Promise.resolve(false)} 
+        />;
+      case View.INBOX: 
+        return currentUser && <CustomerInbox 
+          conversations={conversations.filter(c => c.customerId === currentUser.email)} 
+          onSendMessage={() => {}} 
+          onMarkAsRead={() => {}} 
+          users={users} 
+          typingStatus={null} 
+          onUserTyping={() => {}} 
+          onMarkMessagesAsRead={() => {}} 
+          onFlagContent={() => {}} 
+          onOfferResponse={() => {}} 
+        />;
+      case View.BUYER_DASHBOARD: 
+        return currentUser?.role === 'customer' ? <BuyerDashboard 
+          currentUser={currentUser} 
+          vehicles={vehicles.filter(v => v.status === 'published')} 
+          wishlist={wishlist} 
+          conversations={conversations.filter(c => c.customerId === currentUser.email)} 
+          onNavigate={navigate} 
+          onSelectVehicle={setSelectedVehicle} 
+          onToggleWishlist={() => {}} 
+          onToggleCompare={() => {}} 
+          comparisonList={comparisonList} 
+          onViewSellerProfile={() => {}} 
+        /> : <LoadingSpinner />;
+      case View.USED_CARS: 
+        return <VehicleList 
+          vehicles={vehicles.filter(v => v.status === 'published')} 
+          isLoading={isLoading} 
+          onSelectVehicle={setSelectedVehicle} 
+          comparisonList={comparisonList} 
+          onToggleCompare={() => {}} 
+          onClearCompare={() => {}} 
+          wishlist={wishlist} 
+          onToggleWishlist={() => {}} 
+          categoryTitle="All Used Cars" 
+          initialCategory={selectedCategory} 
+          initialSearchQuery={initialSearchQuery} 
+          onViewSellerProfile={() => {}} 
+          userLocation={userLocation} 
+        />;
+      case View.NEW_CARS: 
+        return <NewCars />;
+      case View.DEALER_PROFILES: 
+        return <DealerProfiles 
+          sellers={users.filter(u => u.role === 'seller')} 
+          onViewProfile={() => {}} 
+        />;
+      case View.WISHLIST: 
+        return <VehicleList 
+          vehicles={vehicles.filter(v => wishlist.includes(v.id))} 
+          isLoading={isLoading} 
+          onSelectVehicle={setSelectedVehicle} 
+          comparisonList={comparisonList} 
+          onToggleCompare={() => {}} 
+          onClearCompare={() => {}} 
+          wishlist={wishlist} 
+          onToggleWishlist={() => {}} 
+          categoryTitle="My Wishlist" 
+          isWishlistMode={true} 
+          onViewSellerProfile={() => {}} 
+          userLocation={userLocation} 
+        />;
+      case View.CITY_LANDING: 
+        return selectedCity && <CityLandingPage 
+          city={selectedCity} 
+          vehicles={vehicles.filter(v => v.status === 'published')} 
+          onSelectVehicle={setSelectedVehicle} 
+          onToggleWishlist={() => {}} 
+          onToggleCompare={() => {}} 
+          wishlist={wishlist} 
+          comparisonList={comparisonList} 
+          onViewSellerProfile={() => {}} 
+        />;
       case View.HOME:
-      default: return <Home onSearch={handleHomeSearch} onSelectCategory={handleSelectCategoryFromHome} featuredVehicles={featuredVehicles} onSelectVehicle={handleSelectVehicle} onToggleCompare={handleToggleCompare} comparisonList={comparisonList} onToggleWishlist={handleToggleWishlist} wishlist={wishlist} onViewSellerProfile={handleViewSellerProfile} recommendations={recommendations} allVehicles={allPublishedVehicles} onNavigate={navigate} />;
+      default: 
+        return <Home 
+          onSearch={(query) => { setInitialSearchQuery(query); navigate(View.USED_CARS); }} 
+          onSelectCategory={(category) => { setSelectedCategory(category); navigate(View.USED_CARS); }} 
+          featuredVehicles={vehicles.filter(v => v.isFeatured && v.status === 'published').slice(0, 4)} 
+          onSelectVehicle={setSelectedVehicle} 
+          onToggleCompare={() => {}} 
+          comparisonList={comparisonList} 
+          onToggleWishlist={() => {}} 
+          wishlist={wishlist} 
+          onViewSellerProfile={() => {}} 
+          recommendations={recommendations} 
+          allVehicles={vehicles.filter(v => v.status === 'published')} 
+          onNavigate={navigate} 
+        />;
     }
   };
-  
-  const inboxCount = useMemo(() => { if(!currentUser || currentUser.role !== 'customer') return 0; return conversations.filter(c => c.customerId === currentUser.email && !c.isReadByCustomer).length; }, [conversations, currentUser]);
+
+  const inboxCount = useMemo(() => {
+    if (!currentUser || currentUser.role !== 'customer') return 0;
+    return conversations.filter(c => c.customerId === currentUser.email && !c.isReadByCustomer).length;
+  }, [conversations, currentUser]);
   
   return (
     <div className="flex flex-col min-h-screen">
-      <Header onNavigate={navigate} currentUser={currentUser} onLogout={handleLogout} compareCount={comparisonList.length} wishlistCount={wishlist.length} inboxCount={inboxCount} isHomePage={isHomePage} notifications={notifications.filter(n => n.recipientEmail === currentUser?.email)} onNotificationClick={handleNotificationClick} onMarkNotificationsAsRead={handleMarkNotificationsAsRead} onMarkAllNotificationsAsRead={() => handleMarkNotificationsAsRead(notifications.filter(n => !n.isRead && n.recipientEmail === currentUser?.email).map(n => n.id))} onOpenCommandPalette={() => setIsCommandPaletteOpen(true)} userLocation={userLocation} onLocationChange={handleLocationChange} addToast={addToast} />
+      <Header 
+        onNavigate={navigate} 
+        currentUser={currentUser} 
+        onLogout={handleLogout} 
+        compareCount={comparisonList.length} 
+        wishlistCount={wishlist.length} 
+        inboxCount={inboxCount} 
+        isHomePage={currentView === View.HOME} 
+        notifications={notifications.filter(n => n.recipientEmail === currentUser?.email)} 
+        onNotificationClick={() => {}} 
+        onMarkNotificationsAsRead={() => {}} 
+        onMarkAllNotificationsAsRead={() => {}} 
+        onOpenCommandPalette={() => setIsCommandPaletteOpen(true)} 
+        userLocation={userLocation} 
+        onLocationChange={setUserLocation} 
+        addToast={addToast} 
+      />
       <main className="flex-grow pt-16">
-        <Suspense fallback={<LoadingSpinner />}>{renderContent()}</Suspense>
+        <Suspense fallback={<LoadingSpinner />}>
+          {renderContent()}
+        </Suspense>
       </main>
-      {activeChat && currentUser && <ChatWidget conversation={activeChat} currentUserRole={currentUser.role as 'customer' | 'seller'} otherUserName={currentUser.role === 'customer' ? (users.find(u => u.email === activeChat.sellerId)?.name || 'Seller') : activeChat.customerName} onClose={() => setActiveChat(null)} onSendMessage={(msg, type, payload) => { if (currentUser.role === 'customer') { handleCustomerSendMessage(activeChat.vehicleId, msg, type, payload); } }} typingStatus={typingStatus} onUserTyping={handleUserTyping} onMarkMessagesAsRead={handleMarkMessagesAsRead} onFlagContent={handleFlagContent} onOfferResponse={handleOfferResponse} />}
+      {activeChat && currentUser && (
+        <ChatWidget 
+          conversation={activeChat} 
+          currentUserRole={currentUser.role as 'customer' | 'seller'} 
+          otherUserName={currentUser.role === 'customer' ? (users.find(u => u.email === activeChat.sellerId)?.name || 'Seller') : activeChat.customerName} 
+          onClose={() => setActiveChat(null)} 
+          onSendMessage={() => {}} 
+          typingStatus={null} 
+          onUserTyping={() => {}} 
+          onMarkMessagesAsRead={() => {}} 
+          onFlagContent={() => {}} 
+          onOfferResponse={() => {}} 
+        />
+      )}
       <ToastContainer toasts={toasts} onRemove={removeToast} />
       <Footer onNavigate={navigate} />
-      <CommandPalette isOpen={isCommandPaletteOpen} onClose={() => setIsCommandPaletteOpen(false)} onNavigate={(view) => { navigate(view); setIsCommandPaletteOpen(false); }} currentUser={currentUser} onLogout={() => { handleLogout(); setIsCommandPaletteOpen(false); }} />
+      <CommandPalette 
+        isOpen={isCommandPaletteOpen} 
+        onClose={() => setIsCommandPaletteOpen(false)} 
+        onNavigate={(view) => { navigate(view); setIsCommandPaletteOpen(false); }} 
+        currentUser={currentUser} 
+        onLogout={() => { handleLogout(); setIsCommandPaletteOpen(false); }} 
+      />
     </div>
   );
 };
+
+const App: React.FC = () => {
+  return (
+    <ErrorBoundary>
+      <AppProvider>
+        <AppContent />
+      </AppProvider>
+    </ErrorBoundary>
+  );
+};
+
 export default App;

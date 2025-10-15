@@ -4,7 +4,7 @@ import type { Vehicle, User, Conversation, PlatformSettings, AuditLogEntry, Vehi
 import EditUserModal from './EditUserModal';
 import EditVehicleModal from './EditVehicleModal';
 import PaymentManagement from './PaymentManagement';
-import { PLAN_DETAILS } from '../constants';
+// Removed blocking import - will lazy load PLAN_DETAILS when needed
 import { VehicleDataBulkUploadModal } from './VehicleDataBulkUploadModal';
 import VehicleDataManagement from './VehicleDataManagement';
 import SellerFormPreview from './SellerFormPreview';

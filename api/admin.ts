@@ -4,7 +4,7 @@ import connectToDatabase from './lib-db.js';
 import User from './lib-user.js';
 import Vehicle from './lib-vehicle.js';
 import mongoose from 'mongoose';
-import { MOCK_USERS, MOCK_VEHICLES } from '../constants';
+// Constants will be imported dynamically when needed
 
 export default async function handler(
   req: VercelRequest,
@@ -80,6 +80,7 @@ export default async function handler(
       console.log(`   Deleted ${deletedVehicles.deletedCount} vehicles`);
 
       console.log('📥 Inserting new data...');
+      const { MOCK_USERS, MOCK_VEHICLES } = await import('../constants');
       const insertedUsers = await User.insertMany(MOCK_USERS);
       const insertedVehicles = await Vehicle.insertMany(MOCK_VEHICLES);
       console.log(`   Inserted ${insertedUsers.length} users`);

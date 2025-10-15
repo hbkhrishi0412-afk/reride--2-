@@ -1,6 +1,7 @@
 import React, { useState, useMemo, memo, useEffect } from 'react';
 import type { Vehicle, ProsAndCons, User, CertifiedInspection, VehicleDocument } from '../types';
 import { generateProsAndCons } from '../services/geminiService';
+import { getFirstValidImage, getValidImages, getSafeImageSrc } from '../utils/imageUtils';
 import StarRating from './StarRating';
 import VehicleCard from './VehicleCard';
 import EMICalculator from './EMICalculator';
@@ -278,7 +279,7 @@ export const VehicleDetail: React.FC<VehicleDetailProps> = ({ vehicle, onBack: o
                     {activeMediaTab === 'images' ? (
                       <>
                         <div className="relative group">
-                            <img key={currentIndex} className="w-full h-auto object-cover rounded-xl shadow-soft-xl animate-fade-in" src={vehicle.images[currentIndex]} alt={`${vehicle.make} ${vehicle.model} image ${currentIndex + 1}`} />
+                            <img key={currentIndex} className="w-full h-auto object-cover rounded-xl shadow-soft-xl animate-fade-in" src={getValidImages(vehicle.images)[currentIndex] || getFirstValidImage(vehicle.images)} alt={`${vehicle.make} ${vehicle.model} image ${currentIndex + 1}`} />
                             {vehicle.images.length > 1 && (
                                 <>
                                     <button onClick={handlePrevImage} className="absolute top-1/2 left-4 -translate-y-1/2 bg-black/40 text-white p-2 rounded-full opacity-0 group-hover:opacity-100 transition-opacity focus:opacity-100" aria-label="Previous image"><svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" /></svg></button>
@@ -288,8 +289,8 @@ export const VehicleDetail: React.FC<VehicleDetailProps> = ({ vehicle, onBack: o
                         </div>
                         {vehicle.images.length > 1 && (
                             <div className="flex space-x-2 overflow-x-auto pb-2 -mt-2">
-                                {vehicle.images.map((img, index) => (
-                                    <img key={index} src={img} alt={`Thumbnail ${index + 1}`} className={`cursor-pointer rounded-md border-2 h-20 w-28 object-cover flex-shrink-0 ${currentIndex === index ? '' : 'border-transparent'} transition`} style={currentIndex === index ? { bordercolor: '#FF6B35' } : undefined} onMouseEnter={(e) => currentIndex !== index && (e.currentTarget.style.borderColor = 'var(--spinny-blue)')} onMouseLeave={(e) => currentIndex !== index && (e.currentTarget.style.borderColor = '')} onClick={() => setCurrentIndex(index)} />
+                                {getValidImages(vehicle.images).map((img, index) => (
+                                    <img key={index} src={getSafeImageSrc(img)} alt={`Thumbnail ${index + 1}`} className={`cursor-pointer rounded-md border-2 h-20 w-28 object-cover flex-shrink-0 ${currentIndex === index ? '' : 'border-transparent'} transition`} style={currentIndex === index ? { bordercolor: '#FF6B35' } : undefined} onMouseEnter={(e) => currentIndex !== index && (e.currentTarget.style.borderColor = 'var(--spinny-blue)')} onMouseLeave={(e) => currentIndex !== index && (e.currentTarget.style.borderColor = '')} onClick={() => setCurrentIndex(index)} />
                                 ))}
                             </div>
                         )}
@@ -330,7 +331,7 @@ export const VehicleDetail: React.FC<VehicleDetailProps> = ({ vehicle, onBack: o
                       {seller && <div className="p-6 bg-white rounded-xl shadow-soft">
                             <h3 className="text-lg font-semibold text-spinny-text-dark dark:text-spinny-text-dark mb-3">Seller Information</h3>
                             <div className="flex items-center gap-4">
-                                <img src={seller.logoUrl || `https://i.pravatar.cc/100?u=${seller.email}`} alt="Seller Logo" className="w-16 h-16 rounded-full object-cover" />
+                                <img src={getSafeImageSrc(seller.logoUrl, `https://i.pravatar.cc/100?u=${seller.email}`)} alt="Seller Logo" className="w-16 h-16 rounded-full object-cover" />
                                 <div>
                                     <h4 className="font-bold text-spinny-text-dark dark:text-spinny-text-dark">{seller.dealershipName || seller.name}</h4>
                                     <div className="flex items-center gap-1 mt-1">

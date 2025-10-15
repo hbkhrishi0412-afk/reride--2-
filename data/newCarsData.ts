@@ -1,4 +1,4 @@
-import { INDIAN_STATES } from '../constants';
+// Constants will be imported dynamically when needed
 
 export interface NewCarVariant {
     variant_name: string;

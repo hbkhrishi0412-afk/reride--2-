@@ -715,3 +715,58 @@ export interface SMSAlert {
   sentAt?: string;
   createdAt: string;
 }
+
+// Type guard functions
+export const isVehicle = (obj: any): obj is Vehicle => {
+  return obj && 
+    typeof obj.id === 'number' &&
+    typeof obj.make === 'string' &&
+    typeof obj.model === 'string' &&
+    typeof obj.year === 'number' &&
+    typeof obj.price === 'number' &&
+    typeof obj.mileage === 'number' &&
+    typeof obj.sellerEmail === 'string' &&
+    Array.isArray(obj.images) &&
+    Array.isArray(obj.features);
+};
+
+export const isUser = (obj: any): obj is User => {
+  return obj &&
+    typeof obj.email === 'string' &&
+    typeof obj.name === 'string' &&
+    typeof obj.password === 'string' &&
+    typeof obj.mobile === 'string' &&
+    ['customer', 'seller', 'admin'].includes(obj.role);
+};
+
+export const isConversation = (obj: any): obj is Conversation => {
+  return obj &&
+    typeof obj.id === 'string' &&
+    typeof obj.customerId === 'string' &&
+    typeof obj.sellerId === 'string' &&
+    typeof obj.vehicleId === 'number' &&
+    Array.isArray(obj.messages);
+};
+
+export const isApiResponse = <T>(obj: any): obj is { data: T; success: boolean } => {
+  return obj && typeof obj === 'object' && 'success' in obj;
+};
+
+export const isChatMessage = (obj: any): obj is ChatMessage => {
+  return obj &&
+    typeof obj.id === 'number' &&
+    typeof obj.sender === 'string' &&
+    typeof obj.text === 'string' &&
+    typeof obj.timestamp === 'string' &&
+    typeof obj.isRead === 'boolean';
+};
+
+export const isNotification = (obj: any): obj is Notification => {
+  return obj &&
+    typeof obj.id === 'number' &&
+    typeof obj.title === 'string' &&
+    typeof obj.message === 'string' &&
+    typeof obj.type === 'string' &&
+    typeof obj.recipientEmail === 'string' &&
+    typeof obj.isRead === 'boolean';
+};

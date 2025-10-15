@@ -1,12 +1,15 @@
 import type { Vehicle, ListingLifecycle, ListingRefresh } from '../types';
-import { LISTING_EXPIRY_DAYS, AUTO_REFRESH_DAYS } from '../constants';
 
 // ============================================
 // LISTING EXPIRY MANAGEMENT
 // ============================================
 
 // Calculate expiry date for a new listing
-export function calculateExpiryDate(daysFromNow: number = LISTING_EXPIRY_DAYS): string {
+export async function calculateExpiryDate(daysFromNow?: number): Promise<string> {
+  if (daysFromNow === undefined) {
+    const { LISTING_EXPIRY_DAYS } = await import('../constants');
+    daysFromNow = LISTING_EXPIRY_DAYS;
+  }
   const date = new Date();
   date.setDate(date.getDate() + daysFromNow);
   return date.toISOString();
@@ -45,7 +48,7 @@ export function filterActiveListings(vehicles: Vehicle[]): Vehicle[] {
 // ============================================
 
 // Check if listing needs refresh
-export function needsRefresh(vehicle: Vehicle): boolean {
+export async function needsRefresh(vehicle: Vehicle): Promise<boolean> {
   if (!vehicle.listingLastRefreshed) return true;
   
   const lastRefresh = new Date(vehicle.listingLastRefreshed);
@@ -53,6 +56,7 @@ export function needsRefresh(vehicle: Vehicle): boolean {
     (Date.now() - lastRefresh.getTime()) / (1000 * 60 * 60 * 24)
   );
   
+  const { AUTO_REFRESH_DAYS } = await import('../constants');
   return daysSinceRefresh >= AUTO_REFRESH_DAYS;
 }
 
@@ -70,12 +74,12 @@ export function refreshListing(vehicle: Vehicle): Vehicle {
 // ============================================
 
 // Renew expired listing
-export function renewListing(vehicle: Vehicle, autoRenew: boolean = false): Vehicle {
+export async function renewListing(vehicle: Vehicle, autoRenew: boolean = false): Promise<Vehicle> {
   const renewalCount = (vehicle.listingRenewalCount || 0) + 1;
   
   return {
     ...vehicle,
-    listingExpiresAt: calculateExpiryDate(),
+    listingExpiresAt: await calculateExpiryDate(),
     listingRenewalCount: renewalCount,
     listingAutoRenew: autoRenew,
     listingLastRefreshed: new Date().toISOString(),
@@ -85,13 +89,14 @@ export function renewListing(vehicle: Vehicle, autoRenew: boolean = false): Vehi
 }
 
 // Auto-renew listings that have auto-renew enabled
-export function autoRenewListings(vehicles: Vehicle[]): Vehicle[] {
-  return vehicles.map(vehicle => {
+export async function autoRenewListings(vehicles: Vehicle[]): Promise<Vehicle[]> {
+  const results = await Promise.all(vehicles.map(async vehicle => {
     if (vehicle.listingAutoRenew && isListingExpired(vehicle)) {
-      return renewListing(vehicle, true);
+      return await renewListing(vehicle, true);
     }
     return vehicle;
-  });
+  }));
+  return results;
 }
 
 // ============================================
@@ -99,11 +104,11 @@ export function autoRenewListings(vehicles: Vehicle[]): Vehicle[] {
 // ============================================
 
 // Get listing lifecycle info
-export function getListingLifecycle(vehicle: Vehicle): ListingLifecycle {
+export async function getListingLifecycle(vehicle: Vehicle): Promise<ListingLifecycle> {
   return {
     vehicleId: vehicle.id,
     createdAt: vehicle.createdAt || new Date().toISOString(),
-    expiresAt: vehicle.listingExpiresAt || calculateExpiryDate(),
+    expiresAt: vehicle.listingExpiresAt || await calculateExpiryDate(),
     lastRefreshedAt: vehicle.listingLastRefreshed,
     autoRenew: vehicle.listingAutoRenew || false,
     renewalCount: vehicle.listingRenewalCount || 0,
@@ -202,7 +207,7 @@ export function bulkRefreshListings(vehicles: Vehicle[]): Vehicle[] {
 }
 
 // Renew multiple listings
-export function bulkRenewListings(vehicles: Vehicle[]): Vehicle[] {
-  return vehicles.map(vehicle => renewListing(vehicle));
+export async function bulkRenewListings(vehicles: Vehicle[]): Promise<Vehicle[]> {
+  return await Promise.all(vehicles.map(vehicle => renewListing(vehicle)));
 }
 

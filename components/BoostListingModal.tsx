@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import type { Vehicle, BoostPackage } from '../types';
-import { BOOST_PACKAGES } from '../constants';
+// Removed blocking import - will lazy load BOOST_PACKAGES when needed
 
 interface BoostListingModalProps {
   vehicle: Vehicle | null;
@@ -15,6 +15,20 @@ const BoostListingModal: React.FC<BoostListingModalProps> = ({
 }) => {
   const [selectedPackage, setSelectedPackage] = useState<string | null>(null);
   const [isProcessing, setIsProcessing] = useState(false);
+  const [boostPackages, setBoostPackages] = useState<BoostPackage[]>([]);
+
+  // Load boost packages when component mounts
+  useEffect(() => {
+    const loadBoostPackages = async () => {
+      try {
+        const { BOOST_PACKAGES } = await import('../constants');
+        setBoostPackages(BOOST_PACKAGES);
+      } catch (error) {
+        console.error('Failed to load boost packages:', error);
+      }
+    };
+    loadBoostPackages();
+  }, []);
 
   if (!vehicle) return null;
 
@@ -105,7 +119,7 @@ const BoostListingModal: React.FC<BoostListingModalProps> = ({
               Choose Your Boost Package
             </h3>
             
-            {BOOST_PACKAGES.map((pkg) => (
+            {boostPackages.map((pkg) => (
               <div
                 key={pkg.id}
                 onClick={() => setSelectedPackage(pkg.id)}

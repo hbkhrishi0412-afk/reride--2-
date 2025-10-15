@@ -1,5 +1,6 @@
 
 import type { Vehicle, User } from '../types';
+import { isVehicle, isApiResponse } from '../types';
 
 // Fallback mock vehicles to prevent loading issues
 const FALLBACK_VEHICLES: Vehicle[] = [
@@ -37,13 +38,21 @@ const getAuthHeader = () => {
   }
 };
 
-const handleResponse = async (response: Response) => {
+const handleResponse = async <T>(response: Response): Promise<T> => {
     if (!response.ok) {
         const error = await response.json().catch(() => ({ error: `API Error: ${response.statusText}` }));
         throw new Error(error.error || `Failed to fetch: ${response.statusText}`);
     }
-    return response.json();
-}
+    
+    const data = await response.json();
+    
+    // Type guard for API responses
+    if (isApiResponse<T>(data)) {
+        return data.data;
+    }
+    
+    return data;
+};
 
 // --- Local Development (localStorage) Functions ---
 
@@ -110,7 +119,19 @@ const deleteVehicleLocal = async (vehicleId: number): Promise<{ success: boolean
 
 const getVehiclesApi = async (): Promise<Vehicle[]> => {
   const response = await fetch('/api/vehicles');
-  return handleResponse(response);
+  const data = await handleResponse<Vehicle[]>(response);
+  
+  // Validate that all items are vehicles
+  if (!Array.isArray(data)) {
+    throw new Error('Invalid response format: expected array');
+  }
+  
+  const validVehicles = data.filter(isVehicle);
+  if (validVehicles.length !== data.length) {
+    console.warn(`Filtered out ${data.length - validVehicles.length} invalid vehicles`);
+  }
+  
+  return validVehicles;
 };
 
 const addVehicleApi = async (vehicleData: Vehicle): Promise<Vehicle> => {
@@ -142,17 +163,26 @@ const deleteVehicleApi = async (vehicleId: number): Promise<{ success: boolean, 
 
 
 // --- Environment Detection ---
-// FORCE PRODUCTION MODE: Always use MongoDB/API, never localStorage
-// This ensures all users see the same data from the database
-const isDevelopment = false; // import.meta.env.DEV || window.location.hostname === 'localhost' || window.location.hostname.includes('localhost');
+// Use local storage in development, API in production
+const isDevelopment = (): boolean => {
+  try {
+    return import.meta.env.DEV || 
+           window.location.hostname === 'localhost' || 
+           window.location.hostname === '127.0.0.1' ||
+           window.location.hostname.includes('localhost') ||
+           window.location.protocol === 'file:';
+  } catch {
+    return false;
+  }
+};
 
 // --- Exported Environment-Aware Service Functions ---
 
 export const getVehicles = async (): Promise<Vehicle[]> => {
   try {
-    console.log('getVehicles: Starting, isDevelopment:', isDevelopment);
+    console.log('getVehicles: Starting, isDevelopment:', isDevelopment());
     // Always try API first for production, with fallback to local
-    if (!isDevelopment) {
+    if (!isDevelopment()) {
       try {
         console.log('getVehicles: Trying API...');
         const result = await getVehiclesApi();
@@ -176,11 +206,11 @@ export const getVehicles = async (): Promise<Vehicle[]> => {
 };
 export const addVehicle = async (vehicleData: Vehicle): Promise<Vehicle> => {
   console.log('🔧 vehicleService.addVehicle called');
-  console.log('📍 Environment - isDevelopment:', isDevelopment);
+  console.log('📍 Environment - isDevelopment:', isDevelopment());
   console.log('📦 Vehicle data received:', vehicleData);
   
   // Always try API first for production, with fallback to local
-  if (!isDevelopment) {
+  if (!isDevelopment()) {
     try {
       console.log('🌐 Attempting API call to /api/vehicles');
       const result = await addVehicleApi(vehicleData);
@@ -202,7 +232,7 @@ export const addVehicle = async (vehicleData: Vehicle): Promise<Vehicle> => {
 
 export const updateVehicle = async (vehicleData: Vehicle): Promise<Vehicle> => {
   // Always try API first for production, with fallback to local
-  if (!isDevelopment) {
+  if (!isDevelopment()) {
     try {
       return await updateVehicleApi(vehicleData);
     } catch (error) {
@@ -218,7 +248,7 @@ export const updateVehicle = async (vehicleData: Vehicle): Promise<Vehicle> => {
 
 export const deleteVehicle = async (vehicleId: number): Promise<{ success: boolean, id: number }> => {
   // Always try API first for production, with fallback to local
-  if (!isDevelopment) {
+  if (!isDevelopment()) {
     try {
       return await deleteVehicleApi(vehicleId);
     } catch (error) {

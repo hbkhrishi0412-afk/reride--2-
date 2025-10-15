@@ -1,5 +1,4 @@
 import type { PlanDetails, SubscriptionPlan } from '../types';
-import { PLAN_DETAILS } from '../constants';
 
 // In-memory storage for plan updates (in a real app, this would be a database)
 let planUpdates: Partial<Record<SubscriptionPlan, Partial<PlanDetails>>> = {};
@@ -9,7 +8,8 @@ type CustomPlanId = SubscriptionPlan | string;
 
 export const planService = {
     // Get plan details with any updates applied
-    getPlanDetails: (planId: SubscriptionPlan): PlanDetails => {
+    getPlanDetails: async (planId: SubscriptionPlan): Promise<PlanDetails> => {
+        const { PLAN_DETAILS } = await import('../constants');
         const basePlan = PLAN_DETAILS[planId];
         const updates = planUpdates[planId] || {};
         return { ...basePlan, ...updates };
@@ -22,9 +22,12 @@ export const planService = {
     },
 
     // Get all plan details with updates applied (max 4 plans)
-    getAllPlans: (): PlanDetails[] => {
-        const basePlans = Object.keys(PLAN_DETAILS).map(planId => 
-            planService.getPlanDetails(planId as SubscriptionPlan)
+    getAllPlans: async (): Promise<PlanDetails[]> => {
+        const { PLAN_DETAILS } = await import('../constants');
+        const basePlans = await Promise.all(
+            Object.keys(PLAN_DETAILS).map(planId => 
+                planService.getPlanDetails(planId as SubscriptionPlan)
+            )
         );
         
         // Add custom plans (excluding base plans from custom updates)
@@ -56,7 +59,8 @@ export const planService = {
     },
 
     // Delete custom plan
-    deletePlan: (planId: string): boolean => {
+    deletePlan: async (planId: string): Promise<boolean> => {
+        const { PLAN_DETAILS } = await import('../constants');
         if (PLAN_DETAILS[planId as SubscriptionPlan]) {
             // Cannot delete base plans
             return false;
@@ -86,7 +90,8 @@ export const planService = {
     },
 
     // Get original plan details without updates
-    getOriginalPlanDetails: (planId: SubscriptionPlan): PlanDetails => {
+    getOriginalPlanDetails: async (planId: SubscriptionPlan): Promise<PlanDetails> => {
+        const { PLAN_DETAILS } = await import('../constants');
         return PLAN_DETAILS[planId];
     },
 
@@ -96,13 +101,15 @@ export const planService = {
     },
 
     // Check if plan limit is reached
-    canAddNewPlan: (): boolean => {
-        return planService.getAllPlans().length < 4;
+    canAddNewPlan: async (): Promise<boolean> => {
+        const plans = await planService.getAllPlans();
+        return plans.length < 4;
     },
 
     // Get plan count
-    getPlanCount: (): number => {
-        return planService.getAllPlans().length;
+    getPlanCount: async (): Promise<number> => {
+        const plans = await planService.getAllPlans();
+        return plans.length;
     }
 };
 

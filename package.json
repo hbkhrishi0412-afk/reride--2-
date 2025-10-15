@@ -7,10 +7,15 @@
   "scripts": {
     "dev": "vite",
     "dev:clean": "npm run clean && vite",
+    "dev:fast": "npm run clean && vite --force",
     "build": "vite build",
+    "build:analyze": "npm run build && node performance-optimize.js --analyze",
     "preview": "vite preview",
     "seed": "node seed-simple.js",
-    "clean": "node -e \"const fs = require('fs'); const path = require('path'); const dirs = ['node_modules/.vite', 'dist']; dirs.forEach(d => { try { fs.rmSync(d, { recursive: true, force: true }); console.log('Cleaned:', d); } catch(e) {} });\""
+    "clean": "node -e \"const fs = require('fs'); const path = require('path'); const dirs = ['node_modules/.vite', 'dist']; dirs.forEach(d => { try { fs.rmSync(d, { recursive: true, force: true }); console.log('Cleaned:', d); } catch(e) {} });\"",
+    "perf": "node performance-optimize.js",
+    "perf:clean": "node performance-optimize.js --clean",
+    "perf:analyze": "node performance-optimize.js --analyze"
   },
   "dependencies": {
     "@google/genai": "^1.17.0",

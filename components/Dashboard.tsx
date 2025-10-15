@@ -3,13 +3,14 @@ import React, { useState, useMemo, useEffect, useRef, memo } from 'react';
 import type { Vehicle, User, Conversation, VehicleData, ChatMessage, VehicleDocument } from '../types';
 import { VehicleCategory, View } from '../types';
 import { generateVehicleDescription, getAiVehicleSuggestions } from '../services/geminiService';
+import { getSafeImageSrc } from '../utils/imageUtils';
 import VehicleCard from './VehicleCard';
 import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend, PointElement, LineElement, LineController, BarController } from 'chart.js';
 import { Bar, Line } from 'react-chartjs-2';
 import AiAssistant from './AiAssistant';
 // FIX: ChatWidget is a named export, not a default. Corrected the import syntax.
 import { ChatWidget } from './ChatWidget';
-import { INDIAN_STATES, CITIES_BY_STATE } from '../constants';
+// Removed blocking import - will lazy load location data when needed
 import { planService } from '../services/planService';
 import BulkUploadModal from './BulkUploadModal';
 import { getPlaceholderImage } from './vehicleData';
@@ -241,9 +242,9 @@ const VehicleForm: React.FC<VehicleFormProps> = memo(({ editingVehicle, onAddVeh
     }, [formData.category, formData.make, formData.model, vehicleData]);
 
     const availableCities = useMemo(() => {
-        if (!formData.state || !CITIES_BY_STATE[formData.state]) return [];
-        return CITIES_BY_STATE[formData.state].sort();
-    }, [formData.state]);
+        if (!formData.state || !citiesByState[formData.state]) return [];
+        return citiesByState[formData.state].sort();
+    }, [formData.state, citiesByState]);
 
     // Check if vehicle data is available for the selected category
     const hasVehicleData = useMemo(() => {
@@ -572,7 +573,7 @@ const VehicleForm: React.FC<VehicleFormProps> = memo(({ editingVehicle, onAddVeh
                     <FormInput label="RTO" name="rto" value={formData.rto} onChange={handleChange} placeholder="e.g., MH01" />
                     <FormInput label="State" name="state" type="select" value={formData.state} onChange={handleChange} required>
                         <option value="" disabled>Select State</option>
-                        {INDIAN_STATES.map(s => <option key={s.code} value={s.code}>{s.name}</option>)}
+                        {indianStates.map(s => <option key={s.code} value={s.code}>{s.name}</option>)}
                     </FormInput>
                     <FormInput label="City" name="city" type="select" value={formData.city} onChange={handleChange} disabled={!formData.state} required>
                         <option value="" disabled>Select City</option>
@@ -664,7 +665,7 @@ const VehicleForm: React.FC<VehicleFormProps> = memo(({ editingVehicle, onAddVeh
                         <div className="mt-4 grid grid-cols-3 sm:grid-cols-4 lg:grid-cols-5 gap-3">
                             {formData.images.map((url, index) => (
                                 <div key={index} className="relative group">
-                                    <img src={url} className="w-full h-24 object-cover rounded-lg shadow-sm" alt={`Vehicle thumbnail ${index + 1}`} />
+                                    <img src={getSafeImageSrc(url)} className="w-full h-24 object-cover rounded-lg shadow-sm" alt={`Vehicle thumbnail ${index + 1}`} />
                                     <button type="button" onClick={() => handleRemoveImageUrl(url)} className="absolute top-1 right-1 bg-spinny-orange text-white rounded-full h-6 w-6 flex items-center justify-center text-sm opacity-0 group-hover:opacity-100">&times;</button>
                                 </div>
                             ))}
@@ -923,7 +924,7 @@ const SellerProfileForm: React.FC<{ seller: User; onUpdateProfile: (details: any
             <h2 className="text-2xl font-bold text-spinny-text-dark dark:text-spinny-text-dark mb-6">Seller Profile</h2>
             <form onSubmit={handleSubmit} className="space-y-6">
                 <div className="flex items-center gap-6">
-                    <img src={formData.logoUrl || 'https://via.placeholder.com/100'} alt="Logo" className="w-24 h-24 rounded-full object-cover bg-white-dark" />
+                    <img src={getSafeImageSrc(formData.logoUrl, 'https://via.placeholder.com/100')} alt="Logo" className="w-24 h-24 rounded-full object-cover bg-white-dark" />
                     <div>
                         <label htmlFor="logo-upload" className="cursor-pointer font-medium transition-colors" style={{ color: '#FF6B35' }} onMouseEnter={(e) => e.currentTarget.style.color = 'var(--spinny-blue)'} onMouseLeave={(e) => e.currentTarget.style.color = 'var(--spinny-orange)'}>
                             <span>Upload New Logo</span>
@@ -954,7 +955,7 @@ const SellerProfileForm: React.FC<{ seller: User; onUpdateProfile: (details: any
                 <h3 className="text-xl font-bold text-spinny-text-dark dark:text-spinny-text-dark mb-4">Your Public Profile</h3>
                 <div className="flex flex-col sm:flex-row items-center gap-6 p-4 bg-white rounded-lg">
                     <div className="text-center">
-                        <img src={qrCodeUrl} alt="Seller Profile QR Code" className="w-36 h-36 rounded-lg border dark:border-gray-200-300" />
+                        <img src={getSafeImageSrc(qrCodeUrl)} alt="Seller Profile QR Code" className="w-36 h-36 rounded-lg border dark:border-gray-200-300" />
                          <a href={qrCodeUrl} download={`qr-code-${seller.email}.png`} className="mt-2 inline-block text-sm hover:underline transition-colors" style={{ color: '#FF6B35' }} onMouseEnter={(e) => e.currentTarget.style.color = 'var(--spinny-blue)'} onMouseLeave={(e) => e.currentTarget.style.color = 'var(--spinny-orange)'}>
                             Download QR Code
                         </a>
@@ -1016,6 +1017,24 @@ const Dashboard: React.FC<DashboardProps> = ({ seller, sellerVehicles, reportedV
   // NEW: Boost listing feature
   const [showBoostModal, setShowBoostModal] = useState(false);
   const [vehicleToBoost, setVehicleToBoost] = useState<Vehicle | null>(null);
+  
+  // Lazy load location data
+  const [indianStates, setIndianStates] = useState<Array<{name: string, code: string}>>([]);
+  const [citiesByState, setCitiesByState] = useState<Record<string, string[]>>({});
+
+  // Load location data when component mounts
+  useEffect(() => {
+    const loadLocationData = async () => {
+      try {
+        const { INDIAN_STATES, CITIES_BY_STATE } = await import('../constants');
+        setIndianStates(INDIAN_STATES);
+        setCitiesByState(CITIES_BY_STATE);
+      } catch (error) {
+        console.error('Failed to load location data:', error);
+      }
+    };
+    loadLocationData();
+  }, []);
 
   useEffect(() => {
     if (selectedConv) {

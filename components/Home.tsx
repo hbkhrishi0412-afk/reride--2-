@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import type { Vehicle, VehicleCategory, View } from '../types';
 import { View as ViewEnum, VehicleCategory as CategoryEnum } from '../types';
+import { getFirstValidImage } from '../utils/imageUtils';
 import StarRating from './StarRating';
 import QuickViewModal from './QuickViewModal';
 
@@ -52,6 +53,7 @@ const FeaturedVehicleCard: React.FC<Pick<HomeProps, 'onSelectVehicle' | 'onToggl
 
     const handleQuickViewClick = (e: React.MouseEvent) => {
       e.stopPropagation();
+      console.log('QuickView button clicked for vehicle:', vehicle.id, vehicle.make, vehicle.model);
       onQuickView(vehicle);
     }
   
@@ -61,7 +63,7 @@ const FeaturedVehicleCard: React.FC<Pick<HomeProps, 'onSelectVehicle' | 'onToggl
         className="spinny-vehicle-card group cursor-pointer"
       >
         <div className="relative overflow-hidden">
-          <img className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300" src={vehicle.images[0]} alt={`${vehicle.make} ${vehicle.model}`} loading="lazy" />
+          <img className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300" src={getFirstValidImage(vehicle.images)} alt={`${vehicle.make} ${vehicle.model}`} loading="lazy" />
           
           {/* Verified Badge */}
           <div className="absolute top-3 left-3">

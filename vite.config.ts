@@ -4,10 +4,20 @@ import react from '@vitejs/plugin-react'
 // https://vitejs.dev/config/
 export default defineConfig({
   plugins: [react()],
+  // Exclude API files and server-side dependencies from client bundling
+  define: {
+    // Prevent server-side code from being bundled in client
+    'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV || 'development')
+  },
   build: {
     // Optimize chunk size - lower threshold to catch bloat earlier
     chunkSizeWarningLimit: 500,
     rollupOptions: {
+      // Exclude API files from client build
+      external: (id) => {
+        // Only exclude actual API files, not all files with /api/ in path
+        return id.includes('/api/') && (id.endsWith('.ts') || id.endsWith('.js'));
+      },
       output: {
         // Aggressive code splitting for faster initial load
         manualChunks: (id) => {
@@ -45,6 +55,10 @@ export default defineConfig({
           if (id.includes('/constants') || id.includes('/data/')) {
             return 'static-data';
           }
+          // Split services into separate chunks
+          if (id.includes('/services/')) {
+            return 'services';
+          }
         }
       }
     },
@@ -65,6 +79,8 @@ export default defineConfig({
     cssCodeSplit: true,
     // Enable asset inlining for small files
     assetsInlineLimit: 4096,
+    // Optimize for faster loading
+    reportCompressedSize: false,
   },
   server: {
     port: 5174,
@@ -74,22 +90,28 @@ export default defineConfig({
     },
     // Enable file system caching for faster rebuilds
     fs: {
-      cachedChecks: true
+      cachedChecks: true,
+      // Exclude API files from file system watching
+      deny: ['**/api/**']
     },
-    // Proxy configuration
-    proxy: {
-      '/api': {
-        target: 'http://localhost:3000',
-        changeOrigin: true,
-        rewrite: (path) => path.replace(/^\/api/, '/api')
-      }
-    }
+    // Optimize development server performance
+    warmup: {
+      clientFiles: ['./src/App.tsx', './src/components/Header.tsx', './src/components/Home.tsx']
+    },
+    // No proxy needed - using Vercel serverless functions
+    // proxy: {
+    //   '/api': {
+    //     target: 'http://localhost:3000',
+    //     changeOrigin: true,
+    //     rewrite: (path) => path.replace(/^\/api/, '/api')
+    //   }
+    // }
   },
   // Optimize dependencies
   optimizeDeps: {
     include: ['react', 'react-dom'],
     // Exclude heavy dependencies from pre-bundling
-    exclude: ['@google/genai']
+    exclude: ['@google/genai', 'mongodb']
   },
   // Enable esbuild optimizations in dev mode
   esbuild: {

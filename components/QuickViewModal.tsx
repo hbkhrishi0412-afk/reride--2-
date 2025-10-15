@@ -1,5 +1,6 @@
 import React, { useState, useEffect, memo } from 'react';
 import type { Vehicle } from '../types';
+import { getFirstValidImage, getValidImages, getSafeImageSrc } from '../utils/imageUtils';
 
 // KeySpec component copied for reuse
 const KeySpec: React.FC<{ label: string; value: string | number; }> = memo(({ label, value }) => (
@@ -20,11 +21,13 @@ interface QuickViewModalProps {
 }
 
 const QuickViewModal: React.FC<QuickViewModalProps> = ({ vehicle, onClose, onSelectVehicle, onToggleCompare, onToggleWishlist, comparisonList, wishlist }) => {
-  const [mainImage, setMainImage] = useState('');
+  const [mainImage, setMainImage] = useState(() => vehicle ? getFirstValidImage(vehicle.images) : '');
 
   useEffect(() => {
     if (vehicle) {
-      setMainImage(vehicle.images[0]);
+      setMainImage(getFirstValidImage(vehicle.images));
+    } else {
+      setMainImage('');
     }
   }, [vehicle]);
 
@@ -44,6 +47,16 @@ const QuickViewModal: React.FC<QuickViewModalProps> = ({ vehicle, onClose, onSel
     return null;
   }
 
+  console.log('QuickViewModal rendering for vehicle:', vehicle.id, vehicle.make, vehicle.model);
+  console.log('Vehicle data:', {
+    id: vehicle.id,
+    make: vehicle.make,
+    model: vehicle.model,
+    price: vehicle.price,
+    images: vehicle.images,
+    imagesLength: vehicle.images?.length
+  });
+
   const isComparing = comparisonList.includes(vehicle.id);
   const isInWishlist = wishlist.includes(vehicle.id);
   const isCompareDisabled = !isComparing && comparisonList.length >= 4;
@@ -54,40 +67,42 @@ const QuickViewModal: React.FC<QuickViewModalProps> = ({ vehicle, onClose, onSel
   };
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-[100] p-4 animate-fade-in" onClick={onClose}>
+    <div className="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-[100] p-4 animate-fade-in" onClick={onClose} style={{ zIndex: 9999 }}>
       <div className="bg-white rounded-xl shadow-2xl w-full max-w-4xl max-h-[90vh] flex flex-col md:flex-row overflow-hidden relative" onClick={(e) => e.stopPropagation()}>
         <button onClick={onClose} className="absolute top-2 right-2 text-white md:text-spinny-text bg-black/30 md:bg-transparent rounded-full w-8 h-8 flex items-center justify-center hover:text-spinny-text-dark dark:hover:text-white z-10 text-2xl">&times;</button>
         
         {/* Image Section */}
         <div className="w-full md:w-1/2 p-4 flex flex-col">
-          <img src={mainImage} alt={`${vehicle.make} ${vehicle.model}`} className="w-full h-64 md:h-auto object-cover rounded-lg flex-grow" />
-          <div className="grid grid-cols-5 gap-2 mt-2">
-            {vehicle.images.slice(0, 5).map((img, index) => (
-              <img
-                key={index}
-                src={img}
-                alt={`Thumbnail ${index + 1}`}
-                className={`cursor-pointer rounded-md border-2 h-16 w-full object-cover ${mainImage === img ? '' : 'border-transparent'} transition`} style={mainImage === img ? { bordercolor: '#FF6B35' } : undefined} onMouseEnter={(e) => mainImage !== img && (e.currentTarget.style.borderColor = 'var(--spinny-blue)')} onMouseLeave={(e) => mainImage !== img && (e.currentTarget.style.borderColor = '')}
-                onClick={() => setMainImage(img)}
-              />
-            ))}
-          </div>
+          <img src={getSafeImageSrc(mainImage)} alt={`${vehicle.make || 'Vehicle'} ${vehicle.model || ''}`} className="w-full h-64 md:h-auto object-cover rounded-lg flex-grow" />
+          {vehicle.images && vehicle.images.length > 1 && (
+            <div className="grid grid-cols-5 gap-2 mt-2">
+              {getValidImages(vehicle.images).slice(0, 5).map((img, index) => (
+                <img
+                  key={index}
+                  src={img}
+                  alt={`Thumbnail ${index + 1}`}
+                  className={`cursor-pointer rounded-md border-2 h-16 w-full object-cover ${mainImage === img ? '' : 'border-transparent'} transition`} style={mainImage === img ? { bordercolor: '#FF6B35' } : undefined} onMouseEnter={(e) => mainImage !== img && (e.currentTarget.style.borderColor = 'var(--spinny-blue)')} onMouseLeave={(e) => mainImage !== img && (e.currentTarget.style.borderColor = '')}
+                  onClick={() => setMainImage(img)}
+                />
+              ))}
+            </div>
+          )}
         </div>
         
         {/* Details Section */}
         <div className="w-full md:w-1/2 p-6 flex flex-col overflow-y-auto">
           <div>
-            <h2 className="text-3xl font-bold text-spinny-text-dark dark:text-spinny-text-dark">{vehicle.year} {vehicle.make} {vehicle.model}</h2>
+            <h2 className="text-3xl font-bold text-spinny-text-dark dark:text-spinny-text-dark">{vehicle.year || 'N/A'} {vehicle.make || 'Vehicle'} {vehicle.model || ''}</h2>
             <p className="text-spinny-text dark:text-spinny-text">{vehicle.variant || ''}</p>
-            <p className="text-3xl font-extrabold my-4" style={{ color: '#FF6B35' }}>₹{vehicle.price.toLocaleString('en-IN')}</p>
+            <p className="text-3xl font-extrabold my-4" style={{ color: '#FF6B35' }}>₹{vehicle.price ? vehicle.price.toLocaleString('en-IN') : 'N/A'}</p>
           </div>
 
           <div className="space-y-2 my-4">
-            <KeySpec label="Mileage" value={`${vehicle.mileage.toLocaleString('en-IN')} kms`} />
-            <KeySpec label="Fuel Type" value={vehicle.fuelType} />
-            <KeySpec label="Transmission" value={vehicle.transmission} />
-            <KeySpec label="Registration Year" value={vehicle.registrationYear} />
-            <KeySpec label="No. of Owners" value={vehicle.noOfOwners} />
+            <KeySpec label="Mileage" value={`${vehicle.mileage ? vehicle.mileage.toLocaleString('en-IN') : 'N/A'} kms`} />
+            <KeySpec label="Fuel Type" value={vehicle.fuelType || 'N/A'} />
+            <KeySpec label="Transmission" value={vehicle.transmission || 'N/A'} />
+            <KeySpec label="Registration Year" value={vehicle.registrationYear || 'N/A'} />
+            <KeySpec label="No. of Owners" value={vehicle.noOfOwners || 'N/A'} />
           </div>
 
           <div className="mt-auto pt-6 space-y-3">

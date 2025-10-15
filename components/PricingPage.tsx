@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import type { User, PlanDetails, SubscriptionPlan } from '../types';
-import { PLAN_DETAILS } from '../constants';
+// Removed blocking import - will lazy load PLAN_DETAILS when needed
 import { planService } from '../services/planService';
 import PaymentRequestModal from './PaymentRequestModal';
 

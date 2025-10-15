@@ -211,9 +211,8 @@ const authApi = async (body: any): Promise<any> => {
 
 
 // --- Environment Detection ---
-// FORCE PRODUCTION MODE: Always use MongoDB/API, never localStorage
-// This ensures all users see the same data from the database
-const isDevelopment = false; // import.meta.env.DEV || window.location.hostname === 'localhost' || window.location.hostname.includes('localhost');
+// Use local storage in development, API in production
+const isDevelopment = import.meta.env.DEV || window.location.hostname === 'localhost' || window.location.hostname.includes('localhost');
 
 // --- Exported Environment-Aware Service Functions ---
 

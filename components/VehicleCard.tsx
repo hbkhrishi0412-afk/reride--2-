@@ -2,6 +2,7 @@ import React, { memo } from 'react';
 import type { Vehicle } from '../types';
 import StarRating from './StarRating';
 import BadgeDisplay from './BadgeDisplay';
+import { getFirstValidImage } from '../utils/imageUtils';
 
 interface VehicleCardProps {
   vehicle: Vehicle;
@@ -42,6 +43,7 @@ const VehicleCard: React.FC<VehicleCardProps> = ({ vehicle, onSelect, onToggleCo
 
   const handleQuickViewClick = (e: React.MouseEvent) => {
     e.stopPropagation();
+    console.log('VehicleCard QuickView button clicked for vehicle:', vehicle.id, vehicle.make, vehicle.model);
     onQuickView(vehicle);
   };
 
@@ -52,7 +54,7 @@ const VehicleCard: React.FC<VehicleCardProps> = ({ vehicle, onSelect, onToggleCo
       style={{ ['--hover-ring-color' as any]: 'var(--spinny-orange)' }}
     >
       <div className="relative overflow-hidden">
-        <img className="w-full h-40 sm:h-56 object-cover group-hover:scale-105 transition-transform duration-500 ease-in-out" src={vehicle.images[0]} alt={`${vehicle.make} ${vehicle.model}`} loading="lazy" />
+        <img className="w-full h-40 sm:h-56 object-cover group-hover:scale-105 transition-transform duration-500 ease-in-out" src={getFirstValidImage(vehicle.images)} alt={`${vehicle.make} ${vehicle.model}`} loading="lazy" />
         <div className="absolute top-0 left-0 right-0 h-20 bg-gradient-to-b from-black/50 to-transparent"></div>
         {/* Boost Indicators */}
         <div className="absolute top-3 left-3 flex flex-col gap-1">

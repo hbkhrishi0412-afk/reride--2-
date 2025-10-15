@@ -1,5 +1,5 @@
-import React, { useState, useMemo } from 'react';
-import { INDIAN_STATES, CITIES_BY_STATE } from '../constants';
+import React, { useState, useMemo, useEffect } from 'react';
+// Removed blocking import - will lazy load location data when needed
 
 interface LocationModalProps {
     isOpen: boolean;
@@ -13,11 +13,29 @@ const LocationModal: React.FC<LocationModalProps> = ({ isOpen, onClose, currentL
     const [selectedState, setSelectedState] = useState('');
     const [selectedCity, setSelectedCity] = useState('');
     const [isDetecting, setIsDetecting] = useState(false);
+    
+    // Lazy load location data
+    const [indianStates, setIndianStates] = useState<Array<{name: string, code: string}>>([]);
+    const [citiesByState, setCitiesByState] = useState<Record<string, string[]>>({});
+
+    // Load location data when component mounts
+    useEffect(() => {
+        const loadLocationData = async () => {
+            try {
+                const { INDIAN_STATES, CITIES_BY_STATE } = await import('../constants');
+                setIndianStates(INDIAN_STATES);
+                setCitiesByState(CITIES_BY_STATE);
+            } catch (error) {
+                console.error('Failed to load location data:', error);
+            }
+        };
+        loadLocationData();
+    }, []);
 
     const availableCities = useMemo(() => {
         if (!selectedState) return [];
-        return CITIES_BY_STATE[selectedState] || [];
-    }, [selectedState]);
+        return citiesByState[selectedState] || [];
+    }, [selectedState, citiesByState]);
 
     const handleDetectLocation = () => {
         if (!navigator.geolocation) {
@@ -56,7 +74,7 @@ const LocationModal: React.FC<LocationModalProps> = ({ isOpen, onClose, currentL
                     console.log('Detected location:', { detectedCity, detectedState });
                     
                     // Try to match with our available cities
-                    const allCities = Object.values(CITIES_BY_STATE).flat();
+                    const allCities = Object.values(citiesByState).flat();
                     let matchedCity = null;
                     
                     // First, try exact match
@@ -76,14 +94,14 @@ const LocationModal: React.FC<LocationModalProps> = ({ isOpen, onClose, currentL
                     
                     // If still no match, try to find major city in the detected state
                     if (!matchedCity && detectedState) {
-                        const stateEntry = INDIAN_STATES.find(s => 
+                        const stateEntry = indianStates.find(s => 
                             s.name.toLowerCase().includes(detectedState.toLowerCase()) ||
                             detectedState.toLowerCase().includes(s.name.toLowerCase())
                         );
                         
-                        if (stateEntry && CITIES_BY_STATE[stateEntry.code]) {
+                        if (stateEntry && citiesByState[stateEntry.code]) {
                             // Pick the first major city in that state
-                            matchedCity = CITIES_BY_STATE[stateEntry.code][0];
+                            matchedCity = citiesByState[stateEntry.code][0];
                         }
                     }
                     
@@ -243,7 +261,7 @@ const LocationModal: React.FC<LocationModalProps> = ({ isOpen, onClose, currentL
                             <label htmlFor="state-select" className="block text-sm font-medium text-spinny-text-dark dark:text-spinny-text-dark mb-1">State</label>
                             <select id="state-select" value={selectedState} onChange={e => { setSelectedState(e.target.value); setSelectedCity(''); }} className="w-full p-2 border border-gray-200 dark:border-gray-200-300 rounded-md bg-white dark:bg-brand-gray-700">
                                 <option value="" disabled>Select a state</option>
-                                {INDIAN_STATES.map(state => <option key={state.code} value={state.code}>{state.name}</option>)}
+                                {indianStates.map(state => <option key={state.code} value={state.code}>{state.name}</option>)}
                             </select>
                         </div>
                         <div>

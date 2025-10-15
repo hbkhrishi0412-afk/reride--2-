@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { NEW_CARS_DATA, NewCarModel, NewCarVariant } from '../data/newCarsData';
+import { getSafeImageSrc } from '../utils/imageUtils';
 import CarSpecModal from './CarSpecModal';
 
 const formatCurrency = (value: number) => {
@@ -40,7 +41,7 @@ const CarModelCard: React.FC<{ car: NewCarModel; isExpanded: boolean; onToggle: 
             className="w-full p-4 text-left flex items-center gap-4 focus:outline-none rounded-xl" onFocus={(e) => e.currentTarget.style.boxShadow = '0 0 0 2px rgba(255, 107, 53, 0.1)'} onBlur={(e) => e.currentTarget.style.boxShadow = ''}
         >
             <div className="w-32 h-24 bg-spinny-off-white dark:bg-brand-gray-700 rounded-lg flex-shrink-0 p-1">
-                 <img src={car.image_url} alt={`${car.brand_name} ${car.model_name}`} className="w-full h-full object-contain" />
+                 <img src={getSafeImageSrc(car.image_url)} alt={`${car.brand_name} ${car.model_name}`} className="w-full h-full object-contain" />
             </div>
             <div className="flex-grow">
                 <h3 className="text-xl font-bold text-spinny-text-dark dark:text-spinny-text-dark">{car.brand_name} {car.model_name} ({car.model_year})</h3>

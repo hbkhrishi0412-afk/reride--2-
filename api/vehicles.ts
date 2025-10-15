@@ -4,7 +4,7 @@ import connectToDatabase from './lib-db.js';
 import Vehicle from './lib-vehicle.js';
 import VehicleDataModel from '../models/VehicleData';
 import type { VehicleData } from '../types';
-import { BOOST_PACKAGES, LISTING_EXPIRY_DAYS } from '../constants';
+// Constants will be imported dynamically when needed
 
 // Helper: Calculate distance between coordinates
 function calculateDistance(lat1: number, lng1: number, lat2: number, lng2: number): number {
@@ -174,6 +174,7 @@ export default async function handler(
         vehicle.updatedAt = new Date();
       } else if (refreshAction === 'renew') {
         const newExpiryDate = new Date();
+        const { LISTING_EXPIRY_DAYS } = await import('../constants');
         newExpiryDate.setDate(newExpiryDate.getDate() + LISTING_EXPIRY_DAYS);
         
         vehicle.listingExpiresAt = newExpiryDate;
@@ -193,6 +194,7 @@ export default async function handler(
     // BOOST LISTING ENDPOINT
     if (action === 'boost') {
       if (req.method === 'GET') {
+        const { BOOST_PACKAGES } = await import('../constants');
         return res.status(200).json({ packages: BOOST_PACKAGES });
       }
 
@@ -212,6 +214,7 @@ export default async function handler(
           return res.status(403).json({ error: 'Unauthorized' });
         }
 
+        const { BOOST_PACKAGES } = await import('../constants');
         const boostPackage = BOOST_PACKAGES.find(p => p.id === packageId);
         if (!boostPackage) {
           return res.status(404).json({ error: 'Boost package not found' });
@@ -269,6 +272,7 @@ export default async function handler(
           
           for (const vehicle of vehiclesToUpdate) {
             const expiryDate = new Date();
+            const { LISTING_EXPIRY_DAYS } = await import('../constants');
             expiryDate.setDate(expiryDate.getDate() + LISTING_EXPIRY_DAYS);
             
             await Vehicle.findOneAndUpdate(
@@ -339,6 +343,7 @@ export default async function handler(
         
         // Set expiry date (30 days from now)
         const expiryDate = new Date();
+        const { LISTING_EXPIRY_DAYS } = await import('../constants');
         expiryDate.setDate(expiryDate.getDate() + LISTING_EXPIRY_DAYS);
         newVehicleData.listingExpiresAt = expiryDate.toISOString();
         

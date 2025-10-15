@@ -7,6 +7,7 @@ import QuickViewModal from './QuickViewModal';
 import VehicleTile from './VehicleTile';
 import VehicleTileSkeleton from './VehicleTileSkeleton';
 import { INDIAN_STATES, FUEL_TYPES } from '../constants';
+// Removed blocking import - will lazy load location data when needed
 
 interface VehicleListProps {
   vehicles: Vehicle[];
@@ -89,6 +90,10 @@ const VehicleList: React.FC<VehicleListProps> = ({ vehicles, onSelectVehicle, is
   const [suggestions, setSuggestions] = useState<string[]>([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
   
+  // Lazy load location and fuel data
+  const [indianStates, setIndianStates] = useState<Array<{name: string, code: string}>>([]);
+  const [fuelTypes, setFuelTypes] = useState<string[]>([]);
+  
   const [makeFilter, setMakeFilter] = useState('');
   const [modelFilter, setModelFilter] = useState('');
   const [priceRange, setPriceRange] = useState({ min: MIN_PRICE, max: MAX_PRICE });
@@ -96,17 +101,7 @@ const VehicleList: React.FC<VehicleListProps> = ({ vehicles, onSelectVehicle, is
   const [fuelTypeFilter, setFuelTypeFilter] = useState('');
   const [yearFilter, setYearFilter] = useState('0');
   const [colorFilter, setColorFilter] = useState('');
-  const [stateFilter, setStateFilter] = useState(() => {
-    // Try to match user location with state codes
-    if (userLocation) {
-      const state = INDIAN_STATES.find(s => 
-        s.name.toLowerCase().includes(userLocation.toLowerCase()) || 
-        userLocation.toLowerCase().includes(s.name.toLowerCase())
-      );
-      return state?.code || '';
-    }
-    return '';
-  });
+  const [stateFilter, setStateFilter] = useState('');
   const [selectedFeatures, setSelectedFeatures] = useState<string[]>([]);
   const [featureSearch, setFeatureSearch] = useState('');
   const [isFeaturesOpen, setIsFeaturesOpen] = useState(false);
@@ -160,7 +155,7 @@ const VehicleList: React.FC<VehicleListProps> = ({ vehicles, onSelectVehicle, is
   }, [tempFilters.makeFilter, vehicles]);
   const uniqueYears = useMemo(() => [...new Set(vehicles.map(v => v.year))].sort((a, b) => Number(b) - Number(a)), [vehicles]);
   const uniqueColors = useMemo(() => [...new Set(vehicles.map(v => v.color))].sort(), [vehicles]);
-  const uniqueStates = useMemo(() => INDIAN_STATES, []);
+  const uniqueStates = useMemo(() => indianStates, [indianStates]);
 
   const allFeatures = useMemo(() => [...new Set(vehicles.flatMap(v => v.features))].sort(), [vehicles]);
   
@@ -213,10 +208,34 @@ const VehicleList: React.FC<VehicleListProps> = ({ vehicles, onSelectVehicle, is
     setCategoryFilter(initialCategory);
   }, [initialCategory]);
 
+  // Load location and fuel data when component mounts
+  useEffect(() => {
+    const loadLocationData = async () => {
+      try {
+        setIndianStates(INDIAN_STATES);
+        setFuelTypes(FUEL_TYPES);
+        
+        // Set initial state filter based on user location
+        if (userLocation) {
+          const state = INDIAN_STATES.find(s => 
+            s.name.toLowerCase().includes(userLocation.toLowerCase()) || 
+            userLocation.toLowerCase().includes(s.name.toLowerCase())
+          );
+          if (state) {
+            setStateFilter(state.code);
+          }
+        }
+      } catch (error) {
+        console.error('Failed to load location data:', error);
+      }
+    };
+    loadLocationData();
+  }, [userLocation]);
+
   // Update state filter when user location changes
   useEffect(() => {
-    if (userLocation) {
-      const state = INDIAN_STATES.find(s => 
+    if (userLocation && indianStates.length > 0) {
+      const state = indianStates.find(s => 
         s.name.toLowerCase().includes(userLocation.toLowerCase()) || 
         userLocation.toLowerCase().includes(s.name.toLowerCase())
       );
@@ -224,7 +243,7 @@ const VehicleList: React.FC<VehicleListProps> = ({ vehicles, onSelectVehicle, is
         setStateFilter(state.code);
       }
     }
-  }, [userLocation]);
+  }, [userLocation, indianStates]);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -585,7 +604,7 @@ const VehicleList: React.FC<VehicleListProps> = ({ vehicles, onSelectVehicle, is
                 <label htmlFor="fuel-type-filter" className="block text-sm font-medium text-spinny-text-dark dark:text-spinny-text-dark mb-1">Fuel Type</label>
                 <select id="fuel-type-filter" name="fuelTypeFilter" value={state.fuelTypeFilter} onChange={handleSelectChange} className={formElementClass}>
                     <option value="">Any Fuel Type</option>
-                    {FUEL_TYPES.map(fuel => <option key={fuel} value={fuel}>{fuel}</option>)}
+                    {fuelTypes.map(fuel => <option key={fuel} value={fuel}>{fuel}</option>)}
                 </select>
             </div>
             <div>

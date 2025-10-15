@@ -1,5 +1,6 @@
 import React, { useMemo, useState } from 'react';
 import type { Vehicle } from '../types';
+import { getFirstValidImage } from '../utils/imageUtils';
 
 interface ComparisonProps {
   vehicles: Vehicle[];
@@ -137,7 +138,7 @@ const Comparison: React.FC<ComparisonProps> = ({ vehicles, onBack: onBackToHome,
               <th className="text-left font-bold text-lg text-spinny-text-dark p-4 sticky left-0 bg-white z-10">Feature</th>
               {vehicles.map(vehicle => (
                 <th key={vehicle.id} className="p-4 min-w-[220px]">
-                  <img src={vehicle.images[0]} alt={`${vehicle.make} ${vehicle.model}`} className="w-full h-40 object-cover rounded-lg mb-2" />
+                  <img src={getFirstValidImage(vehicle.images)} alt={`${vehicle.make} ${vehicle.model}`} className="w-full h-40 object-cover rounded-lg mb-2" />
                   <h3 className="font-bold text-lg dark:text-spinny-text-dark">{vehicle.year} {vehicle.make} {vehicle.model} {vehicle.variant || ''}</h3>
                   <button onClick={() => onToggleCompare(vehicle.id)} className="mt-2 text-sm text-spinny-orange hover:text-spinny-orange">Remove</button>
                 </th>
