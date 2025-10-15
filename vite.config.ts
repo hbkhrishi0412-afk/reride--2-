@@ -33,20 +33,30 @@ export default defineConfig({
     chunkSizeWarningLimit: 500,
     rollupOptions: {
       output: {
-        // Aggressive code splitting for faster initial load
+        // Ultra-aggressive code splitting for maximum efficiency
         manualChunks: (id) => {
           if (id.includes('node_modules')) {
-            // React core - most critical
+            // React core - most critical, smallest possible
             if (id.includes('react') || id.includes('react-dom')) {
-              return 'react-vendor';
+              return 'react-core';
+            }
+            // React hooks and utilities
+            if (id.includes('react-hooks') || id.includes('react-router')) {
+              return 'react-utils';
             }
             // Chart.js - only loaded when needed
             if (id.includes('chart.js') || id.includes('react-chartjs')) {
               return 'charts';
             }
-            // Firebase - large library
-            if (id.includes('firebase')) {
-              return 'firebase';
+            // Firebase - split by feature
+            if (id.includes('firebase/auth')) {
+              return 'firebase-auth';
+            }
+            if (id.includes('firebase/firestore')) {
+              return 'firebase-firestore';
+            }
+            if (id.includes('firebase') && !id.includes('firebase/auth') && !id.includes('firebase/firestore')) {
+              return 'firebase-core';
             }
             // Mongoose - backend only
             if (id.includes('mongoose')) {
@@ -59,7 +69,7 @@ export default defineConfig({
             // Other vendors
             return 'vendor';
           }
-          // Split large components
+          // Split components by feature and usage frequency
           if (id.includes('/components/Dashboard')) {
             return 'dashboard';
           }
@@ -74,6 +84,23 @@ export default defineConfig({
           }
           if (id.includes('/components/Profile') || id.includes('/components/CustomerInbox')) {
             return 'user';
+          }
+          if (id.includes('/components/Login') || id.includes('/components/Auth')) {
+            return 'auth';
+          }
+          if (id.includes('/components/Header') || id.includes('/components/Footer')) {
+            return 'layout';
+          }
+          if (id.includes('/components/Comparison') || id.includes('/components/QuickView')) {
+            return 'interactive';
+          }
+          // Split services
+          if (id.includes('/services/')) {
+            return 'services';
+          }
+          // Split utilities
+          if (id.includes('/utils/') || id.includes('/lib/')) {
+            return 'utils';
           }
         },
         // Optimize chunk naming
@@ -101,7 +128,13 @@ export default defineConfig({
       drop: ['console', 'debugger'],
       legalComments: 'none',
       // Optimize for modern browsers
-      target: 'es2020'
+      target: 'es2020',
+      // Advanced minification options
+      minifyIdentifiers: true,
+      minifySyntax: true,
+      minifyWhitespace: true,
+      // Remove unused code more aggressively
+      treeShaking: true
     },
     // Optimize CSS
     cssMinify: true,
@@ -116,11 +149,107 @@ export default defineConfig({
       moduleSideEffects: false
     },
     // Optimize assets
-    assetsInlineLimit: 4096, // 4kb
+    assetsInlineLimit: 2048, // 2kb - more aggressive inlining
     // Enable compression
     reportCompressedSize: false, // Disable to speed up build
     // Optimize for production
-    emptyOutDir: true
+    emptyOutDir: true,
+    // Performance budgets
+    rollupOptions: {
+      output: {
+        // Ultra-aggressive code splitting for maximum efficiency
+        manualChunks: (id) => {
+          if (id.includes('node_modules')) {
+            // React core - most critical, smallest possible
+            if (id.includes('react') || id.includes('react-dom')) {
+              return 'react-core';
+            }
+            // React hooks and utilities
+            if (id.includes('react-hooks') || id.includes('react-router')) {
+              return 'react-utils';
+            }
+            // Chart.js - only loaded when needed
+            if (id.includes('chart.js') || id.includes('react-chartjs')) {
+              return 'charts';
+            }
+            // Firebase - split by feature
+            if (id.includes('firebase/auth')) {
+              return 'firebase-auth';
+            }
+            if (id.includes('firebase/firestore')) {
+              return 'firebase-firestore';
+            }
+            if (id.includes('firebase') && !id.includes('firebase/auth') && !id.includes('firebase/firestore')) {
+              return 'firebase-core';
+            }
+            // Mongoose - backend only
+            if (id.includes('mongoose')) {
+              return 'mongoose';
+            }
+            // Google AI - only when needed
+            if (id.includes('@google/genai')) {
+              return 'ai';
+            }
+            // Other vendors
+            return 'vendor';
+          }
+          // Split components by feature and usage frequency
+          if (id.includes('/components/Dashboard')) {
+            return 'dashboard';
+          }
+          if (id.includes('/components/AdminPanel')) {
+            return 'admin';
+          }
+          if (id.includes('/components/VehicleList') || id.includes('/components/VehicleDetail')) {
+            return 'vehicles';
+          }
+          if (id.includes('/components/Home')) {
+            return 'home';
+          }
+          if (id.includes('/components/Profile') || id.includes('/components/CustomerInbox')) {
+            return 'user';
+          }
+          if (id.includes('/components/Login') || id.includes('/components/Auth')) {
+            return 'auth';
+          }
+          if (id.includes('/components/Header') || id.includes('/components/Footer')) {
+            return 'layout';
+          }
+          if (id.includes('/components/Comparison') || id.includes('/components/QuickView')) {
+            return 'interactive';
+          }
+          // Split services
+          if (id.includes('/services/')) {
+            return 'services';
+          }
+          // Split utilities
+          if (id.includes('/utils/') || id.includes('/lib/')) {
+            return 'utils';
+          }
+        },
+        // Optimize chunk naming
+        chunkFileNames: (chunkInfo) => {
+          const facadeModuleId = chunkInfo.facadeModuleId ? chunkInfo.facadeModuleId.split('/').pop() : 'chunk';
+          return `assets/js/[name]-[hash].js`;
+        },
+        entryFileNames: 'assets/js/[name]-[hash].js',
+        assetFileNames: (assetInfo) => {
+          const info = assetInfo.name.split('.');
+          const ext = info[info.length - 1];
+          if (/\.(css)$/.test(assetInfo.name)) {
+            return `assets/css/[name]-[hash].${ext}`;
+          }
+          if (/\.(png|jpe?g|svg|gif|tiff|bmp|ico)$/i.test(assetInfo.name)) {
+            return `assets/images/[name]-[hash].${ext}`;
+          }
+          return `assets/[name]-[hash].${ext}`;
+        }
+      },
+      external: (id) => {
+        // Externalize heavy dependencies that might be available via CDN
+        return false; // Keep everything bundled for now
+      }
+    }
   },
   server: {
     proxy: {
