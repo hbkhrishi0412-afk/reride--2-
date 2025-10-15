@@ -1,5 +1,5 @@
 
-import { GoogleGenAI, GenerateContentResponse } from "@google/genai";
+import { GoogleGenerativeAI, GenerateContentResponse } from "@google/generative-ai";
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 
 // This is the main handler for the API route.
@@ -32,15 +32,23 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         }
         
         // Initialize the AI client on the server with the secure API key
-        const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
+        const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
+        
+        // Get the model (default to gemini-1.5-flash if not specified)
+        const modelName = payload.model || "gemini-1.5-flash";
+        const model = genAI.getGenerativeModel({ model: modelName });
+        
+        // Extract the content and generation config from payload
+        const { contents, generationConfig } = payload;
         
         // Make the actual call to the Gemini API
-        // The payload from the client should match the expected format for generateContent.
-        const response: GenerateContentResponse = await ai.models.generateContent(payload);
+        const result = await model.generateContent({
+            contents: contents,
+            generationConfig: generationConfig
+        });
         
-        // The .text property conveniently provides the string output,
-        // which could be plain text or a JSON string.
-        const resultText = response.text;
+        const response = await result.response;
+        const resultText = response.text();
 
         // Send the result back to the frontend
         return res.status(200).json({ result: resultText });

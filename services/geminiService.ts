@@ -1,6 +1,6 @@
 
 
-import { Type } from "@google/genai";
+import { HarmCategory, HarmBlockThreshold } from "@google/generative-ai";
 import type { Vehicle, ProsAndCons, Conversation, Suggestion } from '../types';
 import type { SearchFilters } from "../types";
 
@@ -29,10 +29,10 @@ async function callGeminiAPI(payload: any): Promise<string> {
     } catch (error) {
         console.error("Error calling Gemini proxy API:", error);
         // Return a default value that won't break the UI.
-        const isJson = payload.config?.responseMimeType === "application/json";
+        const isJson = payload.generationConfig?.responseMimeType === "application/json";
         if (isJson) {
             // Check if the expected response is an array or object
-            return payload.config?.responseSchema?.type === Type.ARRAY ? "[]" : "{}";
+            return payload.generationConfig?.responseSchema?.type === "array" ? "[]" : "{}";
         }
         return `Error: ${error instanceof Error ? error.message : "Could not connect to AI service."}`;
     }
@@ -49,25 +49,24 @@ export const parseSearchQuery = async (query: string): Promise<SearchFilters> =>
     Respond only with JSON matching the provided schema. If a value is not present, omit the key.`;
 
     const requestPayload = {
-        model: 'gemini-2.5-flash',
-        contents: prompt,
-        config: {
+        model: 'gemini-1.5-flash',
+        contents: [{ role: 'user', parts: [{ text: prompt }] }],
+        generationConfig: {
             responseMimeType: "application/json",
             responseSchema: {
-                type: Type.OBJECT,
+                type: "object",
                 properties: {
-                    make: { type: Type.STRING, description: "The make of the car, e.g., Tata, Hyundai." },
-                    model: { type: Type.STRING, description: "The model of the car, e.g., Nexon, Creta." },
-                    minPrice: { type: Type.NUMBER, description: "The minimum price in INR." },
-                    maxPrice: { type: Type.NUMBER, description: "The maximum price in INR." },
+                    make: { type: "string", description: "The make of the car, e.g., Tata, Hyundai." },
+                    model: { type: "string", description: "The model of the car, e.g., Nexon, Creta." },
+                    minPrice: { type: "number", description: "The minimum price in INR." },
+                    maxPrice: { type: "number", description: "The maximum price in INR." },
                     features: {
-                        type: Type.ARRAY,
-                        items: { type: Type.STRING },
+                        type: "array",
+                        items: { type: "string" },
                         description: "An array of requested vehicle features, e.g., Sunroof, ADAS."
                     },
                 },
             },
-            thinkingConfig: { thinkingBudget: 0 },
         },
     };
 
@@ -88,15 +87,15 @@ Key features include: ${vehicle.features.join(', ')}.
 Provide the output in JSON format with two keys: "pros" and "cons", each containing an array of strings.`;
 
     const requestPayload = {
-        model: 'gemini-2.5-flash',
-        contents: prompt,
-        config: {
+        model: 'gemini-1.5-flash',
+        contents: [{ role: 'user', parts: [{ text: prompt }] }],
+        generationConfig: {
             responseMimeType: "application/json",
             responseSchema: {
-                type: Type.OBJECT,
+                type: "object",
                 properties: {
-                    pros: { type: Type.ARRAY, items: { type: Type.STRING } },
-                    cons: { type: Type.ARRAY, items: { type: Type.STRING } }
+                    pros: { type: "array", items: { type: "string" } },
+                    cons: { type: "array", items: { type: "string" } }
                 }
             }
         }
@@ -141,11 +140,9 @@ export const generateVehicleDescription = async (vehicle: Partial<Vehicle>): Pro
     7. Ensure the output is just the description text, without any introductory phrases like "Here is the description:".`;
 
     const requestPayload = {
-        model: 'gemini-2.5-flash',
-        contents: prompt,
-        config: {
-            thinkingConfig: { thinkingBudget: 0 },
-        },
+        model: 'gemini-1.5-flash',
+        contents: [{ role: 'user', parts: [{ text: prompt }] }],
+        generationConfig: {},
     };
     
     const descriptionText = await callGeminiAPI(requestPayload);
@@ -171,41 +168,40 @@ Respond ONLY with a single JSON object matching this schema. If a value is not a
 - "featureSuggestions" should be an object where keys are categories like "Comfort & Convenience", "Safety", "Entertainment", and "Exterior", and values are arrays of feature strings.`;
     
     const requestPayload = {
-        model: 'gemini-2.5-flash',
-        contents: prompt,
-        config: {
+        model: 'gemini-1.5-flash',
+        contents: [{ role: 'user', parts: [{ text: prompt }] }],
+        generationConfig: {
             responseMimeType: "application/json",
             responseSchema: {
-                type: Type.OBJECT,
+                type: "object",
                 properties: {
                     structuredSpecs: {
-                        type: Type.OBJECT,
+                        type: "object",
                         properties: {
-                            engine: { type: Type.STRING },
-                            transmission: { type: Type.STRING },
-                            fuelType: { type: Type.STRING },
-                            fuelEfficiency: { type: Type.STRING },
-                            displacement: { type: Type.STRING },
-                            groundClearance: { type: Type.STRING },
-                            bootSpace: { type: Type.STRING },
+                            engine: { type: "string" },
+                            transmission: { type: "string" },
+                            fuelType: { type: "string" },
+                            fuelEfficiency: { type: "string" },
+                            displacement: { type: "string" },
+                            groundClearance: { type: "string" },
+                            bootSpace: { type: "string" },
                         }
                     },
                     featureSuggestions: {
-                        type: Type.OBJECT,
+                        type: "object",
                         properties: {
-                            "Comfort & Convenience": { type: Type.ARRAY, items: { type: Type.STRING } },
-                            "Safety": { type: Type.ARRAY, items: { type: Type.STRING } },
-                            "Entertainment": { type: Type.ARRAY, items: { type: Type.STRING } },
-                            "Exterior": { type: Type.ARRAY, items: { type: Type.STRING } },
+                            "Comfort & Convenience": { type: "array", items: { type: "string" } },
+                            "Safety": { type: "array", items: { type: "string" } },
+                            "Entertainment": { type: "array", items: { type: "string" } },
+                            "Exterior": { type: "array", items: { type: "string" } },
                         },
                         additionalProperties: {
-                            type: Type.ARRAY,
-                            items: { type: Type.STRING }
+                            type: "array",
+                            items: { type: "string" }
                         }
                     }
                 }
-            },
-            thinkingConfig: { thinkingBudget: 0 },
+            }
         }
     };
 
@@ -244,15 +240,14 @@ Available features: ${features.slice(0, 20).join(', ')}
 Return the suggestions as a JSON array of strings. For example: ["Hyundai Creta", "Sunroof", "under 15 lakhs"].`;
 
     const requestPayload = {
-        model: 'gemini-2.5-flash',
-        contents: prompt,
-        config: {
+        model: 'gemini-1.5-flash',
+        contents: [{ role: 'user', parts: [{ text: prompt }] }],
+        generationConfig: {
             responseMimeType: "application/json",
             responseSchema: {
-                type: Type.ARRAY,
-                items: { type: Type.STRING }
-            },
-            thinkingConfig: { thinkingBudget: 0 },
+                type: "array",
+                items: { type: "string" }
+            }
         }
     };
     
@@ -311,23 +306,23 @@ Respond ONLY with a JSON object containing a "suggestions" key, which is an arra
 If there is no data or no meaningful suggestions can be made, return an empty array for "suggestions".`;
 
     const requestPayload = {
-        model: 'gemini-2.5-flash',
-        contents: prompt,
-        config: {
+        model: 'gemini-1.5-flash',
+        contents: [{ role: 'user', parts: [{ text: prompt }] }],
+        generationConfig: {
             responseMimeType: "application/json",
             responseSchema: {
-                type: Type.OBJECT,
+                type: "object",
                 properties: {
                     suggestions: {
-                        type: Type.ARRAY,
+                        type: "array",
                         items: {
-                            type: Type.OBJECT,
+                            type: "object",
                             properties: {
-                                type: { type: Type.STRING },
-                                title: { type: Type.STRING },
-                                description: { type: Type.STRING },
-                                targetId: { type: Type.STRING }, // Gemini may return number as string
-                                priority: { type: Type.STRING },
+                                type: { type: "string" },
+                                title: { type: "string" },
+                                description: { type: "string" },
+                                targetId: { type: "string" }, // Gemini may return number as string
+                                priority: { type: "string" },
                             },
                             required: ["type", "title", "description", "targetId", "priority"]
                         }
@@ -376,13 +371,13 @@ Based on their preferences, recommend up to 5 vehicle IDs from the full list tha
 Respond ONLY with a JSON array of recommended vehicle IDs (numbers). For example: [10, 25, 3]. If no suitable recommendations are found, return an empty array.`;
 
     const requestPayload = {
-        model: 'gemini-2.5-flash',
-        contents: prompt,
-        config: {
+        model: 'gemini-1.5-flash',
+        contents: [{ role: 'user', parts: [{ text: prompt }] }],
+        generationConfig: {
             responseMimeType: "application/json",
             responseSchema: {
-                type: Type.ARRAY,
-                items: { type: Type.NUMBER }
+                type: "array",
+                items: { type: "number" }
             }
         }
     };
@@ -426,16 +421,16 @@ Respond ONLY with a single JSON object matching this schema.
 If there is not enough data to make a suggestion, provide a reason in the summary and set prices to 0.`;
     
     const requestPayload = {
-        model: 'gemini-2.5-flash',
-        contents: prompt,
-        config: {
+        model: 'gemini-1.5-flash',
+        contents: [{ role: 'user', parts: [{ text: prompt }] }],
+        generationConfig: {
             responseMimeType: "application/json",
             responseSchema: {
-                type: Type.OBJECT,
+                type: "object",
                 properties: {
-                    summary: { type: Type.STRING },
-                    suggestedMinPrice: { type: Type.NUMBER },
-                    suggestedMaxPrice: { type: Type.NUMBER },
+                    summary: { type: "string" },
+                    suggestedMinPrice: { type: "number" },
+                    suggestedMaxPrice: { type: "number" },
                 },
                 required: ['summary', 'suggestedMinPrice', 'suggestedMaxPrice'],
             }

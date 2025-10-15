@@ -15,7 +15,7 @@
     "lighthouse": "npx lighthouse http://localhost:3000 --output=html --output-path=./lighthouse-report.html"
   },
   "dependencies": {
-    "@google/genai": "^1.17.0",
+    "@google/generative-ai": "^0.21.0",
     "chart.js": "^4.5.0",
     "firebase": "^10.7.1",
     "mongoose": "^8.4.1",
