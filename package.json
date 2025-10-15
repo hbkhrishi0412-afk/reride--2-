@@ -11,8 +11,14 @@
     "seed": "node seed-simple.js",
     "optimize": "node scripts/optimize.js",
     "build:optimized": "npm run build && npm run optimize",
+    "build:analyze": "npm run build && npm run analyze",
     "analyze": "npx vite-bundle-analyzer dist",
-    "lighthouse": "npx lighthouse http://localhost:3000 --output=html --output-path=./lighthouse-report.html"
+    "lighthouse": "npx lighthouse http://localhost:3000 --output=html --output-path=./lighthouse-report.html",
+    "lighthouse:ci": "npx lighthouse http://localhost:3000 --output=json --output-path=./lighthouse-report.json --chrome-flags='--headless'",
+    "perf:audit": "npm run lighthouse:ci && node scripts/analyze-performance.js",
+    "perf:budget": "node scripts/performance-budget.js",
+    "clean": "rm -rf dist node_modules/.vite",
+    "dev:fast": "npm run clean && npm run dev"
   },
   "dependencies": {
     "@google/generative-ai": "^0.21.0",
