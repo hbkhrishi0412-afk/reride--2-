@@ -3,6 +3,7 @@ import type { User, Notification, Toast as ToastType } from '../types';
 import { View as ViewEnum } from '../types';
 import NotificationCenter from './NotificationCenter';
 import LocationModal from './LocationModal';
+import Logo from './Logo';
 
 interface HeaderProps {
     onNavigate: (view: ViewEnum) => void;
@@ -123,18 +124,10 @@ const Header: React.FC<HeaderProps> = memo(({
                     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                         <div className="flex justify-between items-center h-20">
                             {/* Logo */}
-                            <button 
-                                onClick={() => handleNavigate(ViewEnum.HOME)} 
-                                className="text-3xl font-bold transition-colors"
-                                style={{ 
-                                    background: 'var(--gradient-warm)',
-                                    WebkitBackgroundClip: 'text',
-                                    WebkitTextFillColor: 'transparent',
-                                    backgroundClip: 'text'
-                                }}
-                            >
-                                ReRide
-                            </button>
+                            <Logo 
+                                onClick={() => handleNavigate(ViewEnum.HOME)}
+                                className="cursor-pointer"
+                            />
 
                             {/* Navigation */}
                             <nav className="hidden md:flex items-center gap-2">

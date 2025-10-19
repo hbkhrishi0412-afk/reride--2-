@@ -1,5 +1,6 @@
 import React, { memo } from 'react';
 import { View } from '../types';
+import Logo from './Logo';
 
 interface FooterProps {
     onNavigate: (view: View) => void;
@@ -14,13 +15,11 @@ const Footer: React.FC<FooterProps> = ({ onNavigate }) => {
   return (
     <footer style={{ background: 'linear-gradient(135deg, #424242 0%, #212529 100%)', borderTop: '1px solid var(--spinny-text-dark-light)' }}>
       <div className="container mx-auto px-4 py-8 text-center">
-        <div className="mb-4">
-          <h3 className="text-2xl font-bold" style={{ 
-            background: 'var(--gradient-warm)',
-            WebkitBackgroundClip: 'text',
-            WebkitTextFillColor: 'transparent',
-            backgroundClip: 'text'
-          }}>ReRide</h3>
+        <div className="mb-4 flex justify-center">
+          <Logo 
+            onClick={() => onNavigate(View.HOME)}
+            className="text-white [&_span]:text-white [&_span]:bg-gradient-to-r [&_span]:from-white [&_span]:via-blue-200 [&_span]:to-white [&_svg_path]:fill-white"
+          />
         </div>
         <p style={{ color: 'white' }}>&copy; {new Date().getFullYear()} ReRide. All rights reserved.</p>
         <p className="text-sm mt-1" style={{ color: '#1E88E5' }}>The premier AI-driven marketplace for your next vehicle.</p>

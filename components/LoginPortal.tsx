@@ -1,5 +1,6 @@
 import React from 'react';
 import { View } from '../types';
+import Logo from './Logo';
 
 interface LoginPortalProps {
   onNavigate: (view: View) => void;
@@ -8,7 +9,10 @@ interface LoginPortalProps {
 const LoginPortal: React.FC<LoginPortalProps> = ({ onNavigate }) => {
   return (
     <div className="w-full max-w-md space-y-8 bg-white p-10 rounded-xl shadow-soft-xl text-center">
-      <h2 className="text-3xl font-extrabold text-spinny-text-dark dark:text-spinny-text-dark">Welcome to ReRide</h2>
+      <div className="flex justify-center mb-4">
+        <Logo className="scale-125" />
+      </div>
+      <h2 className="text-2xl font-extrabold text-spinny-text-dark dark:text-spinny-text-dark">Welcome to ReRide</h2>
       <p className="mt-2 text-brand-gray-600 dark:text-spinny-text">Please select your role to continue.</p>
       <div className="mt-8 space-y-4">
         <button
