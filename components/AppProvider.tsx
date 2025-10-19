@@ -51,8 +51,8 @@ interface AppContextType {
   setVehicles: (vehicles: Vehicle[] | ((prev: Vehicle[]) => Vehicle[])) => void;
   setIsLoading: (loading: boolean) => void;
   setCurrentUser: (user: User | null) => void;
-  setComparisonList: (list: number[]) => void;
-  setWishlist: (list: number[]) => void;
+  setComparisonList: (list: number[] | ((prev: number[]) => number[])) => void;
+  setWishlist: (list: number[] | ((prev: number[]) => number[])) => void;
   setConversations: (conversations: Conversation[]) => void;
   setToasts: (toasts: ToastType[]) => void;
   setForgotPasswordRole: (role: 'customer' | 'seller' | null) => void;
@@ -74,7 +74,7 @@ interface AppContextType {
   setSupportTickets: React.Dispatch<React.SetStateAction<SupportTicket[]>>;
   setNotifications: (notifications: Notification[]) => void;
   setRatings: (ratings: { [key: string]: number[] }) => void;
-  setSellerRatings: (ratings: { [key: string]: number[] }) => void;
+  setSellerRatings: (ratings: { [key: string]: number[] } | ((prev: { [key: string]: number[] }) => { [key: string]: number[] })) => void;
 
   // Helper functions
   addToast: (message: string, type: ToastType['type']) => void;
@@ -213,8 +213,8 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     setVehicles: setVehicles as (vehicles: Vehicle[] | ((prev: Vehicle[]) => Vehicle[])) => void,
     setIsLoading,
     setCurrentUser,
-    setComparisonList,
-    setWishlist,
+    setComparisonList: setComparisonList as (list: number[] | ((prev: number[]) => number[])) => void,
+    setWishlist: setWishlist as (list: number[] | ((prev: number[]) => number[])) => void,
     setConversations,
     setToasts,
     setForgotPasswordRole,
@@ -236,7 +236,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     setSupportTickets,
     setNotifications,
     setRatings,
-    setSellerRatings,
+    setSellerRatings: setSellerRatings as (ratings: { [key: string]: number[] } | ((prev: { [key: string]: number[] }) => { [key: string]: number[] })) => void,
 
     // Helper functions
     addToast,

@@ -89,6 +89,7 @@ const AppContent: React.FC = () => {
     setRatings,
     setSellerRatings,
     setWishlist,
+    setComparisonList,
     setPlatformSettings,
     setAuditLog,
     setVehicleData,
@@ -207,6 +208,65 @@ const AppContent: React.FC = () => {
       console.error('Failed to add multiple vehicles:', error);
       addToast('Failed to add vehicles. Please try again.', 'error');
     }
+  };
+
+  const handleViewSellerProfile = (sellerEmail: string) => {
+    console.log('🔍 Viewing seller profile for:', sellerEmail);
+    const seller = users.find(u => u.email === sellerEmail);
+    if (seller) {
+      console.log('✅ Seller found:', seller.name);
+      setPublicSellerProfile(seller);
+      navigate(View.SELLER_PROFILE);
+    } else {
+      console.log('❌ Seller not found with email:', sellerEmail);
+      addToast('Seller profile not found', 'error');
+    }
+  };
+
+  const handleToggleCompare = (vehicleId: number) => {
+    (setComparisonList as any)((prev: number[]) => {
+      if (prev.includes(vehicleId)) {
+        return prev.filter((id: number) => id !== vehicleId);
+      } else if (prev.length < 4) {
+        return [...prev, vehicleId];
+      } else {
+        addToast('You can compare up to 4 vehicles at a time', 'info');
+        return prev;
+      }
+    });
+  };
+
+  const handleToggleWishlist = (vehicleId: number) => {
+    (setWishlist as any)((prev: number[]) => {
+      if (prev.includes(vehicleId)) {
+        return prev.filter((id: number) => id !== vehicleId);
+      } else {
+        return [...prev, vehicleId];
+      }
+    });
+  };
+
+  const handleClearCompare = () => {
+    setComparisonList([]);
+  };
+
+  const handleAddSellerRating = (sellerEmail: string, rating: number) => {
+    (setSellerRatings as any)((prev: { [key: string]: number[] }) => ({
+      ...prev,
+      [sellerEmail]: [...(prev[sellerEmail] || []), rating]
+    }));
+    addToast('Rating added successfully!', 'success');
+  };
+
+  const handleFlagContent = (type: 'vehicle' | 'conversation', id: number | string, reason: string) => {
+    console.log('Flagging content:', { type, id, reason });
+    addToast('Content has been flagged for review', 'success');
+  };
+
+  const handleSelectVehicle = (vehicle: Vehicle) => {
+    console.log('🚗 Selecting vehicle:', vehicle.id, vehicle.make, vehicle.model);
+    setSelectedVehicle(vehicle);
+    navigate(View.DETAIL);
   };
 
   // Initialize data loading
@@ -363,11 +423,45 @@ const AppContent: React.FC = () => {
         case View.LOGIN_PORTAL: 
           return <AuthWrapper><LoginPortal onNavigate={navigate} /></AuthWrapper>;
         case View.CUSTOMER_LOGIN: 
-          return <AuthWrapper><CustomerLogin onLogin={(user) => { setCurrentUser(user); navigate(View.HOME); }} onRegister={(user) => { setUsers(prev => [...prev, user]); setCurrentUser(user); navigate(View.HOME); addToast('Registration successful!', 'success'); }} onNavigate={navigate} onForgotPassword={() => { setForgotPasswordRole('customer'); navigate(View.FORGOT_PASSWORD); }} /></AuthWrapper>;
+          return <AuthWrapper><CustomerLogin onLogin={(user) => { 
+            setCurrentUser(user); 
+            const userJson = JSON.stringify(user);
+            localStorage.setItem('reRideCurrentUser', userJson);
+            sessionStorage.setItem('currentUser', userJson);
+            navigate(View.HOME); 
+          }} onRegister={(user) => { 
+            setUsers(prev => [...prev, user]); 
+            setCurrentUser(user); 
+            const userJson = JSON.stringify(user);
+            localStorage.setItem('reRideCurrentUser', userJson);
+            sessionStorage.setItem('currentUser', userJson);
+            navigate(View.HOME); 
+            addToast('Registration successful!', 'success'); 
+          }} onNavigate={navigate} onForgotPassword={() => { setForgotPasswordRole('customer'); navigate(View.FORGOT_PASSWORD); }} /></AuthWrapper>;
         case View.SELLER_LOGIN: 
-          return <AuthWrapper><Login onLogin={(user) => { setCurrentUser(user); navigate(View.SELLER_DASHBOARD); }} onRegister={(user) => { setUsers(prev => [...prev, user]); setCurrentUser(user); navigate(View.SELLER_DASHBOARD); addToast('Registration successful!', 'success'); }} onNavigate={navigate} onForgotPassword={() => { setForgotPasswordRole('seller'); navigate(View.FORGOT_PASSWORD); }}/></AuthWrapper>;
+          return <AuthWrapper><Login onLogin={(user) => { 
+            setCurrentUser(user); 
+            const userJson = JSON.stringify(user);
+            localStorage.setItem('reRideCurrentUser', userJson);
+            sessionStorage.setItem('currentUser', userJson);
+            navigate(View.SELLER_DASHBOARD); 
+          }} onRegister={(user) => { 
+            setUsers(prev => [...prev, user]); 
+            setCurrentUser(user); 
+            const userJson = JSON.stringify(user);
+            localStorage.setItem('reRideCurrentUser', userJson);
+            sessionStorage.setItem('currentUser', userJson);
+            navigate(View.SELLER_DASHBOARD); 
+            addToast('Registration successful!', 'success'); 
+          }} onNavigate={navigate} onForgotPassword={() => { setForgotPasswordRole('seller'); navigate(View.FORGOT_PASSWORD); }}/></AuthWrapper>;
         case View.ADMIN_LOGIN: 
-          return <AuthWrapper><AdminLogin onLogin={(user) => { setCurrentUser(user); navigate(View.ADMIN_PANEL); }} onNavigate={navigate} /></AuthWrapper>;
+          return <AuthWrapper><AdminLogin onLogin={(user) => { 
+            setCurrentUser(user); 
+            const userJson = JSON.stringify(user);
+            localStorage.setItem('reRideCurrentUser', userJson);
+            sessionStorage.setItem('currentUser', userJson);
+            navigate(View.ADMIN_PANEL); 
+          }} onNavigate={navigate} /></AuthWrapper>;
         case View.FORGOT_PASSWORD: 
           return <AuthWrapper><ForgotPassword onResetRequest={(email) => { console.log(`Password reset for ${email} as a ${forgotPasswordRole}.`); }} onBack={() => navigate(forgotPasswordRole === 'customer' ? View.CUSTOMER_LOGIN : View.SELLER_LOGIN)}/></AuthWrapper>;
       }
@@ -405,30 +499,30 @@ const AppContent: React.FC = () => {
         return publicSellerProfile && <SellerProfilePage 
           seller={users.find(u => u.email === publicSellerProfile.email)!} 
           vehicles={vehicles.filter(v => v.sellerEmail === publicSellerProfile.email && v.status === 'published')} 
-          onSelectVehicle={setSelectedVehicle} 
+          onSelectVehicle={handleSelectVehicle} 
           comparisonList={comparisonList} 
-          onToggleCompare={() => {}} 
+          onToggleCompare={handleToggleCompare} 
           wishlist={wishlist} 
-          onToggleWishlist={() => {}} 
+          onToggleWishlist={handleToggleWishlist} 
           onBack={() => navigate(View.HOME)} 
-          onViewSellerProfile={() => {}} 
+          onViewSellerProfile={handleViewSellerProfile} 
         />;
       case View.DETAIL: 
         return selectedVehicle && <VehicleDetail 
           vehicle={selectedVehicle} 
           onBack={() => navigate(View.USED_CARS)} 
           comparisonList={comparisonList} 
-          onToggleCompare={() => {}} 
-          onAddSellerRating={() => {}} 
+          onToggleCompare={handleToggleCompare} 
+          onAddSellerRating={handleAddSellerRating} 
           wishlist={wishlist} 
-          onToggleWishlist={() => {}} 
+          onToggleWishlist={handleToggleWishlist} 
           currentUser={currentUser} 
-          onFlagContent={() => {}} 
+          onFlagContent={handleFlagContent} 
           users={users} 
-          onViewSellerProfile={() => {}} 
+          onViewSellerProfile={handleViewSellerProfile} 
           onStartChat={() => {}} 
           recommendations={recommendations} 
-          onSelectVehicle={setSelectedVehicle} 
+          onSelectVehicle={handleSelectVehicle} 
         />;
       case View.SELLER_DASHBOARD: {
         if (!currentUser || currentUser.role !== 'seller') {
@@ -496,7 +590,7 @@ const AppContent: React.FC = () => {
         return <Comparison 
           vehicles={vehicles.filter(v => comparisonList.includes(v.id))} 
           onBack={() => navigate(View.USED_CARS)} 
-          onToggleCompare={() => {}} 
+          onToggleCompare={handleToggleCompare} 
         />;
       case View.PROFILE: 
         return currentUser && <Profile 
@@ -513,7 +607,7 @@ const AppContent: React.FC = () => {
           typingStatus={null} 
           onUserTyping={() => {}} 
           onMarkMessagesAsRead={() => {}} 
-          onFlagContent={() => {}} 
+          onFlagContent={handleFlagContent} 
           onOfferResponse={() => {}} 
         />;
       case View.BUYER_DASHBOARD: 
@@ -523,26 +617,26 @@ const AppContent: React.FC = () => {
           wishlist={wishlist} 
           conversations={conversations.filter(c => c.customerId === currentUser.email)} 
           onNavigate={navigate} 
-          onSelectVehicle={setSelectedVehicle} 
-          onToggleWishlist={() => {}} 
-          onToggleCompare={() => {}} 
+          onSelectVehicle={handleSelectVehicle} 
+          onToggleWishlist={handleToggleWishlist} 
+          onToggleCompare={handleToggleCompare} 
           comparisonList={comparisonList} 
-          onViewSellerProfile={() => {}} 
+          onViewSellerProfile={handleViewSellerProfile} 
         /> : <LoadingSpinner />;
       case View.USED_CARS: 
         return <VehicleList 
           vehicles={vehicles.filter(v => v.status === 'published')} 
           isLoading={isLoading} 
-          onSelectVehicle={setSelectedVehicle} 
+          onSelectVehicle={handleSelectVehicle} 
           comparisonList={comparisonList} 
-          onToggleCompare={() => {}} 
-          onClearCompare={() => {}} 
+          onToggleCompare={handleToggleCompare} 
+          onClearCompare={handleClearCompare} 
           wishlist={wishlist} 
-          onToggleWishlist={() => {}} 
+          onToggleWishlist={handleToggleWishlist} 
           categoryTitle="All Used Cars" 
           initialCategory={selectedCategory} 
           initialSearchQuery={initialSearchQuery} 
-          onViewSellerProfile={() => {}} 
+          onViewSellerProfile={handleViewSellerProfile} 
           userLocation={userLocation} 
         />;
       case View.NEW_CARS: 
@@ -556,27 +650,27 @@ const AppContent: React.FC = () => {
         return <VehicleList 
           vehicles={vehicles.filter(v => wishlist.includes(v.id))} 
           isLoading={isLoading} 
-          onSelectVehicle={setSelectedVehicle} 
+          onSelectVehicle={handleSelectVehicle} 
           comparisonList={comparisonList} 
-          onToggleCompare={() => {}} 
-          onClearCompare={() => {}} 
+          onToggleCompare={handleToggleCompare} 
+          onClearCompare={handleClearCompare} 
           wishlist={wishlist} 
-          onToggleWishlist={() => {}} 
+          onToggleWishlist={handleToggleWishlist} 
           categoryTitle="My Wishlist" 
           isWishlistMode={true} 
-          onViewSellerProfile={() => {}} 
+          onViewSellerProfile={handleViewSellerProfile} 
           userLocation={userLocation} 
         />;
       case View.CITY_LANDING: 
         return selectedCity && <CityLandingPage 
           city={selectedCity} 
           vehicles={vehicles.filter(v => v.status === 'published')} 
-          onSelectVehicle={setSelectedVehicle} 
-          onToggleWishlist={() => {}} 
-          onToggleCompare={() => {}} 
+          onSelectVehicle={handleSelectVehicle} 
+          onToggleWishlist={handleToggleWishlist} 
+          onToggleCompare={handleToggleCompare} 
           wishlist={wishlist} 
           comparisonList={comparisonList} 
-          onViewSellerProfile={() => {}} 
+          onViewSellerProfile={handleViewSellerProfile} 
         />;
       case View.HOME:
       default: 
@@ -584,12 +678,12 @@ const AppContent: React.FC = () => {
           onSearch={(query) => { setInitialSearchQuery(query); navigate(View.USED_CARS); }} 
           onSelectCategory={(category) => { setSelectedCategory(category); navigate(View.USED_CARS); }} 
           featuredVehicles={vehicles.filter(v => v.isFeatured && v.status === 'published').slice(0, 4)} 
-          onSelectVehicle={setSelectedVehicle} 
-          onToggleCompare={() => {}} 
+          onSelectVehicle={handleSelectVehicle} 
+          onToggleCompare={handleToggleCompare} 
           comparisonList={comparisonList} 
-          onToggleWishlist={() => {}} 
+          onToggleWishlist={handleToggleWishlist} 
           wishlist={wishlist} 
-          onViewSellerProfile={() => {}} 
+          onViewSellerProfile={handleViewSellerProfile} 
           recommendations={recommendations} 
           allVehicles={vehicles.filter(v => v.status === 'published')} 
           onNavigate={navigate} 
@@ -636,7 +730,7 @@ const AppContent: React.FC = () => {
           typingStatus={null} 
           onUserTyping={() => {}} 
           onMarkMessagesAsRead={() => {}} 
-          onFlagContent={() => {}} 
+          onFlagContent={handleFlagContent} 
           onOfferResponse={() => {}} 
         />
       )}
