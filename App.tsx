@@ -48,59 +48,64 @@ const LoadingSpinner: React.FC = () => (
 );
 
 const AppContent: React.FC = () => {
-  const {
-    currentView,
-    selectedVehicle,
-    vehicles,
-    isLoading,
-    currentUser,
-    comparisonList,
-    wishlist,
-    conversations,
-    toasts,
-    activeChat,
-    users,
-    platformSettings,
-    auditLog,
-    vehicleData,
-    faqItems,
-    supportTickets,
-    notifications,
-    forgotPasswordRole,
-    selectedCategory,
-    initialSearchQuery,
-    userLocation,
-    selectedCity,
-    publicSellerProfile,
-    recommendations,
-    typingStatus,
-    removeToast,
-    handleLogout,
-    navigate,
-    addToast,
-    setActiveChat,
-    setIsCommandPaletteOpen,
-    isCommandPaletteOpen,
-    setUserLocation,
-    setCurrentUser,
-    setUsers,
-    setVehicles,
-    setIsLoading,
-    setConversations,
-    setRatings,
-    setSellerRatings,
-    setWishlist,
-    setComparisonList,
-    setPlatformSettings,
-    setVehicleData,
-    setSupportTickets,
-    setFaqItems,
-    setForgotPasswordRole,
-    setPublicSellerProfile,
-    setSelectedVehicle,
-    setSelectedCategory,
-    setInitialSearchQuery,
-  } = useApp();
+  console.log('🔧 AppContent: Starting initialization...');
+  
+  try {
+    const {
+      currentView,
+      selectedVehicle,
+      vehicles,
+      isLoading,
+      currentUser,
+      comparisonList,
+      wishlist,
+      conversations,
+      toasts,
+      activeChat,
+      users,
+      platformSettings,
+      auditLog,
+      vehicleData,
+      faqItems,
+      supportTickets,
+      notifications,
+      forgotPasswordRole,
+      selectedCategory,
+      initialSearchQuery,
+      userLocation,
+      selectedCity,
+      publicSellerProfile,
+      recommendations,
+      typingStatus,
+      removeToast,
+      handleLogout,
+      navigate,
+      addToast,
+      setActiveChat,
+      setIsCommandPaletteOpen,
+      isCommandPaletteOpen,
+      setUserLocation,
+      setCurrentUser,
+      setUsers,
+      setVehicles,
+      setIsLoading,
+      setConversations,
+      setRatings,
+      setSellerRatings,
+      setWishlist,
+      setComparisonList,
+      setPlatformSettings,
+      setVehicleData,
+      setSupportTickets,
+      setFaqItems,
+      setForgotPasswordRole,
+      setPublicSellerProfile,
+      setSelectedVehicle,
+      setSelectedCategory,
+      setInitialSearchQuery,
+    } = useApp();
+    
+    console.log('🔧 AppContent: useApp hook successful, currentView:', currentView);
 
   // Vehicle operation handlers
   const handleAddVehicle = async (vehicleData: Omit<Vehicle, 'id' | 'averageRating' | 'ratingCount'>, isFeaturing: boolean = false) => {
@@ -1266,6 +1271,10 @@ const AppContent: React.FC = () => {
       />
     </div>
   );
+  } catch (error) {
+    console.error('🔧 AppContent: Error in AppContent:', error);
+    throw error;
+  }
 };
 
 const App: React.FC = () => {

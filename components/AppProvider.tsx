@@ -94,6 +94,8 @@ export const useApp = () => {
 };
 
 export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  console.log('🔧 AppProvider: Initializing...');
+  
   // All state from App.tsx moved here
   const [currentView, setCurrentView] = useState<View>(View.HOME);
   const [previousView, setPreviousView] = useState<View>(View.HOME);
@@ -260,9 +262,15 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     navigate,
   };
 
-  return (
-    <AppContext.Provider value={contextValue}>
-      {children}
-    </AppContext.Provider>
-  );
+  try {
+    console.log('🔧 AppProvider: Rendering with context value');
+    return (
+      <AppContext.Provider value={contextValue}>
+        {children}
+      </AppContext.Provider>
+    );
+  } catch (error) {
+    console.error('🔧 AppProvider: Error rendering:', error);
+    throw error;
+  }
 };
