@@ -709,8 +709,20 @@ const AppContent: React.FC = () => {
     console.log('🚗 Selecting vehicle:', vehicle.id, vehicle.make, vehicle.model);
     console.log('🚗 Current view before navigation:', currentView);
     console.log('🚗 Setting selectedVehicle to:', vehicle);
+    
+    // Store vehicle in sessionStorage for persistence and recovery
+    try {
+      sessionStorage.setItem('selectedVehicle', JSON.stringify(vehicle));
+      console.log('🚗 Vehicle stored in sessionStorage for persistence');
+    } catch (error) {
+      console.warn('🚗 Failed to store vehicle in sessionStorage:', error);
+    }
+    
+    // Set the state
     setSelectedVehicle(vehicle);
     console.log('🚗 selectedVehicle state should now be set');
+    
+    // Navigate to detail view
     console.log('🚗 Navigating to DETAIL view...');
     navigate(View.DETAIL);
     console.log('🚗 Navigation called, current view should be:', View.DETAIL);
@@ -984,8 +996,25 @@ const AppContent: React.FC = () => {
         console.log('🎯 Rendering DETAIL view, selectedVehicle:', selectedVehicle);
         console.log('🎯 selectedVehicle exists?', !!selectedVehicle);
         console.log('🎯 selectedVehicle type:', typeof selectedVehicle);
-        if (!selectedVehicle) {
-          console.log('❌ No selectedVehicle, rendering loading or error');
+        
+        // State recovery mechanism - try to recover vehicle from sessionStorage
+        let vehicleToShow = selectedVehicle;
+        if (!vehicleToShow) {
+          try {
+            const storedVehicle = sessionStorage.getItem('selectedVehicle');
+            if (storedVehicle) {
+              vehicleToShow = JSON.parse(storedVehicle);
+              console.log('🔧 Recovered vehicle from sessionStorage:', vehicleToShow?.id, vehicleToShow?.make, vehicleToShow?.model);
+              // Update the state with recovered vehicle
+              setSelectedVehicle(vehicleToShow);
+            }
+          } catch (error) {
+            console.warn('🔧 Failed to recover vehicle from sessionStorage:', error);
+          }
+        }
+        
+        if (!vehicleToShow) {
+          console.log('❌ No selectedVehicle and no recovery possible, rendering error');
           return <div className="min-h-screen flex items-center justify-center">
             <div className="text-center">
               <h2 className="text-2xl font-bold text-gray-900 mb-4">No Vehicle Selected</h2>
@@ -1000,7 +1029,7 @@ const AppContent: React.FC = () => {
           </div>;
         }
         return <VehicleDetail 
-          vehicle={selectedVehicle} 
+          vehicle={vehicleToShow} 
           onBack={() => navigate(View.USED_CARS)} 
           comparisonList={comparisonList} 
           onToggleCompare={handleToggleCompare} 

@@ -62,8 +62,24 @@ const QuickViewModal: React.FC<QuickViewModalProps> = ({ vehicle, onClose, onSel
   const isCompareDisabled = !isComparing && comparisonList.length >= 4;
 
   const handleFullDetailsClick = () => {
-      onSelectVehicle(vehicle);
+    console.log('🔧 QuickViewModal: View Full Details clicked for vehicle:', vehicle.id, vehicle.make, vehicle.model);
+    
+    // Store vehicle in sessionStorage as backup to prevent state loss
+    try {
+      sessionStorage.setItem('selectedVehicle', JSON.stringify(vehicle));
+      console.log('🔧 QuickViewModal: Vehicle stored in sessionStorage as backup');
+    } catch (error) {
+      console.warn('🔧 QuickViewModal: Failed to store vehicle in sessionStorage:', error);
+    }
+    
+    // Call onSelectVehicle first to set the state
+    onSelectVehicle(vehicle);
+    
+    // Add small delay to ensure state is committed before closing modal
+    setTimeout(() => {
+      console.log('🔧 QuickViewModal: Closing modal after state commit');
       onClose();
+    }, 50);
   };
 
   return (
