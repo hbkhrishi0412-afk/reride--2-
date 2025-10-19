@@ -6,8 +6,7 @@ import { parseSearchQuery, getSearchSuggestions } from '../services/geminiServic
 import QuickViewModal from './QuickViewModal';
 import VehicleTile from './VehicleTile';
 import VehicleTileSkeleton from './VehicleTileSkeleton';
-import { INDIAN_STATES, FUEL_TYPES } from '../constants';
-// Removed blocking import - will lazy load location data when needed
+// Lazy load location data when needed
 
 interface VehicleListProps {
   vehicles: Vehicle[];
@@ -123,16 +122,7 @@ const VehicleList: React.FC<VehicleListProps> = ({ vehicles, onSelectVehicle, is
     fuelTypeFilter: '',
     yearFilter: '0',
     colorFilter: '',
-    stateFilter: (() => {
-      if (userLocation) {
-        const state = INDIAN_STATES.find(s => 
-          s.name.toLowerCase().includes(userLocation.toLowerCase()) || 
-          userLocation.toLowerCase().includes(s.name.toLowerCase())
-        );
-        return state?.code || '';
-      }
-      return '';
-    })(),
+    stateFilter: '',
     selectedFeatures: [],
     featureSearch: ''
   });
@@ -212,6 +202,10 @@ const VehicleList: React.FC<VehicleListProps> = ({ vehicles, onSelectVehicle, is
   useEffect(() => {
     const loadLocationData = async () => {
       try {
+        const { loadLocationData: loadLoc } = await import('../utils/dataLoaders');
+        const locationData = await loadLoc();
+        const { INDIAN_STATES, FUEL_TYPES } = await locationData;
+        
         setIndianStates(INDIAN_STATES);
         setFuelTypes(FUEL_TYPES);
         
@@ -227,6 +221,8 @@ const VehicleList: React.FC<VehicleListProps> = ({ vehicles, onSelectVehicle, is
         }
       } catch (error) {
         console.error('Failed to load location data:', error);
+        // Fallback to basic data
+        setFuelTypes(['Petrol', 'Diesel', 'Electric', 'CNG', 'Hybrid']);
       }
     };
     loadLocationData();

@@ -38,10 +38,15 @@ export default defineConfig({
             if (id.includes('@google/genai')) {
               return 'gemini';
             }
+            // React Window for virtual scrolling
+            if (id.includes('react-window')) {
+              return 'react-window';
+            }
             // Other vendors
             return 'vendor';
           }
-          // Split large components
+          
+          // Split by feature/route for better caching
           if (id.includes('/components/Dashboard')) {
             return 'dashboard';
           }
@@ -51,13 +56,47 @@ export default defineConfig({
           if (id.includes('/components/VehicleList') || id.includes('/components/VehicleDetail')) {
             return 'vehicles';
           }
-          // Split static data into separate chunks
-          if (id.includes('/constants') || id.includes('/data/')) {
-            return 'static-data';
+          if (id.includes('/components/Home')) {
+            return 'home';
           }
-          // Split services into separate chunks
+          if (id.includes('/components/Profile') || id.includes('/components/Login')) {
+            return 'auth';
+          }
+          
+          // Split constants by type for better lazy loading
+          if (id.includes('/constants/location')) {
+            return 'constants-location';
+          }
+          if (id.includes('/constants/plans')) {
+            return 'constants-plans';
+          }
+          if (id.includes('/constants/fallback')) {
+            return 'constants-fallback';
+          }
+          if (id.includes('/constants/boost')) {
+            return 'constants-boost';
+          }
+          if (id.includes('/constants/') || id.includes('/data/')) {
+            return 'constants';
+          }
+          
+          // Split services by functionality
+          if (id.includes('/services/vehicleService')) {
+            return 'service-vehicle';
+          }
+          if (id.includes('/services/userService')) {
+            return 'service-user';
+          }
+          if (id.includes('/services/geminiService')) {
+            return 'service-gemini';
+          }
           if (id.includes('/services/')) {
             return 'services';
+          }
+          
+          // Split utils
+          if (id.includes('/utils/')) {
+            return 'utils';
           }
         }
       }

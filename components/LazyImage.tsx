@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useRef, useEffect, memo } from 'react';
 
 interface LazyImageProps {
   src: string;
@@ -6,73 +6,78 @@ interface LazyImageProps {
   className?: string;
   placeholder?: string;
   onLoad?: () => void;
+  onError?: () => void;
+  [key: string]: any;
 }
 
-const LazyImage: React.FC<LazyImageProps> = ({ 
-  src, 
-  alt, 
-  className = '', 
-  placeholder = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300"%3E%3Crect fill="%23f3f4f6" width="400" height="300"/%3E%3C/svg%3E',
-  onLoad 
+const LazyImage: React.FC<LazyImageProps> = memo(({
+  src,
+  alt,
+  className = '',
+  placeholder = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iODAwIiBoZWlnaHQ9IjYwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjZjNmNGY2Ii8+PHRleHQgeD0iNTAlIiB5PSI1MCUiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIxNCIgZmlsbD0iIzk5YTNhZiIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZHk9Ii4zZW0iPkxvYWRpbmcuLi48L3RleHQ+PC9zdmc+',
+  onLoad,
+  onError,
+  ...props
 }) => {
-  const [imageSrc, setImageSrc] = useState(placeholder);
   const [isLoaded, setIsLoaded] = useState(false);
+  const [isInView, setIsInView] = useState(false);
+  const [hasError, setHasError] = useState(false);
   const imgRef = useRef<HTMLImageElement>(null);
 
   useEffect(() => {
-    let observer: IntersectionObserver;
-    
-    if (imgRef.current) {
-      observer = new IntersectionObserver(
-        (entries) => {
-          entries.forEach((entry) => {
-            if (entry.isIntersecting) {
-              const img = new Image();
-              img.src = src;
-              img.onload = () => {
-                setImageSrc(src);
-                setIsLoaded(true);
-                if (onLoad) onLoad();
-              };
-              img.onerror = () => {
-                console.error(`Failed to load image: ${src}`);
-                setIsLoaded(true);
-              };
-              
-              if (observer && imgRef.current) {
-                observer.unobserve(imgRef.current);
-              }
-            }
-          });
-        },
-        {
-          rootMargin: '50px', // Start loading 50px before the image enters viewport
-          threshold: 0.01
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setIsInView(true);
+          observer.disconnect();
         }
-      );
+      },
+      {
+        threshold: 0.1,
+        rootMargin: '50px'
+      }
+    );
 
+    if (imgRef.current) {
       observer.observe(imgRef.current);
     }
 
-    return () => {
-      if (observer && imgRef.current) {
-        observer.unobserve(imgRef.current);
-      }
-    };
-  }, [src, onLoad]);
+    return () => observer.disconnect();
+  }, []);
+
+  const handleLoad = () => {
+    setIsLoaded(true);
+    onLoad?.();
+  };
+
+  const handleError = () => {
+    setHasError(true);
+    onError?.();
+  };
 
   return (
-    <img
-      ref={imgRef}
-      src={imageSrc}
-      alt={alt}
-      className={`${className} ${isLoaded ? 'opacity-100' : 'opacity-0'} transition-opacity duration-300`}
-      loading="lazy"
-      decoding="async"
-    />
+    <div ref={imgRef} className={`relative overflow-hidden ${className}`} {...props}>
+      {isInView && (
+        <img
+          src={hasError ? placeholder : src}
+          alt={alt}
+          onLoad={handleLoad}
+          onError={handleError}
+          className={`transition-opacity duration-300 ${
+            isLoaded ? 'opacity-100' : 'opacity-0'
+          } w-full h-full object-cover`}
+          loading="lazy"
+        />
+      )}
+      {!isLoaded && isInView && (
+        <div className="absolute inset-0 bg-gray-200 animate-pulse flex items-center justify-center">
+          <div className="text-gray-400 text-sm">Loading...</div>
+        </div>
+      )}
+    </div>
   );
-};
+});
+
+LazyImage.displayName = 'LazyImage';
 
 export default LazyImage;
-
-

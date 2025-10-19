@@ -20,20 +20,38 @@ export const loadNewCarsData = async () => {
 
 // Helper to get PLAN_DETAILS without loading entire constants file
 export const loadPlanDetails = async () => {
-  const { PLAN_DETAILS } = await import('../constants');
-  return PLAN_DETAILS;
+  const { loadPlanDetails: loadPlans } = await import('../constants');
+  return loadPlans();
+};
+
+// Helper to get location data
+export const loadLocationData = async () => {
+  const { loadLocationData: loadLoc } = await import('../constants');
+  return loadLoc();
+};
+
+// Helper to get boost packages
+export const loadBoostPackages = async () => {
+  const { loadBoostPackages: loadBoost } = await import('../constants');
+  return loadBoost();
+};
+
+// Helper to get fallback data
+export const loadFallbackData = async () => {
+  const { loadFallbackData: loadFallback } = await import('../constants');
+  return loadFallback();
 };
 
 // Helper to get MOCK_SUPPORT_TICKETS without loading entire constants file
 export const loadMockSupportTickets = async () => {
-  const { MOCK_SUPPORT_TICKETS } = await import('../constants');
-  return MOCK_SUPPORT_TICKETS;
+  const fallbackData = await loadFallbackData();
+  return fallbackData.supportTickets;
 };
 
 // Helper to get MOCK_FAQS without loading entire constants file
 export const loadMockFaqs = async () => {
-  const { MOCK_FAQS } = await import('../constants');
-  return MOCK_FAQS;
+  const fallbackData = await loadFallbackData();
+  return fallbackData.faqs;
 };
 
 // Helper to get vehicle placeholder image function

@@ -6,7 +6,7 @@ import Footer from './components/Footer';
 import ToastContainer from './components/ToastContainer';
 import CommandPalette from './components/CommandPalette';
 import { ChatWidget } from './components/ChatWidget';
-import { View, User, SupportTicket, Vehicle } from './types';
+import { View, Vehicle } from './types';
 import { getConversations, saveConversations } from './services/chatService';
 import { getRatings, getSellerRatings } from './services/ratingService';
 import { saveSettings } from './services/settingsService';
@@ -91,18 +91,13 @@ const AppContent: React.FC = () => {
     setWishlist,
     setComparisonList,
     setPlatformSettings,
-    setAuditLog,
     setVehicleData,
-    setFaqItems,
     setSupportTickets,
-    setNotifications,
     setForgotPasswordRole,
     setPublicSellerProfile,
     setSelectedVehicle,
-    setPreviousView,
     setSelectedCategory,
     setInitialSearchQuery,
-    setRecommendations,
   } = useApp();
 
   // Vehicle operation handlers
