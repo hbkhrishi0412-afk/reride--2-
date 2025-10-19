@@ -23,7 +23,7 @@ export default async function handler(
     // Get collection info
     const db = Vehicle.db;
     const collections = await db.listCollections().toArray();
-    const vehiclesCollection = collections.find(c => c.name === 'vehicles');
+    const vehiclesCollection = collections.find((c: any) => c.name === 'vehicles');
     
     // Get a sample vehicle if any exist
     let sampleVehicle = null;
@@ -34,10 +34,10 @@ export default async function handler(
     return res.status(200).json({
       status: 'success',
       message: 'MongoDB connection and collection verified',
-      database: db.databaseName,
+      database: db.name,
       collection: 'vehicles',
       vehicleCount: vehicleCount,
-      collections: collections.map(c => c.name),
+      collections: collections.map((c: any) => c.name),
       vehiclesCollectionInfo: vehiclesCollection,
       sampleVehicle: sampleVehicle,
       timestamp: new Date().toISOString()

@@ -1,5 +1,5 @@
 import { VercelRequest, VercelResponse } from '@vercel/node';
-import connectDB from './lib-db';
+import connectToDatabase from './lib-db';
 import User from './lib-user';
 import { PaymentRequest } from '../types';
 
@@ -8,7 +8,7 @@ export default async function handler(
   res: VercelResponse,
 ) {
   try {
-    await connectDB();
+    await connectToDatabase();
 
     const { action } = req.query;
 
