@@ -44,12 +44,24 @@ export const getPaymentRequestStatus = async (sellerEmail: string): Promise<Paym
     const response = await fetch(`/api/payment-requests?action=status&sellerEmail=${encodeURIComponent(sellerEmail)}`);
     
     if (!response.ok) {
-      const error = await response.json();
-      throw new Error(error.error || 'Failed to get payment request status');
+      // Check if response is JSON
+      const contentType = response.headers.get('content-type');
+      if (contentType && contentType.includes('application/json')) {
+        const error = await response.json();
+        throw new Error(error.error || 'Failed to get payment request status');
+      } else {
+        throw new Error(`API endpoint not found (${response.status})`);
+      }
     }
 
-    const data = await response.json();
-    return data.paymentRequest;
+    // Check if response is JSON
+    const contentType = response.headers.get('content-type');
+    if (contentType && contentType.includes('application/json')) {
+      const data = await response.json();
+      return data.paymentRequest;
+    } else {
+      throw new Error('API returned non-JSON response');
+    }
   } catch (error) {
     console.error('Error getting payment request status:', error);
     return null;

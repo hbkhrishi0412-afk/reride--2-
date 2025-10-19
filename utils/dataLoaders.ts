@@ -20,25 +20,25 @@ export const loadNewCarsData = async () => {
 
 // Helper to get PLAN_DETAILS without loading entire constants file
 export const loadPlanDetails = async () => {
-  const { loadPlanDetails: loadPlans } = await import('../constants');
+  const { loadPlanDetails: loadPlans } = await import('../constants/index');
   return loadPlans();
 };
 
 // Helper to get location data
 export const loadLocationData = async () => {
-  const { loadLocationData: loadLoc } = await import('../constants');
+  const { loadLocationData: loadLoc } = await import('../constants/index');
   return loadLoc();
 };
 
 // Helper to get boost packages
 export const loadBoostPackages = async () => {
-  const { loadBoostPackages: loadBoost } = await import('../constants');
+  const { loadBoostPackages: loadBoost } = await import('../constants/index');
   return loadBoost();
 };
 
 // Helper to get fallback data
 export const loadFallbackData = async () => {
-  const { loadFallbackData: loadFallback } = await import('../constants');
+  const { loadFallbackData: loadFallback } = await import('../constants/index');
   return loadFallback();
 };
 

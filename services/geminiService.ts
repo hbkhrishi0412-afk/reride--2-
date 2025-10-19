@@ -32,7 +32,7 @@ async function callGeminiAPI(payload: any): Promise<string> {
         const isJson = payload.config?.responseMimeType === "application/json";
         if (isJson) {
             // Check if the expected response is an array or object
-            return payload.config?.responseSchema?.type === SchemaSchemaType.ARRAY ? "[]" : "{}";
+            return payload.config?.responseSchema?.type === SchemaType.ARRAY ? "[]" : "{}";
         }
         // For non-JSON responses, return a user-friendly message
         return "AI service is temporarily unavailable. Please try again later.";
@@ -55,15 +55,15 @@ export const parseSearchQuery = async (query: string): Promise<SearchFilters> =>
         config: {
             responseMimeType: "application/json",
             responseSchema: {
-                type: SchemaSchemaType.OBJECT,
+                type: SchemaType.OBJECT,
                 properties: {
-                    make: { type: SchemaSchemaType.STRING, description: "The make of the car, e.g., Tata, Hyundai." },
-                    model: { type: SchemaSchemaType.STRING, description: "The model of the car, e.g., Nexon, Creta." },
-                    minPrice: { type: SchemaSchemaType.NUMBER, description: "The minimum price in INR." },
-                    maxPrice: { type: SchemaSchemaType.NUMBER, description: "The maximum price in INR." },
+                    make: { type: SchemaType.STRING, description: "The make of the car, e.g., Tata, Hyundai." },
+                    model: { type: SchemaType.STRING, description: "The model of the car, e.g., Nexon, Creta." },
+                    minPrice: { type: SchemaType.NUMBER, description: "The minimum price in INR." },
+                    maxPrice: { type: SchemaType.NUMBER, description: "The maximum price in INR." },
                     features: {
-                        type: SchemaSchemaType.ARRAY,
-                        items: { type: SchemaSchemaType.STRING },
+                        type: SchemaType.ARRAY,
+                        items: { type: SchemaType.STRING },
                         description: "An array of requested vehicle features, e.g., Sunroof, ADAS."
                     },
                 },
@@ -94,10 +94,10 @@ Provide the output in JSON format with two keys: "pros" and "cons", each contain
         config: {
             responseMimeType: "application/json",
             responseSchema: {
-                type: SchemaSchemaType.OBJECT,
+                type: SchemaType.OBJECT,
                 properties: {
-                    pros: { type: SchemaSchemaType.ARRAY, items: { type: SchemaSchemaType.STRING } },
-                    cons: { type: SchemaSchemaType.ARRAY, items: { type: SchemaSchemaType.STRING } }
+                    pros: { type: SchemaType.ARRAY, items: { type: SchemaType.STRING } },
+                    cons: { type: SchemaType.ARRAY, items: { type: SchemaType.STRING } }
                 }
             }
         }
@@ -177,10 +177,10 @@ Respond ONLY with a single JSON object matching this schema. If a value is not a
         config: {
             responseMimeType: "application/json",
             responseSchema: {
-                type: SchemaSchemaType.OBJECT,
+                type: SchemaType.OBJECT,
                 properties: {
                     structuredSpecs: {
-                        type: SchemaSchemaType.OBJECT,
+                        type: SchemaType.OBJECT,
                         properties: {
                             engine: { type: SchemaType.STRING },
                             transmission: { type: SchemaType.STRING },
@@ -192,7 +192,7 @@ Respond ONLY with a single JSON object matching this schema. If a value is not a
                         }
                     },
                     featureSuggestions: {
-                        type: SchemaSchemaType.OBJECT,
+                        type: SchemaType.OBJECT,
                         properties: {
                             "Comfort & Convenience": { type: SchemaType.ARRAY, items: { type: SchemaType.STRING } },
                             "Safety": { type: SchemaType.ARRAY, items: { type: SchemaType.STRING } },
@@ -317,12 +317,12 @@ If there is no data or no meaningful suggestions can be made, return an empty ar
         config: {
             responseMimeType: "application/json",
             responseSchema: {
-                type: SchemaSchemaType.OBJECT,
+                type: SchemaType.OBJECT,
                 properties: {
                     suggestions: {
                         type: SchemaType.ARRAY,
                         items: {
-                            type: SchemaSchemaType.OBJECT,
+                            type: SchemaType.OBJECT,
                             properties: {
                                 type: { type: SchemaType.STRING },
                                 title: { type: SchemaType.STRING },
@@ -432,7 +432,7 @@ If there is not enough data to make a suggestion, provide a reason in the summar
         config: {
             responseMimeType: "application/json",
             responseSchema: {
-                type: SchemaSchemaType.OBJECT,
+                type: SchemaType.OBJECT,
                 properties: {
                     summary: { type: SchemaType.STRING },
                     suggestedMinPrice: { type: SchemaType.NUMBER },

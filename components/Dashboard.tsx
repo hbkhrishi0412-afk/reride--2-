@@ -160,7 +160,7 @@ const PlanStatusCard: React.FC<{
                 <div className="mt-4 pt-4 border-t border-spinny-white/20">
                     <h4 className="font-semibold mb-2">Plan Features:</h4>
                     <ul className="space-y-2 text-xs">
-                        {plan.features.map(feature => (
+                        {(plan.features || []).map(feature => (
                             <li key={feature} className="flex items-start">
                                 <svg className="w-4 h-4 text-spinny-orange mr-2 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
                                     <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd"></path>
@@ -259,7 +259,7 @@ const VehicleForm: React.FC<VehicleFormProps> = memo(({ editingVehicle, onAddVeh
 
     const availableMakes = useMemo(() => {
         if (!formData.category || !vehicleData[formData.category]) return [];
-        return vehicleData[formData.category].map(make => make.name).sort();
+        return (vehicleData[formData.category] || []).map(make => make.name).sort();
     }, [formData.category, vehicleData]);
 
     const availableModels = useMemo(() => {
@@ -276,7 +276,7 @@ const VehicleForm: React.FC<VehicleFormProps> = memo(({ editingVehicle, onAddVeh
     }, [formData.category, formData.make, formData.model, vehicleData]);
 
     const availableCities = useMemo(() => {
-        if (!formData.state || !citiesByState[formData.state]) return [];
+        if (!formData.state || !citiesByState || !citiesByState[formData.state]) return [];
         return citiesByState[formData.state].sort();
     }, [formData.state, citiesByState]);
 
@@ -1060,9 +1060,10 @@ const Dashboard: React.FC<DashboardProps> = ({ seller, sellerVehicles, reportedV
   useEffect(() => {
     const loadLocationData = async () => {
       try {
-        const { INDIAN_STATES, CITIES_BY_STATE } = await import('../constants');
-        setIndianStates(INDIAN_STATES);
-        setCitiesByState(CITIES_BY_STATE);
+        const { loadLocationData } = await import('../utils/dataLoaders');
+        const locationData = await loadLocationData();
+        setIndianStates(locationData.INDIAN_STATES || []);
+        setCitiesByState(locationData.CITIES_BY_STATE || {});
       } catch (error) {
         console.error('Failed to load location data:', error);
       }
@@ -1598,6 +1599,15 @@ const Dashboard: React.FC<DashboardProps> = ({ seller, sellerVehicles, reportedV
                     onEditVehicle={handleEditClick}
                     onDeleteVehicle={onDeleteVehicle}
                 />;
+      default:
+        return (
+          <div className="text-center py-8">
+            <h2 className="text-xl font-semibold text-spinny-text-dark dark:text-spinny-text-dark mb-4">
+              Page Not Found
+            </h2>
+            <p className="text-gray-600">The requested dashboard section could not be found.</p>
+          </div>
+        );
     }
   }
 
@@ -1608,11 +1618,19 @@ const Dashboard: React.FC<DashboardProps> = ({ seller, sellerVehicles, reportedV
     </button>
   );
 
+  const AppNavItem: React.FC<{ view: View, children: React.ReactNode, count?: number }> = ({ view, children, count }) => (
+    <button onClick={() => onNavigate(view)} className={`flex justify-between items-center w-full text-left px-4 py-3 rounded-lg transition-colors hover:bg-brand-gray-light dark:hover:bg-white text-gray-700 dark:text-gray-300`}>
+      <span>{children}</span>
+      {count && count > 0 && <span className="bg-spinny-orange-light0 text-white text-xs font-bold rounded-full px-2 py-0.5">{count}</span>}
+    </button>
+  );
+
   return (
     <div className="container mx-auto py-8 animate-fade-in">
         <div className="grid grid-cols-1 md:grid-cols-[250px_1fr] gap-8">
             <aside>
             <div className="bg-white p-4 rounded-lg shadow-md space-y-2">
+                <h3 className="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-3">Dashboard</h3>
                 <NavItem view="overview">Overview</NavItem>
                 <NavItem view="analytics">Analytics</NavItem>
                 <NavItem view="listings">My Listings</NavItem>

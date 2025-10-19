@@ -319,18 +319,6 @@ const AppContent: React.FC = () => {
       console.log('✅ Restored user from storage:', user.email, 'Role:', user.role);
       setCurrentUser(user);
       
-      // Auto-navigate to appropriate dashboard based on user role
-      if (user.role === 'seller' && currentView === View.HOME) {
-        console.log('🔄 Auto-navigating seller to dashboard');
-        navigate(View.SELLER_DASHBOARD);
-      } else if (user.role === 'customer' && currentView === View.HOME) {
-        console.log('🔄 Auto-navigating customer to home');
-        navigate(View.HOME);
-      } else if (user.role === 'admin' && currentView === View.HOME) {
-        console.log('🔄 Auto-navigating admin to panel');
-        navigate(View.ADMIN_PANEL);
-      }
-      
       if (!localUserJson && sessionUserJson) {
         localStorage.setItem('reRideCurrentUser', sessionUserJson);
         console.log('🔄 Migrated session to localStorage');
@@ -351,7 +339,21 @@ const AppContent: React.FC = () => {
       flagReason: c.flagReason || undefined, 
       flaggedAt: c.flaggedAt || undefined 
     })));
-  }, [setCurrentUser, setWishlist, setConversations, currentView, navigate]);
+  }, []); // Empty dependency array - only run once on mount
+
+  // Separate effect for auto-navigation based on user role
+  useEffect(() => {
+    if (currentUser && currentView === View.HOME) {
+      if (currentUser.role === 'seller') {
+        console.log('🔄 Auto-navigating seller to dashboard');
+        navigate(View.SELLER_DASHBOARD);
+      } else if (currentUser.role === 'admin') {
+        console.log('🔄 Auto-navigating admin to panel');
+        navigate(View.ADMIN_PANEL);
+      }
+      // Note: customers stay on HOME, so no navigation needed
+    }
+  }, [currentUser, currentView, navigate]);
 
   // Load ratings
   useEffect(() => {
@@ -583,6 +585,7 @@ const AppContent: React.FC = () => {
           onExportUsers={() => {}} 
           onExportVehicles={() => {}} 
           onExportSales={() => {}} 
+          onNavigate={navigate}
           vehicleData={vehicleData} 
           onUpdateVehicleData={setVehicleData} 
           onToggleVerifiedStatus={() => {}} 

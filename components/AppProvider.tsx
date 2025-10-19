@@ -173,6 +173,21 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     else setCurrentView(view);
   }, [currentView, currentUser]);
 
+  // Add navigation event listener for dashboard navigation
+  useEffect(() => {
+    const handleNavigationEvent = (event: CustomEvent) => {
+      const { view } = event.detail;
+      if (view && Object.values(View).includes(view)) {
+        navigate(view as View);
+      }
+    };
+
+    window.addEventListener('navigate', handleNavigationEvent as EventListener);
+    return () => {
+      window.removeEventListener('navigate', handleNavigationEvent as EventListener);
+    };
+  }, [navigate]);
+
   const contextValue: AppContextType = {
     // State
     currentView,

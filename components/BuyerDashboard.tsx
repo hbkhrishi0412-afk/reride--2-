@@ -127,6 +127,52 @@ const BuyerDashboard: React.FC<BuyerDashboardProps> = ({
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-brand-gray-900">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div className="grid grid-cols-1 lg:grid-cols-[250px_1fr] gap-8">
+          {/* Sidebar Navigation */}
+          <aside className="lg:col-span-1">
+            <div className="bg-white dark:bg-brand-gray-800 rounded-xl shadow-soft p-4 space-y-2 sticky top-8">
+              <h3 className="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-3">Dashboard</h3>
+              <button
+                onClick={() => setActiveTab('overview')}
+                className={`w-full text-left px-4 py-3 rounded-lg transition-colors ${
+                  activeTab === 'overview' ? 'bg-brand-blue-50 text-brand-blue-700' : 'text-gray-600 hover:bg-gray-50'
+                }`}
+              >
+                📊 Overview
+              </button>
+              <button
+                onClick={() => setActiveTab('searches')}
+                className={`w-full text-left px-4 py-3 rounded-lg transition-colors ${
+                  activeTab === 'searches' ? 'bg-brand-blue-50 text-brand-blue-700' : 'text-gray-600 hover:bg-gray-50'
+                }`}
+              >
+                🔍 Saved Searches
+              </button>
+              <button
+                onClick={() => setActiveTab('activity')}
+                className={`w-full text-left px-4 py-3 rounded-lg transition-colors ${
+                  activeTab === 'activity' ? 'bg-brand-blue-50 text-brand-blue-700' : 'text-gray-600 hover:bg-gray-50'
+                }`}
+              >
+                🕒 Recent Activity
+              </button>
+              <button
+                onClick={() => setActiveTab('alerts')}
+                className={`w-full text-left px-4 py-3 rounded-lg transition-colors ${
+                  activeTab === 'alerts' ? 'bg-brand-blue-50 text-brand-blue-700' : 'text-gray-600 hover:bg-gray-50'
+                }`}
+              >
+                🔔 Alerts {priceDrops.length + newMatches.length > 0 && (
+                  <span className="bg-red-100 text-red-600 text-xs font-bold px-2 py-0.5 rounded-full ml-2">
+                    {priceDrops.length + newMatches.length}
+                  </span>
+                )}
+              </button>
+            </div>
+          </aside>
+          
+          {/* Main Content */}
+          <main className="lg:col-span-1">
         {/* Header */}
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-spinny-text-dark dark:text-spinny-text mb-2">
@@ -232,35 +278,8 @@ const BuyerDashboard: React.FC<BuyerDashboardProps> = ({
           </div>
         )}
 
-        {/* Tabs */}
+        {/* Content */}
         <div className="bg-white dark:bg-brand-gray-800 rounded-xl shadow-soft mb-8">
-          <div className="border-b border-gray-200 dark:border-gray-700">
-            <nav className="flex gap-4 px-6" aria-label="Tabs">
-              {[
-                { id: 'overview', label: 'Overview', icon: '📊' },
-                { id: 'searches', label: 'Saved Searches', icon: '🔍' },
-                { id: 'activity', label: 'Recent Activity', icon: '🕒' },
-                { id: 'alerts', label: 'Alerts', icon: '🔔', badge: priceDrops.length + newMatches.length },
-              ].map((tab) => (
-                <button
-                  key={tab.id}
-                  onClick={() => setActiveTab(tab.id as any)}
-                  className={`py-4 px-2 border-b-2 font-medium text-sm transition-colors relative ${
-                    activeTab === tab.id
-                      ? 'border-spinny-orange text-spinny-orange'
-                      : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-                  }`}
-                >
-                  {tab.icon} {tab.label}
-                  {tab.badge !== undefined && tab.badge > 0 && (
-                    <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
-                      {tab.badge}
-                    </span>
-                  )}
-                </button>
-              ))}
-            </nav>
-          </div>
 
           <div className="p-6">
             {/* Overview Tab */}
@@ -500,6 +519,8 @@ const BuyerDashboard: React.FC<BuyerDashboardProps> = ({
               </div>
             )}
           </div>
+        </div>
+          </main>
         </div>
       </div>
     </div>

@@ -56,19 +56,19 @@ const DashboardOptimized: React.FC<DashboardOptimizedProps> = memo((props) => {
 
   const handleEditVehicle = (vehicle: Vehicle) => {
     setEditingVehicle(vehicle);
-    // Navigate to edit form or open modal
+    setActiveView('listings');
   };
 
   const handleViewSellerProfile = (sellerEmail: string) => {
-    // Handle seller profile view
+    onNavigate(View.SELLER_PROFILE);
   };
 
   const handleToggleCompare = (vehicleId: number) => {
-    // Handle compare toggle
+    // Handle compare toggle - this would need to be passed from parent
   };
 
   const handleToggleWishlist = (vehicleId: number) => {
-    // Handle wishlist toggle
+    // Handle wishlist toggle - this would need to be passed from parent
   };
 
   const navigationItems = [
@@ -153,29 +153,36 @@ const DashboardOptimized: React.FC<DashboardOptimizedProps> = memo((props) => {
           </p>
         </div>
 
-        {/* Navigation */}
-        <div className="mb-8">
-          <nav className="flex space-x-8">
-            {navigationItems.map((item) => (
-              <button
-                key={item.id}
-                onClick={() => setActiveView(item.id as DashboardView)}
-                className={`flex items-center space-x-2 px-4 py-2 rounded-lg transition-colors ${
-                  activeView === item.id
-                    ? 'bg-spinny-orange text-white'
-                    : 'text-gray-600 hover:text-spinny-orange hover:bg-orange-50'
-                }`}
-              >
-                <span>{item.icon}</span>
-                <span>{item.label}</span>
-              </button>
-            ))}
-          </nav>
-        </div>
+        <div className="grid grid-cols-1 lg:grid-cols-[250px_1fr] gap-8">
+          {/* Sidebar Navigation */}
+          <aside className="lg:col-span-1">
+            <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-4 space-y-2 sticky top-8">
+              <h3 className="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-3">Dashboard</h3>
+              {navigationItems.map((item) => (
+                <button
+                  key={item.id}
+                  onClick={() => setActiveView(item.id as DashboardView)}
+                  className={`w-full text-left px-4 py-3 rounded-lg transition-colors ${
+                    activeView === item.id
+                      ? 'bg-brand-blue-50 text-brand-blue-700'
+                      : 'text-gray-600 hover:bg-gray-50'
+                  }`}
+                >
+                  <span className="mr-2">{item.icon}</span>
+                  {item.label}
+                </button>
+              ))}
+            </div>
+          </aside>
+          
+          {/* Main Content */}
+          <main className="lg:col-span-1">
 
-        {/* Content */}
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
-          {renderContent()}
+            {/* Content */}
+            <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
+              {renderContent()}
+            </div>
+          </main>
         </div>
       </div>
     </div>

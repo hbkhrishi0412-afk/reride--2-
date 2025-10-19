@@ -134,20 +134,20 @@ const VehicleList: React.FC<VehicleListProps> = ({ vehicles, onSelectVehicle, is
   const featuresSearchInputRef = useRef<HTMLInputElement>(null);
   const suggestionDebounceRef = useRef<number | null>(null);
 
-  const uniqueMakes = useMemo(() => [...new Set(vehicles.map(v => v.make))].sort(), [vehicles]);
+  const uniqueMakes = useMemo(() => [...new Set((vehicles || []).map(v => v.make))].sort(), [vehicles]);
   const availableModels = useMemo(() => {
     if (!makeFilter) return [];
-    return [...new Set(vehicles.filter(v => v.make === makeFilter).map(v => v.model))].sort();
+    return [...new Set((vehicles || []).filter(v => v.make === makeFilter).map(v => v.model))].sort();
   }, [makeFilter, vehicles]);
   const tempAvailableModels = useMemo(() => {
       if (!tempFilters.makeFilter) return [];
-      return [...new Set(vehicles.filter(v => v.make === tempFilters.makeFilter).map(v => v.model))].sort();
+      return [...new Set((vehicles || []).filter(v => v.make === tempFilters.makeFilter).map(v => v.model))].sort();
   }, [tempFilters.makeFilter, vehicles]);
-  const uniqueYears = useMemo(() => [...new Set(vehicles.map(v => v.year))].sort((a, b) => Number(b) - Number(a)), [vehicles]);
-  const uniqueColors = useMemo(() => [...new Set(vehicles.map(v => v.color))].sort(), [vehicles]);
+  const uniqueYears = useMemo(() => [...new Set((vehicles || []).map(v => v.year))].sort((a, b) => Number(b) - Number(a)), [vehicles]);
+  const uniqueColors = useMemo(() => [...new Set((vehicles || []).map(v => v.color))].sort(), [vehicles]);
   const uniqueStates = useMemo(() => indianStates, [indianStates]);
 
-  const allFeatures = useMemo(() => [...new Set(vehicles.flatMap(v => v.features))].sort(), [vehicles]);
+  const allFeatures = useMemo(() => [...new Set((vehicles || []).flatMap(v => v.features))].sort(), [vehicles]);
   
   const filteredFeatures = useMemo(() => {
       return allFeatures.filter(feature => feature.toLowerCase().includes(featureSearch.toLowerCase()));
@@ -168,11 +168,11 @@ const VehicleList: React.FC<VehicleListProps> = ({ vehicles, onSelectVehicle, is
     if (parsedFilters.make && uniqueMakes.includes(parsedFilters.make)) {
       const newMake = parsedFilters.make;
       setMakeFilter(newMake);
-      const modelsForMake = [...new Set(vehicles.filter(v => v.make === newMake).map(v => v.model))];
+      const modelsForMake = [...new Set((vehicles || []).filter(v => v.make === newMake).map(v => v.model))];
       if (parsedFilters.model && modelsForMake.includes(parsedFilters.model)) setModelFilter(parsedFilters.model);
       else setModelFilter('');
     } else if (parsedFilters.model && makeFilter) {
-        const currentModels = [...new Set(vehicles.filter(v => v.make === makeFilter).map(v => v.model))];
+        const currentModels = [...new Set((vehicles || []).filter(v => v.make === makeFilter).map(v => v.model))];
         if (currentModels.includes(parsedFilters.model)) setModelFilter(parsedFilters.model);
     }
     
@@ -336,7 +336,7 @@ const VehicleList: React.FC<VehicleListProps> = ({ vehicles, onSelectVehicle, is
       }
 
       suggestionDebounceRef.current = window.setTimeout(async () => {
-          const vehicleContext = vehicles.map(v => ({ make: v.make, model: v.model, features: v.features }));
+          const vehicleContext = (vehicles || []).map(v => ({ make: v.make, model: v.model, features: v.features }));
           const fetchedSuggestions = await getSearchSuggestions(query, vehicleContext);
           setSuggestions(fetchedSuggestions);
           setShowSuggestions(fetchedSuggestions.length > 0);
@@ -600,7 +600,7 @@ const VehicleList: React.FC<VehicleListProps> = ({ vehicles, onSelectVehicle, is
                 <label htmlFor="fuel-type-filter" className="block text-sm font-medium text-spinny-text-dark dark:text-spinny-text-dark mb-1">Fuel Type</label>
                 <select id="fuel-type-filter" name="fuelTypeFilter" value={state.fuelTypeFilter} onChange={handleSelectChange} className={formElementClass}>
                     <option value="">Any Fuel Type</option>
-                    {fuelTypes.map(fuel => <option key={fuel} value={fuel}>{fuel}</option>)}
+                    {fuelTypes?.map(fuel => <option key={fuel} value={fuel}>{fuel}</option>) || []}
                 </select>
             </div>
             <div>

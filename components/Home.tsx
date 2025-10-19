@@ -186,7 +186,7 @@ const Home: React.FC<HomeProps> = ({ onSearch, onSelectCategory, featuredVehicle
 
         const viewedIds = getViewedIds();
         if (viewedIds.length > 0) {
-            const vehicleMap = new Map(allVehicles.map(v => [v.id, v]));
+            const vehicleMap = new Map((allVehicles || []).map(v => [v.id, v]));
             const viewedVehiclesInOrder = viewedIds.map(id => vehicleMap.get(id)).filter((v): v is Vehicle => !!v);
             setRecentlyViewed(viewedVehiclesInOrder.slice(0, 5));
         }
@@ -303,7 +303,7 @@ const Home: React.FC<HomeProps> = ({ onSearch, onSelectCategory, featuredVehicle
                                 </div>
                                 
                                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                                    {spotlightVehicles.slice(0, 2).map((vehicle) => (
+                                    {(spotlightVehicles || []).slice(0, 2).map((vehicle) => (
                                         <div key={vehicle.id} className="bg-white rounded-2xl shadow-xl overflow-hidden hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1">
                                             <div className="relative">
                                                 <img 
@@ -385,7 +385,7 @@ const Home: React.FC<HomeProps> = ({ onSearch, onSelectCategory, featuredVehicle
                     </div>
                     
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                        {featuredVehicles.slice(0, 8).map((vehicle) => (
+                        {(featuredVehicles || []).slice(0, 8).map((vehicle) => (
                             <FeaturedVehicleCard
                                 key={vehicle.id}
                                 vehicle={vehicle}
@@ -409,7 +409,7 @@ const Home: React.FC<HomeProps> = ({ onSearch, onSelectCategory, featuredVehicle
                     <p className="text-center text-gray-600 mb-8">Find quality used cars in your city</p>
                     <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
                         {['Mumbai', 'New Delhi', 'Bengaluru', 'Hyderabad', 'Chennai', 'Pune', 'Ahmedabad', 'Kolkata'].map(city => {
-                            const cityVehicles = allVehicles.filter(v => v.city === city && v.status === 'published');
+                            const cityVehicles = (allVehicles || []).filter(v => v.city === city && v.status === 'published');
                             return (
                                 <button
                                     key={city}
@@ -473,7 +473,7 @@ const Home: React.FC<HomeProps> = ({ onSearch, onSelectCategory, featuredVehicle
                              </p>
                         </div>
                         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
-                            {recommendations.map((vehicle, index) => (
+                            {(recommendations || []).map((vehicle, index) => (
                                 <div 
                                     key={vehicle.id}
                                     className="animate-fadeInUp"
@@ -505,7 +505,7 @@ const Home: React.FC<HomeProps> = ({ onSearch, onSelectCategory, featuredVehicle
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     <h2 className="text-3xl font-bold text-center mb-12 text-spinny-text-dark">Featured Collection</h2>
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                        {featuredVehicles.map(vehicle => (
+                        {(featuredVehicles || []).map(vehicle => (
                             <FeaturedVehicleCard
                                 key={vehicle.id} 
                                 vehicle={vehicle} 
@@ -538,7 +538,7 @@ const Home: React.FC<HomeProps> = ({ onSearch, onSelectCategory, featuredVehicle
                             </button>
                         </div>
                         <div className="flex overflow-x-auto space-x-6 pb-6 -mx-4 px-4">
-                            {recentlyViewed.map(vehicle => (
+                            {(recentlyViewed || []).map(vehicle => (
                                 <div key={vehicle.id} className="flex-shrink-0 w-11/12 max-w-xs sm:w-80">
                                     <FeaturedVehicleCard
                                         vehicle={vehicle} 

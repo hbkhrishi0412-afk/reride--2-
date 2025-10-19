@@ -1,6 +1,7 @@
 
 import React, { useMemo, useState, useEffect } from 'react';
 import type { Vehicle, User, Conversation, PlatformSettings, AuditLogEntry, VehicleData, SupportTicket, FAQItem, SubscriptionPlan, PlanDetails } from '../types';
+import { View } from '../types';
 import EditUserModal from './EditUserModal';
 import EditVehicleModal from './EditVehicleModal';
 import PaymentManagement from './PaymentManagement';
@@ -31,6 +32,7 @@ interface AdminPanelProps {
     onExportUsers: () => void;
     onExportVehicles: () => void;
     onExportSales: () => void;
+    onNavigate?: (view: View) => void;
     vehicleData: VehicleData;
     onUpdateVehicleData: (newData: VehicleData) => void;
     onToggleVerifiedStatus: (email: string) => void;
@@ -98,12 +100,12 @@ const SortableHeader: React.FC<{
 };
 
 const BarChart: React.FC<{ title: string; data: { label: string; value: number }[] }> = ({ title, data }) => {
-    const maxValue = Math.max(...data.map(d => d.value), 1);
+    const maxValue = Math.max(...(data || []).map(d => d.value), 1);
     return (
         <div className="bg-white p-6 rounded-lg shadow-md">
             <h3 className="text-lg font-bold text-spinny-text-dark dark:text-spinny-text-dark mb-4">{title}</h3>
             <div className="space-y-4">
-                {data.map(({ label, value }) => (
+                {(data || []).map(({ label, value }) => (
                     <div key={label} className="grid grid-cols-[100px_1fr] items-center gap-4 text-sm">
                         <span className="font-medium text-spinny-text-dark dark:text-spinny-text-dark truncate text-right">{label}</span>
                         <div className="flex items-center gap-2">
@@ -1849,6 +1851,29 @@ const AdminPanel: React.FC<AdminPanelProps> = (props) => {
             </button>
     );
 
+    const AppNavItem: React.FC<{ view: View; label: string; count?: number }> = ({ view, label, count }) => (
+        <button
+            onClick={() => {
+                // Use the navigate function passed from props
+                if (props.onNavigate) {
+                    props.onNavigate(view);
+                } else {
+                    // Fallback to event system
+                    const event = new CustomEvent('navigate', { detail: { view } });
+                    window.dispatchEvent(event);
+                }
+            }}
+            className="w-full flex items-center justify-between px-4 py-3 text-left rounded-lg transition-colors text-gray-600 hover:bg-gray-50 hover:text-gray-900"
+        >
+            <span>{label}</span>
+            {count !== undefined && count > 0 && (
+                <span className="bg-red-100 text-red-600 text-xs font-bold px-2 py-1 rounded-full">
+                    {count}
+                </span>
+            )}
+        </button>
+    );
+
     return (
         <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
             <div className="flex">
@@ -1856,6 +1881,7 @@ const AdminPanel: React.FC<AdminPanelProps> = (props) => {
                     <div className="p-6">
                         <h1 className="text-2xl font-bold text-gray-800 dark:text-white mb-8">Admin Panel</h1>
                         <nav className="space-y-2">
+                            <h3 className="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-3">Admin Panel</h3>
                             <NavItem view="analytics" label="Analytics" />
                             <NavItem view="users" label="User Management" />
                             <NavItem view="listings" label="Listings" />
