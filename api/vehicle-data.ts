@@ -29,12 +29,12 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       const db = client.db(DB_NAME);
       const collection = db.collection('vehicleData');
 
-      // Try to get from database
-      const data = await collection.findOne({ _id: 'vehicleData' });
+      // Try to get from database using a type field instead of custom _id
+      const data = await collection.findOne({ type: 'vehicleData' });
       
       if (data) {
         // Remove MongoDB's _id field and return the data
-        const { _id, ...vehicleData } = data;
+        const { _id, type, ...vehicleData } = data;
         return res.status(200).json(vehicleData);
       } else {
         // No data in database, return default data
@@ -45,7 +45,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         
         // Save default data to database for future use
         await collection.insertOne({
-          _id: 'vehicleData',
+          type: 'vehicleData',
           ...defaultData
         });
         
@@ -75,9 +75,9 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
       // Upsert the vehicle data
       await collection.replaceOne(
-        { _id: 'vehicleData' },
+        { type: 'vehicleData' },
         {
-          _id: 'vehicleData',
+          type: 'vehicleData',
           ...vehicleData
         },
         { upsert: true }
