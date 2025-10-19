@@ -237,6 +237,15 @@ interface VehicleFormProps {
 
 const VehicleForm: React.FC<VehicleFormProps> = memo(({ editingVehicle, onAddVehicle, onUpdateVehicle, onCancel, vehicleData, seller, onFeatureListing, allVehicles }) => {
     const [formData, setFormData] = useState(editingVehicle ? { ...initialFormState, ...editingVehicle, sellerEmail: editingVehicle.sellerEmail } : { ...initialFormState, sellerEmail: seller.email });
+    
+    // Debug logging for form initialization
+    console.log('🔧 VehicleForm initialized:', {
+        editingVehicle: !!editingVehicle,
+        sellerEmail: seller.email,
+        formDataSellerEmail: formData.sellerEmail,
+        formDataMake: formData.make,
+        formDataModel: formData.model
+    });
     const [featureInput, setFeatureInput] = useState('');
     const [fixInput, setFixInput] = useState('');
     const [isGeneratingDesc, setIsGeneratingDesc] = useState(false);
@@ -539,6 +548,8 @@ const VehicleForm: React.FC<VehicleFormProps> = memo(({ editingVehicle, onAddVeh
             }
         } else {
             console.log('➕ Adding new vehicle');
+            console.log('📧 Seller email in sanitized data:', sanitizedFormData.sellerEmail);
+            console.log('📧 Seller email from props:', seller.email);
             onAddVehicle(sanitizedFormData, isFeaturing);
         }
         onCancel();

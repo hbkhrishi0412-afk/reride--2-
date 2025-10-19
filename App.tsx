@@ -105,19 +105,27 @@ const AppContent: React.FC = () => {
   // Vehicle operation handlers
   const handleAddVehicle = async (vehicleData: Omit<Vehicle, 'id' | 'averageRating' | 'ratingCount'>, isFeaturing: boolean = false) => {
     try {
+      console.log('🚀 App.handleAddVehicle called with:', vehicleData);
+      console.log('⭐ Is featuring:', isFeaturing);
+      
       const { addVehicle } = await import('./services/vehicleService');
-      const newVehicle = await addVehicle({
+      const vehicleToAdd = {
         ...vehicleData,
         id: Date.now(),
         averageRating: 0,
         ratingCount: 0,
         isFeatured: isFeaturing,
         status: 'published'
-      } as Vehicle);
+      } as Vehicle;
+      
+      console.log('📦 Vehicle to add:', vehicleToAdd);
+      const newVehicle = await addVehicle(vehicleToAdd);
+      console.log('✅ Vehicle added successfully:', newVehicle);
+      
       (setVehicles as any)((prev: Vehicle[]) => [...prev, newVehicle]);
       addToast('Vehicle added successfully!', 'success');
     } catch (error) {
-      console.error('Failed to add vehicle:', error);
+      console.error('❌ Failed to add vehicle:', error);
       addToast('Failed to add vehicle. Please try again.', 'error');
     }
   };
