@@ -1,6 +1,6 @@
 
 
-import { Type } from "@google/genai";
+import { SchemaType } from "@google/generative-ai";
 import type { Vehicle, ProsAndCons, Conversation, Suggestion } from '../types';
 import type { SearchFilters } from "../types";
 
@@ -32,7 +32,7 @@ async function callGeminiAPI(payload: any): Promise<string> {
         const isJson = payload.config?.responseMimeType === "application/json";
         if (isJson) {
             // Check if the expected response is an array or object
-            return payload.config?.responseSchema?.type === Type.ARRAY ? "[]" : "{}";
+            return payload.config?.responseSchema?.type === SchemaSchemaType.ARRAY ? "[]" : "{}";
         }
         // For non-JSON responses, return a user-friendly message
         return "AI service is temporarily unavailable. Please try again later.";
@@ -55,15 +55,15 @@ export const parseSearchQuery = async (query: string): Promise<SearchFilters> =>
         config: {
             responseMimeType: "application/json",
             responseSchema: {
-                type: Type.OBJECT,
+                type: SchemaSchemaType.OBJECT,
                 properties: {
-                    make: { type: Type.STRING, description: "The make of the car, e.g., Tata, Hyundai." },
-                    model: { type: Type.STRING, description: "The model of the car, e.g., Nexon, Creta." },
-                    minPrice: { type: Type.NUMBER, description: "The minimum price in INR." },
-                    maxPrice: { type: Type.NUMBER, description: "The maximum price in INR." },
+                    make: { type: SchemaSchemaType.STRING, description: "The make of the car, e.g., Tata, Hyundai." },
+                    model: { type: SchemaSchemaType.STRING, description: "The model of the car, e.g., Nexon, Creta." },
+                    minPrice: { type: SchemaSchemaType.NUMBER, description: "The minimum price in INR." },
+                    maxPrice: { type: SchemaSchemaType.NUMBER, description: "The maximum price in INR." },
                     features: {
-                        type: Type.ARRAY,
-                        items: { type: Type.STRING },
+                        type: SchemaSchemaType.ARRAY,
+                        items: { type: SchemaSchemaType.STRING },
                         description: "An array of requested vehicle features, e.g., Sunroof, ADAS."
                     },
                 },
@@ -94,10 +94,10 @@ Provide the output in JSON format with two keys: "pros" and "cons", each contain
         config: {
             responseMimeType: "application/json",
             responseSchema: {
-                type: Type.OBJECT,
+                type: SchemaSchemaType.OBJECT,
                 properties: {
-                    pros: { type: Type.ARRAY, items: { type: Type.STRING } },
-                    cons: { type: Type.ARRAY, items: { type: Type.STRING } }
+                    pros: { type: SchemaSchemaType.ARRAY, items: { type: SchemaSchemaType.STRING } },
+                    cons: { type: SchemaSchemaType.ARRAY, items: { type: SchemaSchemaType.STRING } }
                 }
             }
         }
@@ -177,31 +177,31 @@ Respond ONLY with a single JSON object matching this schema. If a value is not a
         config: {
             responseMimeType: "application/json",
             responseSchema: {
-                type: Type.OBJECT,
+                type: SchemaSchemaType.OBJECT,
                 properties: {
                     structuredSpecs: {
-                        type: Type.OBJECT,
+                        type: SchemaSchemaType.OBJECT,
                         properties: {
-                            engine: { type: Type.STRING },
-                            transmission: { type: Type.STRING },
-                            fuelType: { type: Type.STRING },
-                            fuelEfficiency: { type: Type.STRING },
-                            displacement: { type: Type.STRING },
-                            groundClearance: { type: Type.STRING },
-                            bootSpace: { type: Type.STRING },
+                            engine: { type: SchemaType.STRING },
+                            transmission: { type: SchemaType.STRING },
+                            fuelType: { type: SchemaType.STRING },
+                            fuelEfficiency: { type: SchemaType.STRING },
+                            displacement: { type: SchemaType.STRING },
+                            groundClearance: { type: SchemaType.STRING },
+                            bootSpace: { type: SchemaType.STRING },
                         }
                     },
                     featureSuggestions: {
-                        type: Type.OBJECT,
+                        type: SchemaSchemaType.OBJECT,
                         properties: {
-                            "Comfort & Convenience": { type: Type.ARRAY, items: { type: Type.STRING } },
-                            "Safety": { type: Type.ARRAY, items: { type: Type.STRING } },
-                            "Entertainment": { type: Type.ARRAY, items: { type: Type.STRING } },
-                            "Exterior": { type: Type.ARRAY, items: { type: Type.STRING } },
+                            "Comfort & Convenience": { type: SchemaType.ARRAY, items: { type: SchemaType.STRING } },
+                            "Safety": { type: SchemaType.ARRAY, items: { type: SchemaType.STRING } },
+                            "Entertainment": { type: SchemaType.ARRAY, items: { type: SchemaType.STRING } },
+                            "Exterior": { type: SchemaType.ARRAY, items: { type: SchemaType.STRING } },
                         },
                         additionalProperties: {
-                            type: Type.ARRAY,
-                            items: { type: Type.STRING }
+                            type: SchemaType.ARRAY,
+                            items: { type: SchemaType.STRING }
                         }
                     }
                 }
@@ -250,8 +250,8 @@ Return the suggestions as a JSON array of strings. For example: ["Hyundai Creta"
         config: {
             responseMimeType: "application/json",
             responseSchema: {
-                type: Type.ARRAY,
-                items: { type: Type.STRING }
+                type: SchemaType.ARRAY,
+                items: { type: SchemaType.STRING }
             },
             thinkingConfig: { thinkingBudget: 0 },
         }
@@ -317,18 +317,18 @@ If there is no data or no meaningful suggestions can be made, return an empty ar
         config: {
             responseMimeType: "application/json",
             responseSchema: {
-                type: Type.OBJECT,
+                type: SchemaSchemaType.OBJECT,
                 properties: {
                     suggestions: {
-                        type: Type.ARRAY,
+                        type: SchemaType.ARRAY,
                         items: {
-                            type: Type.OBJECT,
+                            type: SchemaSchemaType.OBJECT,
                             properties: {
-                                type: { type: Type.STRING },
-                                title: { type: Type.STRING },
-                                description: { type: Type.STRING },
-                                targetId: { type: Type.STRING }, // Gemini may return number as string
-                                priority: { type: Type.STRING },
+                                type: { type: SchemaType.STRING },
+                                title: { type: SchemaType.STRING },
+                                description: { type: SchemaType.STRING },
+                                targetId: { type: SchemaType.STRING }, // Gemini may return number as string
+                                priority: { type: SchemaType.STRING },
                             },
                             required: ["type", "title", "description", "targetId", "priority"]
                         }
@@ -382,8 +382,8 @@ Respond ONLY with a JSON array of recommended vehicle IDs (numbers). For example
         config: {
             responseMimeType: "application/json",
             responseSchema: {
-                type: Type.ARRAY,
-                items: { type: Type.NUMBER }
+                type: SchemaType.ARRAY,
+                items: { type: SchemaType.NUMBER }
             }
         }
     };
@@ -432,11 +432,11 @@ If there is not enough data to make a suggestion, provide a reason in the summar
         config: {
             responseMimeType: "application/json",
             responseSchema: {
-                type: Type.OBJECT,
+                type: SchemaSchemaType.OBJECT,
                 properties: {
-                    summary: { type: Type.STRING },
-                    suggestedMinPrice: { type: Type.NUMBER },
-                    suggestedMaxPrice: { type: Type.NUMBER },
+                    summary: { type: SchemaType.STRING },
+                    suggestedMinPrice: { type: SchemaType.NUMBER },
+                    suggestedMaxPrice: { type: SchemaType.NUMBER },
                 },
                 required: ['summary', 'suggestedMinPrice', 'suggestedMaxPrice'],
             }

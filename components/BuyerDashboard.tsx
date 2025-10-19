@@ -44,7 +44,7 @@ const BuyerDashboard: React.FC<BuyerDashboardProps> = ({
             Please log in to view your dashboard
           </h2>
           <button
-            onClick={() => onNavigate(View.LOGIN)}
+            onClick={() => onNavigate(View.LOGIN_PORTAL)}
             className="btn-brand-primary text-white px-6 py-2 rounded-lg"
           >
             Go to Login
@@ -87,12 +87,12 @@ const BuyerDashboard: React.FC<BuyerDashboardProps> = ({
       .filter(result => result.matches.length > 0);
   }, [currentUser.email, vehicles]);
 
-  const handleDeleteSearch = useCallback((searchId: number) => {
+  const handleDeleteSearch = useCallback((searchId: string) => {
     buyerService.deleteSavedSearch(currentUser.email, searchId);
     setSavedSearches(buyerService.getSavedSearches(currentUser.email));
   }, [currentUser.email]);
 
-  const handleToggleAlerts = useCallback((searchId: number, emailAlerts: boolean) => {
+  const handleToggleAlerts = useCallback((searchId: string, emailAlerts: boolean) => {
     buyerService.updateSavedSearch(currentUser.email, searchId, { emailAlerts });
     setSavedSearches(buyerService.getSavedSearches(currentUser.email));
   }, [currentUser.email]);
@@ -287,10 +287,12 @@ const BuyerDashboard: React.FC<BuyerDashboardProps> = ({
                           vehicle={vehicle}
                           onSelect={onSelectVehicle}
                           onToggleCompare={onToggleCompare}
-                          comparisonList={comparisonList}
+                          isSelectedForCompare={comparisonList.includes(vehicle.id)}
                           onToggleWishlist={onToggleWishlist}
-                          wishlist={wishlist}
+                          isInWishlist={wishlist.includes(vehicle.id)}
+                          isCompareDisabled={!comparisonList.includes(vehicle.id) && comparisonList.length >= 4}
                           onViewSellerProfile={onViewSellerProfile}
+                          onQuickView={onSelectVehicle}
                         />
                       ))}
                     </div>
@@ -310,10 +312,12 @@ const BuyerDashboard: React.FC<BuyerDashboardProps> = ({
                           vehicle={vehicle}
                           onSelect={onSelectVehicle}
                           onToggleCompare={onToggleCompare}
-                          comparisonList={comparisonList}
+                          isSelectedForCompare={comparisonList.includes(vehicle.id)}
                           onToggleWishlist={onToggleWishlist}
-                          wishlist={wishlist}
+                          isInWishlist={wishlist.includes(vehicle.id)}
+                          isCompareDisabled={!comparisonList.includes(vehicle.id) && comparisonList.length >= 4}
                           onViewSellerProfile={onViewSellerProfile}
+                          onQuickView={onSelectVehicle}
                         />
                       ))}
                     </div>

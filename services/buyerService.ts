@@ -6,8 +6,10 @@ export const saveSearch = (userId: string, search: Omit<SavedSearch, 'id' | 'cre
     const searches = getSavedSearches(userId);
     const newSearch: SavedSearch = {
       ...search,
-      id: Date.now(),
+      id: `search_${Date.now()}`,
       createdAt: new Date().toISOString(),
+      smsAlerts: false,
+      notificationFrequency: 'instant',
     };
     searches.push(newSearch);
     localStorage.setItem(`savedSearches_${userId}`, JSON.stringify(searches));
@@ -31,7 +33,7 @@ export const getSavedSearches = (userId: string): SavedSearch[] => {
 };
 
 // Delete saved search
-export const deleteSavedSearch = (userId: string, searchId: number): void => {
+export const deleteSavedSearch = (userId: string, searchId: string): void => {
   try {
     const searches = getSavedSearches(userId);
     const filtered = searches.filter(s => s.id !== searchId);
@@ -42,7 +44,7 @@ export const deleteSavedSearch = (userId: string, searchId: number): void => {
 };
 
 // Update saved search
-export const updateSavedSearch = (userId: string, searchId: number, updates: Partial<SavedSearch>): void => {
+export const updateSavedSearch = (userId: string, searchId: string, updates: Partial<SavedSearch>): void => {
   try {
     const searches = getSavedSearches(userId);
     const updated = searches.map(s => s.id === searchId ? { ...s, ...updates } : s);
@@ -88,7 +90,7 @@ export const matchVehiclesToSearch = (vehicles: Vehicle[], search: SavedSearch):
 };
 
 // Find new matches for all saved searches
-export const findNewMatches = (userId: string, vehicles: Vehicle[]): { searchId: number; matches: Vehicle[] }[] => {
+export const findNewMatches = (userId: string, vehicles: Vehicle[]): { searchId: string; matches: Vehicle[] }[] => {
   const searches = getSavedSearches(userId);
   return searches.map(search => ({
     searchId: search.id,

@@ -388,26 +388,6 @@ export interface ListingBoost {
   isActive: boolean;
 }
 
-export interface SavedSearch {
-  id: number;
-  userId: string;
-  name: string;
-  filters: {
-    make?: string;
-    model?: string;
-    minPrice?: number;
-    maxPrice?: number;
-    minYear?: number;
-    maxYear?: number;
-    category?: VehicleCategory;
-    fuelType?: string;
-    transmission?: string;
-    location?: string;
-    radius?: number; // km
-  };
-  emailAlerts: boolean;
-  createdAt: string;
-}
 
 export interface BuyerActivity {
   userId: string;
