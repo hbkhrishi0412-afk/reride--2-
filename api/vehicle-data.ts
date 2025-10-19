@@ -1,5 +1,5 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
-import { MongoClient } from 'mongodb';
+import { MongoClient, Document } from 'mongodb';
 
 const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://localhost:27017';
 const DB_NAME = process.env.DB_NAME || 'reride';
@@ -27,10 +27,10 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     try {
       const client = await connectToDatabase();
       const db = client.db(DB_NAME);
-      const collection = db.collection('vehicleData');
+      const collection = db.collection<Document>('vehicleData');
 
       // Try to get from database using a type field instead of custom _id
-      const data = await collection.findOne({ type: 'vehicleData' });
+      const data = await collection.findOne({ type: 'vehicleData' } as any);
       
       if (data) {
         // Remove MongoDB's _id field and return the data
@@ -47,7 +47,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         await collection.insertOne({
           type: 'vehicleData',
           ...defaultData
-        });
+        } as any);
         
         return res.status(200).json(defaultData);
       }
@@ -71,15 +71,15 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
       const client = await connectToDatabase();
       const db = client.db(DB_NAME);
-      const collection = db.collection('vehicleData');
+      const collection = db.collection<Document>('vehicleData');
 
       // Upsert the vehicle data
       await collection.replaceOne(
-        { type: 'vehicleData' },
+        { type: 'vehicleData' } as any,
         {
           type: 'vehicleData',
           ...vehicleData
-        },
+        } as any,
         { upsert: true }
       );
 
