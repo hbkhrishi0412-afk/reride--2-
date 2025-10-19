@@ -3,6 +3,7 @@ import React from 'react';
 import ReactDOM from 'react-dom/client';
 import './index.css';
 import App from './App';
+import ErrorBoundary from './components/ErrorBoundary';
 import { reportWebVitals, logPerformanceMetrics } from './utils/performance';
 
 const rootElement = document.getElementById('root');
@@ -18,7 +19,17 @@ const root = ReactDOM.createRoot(rootElement);
 const isDev = import.meta.env.DEV;
 
 root.render(
-  isDev ? <App /> : <React.StrictMode><App /></React.StrictMode>
+  isDev ? (
+    <ErrorBoundary>
+      <App />
+    </ErrorBoundary>
+  ) : (
+    <React.StrictMode>
+      <ErrorBoundary>
+        <App />
+      </ErrorBoundary>
+    </React.StrictMode>
+  )
 );
 
 // Service worker disabled to prevent caching issues

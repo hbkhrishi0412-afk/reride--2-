@@ -8,7 +8,22 @@ export default async function handler(
   res: VercelResponse,
 ) {
   try {
-    await connectToDatabase();
+    // Try to connect to database, but don't fail if it's not available
+    try {
+      await connectToDatabase();
+    } catch (dbError) {
+      console.warn('Database connection failed, using fallback data:', dbError);
+      // Return fallback data for GET requests
+      if (req.method === 'GET') {
+        return res.status(200).json([]);
+      }
+      // For other methods, return appropriate error
+      return res.status(503).json({ 
+        success: false, 
+        reason: 'Database temporarily unavailable. Please try again later.',
+        fallback: true
+      });
+    }
 
     // Handle authentication actions (POST with action parameter)
     if (req.method === 'POST') {

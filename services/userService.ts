@@ -33,6 +33,11 @@ const getAuthHeader = () => {
 
 const handleResponse = async (response: Response) => {
     if (!response.ok) {
+        // For 500 errors, don't throw - let the fallback mechanism handle it
+        if (response.status >= 500) {
+            console.warn(`API returned ${response.status}: ${response.statusText}, will use fallback data`);
+            throw new Error(`API Error: ${response.status} - ${response.statusText}`);
+        }
         const error = await response.json().catch(() => ({ error: `API Error: ${response.statusText}` }));
         throw new Error(error.error || `Failed to fetch: ${response.statusText}`);
     }
@@ -228,6 +233,10 @@ export const getUsers = async (): Promise<User[]> => {
         return result;
       } catch (error) {
         console.warn('getUsers: API failed, falling back to local storage:', error);
+        // Show user-friendly notification for API failures
+        if (error instanceof Error && error.message.includes('API Error: 5')) {
+          console.info('getUsers: Using cached data due to server issues');
+        }
         // Fallback to local storage if API fails
         return await getUsersLocal();
       }

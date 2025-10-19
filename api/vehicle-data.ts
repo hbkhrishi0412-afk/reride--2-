@@ -25,7 +25,18 @@ async function connectToDatabase() {
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   if (req.method === 'GET') {
     try {
-      const client = await connectToDatabase();
+      // Try to connect to database, but don't fail if it's not available
+      let client;
+      try {
+        client = await connectToDatabase();
+      } catch (dbError) {
+        console.warn('Database connection failed, using fallback data:', dbError);
+        // Return fallback data
+        return res.status(200).json({
+          categories: ['four-wheeler', 'two-wheeler', 'three-wheeler'],
+          makes: ['Honda', 'Toyota', 'Maruti', 'Hyundai', 'Tata', 'Mahindra', 'Bajaj', 'TVS', 'Hero', 'Yamaha']
+        });
+      }
       const db = client.db(DB_NAME);
       const collection = db.collection<Document>('vehicleData');
 

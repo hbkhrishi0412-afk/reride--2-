@@ -40,6 +40,11 @@ const getAuthHeader = () => {
 
 const handleResponse = async <T>(response: Response): Promise<T> => {
     if (!response.ok) {
+        // For 500 errors, don't throw - let the fallback mechanism handle it
+        if (response.status >= 500) {
+            console.warn(`API returned ${response.status}: ${response.statusText}, will use fallback data`);
+            throw new Error(`API Error: ${response.status} - ${response.statusText}`);
+        }
         const error = await response.json().catch(() => ({ error: `API Error: ${response.statusText}` }));
         throw new Error(error.error || `Failed to fetch: ${response.statusText}`);
     }

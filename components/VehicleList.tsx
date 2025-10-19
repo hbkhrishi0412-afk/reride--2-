@@ -376,7 +376,20 @@ const VehicleList: React.FC<VehicleListProps> = ({ vehicles, onSelectVehicle, is
         const matchesYear = Number(yearFilter) === 0 || vehicle.year === Number(yearFilter);
         const matchesColor = !colorFilter || vehicle.color === colorFilter;
         const matchesState = !stateFilter || vehicle.state === stateFilter;
-        const matchesFeatures = selectedFeatures.every(feature => vehicle.features.includes(feature));
+        const matchesFeatures = selectedFeatures.length === 0 || selectedFeatures.every(feature => vehicle.features && vehicle.features.includes(feature));
+        
+        // Debug logging for filter issues
+        if (process.env.NODE_ENV === 'development' && sourceVehicles.length > 0) {
+          const debugInfo = {
+            vehicle: vehicle.make + ' ' + vehicle.model,
+            matchesCategory, matchesMake, matchesModel, matchesPrice, matchesMileage,
+            matchesFuelType, matchesYear, matchesColor, matchesState, matchesFeatures,
+            filters: { categoryFilter, makeFilter, modelFilter, priceRange, mileageRange, fuelTypeFilter, yearFilter, colorFilter, stateFilter, selectedFeatures }
+          };
+          if (!matchesCategory || !matchesMake || !matchesModel || !matchesPrice || !matchesMileage || !matchesFuelType || !matchesYear || !matchesColor || !matchesState || !matchesFeatures) {
+            console.log('Filter debug:', debugInfo);
+          }
+        }
         
         return matchesCategory && matchesMake && matchesModel && matchesPrice && matchesYear && matchesFeatures && matchesColor && matchesState && matchesMileage && matchesFuelType;
     });
