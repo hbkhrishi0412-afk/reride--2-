@@ -18,7 +18,7 @@ const Footer: React.FC<FooterProps> = ({ onNavigate }) => {
         <div className="mb-4 flex justify-center">
           <Logo 
             onClick={() => onNavigate(View.HOME)}
-            className="text-white [&_span]:text-white [&_span]:bg-gradient-to-r [&_span]:from-white [&_span]:via-blue-200 [&_span]:to-white [&_svg_path]:fill-white"
+            className="[&_span]:text-white [&_span]:bg-gradient-to-r [&_span]:from-white [&_span]:via-blue-200 [&_span]:to-white"
           />
         </div>
         <p style={{ color: 'white' }}>&copy; {new Date().getFullYear()} ReRide. All rights reserved.</p>
