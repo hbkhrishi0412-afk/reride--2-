@@ -321,8 +321,21 @@ const AppContent: React.FC = () => {
     const userJson = localUserJson || sessionUserJson;
     if (userJson) {
       const user = JSON.parse(userJson);
-      console.log('✅ Restored user from storage:', user.email);
+      console.log('✅ Restored user from storage:', user.email, 'Role:', user.role);
       setCurrentUser(user);
+      
+      // Auto-navigate to appropriate dashboard based on user role
+      if (user.role === 'seller' && currentView === View.HOME) {
+        console.log('🔄 Auto-navigating seller to dashboard');
+        navigate(View.SELLER_DASHBOARD);
+      } else if (user.role === 'customer' && currentView === View.HOME) {
+        console.log('🔄 Auto-navigating customer to home');
+        navigate(View.HOME);
+      } else if (user.role === 'admin' && currentView === View.HOME) {
+        console.log('🔄 Auto-navigating admin to panel');
+        navigate(View.ADMIN_PANEL);
+      }
+      
       if (!localUserJson && sessionUserJson) {
         localStorage.setItem('reRideCurrentUser', sessionUserJson);
         console.log('🔄 Migrated session to localStorage');
@@ -343,7 +356,7 @@ const AppContent: React.FC = () => {
       flagReason: c.flagReason || undefined, 
       flaggedAt: c.flaggedAt || undefined 
     })));
-  }, [setCurrentUser, setWishlist, setConversations]);
+  }, [setCurrentUser, setWishlist, setConversations, currentView, navigate]);
 
   // Load ratings
   useEffect(() => {
@@ -644,7 +657,7 @@ const AppContent: React.FC = () => {
       case View.DEALER_PROFILES: 
         return <DealerProfiles 
           sellers={users.filter(u => u.role === 'seller')} 
-          onViewProfile={() => {}} 
+          onViewProfile={handleViewSellerProfile} 
         />;
       case View.WISHLIST: 
         return <VehicleList 
