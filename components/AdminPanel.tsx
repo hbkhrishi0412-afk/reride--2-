@@ -130,14 +130,51 @@ const CertificationRequestsView: React.FC<{
     onCertificationApproval: (vehicleId: number, decision: 'approved' | 'rejected') => void;
 }> = ({ requests, users, onCertificationApproval }) => {
     
-    const getSellerInfo = (email: string) => {
-        const seller = users.find(u => u.email === email);
-        if (!seller) return { planName: 'N/A', usage: 'N/A', hasFreeCredits: false };
-        const plan = PLAN_DETAILS[seller.subscriptionPlan || 'free'];
-        const used = seller.usedCertifications || 0;
-        const total = plan.freeCertifications;
-        const usage = `${used}/${total}`;
-        return { planName: plan.name, usage, hasFreeCredits: used < total };
+    // Certification Request Row Component
+    const CertificationRequestRow: React.FC<{ vehicle: Vehicle }> = ({ vehicle }) => {
+        const [sellerInfo, setSellerInfo] = useState<{ planName: string; usage: string; hasFreeCredits: boolean } | null>(null);
+        
+        useEffect(() => {
+            const getSellerInfo = async () => {
+                const seller = users.find(u => u.email === vehicle.sellerEmail);
+                if (!seller) {
+                    setSellerInfo({ planName: 'N/A', usage: 'N/A', hasFreeCredits: false });
+                    return;
+                }
+                const plan = await planService.getPlanDetails(seller.subscriptionPlan || 'free');
+                const used = seller.usedCertifications || 0;
+                const total = plan.freeCertifications;
+                const usage = `${used}/${total}`;
+                setSellerInfo({ planName: plan.name, usage, hasFreeCredits: used < total });
+            };
+            getSellerInfo();
+        }, [vehicle.sellerEmail]);
+        
+        if (!sellerInfo) {
+            return (
+                <tr key={vehicle.id}>
+                    <td colSpan={4} className="px-6 py-4 text-center text-gray-500">
+                        Loading seller info...
+                    </td>
+                </tr>
+            );
+        }
+        
+        return (
+            <tr key={vehicle.id}>
+                <td className="px-6 py-4 whitespace-nowrap font-medium">{vehicle.year} {vehicle.make} {vehicle.model}</td>
+                <td className="px-6 py-4">{vehicle.sellerEmail}</td>
+                <td className="px-6 py-4">
+                    <div>Plan: <span className="font-semibold">{sellerInfo.planName}</span></div>
+                    <div className="text-sm">Free Certs Used: {sellerInfo.usage}</div>
+                    {!sellerInfo.hasFreeCredits && <div className="text-xs text-spinny-text-dark">No free credits left</div>}
+                </td>
+                <td className="px-6 py-4 whitespace-nowrap text-sm font-medium space-x-3">
+                    <button onClick={() => onCertificationApproval(vehicle.id, 'approved')} className="text-spinny-orange hover:text-spinny-orange">Approve</button>
+                    <button onClick={() => onCertificationApproval(vehicle.id, 'rejected')} className="text-spinny-orange hover:text-spinny-orange">Reject</button>
+                </td>
+            </tr>
+        );
     };
 
     return (
@@ -153,24 +190,9 @@ const CertificationRequestsView: React.FC<{
                         </tr>
                     </thead>
                     <tbody className="bg-white divide-y divide-gray-200 dark:divide-gray-700">
-                        {requests.map(v => {
-                            const sellerInfo = getSellerInfo(v.sellerEmail);
-                            return (
-                                <tr key={v.id}>
-                                    <td className="px-6 py-4 whitespace-nowrap font-medium">{v.year} {v.make} {v.model}</td>
-                                    <td className="px-6 py-4">{v.sellerEmail}</td>
-                                    <td className="px-6 py-4">
-                                        <div>Plan: <span className="font-semibold">{sellerInfo.planName}</span></div>
-                                        <div className="text-sm">Free Certs Used: {sellerInfo.usage}</div>
-                                        {!sellerInfo.hasFreeCredits && <div className="text-xs text-spinny-text-dark">No free credits left</div>}
-                                    </td>
-                                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium space-x-3">
-                                        <button onClick={() => onCertificationApproval(v.id, 'approved')} className="text-spinny-orange hover:text-spinny-orange">Approve</button>
-                                        <button onClick={() => onCertificationApproval(v.id, 'rejected')} className="text-spinny-orange hover:text-spinny-orange">Reject</button>
-                                    </td>
-                                </tr>
-                            );
-                        })}
+                        {requests.map(vehicle => (
+                            <CertificationRequestRow key={vehicle.id} vehicle={vehicle} />
+                        ))}
                     </tbody>
                 </table>
             ) : <p className="text-center py-8 text-spinny-text-dark dark:text-spinny-text-dark">No pending certification requests.</p>}
@@ -1304,19 +1326,6 @@ const AdminPanel: React.FC<AdminPanelProps> = (props) => {
             }
         };
 
-        const getPriorityColor = (priority: string) => {
-            switch (priority) {
-                case 'High':
-                    return 'bg-red-100 text-red-800';
-                case 'Medium':
-                    return 'bg-yellow-100 text-yellow-800';
-                case 'Low':
-                    return 'bg-green-100 text-green-800';
-                default:
-                    return 'bg-gray-100 text-gray-800';
-            }
-        };
-
         return (
             <div className="space-y-6">
                 {/* Filter Tabs */}
@@ -1367,11 +1376,6 @@ const AdminPanel: React.FC<AdminPanelProps> = (props) => {
                                         <td className="px-6 py-4 text-sm text-gray-900 max-w-xs truncate" title={ticket.subject}>
                                             {ticket.subject}
                                         </td>
-                                                        <td className="px-6 py-4 whitespace-nowrap">
-                                                            <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${getPriorityColor(ticket.priority || 'Medium')}`}>
-                                                                {ticket.priority || 'Medium'}
-                                                            </span>
-                                                        </td>
                                         <td className="px-6 py-4 whitespace-nowrap">
                                             <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${getStatusColor(ticket.status)}`}>
                                                 {ticket.status}
@@ -1423,9 +1427,195 @@ const AdminPanel: React.FC<AdminPanelProps> = (props) => {
         });
         const [plans, setPlans] = useState<PlanDetails[]>([]);
 
+        // Helper function to check if a plan is custom
+        const isCustomPlan = async (planId: string): Promise<boolean> => {
+            try {
+                await planService.getOriginalPlanDetails(planId as SubscriptionPlan);
+                return false; // If we can get original details, it's a base plan
+            } catch (error) {
+                return true; // If we can't get original details, it's a custom plan
+            }
+        };
+
+        // User Row Component
+        const UserRow: React.FC<{ user: User; currentPlan: SubscriptionPlan }> = ({ user, currentPlan }) => {
+            const [planDetails, setPlanDetails] = useState<PlanDetails | null>(null);
+            
+            useEffect(() => {
+                planService.getPlanDetails(currentPlan).then(setPlanDetails);
+            }, [currentPlan]);
+            
+            const userVehicles = vehicles.filter((v: Vehicle) => v.sellerEmail === user.email);
+            const activeListings = userVehicles.filter((v: Vehicle) => v.status === 'published').length;
+            
+            if (!planDetails) {
+                return (
+                    <tr key={user.email}>
+                        <td colSpan={5} className="px-6 py-4 text-center text-gray-500">
+                            Loading plan details...
+                        </td>
+                    </tr>
+                );
+            }
+            
+            return (
+                <tr key={user.email}>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                        <div className="flex items-center">
+                            <div className="flex-shrink-0 h-10 w-10">
+                                <div className="h-10 w-10 rounded-full bg-spinny-orange flex items-center justify-center text-white font-bold">
+                                    {user.name.charAt(0).toUpperCase()}
+                                </div>
+                            </div>
+                            <div className="ml-4">
+                                <div className="text-sm font-medium text-gray-900 dark:text-white">{user.name}</div>
+                                <div className="text-sm text-gray-500 dark:text-gray-400">{user.email}</div>
+                            </div>
+                        </div>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                        <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
+                            currentPlan === 'free' ? 'bg-gray-100 text-gray-800' :
+                            currentPlan === 'pro' ? 'bg-blue-100 text-blue-800' :
+                            'bg-purple-100 text-purple-800'
+                        }`}>
+                            {planDetails.name}
+                        </span>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">
+                        {activeListings} / {planDetails.listingLimit === 'unlimited' ? '∞' : planDetails.listingLimit}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                        <div className="flex items-center">
+                            <div className="flex-1">
+                                <div className="text-sm text-gray-900 dark:text-white">
+                                                    {user.usedCertifications || 0} / {planDetails.freeCertifications}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                                        <div className="flex flex-col gap-2">
+                                            {currentPlan !== 'free' && (
+                                                <button 
+                                                    onClick={() => handleAssignPlan(user.email, 'free')}
+                                                    className="text-gray-600 hover:text-gray-800 transition-colors"
+                                                >
+                                                    Assign Free
+                                                </button>
+                                            )}
+                                            {currentPlan !== 'pro' && (
+                                                <button 
+                                                    onClick={() => handleAssignPlan(user.email, 'pro')}
+                                                    className="text-blue-600 hover:text-blue-800 transition-colors"
+                                                >
+                                                    Assign Pro
+                                                </button>
+                                            )}
+                                            {currentPlan !== 'premium' && (
+                                                <button 
+                                                    onClick={() => handleAssignPlan(user.email, 'premium')}
+                                                    className="text-purple-600 hover:text-purple-800 transition-colors"
+                                                >
+                                                    Assign Premium
+                                                </button>
+                                            )}
+                                        </div>
+                                    </td>
+                                </tr>
+            );
+        };
+
+        // Plan Card Component
+        const PlanCard: React.FC<{ plan: PlanDetails }> = ({ plan }) => {
+            const [isCustom, setIsCustom] = useState<boolean>(false);
+            
+            useEffect(() => {
+                isCustomPlan(plan.id).then(setIsCustom);
+            }, [plan.id]);
+
+            return (
+                <div key={plan.id} className={`border rounded-lg p-6 hover:shadow-lg transition-shadow ${
+                    isCustom 
+                        ? 'border-purple-300 dark:border-purple-600 bg-purple-50 dark:bg-purple-900/20' 
+                        : 'border-gray-200 dark:border-gray-700'
+                }`}>
+                    <div className="flex justify-between items-start mb-4">
+                        <div>
+                            <div className="flex items-center gap-2">
+                                <h3 className="text-lg font-semibold text-spinny-text-dark dark:text-spinny-text-dark">{plan.name}</h3>
+                                {isCustom && (
+                                    <span className="px-2 py-1 bg-purple-100 text-purple-700 text-xs font-bold rounded-full">
+                                        CUSTOM
+                                    </span>
+                                )}
+                            </div>
+                            <p className="text-2xl font-bold text-spinny-text-dark dark:text-spinny-text-dark mt-2">
+                                ₹{plan.price.toLocaleString()}
+                                <span className="text-sm font-normal text-gray-500">/month</span>
+                            </p>
+                        </div>
+                        <div className="flex gap-2">
+                            <button
+                                onClick={() => handleEditPlan(plan)}
+                                className="px-3 py-1 text-sm bg-blue-100 text-blue-700 rounded hover:bg-blue-200 transition-colors"
+                            >
+                                Edit
+                            </button>
+                            {isCustom && (
+                                <button
+                                    onClick={() => handleDeletePlan(plan)}
+                                    className="px-3 py-1 text-sm bg-red-100 text-red-700 rounded hover:bg-red-200 transition-colors"
+                                >
+                                    Delete
+                                </button>
+                            )}
+                        </div>
+                    </div>
+                    
+                    <div className="space-y-2 mb-4">
+                        <div className="flex justify-between text-sm">
+                            <span className="text-gray-600 dark:text-gray-400">Listings:</span>
+                            <span className="font-medium">{plan.listingLimit}</span>
+                        </div>
+                        <div className="flex justify-between text-sm">
+                            <span className="text-gray-600 dark:text-gray-400">Featured Credits:</span>
+                            <span className="font-medium">{plan.featuredCredits}</span>
+                        </div>
+                        <div className="flex justify-between text-sm">
+                            <span className="text-gray-600 dark:text-gray-400">Free Certifications:</span>
+                            <span className="font-medium">{plan.freeCertifications}</span>
+                        </div>
+                    </div>
+                    
+                    <div className="space-y-1">
+                        <p className="text-sm font-medium text-gray-700 dark:text-gray-300">Features:</p>
+                        <ul className="text-sm text-gray-600 dark:text-gray-400 space-y-1">
+                            {plan.features.map((feature, index) => (
+                                <li key={index} className="flex items-center gap-2">
+                                    <span className="w-1 h-1 bg-green-500 rounded-full"></span>
+                                    {feature}
+                                </li>
+                            ))}
+                        </ul>
+                    </div>
+                    
+                    {plan.isMostPopular && (
+                        <div className="mt-4 px-3 py-1 bg-yellow-100 text-yellow-800 text-xs font-bold rounded-full text-center">
+                            MOST POPULAR
+                        </div>
+                    )}
+                </div>
+            );
+        };
+
         // Load plans from service
         useEffect(() => {
-            setPlans(planService.getAllPlans());
+            const loadPlans = async () => {
+                const allPlans = await planService.getAllPlans();
+                setPlans(allPlans);
+            };
+            loadPlans();
         }, []);
 
         // Calculate plan statistics
@@ -1448,20 +1638,21 @@ const AdminPanel: React.FC<AdminPanelProps> = (props) => {
             setShowPlanModal(true);
         };
 
-        const handleAddNewPlan = () => {
-            if (!planService.canAddNewPlan()) {
+        const handleAddNewPlan = async () => {
+            if (!(await planService.canAddNewPlan())) {
                 alert('Maximum of 4 plans allowed. Please delete an existing custom plan first.');
                 return;
             }
             setShowAddPlanModal(true);
         };
 
-        const handleSavePlan = (updatedPlan: PlanDetails) => {
+        const handleSavePlan = async (updatedPlan: PlanDetails) => {
             // Update the plan using the plan service
             planService.updatePlan(updatedPlan.id, updatedPlan);
             
             // Refresh the plans list
-            setPlans(planService.getAllPlans());
+            const allPlans = await planService.getAllPlans();
+            setPlans(allPlans);
             
             // Close modal
             setShowPlanModal(false);
@@ -1471,12 +1662,13 @@ const AdminPanel: React.FC<AdminPanelProps> = (props) => {
             alert(`Plan "${updatedPlan.name}" has been updated successfully!`);
         };
 
-        const handleCreatePlan = (newPlanData: Omit<PlanDetails, 'id'>) => {
+        const handleCreatePlan = async (newPlanData: Omit<PlanDetails, 'id'>) => {
             // Create new plan using the plan service
             planService.createPlan(newPlanData);
             
             // Refresh the plans list
-            setPlans(planService.getAllPlans());
+            const allPlans = await planService.getAllPlans();
+            setPlans(allPlans);
             
             // Close modal
             setShowAddPlanModal(false);
@@ -1485,15 +1677,21 @@ const AdminPanel: React.FC<AdminPanelProps> = (props) => {
             alert(`Plan "${newPlanData.name}" has been created successfully!`);
         };
 
-        const handleDeletePlan = (plan: PlanDetails) => {
-            if (PLAN_DETAILS[plan.id as SubscriptionPlan]) {
-                alert('Cannot delete base plans (Free, Pro, Premium).');
-                return;
+        const handleDeletePlan = async (plan: PlanDetails) => {
+            // Check if it's a base plan by trying to get original details
+            try {
+                const originalPlan = await planService.getOriginalPlanDetails(plan.id as SubscriptionPlan);
+                if (originalPlan) {
+                    alert('Cannot delete base plans (Free, Pro, Premium).');
+                    return;
+                }
+            } catch (error) {
+                // If we can't get original details, it's likely a custom plan
             }
             
             if (window.confirm(`Are you sure you want to delete the "${plan.name}" plan? This action cannot be undone.`)) {
-                if (planService.deletePlan(plan.id)) {
-                    setPlans(planService.getAllPlans());
+                if (await planService.deletePlan(plan.id)) {
+                    setPlans(await planService.getAllPlans());
                     alert(`Plan "${plan.name}" has been deleted successfully!`);
                 }
             }
@@ -1541,13 +1739,14 @@ const AdminPanel: React.FC<AdminPanelProps> = (props) => {
                         <div>
                             <h2 className="text-xl font-bold text-spinny-text-dark dark:text-spinny-text-dark">Plan Configuration</h2>
                             <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
-                                {planService.getPlanCount()}/4 plans configured
+                                {plans.length}/4 plans configured
                             </p>
                         </div>
                         <div className="flex gap-2">
                             <button 
-                                onClick={() => {
-                                    setPlans(planService.getAllPlans());
+                                onClick={async () => {
+                                    const allPlans = await planService.getAllPlans();
+                                    setPlans(allPlans);
                                     alert('Plans refreshed successfully!');
                                 }}
                                 className="bg-blue-500 text-white font-bold py-2 px-4 rounded-lg hover:bg-blue-600 transition-colors"
@@ -1556,94 +1755,22 @@ const AdminPanel: React.FC<AdminPanelProps> = (props) => {
                             </button>
                             <button 
                                 onClick={handleAddNewPlan}
-                                disabled={!planService.canAddNewPlan()}
+                                disabled={plans.length >= 4}
                                 className={`font-bold py-2 px-4 rounded-lg transition-colors ${
-                                    planService.canAddNewPlan()
+                                    plans.length < 4
                                         ? 'bg-spinny-orange text-white hover:bg-spinny-orange/90'
                                         : 'bg-gray-300 text-gray-500 cursor-not-allowed'
                                 }`}
                             >
-                                {planService.canAddNewPlan() ? '+ Add New Plan' : 'Max Plans Reached'}
+                                {plans.length < 4 ? '+ Add New Plan' : 'Max Plans Reached'}
                             </button>
                         </div>
                     </div>
                     
                     <div className={`grid gap-6 ${plans.length <= 2 ? 'grid-cols-1 md:grid-cols-2' : plans.length === 3 ? 'grid-cols-1 md:grid-cols-3' : 'grid-cols-1 md:grid-cols-2 lg:grid-cols-4'}`}>
-                        {plans.map(plan => {
-                            const isCustomPlan = !PLAN_DETAILS[plan.id as SubscriptionPlan];
-                return (
-                                <div key={plan.id} className={`border rounded-lg p-6 hover:shadow-lg transition-shadow ${
-                                    isCustomPlan 
-                                        ? 'border-purple-300 dark:border-purple-600 bg-purple-50 dark:bg-purple-900/20' 
-                                        : 'border-gray-200 dark:border-gray-700'
-                                }`}>
-                                    <div className="flex justify-between items-start mb-4">
-                                        <div>
-                                            <div className="flex items-center gap-2">
-                                                <h3 className="text-lg font-semibold text-spinny-text-dark dark:text-spinny-text-dark">{plan.name}</h3>
-                                                {isCustomPlan && (
-                                                    <span className="px-2 py-1 bg-purple-100 text-purple-700 text-xs font-bold rounded-full">
-                                                        CUSTOM
-                                                    </span>
-                                                )}
-                        </div>
-                                            <p className="text-2xl font-bold text-spinny-orange">₹{plan.price.toLocaleString('en-IN')}/month</p>
-                                            {plan.isMostPopular && (
-                                                <span className="inline-block mt-1 px-2 py-1 bg-spinny-orange text-white text-xs font-bold rounded-full">
-                                                    MOST POPULAR
-                                                </span>
-                                            )}
-                        </div>
-                                        <div className="flex flex-col gap-1">
-                                            <button 
-                                                onClick={() => handleEditPlan(plan)}
-                                                className="text-spinny-orange hover:text-spinny-blue transition-colors text-sm"
-                                            >
-                                                ✏️ Edit
-                                            </button>
-                                            {isCustomPlan && (
-                                                <button 
-                                                    onClick={() => handleDeletePlan(plan)}
-                                                    className="text-red-500 hover:text-red-700 transition-colors text-sm"
-                                                >
-                                                    🗑️ Delete
-                                                </button>
-                                            )}
-                            </div>
-                        </div>
-                                    
-                                    <div className="space-y-2 mb-4">
-                                        <div className="flex justify-between text-sm">
-                                            <span className="text-spinny-text-dark dark:text-spinny-text-dark">Listings:</span>
-                                            <span className="font-medium">{plan.listingLimit === 'unlimited' ? '∞' : plan.listingLimit}</span>
-                                        </div>
-                                        <div className="flex justify-between text-sm">
-                                            <span className="text-spinny-text-dark dark:text-spinny-text-dark">Featured Credits:</span>
-                                            <span className="font-medium">{plan.featuredCredits}/month</span>
-                                        </div>
-                                        <div className="flex justify-between text-sm">
-                                            <span className="text-spinny-text-dark dark:text-spinny-text-dark">Free Certifications:</span>
-                                            <span className="font-medium">{plan.freeCertifications}/month</span>
-                                        </div>
-                                    </div>
-                                    
-                                    <div className="text-sm text-spinny-text-dark dark:text-spinny-text-dark">
-                                        <strong>Features:</strong>
-                                        <ul className="mt-1 space-y-1">
-                                            {plan.features.slice(0, 3).map((feature, index) => (
-                                                <li key={index} className="flex items-center gap-2">
-                                                    <span className="text-green-500">✓</span>
-                                                    {feature}
-                                                </li>
-                                            ))}
-                                            {plan.features.length > 3 && (
-                                                <li className="text-spinny-orange">+{plan.features.length - 3} more...</li>
-                                            )}
-                                        </ul>
-                        </div>
-                    </div>
-                );
-                        })}
+                        {plans.map(plan => (
+                            <PlanCard key={plan.id} plan={plan} />
+                        ))}
                     </div>
                 </div>
 
@@ -1674,80 +1801,8 @@ const AdminPanel: React.FC<AdminPanelProps> = (props) => {
                         </thead>
                             <tbody className="bg-white divide-y divide-gray-200 dark:divide-gray-700">
                                 {filteredUsers.map(user => {
-                                const currentPlan = user.subscriptionPlan || 'free';
-                                const planDetails = planService.getPlanDetails(currentPlan);
-                                const userVehicles = vehicles.filter((v: Vehicle) => v.sellerEmail === user.email);
-                                const activeListings = userVehicles.filter((v: Vehicle) => v.status === 'published').length;
-                                
-                                    return (
-                                        <tr key={user.email}>
-                                        <td className="px-6 py-4 whitespace-nowrap">
-                                            <div>
-                                                <div className="font-medium text-spinny-text-dark dark:text-spinny-text-dark">{user.name}</div>
-                                                <div className="text-sm text-spinny-text-dark dark:text-spinny-text-dark">{user.email}</div>
-                                            </div>
-                                            </td>
-                                        <td className="px-6 py-4 whitespace-nowrap">
-                                            <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                                                currentPlan === 'premium' ? 'bg-purple-100 text-purple-800' :
-                                                currentPlan === 'pro' ? 'bg-blue-100 text-blue-800' :
-                                                'bg-gray-100 text-gray-800'
-                                            }`}>
-                                                {planDetails.name}
-                                            </span>
-                                        </td>
-                                        <td className="px-6 py-4 whitespace-nowrap text-sm">
-                                            <div className="space-y-1">
-                                                <div className="flex justify-between">
-                                                    <span>Listings:</span>
-                                                    <span className="font-medium">
-                                                        {activeListings} / {planDetails.listingLimit === 'unlimited' ? '∞' : planDetails.listingLimit}
-                                                    </span>
-                                                </div>
-                                                <div className="flex justify-between">
-                                                    <span>Featured:</span>
-                                                    <span className="font-medium">
-                                                        {user.featuredCredits || 0} / {planDetails.featuredCredits}
-                                                    </span>
-                                                </div>
-                                                <div className="flex justify-between">
-                                                    <span>Certifications:</span>
-                                                    <span className="font-medium">
-                                                        {user.usedCertifications || 0} / {planDetails.freeCertifications}
-                                                    </span>
-                                                </div>
-                                            </div>
-                                        </td>
-                                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                                            <div className="flex flex-col gap-2">
-                                                {currentPlan !== 'free' && (
-                                                    <button 
-                                                        onClick={() => handleAssignPlan(user.email, 'free')}
-                                                        className="text-gray-600 hover:text-gray-800 transition-colors"
-                                                    >
-                                                        Assign Free
-                                                    </button>
-                                                )}
-                                                {currentPlan !== 'pro' && (
-                                                    <button 
-                                                        onClick={() => handleAssignPlan(user.email, 'pro')}
-                                                        className="text-blue-600 hover:text-blue-800 transition-colors"
-                                                    >
-                                                        Assign Pro
-                                                    </button>
-                                                )}
-                                                {currentPlan !== 'premium' && (
-                                                    <button 
-                                                        onClick={() => handleAssignPlan(user.email, 'premium')}
-                                                        className="text-purple-600 hover:text-purple-800 transition-colors"
-                                                    >
-                                                        Assign Premium
-                                                    </button>
-                                                )}
-                                            </div>
-                                            </td>
-                                        </tr>
-                                    );
+                                    const currentPlan = user.subscriptionPlan || 'free';
+                                    return <UserRow key={user.email} user={user} currentPlan={currentPlan} />;
                                 })}
                             </tbody>
                        </table>
