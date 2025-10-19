@@ -246,6 +246,11 @@ const VehicleForm: React.FC<VehicleFormProps> = memo(({ editingVehicle, onAddVeh
         formDataMake: formData.make,
         formDataModel: formData.model
     });
+    
+    // Location data state for this component
+    const [indianStates, setIndianStates] = useState<Array<{name: string, code: string}>>([]);
+    const [citiesByState, setCitiesByState] = useState<Record<string, string[]>>({});
+    
     const [featureInput, setFeatureInput] = useState('');
     const [fixInput, setFixInput] = useState('');
     const [isGeneratingDesc, setIsGeneratingDesc] = useState(false);
@@ -265,6 +270,21 @@ const VehicleForm: React.FC<VehicleFormProps> = memo(({ editingVehicle, onAddVeh
             setFormData(prev => ({ ...prev, sellerEmail: seller.email }));
         }
     }, [seller.email, formData.sellerEmail]);
+
+    // Load location data when component mounts
+    useEffect(() => {
+        const loadLocationData = async () => {
+            try {
+                const { loadLocationData } = await import('../utils/dataLoaders');
+                const locationData = await loadLocationData();
+                setIndianStates(locationData.INDIAN_STATES || []);
+                setCitiesByState(locationData.CITIES_BY_STATE || {});
+            } catch (error) {
+                console.error('Failed to load location data:', error);
+            }
+        };
+        loadLocationData();
+    }, []);
 
     const availableMakes = useMemo(() => {
         if (!formData.category || !vehicleData[formData.category]) return [];
@@ -1063,24 +1083,7 @@ const Dashboard: React.FC<DashboardProps> = ({ seller, sellerVehicles, reportedV
   const [showBoostModal, setShowBoostModal] = useState(false);
   const [vehicleToBoost, setVehicleToBoost] = useState<Vehicle | null>(null);
   
-  // Lazy load location data
-  const [indianStates, setIndianStates] = useState<Array<{name: string, code: string}>>([]);
-  const [citiesByState, setCitiesByState] = useState<Record<string, string[]>>({});
-
-  // Load location data when component mounts
-  useEffect(() => {
-    const loadLocationData = async () => {
-      try {
-        const { loadLocationData } = await import('../utils/dataLoaders');
-        const locationData = await loadLocationData();
-        setIndianStates(locationData.INDIAN_STATES || []);
-        setCitiesByState(locationData.CITIES_BY_STATE || {});
-      } catch (error) {
-        console.error('Failed to load location data:', error);
-      }
-    };
-    loadLocationData();
-  }, []);
+  // Location data is now handled by individual components that need it
 
   useEffect(() => {
     if (selectedConv) {

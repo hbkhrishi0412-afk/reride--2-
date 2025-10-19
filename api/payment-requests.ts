@@ -135,7 +135,8 @@ export default async function handler(
 
       // Update user plan and credits
       const { PLAN_DETAILS } = await import('../constants');
-      const planDetails = PLAN_DETAILS[user.pendingPlanUpgrade.planId];
+      const planId = user.pendingPlanUpgrade.planId;
+      const planDetails = PLAN_DETAILS[planId as keyof typeof PLAN_DETAILS];
       
       const updatedUser = {
         subscriptionPlan: user.pendingPlanUpgrade.planId,
