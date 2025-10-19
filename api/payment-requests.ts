@@ -1,6 +1,6 @@
 import { VercelRequest, VercelResponse } from '@vercel/node';
-import connectDB from './lib-db';
-import User from './lib-user';
+import connectDB from './lib-db.js';
+import User from './lib-user.js';
 import { PaymentRequest } from '../types';
 
 export default async function handler(

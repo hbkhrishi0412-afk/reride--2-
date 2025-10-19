@@ -2,7 +2,7 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 import connectToDatabase from './lib-db.js';
 import Vehicle from './lib-vehicle.js';
-import VehicleDataModel from '../models/VehicleData';
+import VehicleDataModel from '../models/VehicleData.js';
 import type { VehicleData } from '../types';
 // Constants will be imported dynamically when needed
 

@@ -1,6 +1,5 @@
-import { NextApiRequest, NextApiResponse } from 'next';
+import type { VercelRequest, VercelResponse } from '@vercel/node';
 import { MongoClient } from 'mongodb';
-import { VEHICLE_DATA } from '../components/vehicleData';
 
 const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://localhost:27017';
 const DB_NAME = process.env.DB_NAME || 'reride';
@@ -23,7 +22,7 @@ async function connectToDatabase() {
   }
 }
 
-export default async function handler(req: NextApiRequest, res: NextApiResponse) {
+export default async function handler(req: VercelRequest, res: VercelResponse) {
   if (req.method === 'GET') {
     try {
       const client = await connectToDatabase();
@@ -39,7 +38,10 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         return res.status(200).json(vehicleData);
       } else {
         // No data in database, return default data
-        const defaultData = VEHICLE_DATA;
+        const defaultData = {
+          categories: ['four-wheeler', 'two-wheeler', 'three-wheeler'],
+          makes: ['Honda', 'Toyota', 'Maruti', 'Hyundai', 'Tata', 'Mahindra', 'Bajaj', 'TVS', 'Hero', 'Yamaha']
+        };
         
         // Save default data to database for future use
         await collection.insertOne({
@@ -52,7 +54,10 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     } catch (error) {
       console.error('Error fetching vehicle data:', error);
       // Fallback to default data
-      return res.status(200).json(VEHICLE_DATA);
+      return res.status(200).json({
+        categories: ['four-wheeler', 'two-wheeler', 'three-wheeler'],
+        makes: ['Honda', 'Toyota', 'Maruti', 'Hyundai', 'Tata', 'Mahindra', 'Bajaj', 'TVS', 'Hero', 'Yamaha']
+      });
     }
   }
 
