@@ -1,8 +1,8 @@
 
 import type { VercelRequest, VercelResponse } from '@vercel/node';
-import connectToDatabase from './lib-db.js';
-import User from './lib-user.js';
-import Vehicle from './lib-vehicle.js';
+import connectToDatabase from './lib-db';
+import User from './lib-user';
+import Vehicle from './lib-vehicle';
 import mongoose from 'mongoose';
 // Constants will be imported dynamically when needed
 

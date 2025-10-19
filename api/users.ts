@@ -1,7 +1,7 @@
 
 import type { VercelRequest, VercelResponse } from '@vercel/node';
-import connectToDatabase from './lib-db.js';
-import User from './lib-user.js';
+import connectToDatabase from './lib-db';
+import User from './lib-user';
 
 export default async function handler(
   req: VercelRequest,
