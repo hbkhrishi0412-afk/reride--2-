@@ -1429,20 +1429,35 @@ const Dashboard: React.FC<DashboardProps> = ({ seller, sellerVehicles, reportedV
                             <div className="flex items-center space-x-1">
                               {getCertificationButton(v)}
                               <button 
-                                onClick={() => onMarkAsSold(v.id)} 
-                                className="px-1.5 py-0.5 text-spinny-orange hover:text-spinny-orange text-xs border border-spinny-orange rounded hover:bg-spinny-orange-light"
+                                onClick={(e) => {
+                                    e.preventDefault();
+                                    e.stopPropagation();
+                                    console.log('🔄 Mark as sold button clicked for vehicle:', v.id);
+                                    onMarkAsSold(v.id);
+                                }} 
+                                className="px-1.5 py-0.5 text-spinny-orange hover:text-spinny-orange text-xs border border-spinny-orange rounded hover:bg-spinny-orange-light cursor-pointer"
                               >
                                 ✅ Sold
                               </button>
                               <button 
-                                onClick={() => handleEditClick(v)} 
-                                className="px-1.5 py-0.5 text-spinny-blue hover:text-spinny-blue text-xs border border-spinny-blue rounded hover:bg-spinny-blue-light"
+                                onClick={(e) => {
+                                    e.preventDefault();
+                                    e.stopPropagation();
+                                    console.log('🔄 Edit vehicle button clicked for vehicle:', v.id);
+                                    handleEditClick(v);
+                                }} 
+                                className="px-1.5 py-0.5 text-spinny-blue hover:text-spinny-blue text-xs border border-spinny-blue rounded hover:bg-spinny-blue-light cursor-pointer"
                               >
                                 ✏️ Edit
                               </button>
                               <button 
-                                onClick={() => onDeleteVehicle(v.id)} 
-                                className="px-1.5 py-0.5 text-red-600 hover:text-red-700 text-xs border border-red-600 rounded hover:bg-red-50"
+                                onClick={(e) => {
+                                    e.preventDefault();
+                                    e.stopPropagation();
+                                    console.log('🔄 Delete vehicle button clicked for vehicle:', v.id);
+                                    onDeleteVehicle(v.id);
+                                }} 
+                                className="px-1.5 py-0.5 text-red-600 hover:text-red-700 text-xs border border-red-600 rounded hover:bg-red-50 cursor-pointer"
                               >
                                 🗑️ Delete
                               </button>
@@ -1502,22 +1517,37 @@ const Dashboard: React.FC<DashboardProps> = ({ seller, sellerVehicles, reportedV
                               <div className="flex items-center space-x-1">
                                 {getCertificationButton(v)}
                                 <button 
-                                  onClick={() => onMarkAsSold(v.id)} 
-                                  className="px-1.5 py-0.5 text-spinny-orange text-xs border border-spinny-orange rounded"
+                                  onClick={(e) => {
+                                      e.preventDefault();
+                                      e.stopPropagation();
+                                      console.log('🔄 Mark as sold button clicked for vehicle:', v.id);
+                                      onMarkAsSold(v.id);
+                                  }} 
+                                  className="px-1.5 py-0.5 text-spinny-orange text-xs border border-spinny-orange rounded cursor-pointer"
                                   title="Sold"
                                 >
                                   ✅
                                 </button>
                                 <button 
-                                  onClick={() => handleEditClick(v)} 
-                                  className="px-1.5 py-0.5 text-spinny-blue text-xs border border-spinny-blue rounded"
+                                  onClick={(e) => {
+                                      e.preventDefault();
+                                      e.stopPropagation();
+                                      console.log('🔄 Edit vehicle button clicked for vehicle:', v.id);
+                                      handleEditClick(v);
+                                  }} 
+                                  className="px-1.5 py-0.5 text-spinny-blue text-xs border border-spinny-blue rounded cursor-pointer"
                                   title="Edit"
                                 >
                                   ✏️
                                 </button>
                                 <button 
-                                  onClick={() => onDeleteVehicle(v.id)} 
-                                  className="px-1.5 py-0.5 text-red-600 text-xs border border-red-600 rounded"
+                                  onClick={(e) => {
+                                      e.preventDefault();
+                                      e.stopPropagation();
+                                      console.log('🔄 Delete vehicle button clicked for vehicle:', v.id);
+                                      onDeleteVehicle(v.id);
+                                  }} 
+                                  className="px-1.5 py-0.5 text-red-600 text-xs border border-red-600 rounded cursor-pointer"
                                   title="Delete"
                                 >
                                   🗑️

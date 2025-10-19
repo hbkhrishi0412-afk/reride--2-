@@ -54,9 +54,12 @@ const VehicleDataManagement: React.FC<VehicleDataManagementProps> = ({
   );
 
   const handleUpdateData = (updater: (draft: VehicleData) => void) => {
+    console.log('🔄 Updating vehicle data...');
     const newData = { ...vehicleData };
     updater(newData);
+    console.log('📝 New vehicle data:', newData);
     onUpdate(newData);
+    console.log('✅ Vehicle data update sent to parent');
   };
 
   const handleEdit = (type: EditingState['type'], path: string[], value: string) => {
@@ -163,6 +166,7 @@ const VehicleDataManagement: React.FC<VehicleDataManagementProps> = ({
   };
 
   const handleAddNew = (type: string, path: string[]) => {
+    console.log('🔄 Add New button clicked:', { type, path });
     setAdding({ type, path });
     setNewItemValue('');
   };
@@ -174,6 +178,7 @@ const VehicleDataManagement: React.FC<VehicleDataManagementProps> = ({
     }
 
     const newValue = newItemValue.trim();
+    console.log('🔄 Saving new item:', { type: adding.type, value: newValue, path: adding.path });
 
     handleUpdateData(draft => {
       if (adding.type === 'category') {
@@ -209,6 +214,7 @@ const VehicleDataManagement: React.FC<VehicleDataManagementProps> = ({
       }
     });
 
+    console.log('✅ New item saved successfully');
     setAdding(null);
     setNewItemValue('');
   };

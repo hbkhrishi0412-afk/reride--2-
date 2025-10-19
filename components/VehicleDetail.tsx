@@ -183,6 +183,39 @@ const CertifiedInspectionReport: React.FC<{ report: CertifiedInspection }> = ({ 
 
 
 export const VehicleDetail: React.FC<VehicleDetailProps> = ({ vehicle, onBack: onBackToHome, comparisonList, onToggleCompare, onAddSellerRating, wishlist, onToggleWishlist, currentUser, onFlagContent, users, onViewSellerProfile, onStartChat, recommendations, onSelectVehicle }) => {
+  console.log('🎯 VehicleDetail component rendering with vehicle:', vehicle);
+  console.log('🎯 Vehicle data:', { id: vehicle?.id, make: vehicle?.make, model: vehicle?.model, price: vehicle?.price });
+  
+  // Lightweight safety check - only essential properties
+  const safeVehicle = {
+    ...vehicle,
+    images: vehicle.images || [],
+    features: vehicle.features || [],
+    description: vehicle.description || '',
+    engine: vehicle.engine || '',
+    transmission: vehicle.transmission || '',
+    fuelType: vehicle.fuelType || '',
+    fuelEfficiency: vehicle.fuelEfficiency || '',
+    color: vehicle.color || '',
+    registrationYear: vehicle.registrationYear || vehicle.year,
+    insuranceValidity: vehicle.insuranceValidity || '',
+    rto: vehicle.rto || '',
+    city: vehicle.city || '',
+    state: vehicle.state || '',
+    noOfOwners: vehicle.noOfOwners || 1,
+    displacement: vehicle.displacement || '',
+    groundClearance: vehicle.groundClearance || '',
+    bootSpace: vehicle.bootSpace || '',
+    averageRating: vehicle.averageRating || 0,
+    ratingCount: vehicle.ratingCount || 0,
+    sellerName: vehicle.sellerName || '',
+    sellerBadges: vehicle.sellerBadges || [],
+    status: vehicle.status || 'published',
+    isFeatured: vehicle.isFeatured || false,
+    views: vehicle.views || 0,
+    inquiriesCount: vehicle.inquiriesCount || 0
+  };
+  
   const [currentIndex, setCurrentIndex] = useState(0);
   const [activeMediaTab, setActiveMediaTab] = useState<'images' | 'video'>('images');
   const [showSellerRatingSuccess, setShowSellerRatingSuccess] = useState(false);
@@ -194,29 +227,29 @@ export const VehicleDetail: React.FC<VehicleDetailProps> = ({ vehicle, onBack: o
     setCurrentIndex(0);
     setProsAndCons(null);
     setIsGeneratingProsCons(false);
-    setActiveMediaTab(vehicle.videoUrl ? 'images' : 'images');
+    setActiveMediaTab(safeVehicle.videoUrl ? 'images' : 'images');
     window.scrollTo(0, 0);
-  }, [vehicle]);
+  }, [safeVehicle]);
   
   const handlePrevImage = (e: React.MouseEvent) => {
     e.stopPropagation();
-    setCurrentIndex((prevIndex) => (prevIndex - 1 + vehicle.images.length) % vehicle.images.length);
+    setCurrentIndex((prevIndex) => (prevIndex - 1 + safeVehicle.images.length) % safeVehicle.images.length);
   };
   
   const handleNextImage = (e: React.MouseEvent) => {
     e.stopPropagation();
-    setCurrentIndex((prevIndex) => (prevIndex + 1) % vehicle.images.length);
+    setCurrentIndex((prevIndex) => (prevIndex + 1) % safeVehicle.images.length);
   };
 
   const handleGenerateProsCons = async () => {
     setIsGeneratingProsCons(true);
-    const result = await generateProsAndCons(vehicle);
+    const result = await generateProsAndCons(safeVehicle);
     setProsAndCons(result);
     setIsGeneratingProsCons(false);
   };
   
   const handleRateSeller = (rating: number) => {
-    onAddSellerRating(vehicle.sellerEmail, Number(rating));
+    onAddSellerRating(safeVehicle.sellerEmail, Number(rating));
     setShowSellerRatingSuccess(true);
     setTimeout(() => setShowSellerRatingSuccess(false), 3000);
   };
@@ -225,24 +258,25 @@ export const VehicleDetail: React.FC<VehicleDetailProps> = ({ vehicle, onBack: o
       if(window.confirm('Are you sure you want to report this listing for review by an administrator?')) {
         const reason = window.prompt("Please provide a reason for reporting this listing (optional):");
         if (reason !== null) {
-            onFlagContent('vehicle', vehicle.id, reason || "No reason provided");
+            onFlagContent('vehicle', safeVehicle.id, reason || "No reason provided");
         }
       }
   }
 
-  const isComparing = comparisonList.includes(vehicle.id);
-  const isInWishlist = wishlist.includes(vehicle.id);
+  const isComparing = comparisonList.includes(safeVehicle.id);
+  const isInWishlist = wishlist.includes(safeVehicle.id);
   const canRate = currentUser?.role === 'customer';
   const isCompareDisabled = !isComparing && comparisonList.length >= 4;
   
   const seller = useMemo(() => {
-    return users.find(u => u.email === vehicle.sellerEmail);
-  }, [users, vehicle.sellerEmail]);
+    return users.find(u => u.email === safeVehicle.sellerEmail);
+  }, [users, safeVehicle.sellerEmail]);
 
   const filteredRecommendations = useMemo(() => {
-      return recommendations.filter(rec => rec.id !== vehicle.id).slice(0, 3);
-  }, [recommendations, vehicle.id]);
+      return recommendations.filter(rec => rec.id !== safeVehicle.id).slice(0, 3);
+  }, [recommendations, safeVehicle.id]);
   
+  console.log('🎯 VehicleDetail about to render JSX');
   return (
     <>
       <div className="bg-white dark:bg-white animate-fade-in">
@@ -251,15 +285,15 @@ export const VehicleDetail: React.FC<VehicleDetailProps> = ({ vehicle, onBack: o
                 &larr; Back to Listings
               </button>
               
-              <h1 className="text-4xl font-extrabold text-spinny-text-dark dark:text-spinny-text-dark mb-2">{vehicle.year} {vehicle.make} {vehicle.model} {vehicle.variant || ''}</h1>
+              <h1 className="text-4xl font-extrabold text-spinny-text-dark dark:text-spinny-text-dark mb-2">{safeVehicle.year} {safeVehicle.make} {safeVehicle.model} {safeVehicle.variant || ''}</h1>
               <div className="flex items-center gap-4 mb-6">
                   <div className="flex items-center gap-2">
-                    <StarRating rating={vehicle.averageRating || 0} readOnly />
+                    <StarRating rating={safeVehicle.averageRating || 0} readOnly />
                     <span className="text-brand-gray-600 dark:text-spinny-text">
-                        {vehicle.averageRating?.toFixed(1) || 'No rating'} ({vehicle.ratingCount || 0} reviews)
+                        {safeVehicle.averageRating?.toFixed(1) || 'No rating'} ({safeVehicle.ratingCount || 0} reviews)
                     </span>
                   </div>
-                  {vehicle.certifiedInspection && (
+                  {safeVehicle.certifiedInspection && (
                       <span className="bg-spinny-orange-light text-spinny-orange text-xs font-bold px-3 py-1 rounded-full flex items-center gap-1">
                           <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor"><path fillRule="evenodd" d="M6.267 3.455a3.066 3.066 0 001.745-.723 3.066 3.066 0 013.976 0 3.066 3.066 0 001.745.723 3.066 3.066 0 012.812 2.812c.051.643.304 1.254.723 1.745a3.066 3.066 0 010 3.976 3.066 3.066 0 00-.723 1.745 3.066 3.066 0 01-2.812 2.812 3.066 3.066 0 00-1.745.723 3.066 3.066 0 01-3.976 0 3.066 3.066 0 00-1.745-.723 3.066 3.066 0 01-2.812-2.812 3.066 3.066 0 00-.723-1.745 3.066 3.066 0 010-3.976 3.066 3.066 0 00.723-1.745 3.066 3.066 0 012.812-2.812zm7.44-1.22a.75.75 0 00-1.06 0L8.172 6.172a.75.75 0 00-1.06 1.06L8.94 9.332a.75.75 0 001.191.04l3.22-4.294a.75.75 0 00-.04-1.19z" clipRule="evenodd" /></svg>
                           Certified
@@ -270,7 +304,7 @@ export const VehicleDetail: React.FC<VehicleDetailProps> = ({ vehicle, onBack: o
               <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                   {/* Left Column: Media */}
                   <div className="lg:col-span-2 space-y-4">
-                    {vehicle.videoUrl && (
+                    {safeVehicle.videoUrl && (
                       <div className="flex space-x-2 border-b-2 border-gray-200-200 dark:border-gray-200-200">
                         <button onClick={() => setActiveMediaTab('images')} className={`py-2 px-4 font-semibold ${activeMediaTab === 'images' ? 'border-b-2' : 'text-spinny-text'}`} style={activeMediaTab === 'images' ? { bordercolor: '#FF6B35', color: '#FF6B35' } : undefined}>Images</button>
                         <button onClick={() => setActiveMediaTab('video')} className={`py-2 px-4 font-semibold ${activeMediaTab === 'video' ? 'border-b-2' : 'text-spinny-text'}`} style={activeMediaTab === 'video' ? { bordercolor: '#FF6B35', color: '#FF6B35' } : undefined}>Video</button>
@@ -279,17 +313,17 @@ export const VehicleDetail: React.FC<VehicleDetailProps> = ({ vehicle, onBack: o
                     {activeMediaTab === 'images' ? (
                       <>
                         <div className="relative group">
-                            <img key={currentIndex} className="w-full h-auto object-cover rounded-xl shadow-soft-xl animate-fade-in" src={getValidImages(vehicle.images)[currentIndex] || getFirstValidImage(vehicle.images)} alt={`${vehicle.make} ${vehicle.model} image ${currentIndex + 1}`} />
-                            {vehicle.images.length > 1 && (
+                            <img key={currentIndex} className="w-full h-auto object-cover rounded-xl shadow-soft-xl animate-fade-in" src={getValidImages(safeVehicle.images)[currentIndex] || getFirstValidImage(safeVehicle.images)} alt={`${safeVehicle.make} ${safeVehicle.model} image ${currentIndex + 1}`} />
+                            {safeVehicle.images.length > 1 && (
                                 <>
                                     <button onClick={handlePrevImage} className="absolute top-1/2 left-4 -translate-y-1/2 bg-black/40 text-white p-2 rounded-full opacity-0 group-hover:opacity-100 transition-opacity focus:opacity-100" aria-label="Previous image"><svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" /></svg></button>
                                     <button onClick={handleNextImage} className="absolute top-1/2 right-4 -translate-y-1/2 bg-black/40 text-white p-2 rounded-full opacity-0 group-hover:opacity-100 transition-opacity focus:opacity-100" aria-label="Next image"><svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" /></svg></button>
                                 </>
                             )}
                         </div>
-                        {vehicle.images.length > 1 && (
+                        {safeVehicle.images.length > 1 && (
                             <div className="flex space-x-2 overflow-x-auto pb-2 -mt-2">
-                                {getValidImages(vehicle.images).map((img, index) => (
+                                {getValidImages(safeVehicle.images).map((img, index) => (
                                     <img key={index} src={getSafeImageSrc(img)} alt={`Thumbnail ${index + 1}`} className={`cursor-pointer rounded-md border-2 h-20 w-28 object-cover flex-shrink-0 ${currentIndex === index ? '' : 'border-transparent'} transition`} style={currentIndex === index ? { bordercolor: '#FF6B35' } : undefined} onMouseEnter={(e) => currentIndex !== index && (e.currentTarget.style.borderColor = 'var(--spinny-blue)')} onMouseLeave={(e) => currentIndex !== index && (e.currentTarget.style.borderColor = '')} onClick={() => setCurrentIndex(index)} />
                                 ))}
                             </div>
@@ -297,7 +331,7 @@ export const VehicleDetail: React.FC<VehicleDetailProps> = ({ vehicle, onBack: o
                       </>
                     ) : (
                       <div className="w-full aspect-video bg-black rounded-xl shadow-soft-xl overflow-hidden animate-fade-in">
-                        <video src={vehicle.videoUrl} controls className="w-full h-full object-cover">Your browser does not support the video tag.</video>
+                        <video src={safeVehicle.videoUrl} controls className="w-full h-full object-cover">Your browser does not support the video tag.</video>
                       </div>
                     )}
                   </div>
@@ -305,27 +339,27 @@ export const VehicleDetail: React.FC<VehicleDetailProps> = ({ vehicle, onBack: o
                   {/* Right Column: Price and Actions */}
                   <div className="space-y-6 self-start lg:sticky top-24">
                       <div className="p-6 bg-white rounded-xl shadow-soft-lg space-y-4">
-                           <p className="text-4xl font-extrabold" style={{ color: '#FF6B35' }}>₹{vehicle.price.toLocaleString('en-IN')}</p>
-                           <button onClick={() => onStartChat(vehicle)} className="w-full btn-brand-primary text-white font-bold py-3 px-6 rounded-lg text-lg transition-all transform hover:scale-105">
+                           <p className="text-4xl font-extrabold" style={{ color: '#FF6B35' }}>₹{safeVehicle.price.toLocaleString('en-IN')}</p>
+                           <button onClick={() => onStartChat(safeVehicle)} className="w-full btn-brand-primary text-white font-bold py-3 px-6 rounded-lg text-lg transition-all transform hover:scale-105">
                                 Chat with Seller
                             </button>
                             <div className="flex gap-4">
                                <button
-                                  onClick={() => onToggleCompare(vehicle.id)}
+                                  onClick={() => onToggleCompare(safeVehicle.id)}
                                   disabled={isCompareDisabled}
                                   className={`w-full font-bold py-3 px-4 rounded-lg text-lg transition-all flex items-center justify-center gap-2 ${isComparing ? 'bg-spinny-orange text-spinny-orange' : 'bg-spinny-light-gray dark:bg-brand-gray-700'} ${isCompareDisabled ? 'opacity-50 cursor-not-allowed' : ''}`}
                                 >
                                   {isComparing ? 'Comparing' : 'Compare'}
                               </button>
                                <button
-                                  onClick={() => onToggleWishlist(vehicle.id)}
+                                  onClick={() => onToggleWishlist(safeVehicle.id)}
                                   className={`w-full font-bold py-3 px-4 rounded-lg text-lg transition-all flex items-center justify-center gap-2 ${isInWishlist ? 'bg-spinny-blue text-spinny-orange' : 'bg-spinny-light-gray dark:bg-brand-gray-700'}`}
                                 >
                                   <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" viewBox="0 0 20 20" fill="currentColor"><path fillRule="evenodd" d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z" clipRule="evenodd" /></svg>
                                   {isInWishlist ? 'Saved' : 'Save'}
                               </button>
                             </div>
-                            <SocialShareButtons vehicle={vehicle} />
+                            <SocialShareButtons vehicle={safeVehicle} />
                       </div>
                       
                       {seller && <div className="p-6 bg-white rounded-xl shadow-soft">
@@ -351,7 +385,7 @@ export const VehicleDetail: React.FC<VehicleDetailProps> = ({ vehicle, onBack: o
                             </div>}
                       </div>}
                       
-                      <EMICalculator price={vehicle.price} />
+                      <EMICalculator price={safeVehicle.price} />
 
                   </div>
               </div>
@@ -360,33 +394,33 @@ export const VehicleDetail: React.FC<VehicleDetailProps> = ({ vehicle, onBack: o
                <div className="mt-10 lg:mt-12 space-y-6">
                     <CollapsibleSection title="Overview" defaultOpen={true}>
                         <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-6">
-                            <KeySpec label="Make Year" value={vehicle.year} />
-                            <KeySpec label="Registration" value={vehicle.registrationYear} />
-                            <KeySpec label="Fuel Type" value={vehicle.fuelType} />
-                            <KeySpec label="Km Driven" value={vehicle.mileage.toLocaleString('en-IN')} />
-                            <KeySpec label="Transmission" value={vehicle.transmission} />
-                            <KeySpec label="Owners" value={vehicle.noOfOwners} />
-                            <KeySpec label="Insurance" value={vehicle.insuranceValidity} />
-                            <KeySpec label="RTO" value={vehicle.rto} />
+                            <KeySpec label="Make Year" value={safeVehicle.year} />
+                            <KeySpec label="Registration" value={safeVehicle.registrationYear} />
+                            <KeySpec label="Fuel Type" value={safeVehicle.fuelType} />
+                            <KeySpec label="Km Driven" value={safeVehicle.mileage.toLocaleString('en-IN')} />
+                            <KeySpec label="Transmission" value={safeVehicle.transmission} />
+                            <KeySpec label="Owners" value={safeVehicle.noOfOwners} />
+                            <KeySpec label="Insurance" value={safeVehicle.insuranceValidity} />
+                            <KeySpec label="RTO" value={safeVehicle.rto} />
                         </div>
-                        {vehicle.description && (
+                        {safeVehicle.description && (
                             <div>
                                 <h4 className="text-lg font-semibold text-spinny-text-dark dark:text-spinny-text-dark mb-2">Description</h4>
-                                <p className="text-spinny-text-dark dark:text-spinny-text-dark whitespace-pre-line">{vehicle.description}</p>
+                                <p className="text-spinny-text-dark dark:text-spinny-text-dark whitespace-pre-line">{safeVehicle.description}</p>
                             </div>
                         )}
                     </CollapsibleSection>
                     
                      <CollapsibleSection title="Detailed Specifications">
                         <dl className="grid grid-cols-1 md:grid-cols-2 gap-x-8">
-                             <SpecDetail label="Engine" value={vehicle.engine} />
-                             <SpecDetail label="Displacement" value={vehicle.displacement} />
-                             <SpecDetail label="Transmission" value={vehicle.transmission} />
-                             <SpecDetail label="Fuel Type" value={vehicle.fuelType} />
-                             <SpecDetail label="Mileage / Range" value={vehicle.fuelEfficiency} />
-                             <SpecDetail label="Ground Clearance" value={vehicle.groundClearance} />
-                             <SpecDetail label="Boot Space" value={vehicle.bootSpace} />
-                             <SpecDetail label="Color" value={vehicle.color} />
+                             <SpecDetail label="Engine" value={safeVehicle.engine} />
+                             <SpecDetail label="Displacement" value={safeVehicle.displacement} />
+                             <SpecDetail label="Transmission" value={safeVehicle.transmission} />
+                             <SpecDetail label="Fuel Type" value={safeVehicle.fuelType} />
+                             <SpecDetail label="Mileage / Range" value={safeVehicle.fuelEfficiency} />
+                             <SpecDetail label="Ground Clearance" value={safeVehicle.groundClearance} />
+                             <SpecDetail label="Boot Space" value={safeVehicle.bootSpace} />
+                             <SpecDetail label="Color" value={safeVehicle.color} />
                         </dl>
                     </CollapsibleSection>
 
@@ -394,9 +428,9 @@ export const VehicleDetail: React.FC<VehicleDetailProps> = ({ vehicle, onBack: o
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                             <div>
                                 <h4 className="text-lg font-semibold text-spinny-text-dark dark:text-spinny-text-dark mb-4">Included Features</h4>
-                                {vehicle.features.length > 0 ? (
+                                {safeVehicle.features.length > 0 ? (
                                     <div className="flex flex-wrap gap-3">
-                                        {vehicle.features.map(feature => (
+                                        {safeVehicle.features.map(feature => (
                                           <div key={feature} className="flex items-center gap-2 text-spinny-text-dark dark:text-spinny-text-dark bg-spinny-off-white dark:bg-brand-gray-700 px-3 py-1 rounded-full text-sm">
                                             <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-spinny-orange" viewBox="0 0 20 20" fill="currentColor"><path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" /></svg>
                                             {feature}
@@ -427,21 +461,21 @@ export const VehicleDetail: React.FC<VehicleDetailProps> = ({ vehicle, onBack: o
                         </div>
                     </CollapsibleSection>
                     
-                    {vehicle.certifiedInspection && (
+                    {safeVehicle.certifiedInspection && (
                         <CollapsibleSection title="Certified Inspection Report">
-                            <CertifiedInspectionReport report={vehicle.certifiedInspection} />
+                            <CertifiedInspectionReport report={safeVehicle.certifiedInspection} />
                         </CollapsibleSection>
                     )}
 
-                    {(vehicle.serviceRecords || vehicle.accidentHistory || vehicle.documents) && (
+                    {(safeVehicle.serviceRecords || safeVehicle.accidentHistory || safeVehicle.documents) && (
                         <CollapsibleSection title="Vehicle History & Documents">
-                            {(vehicle.serviceRecords || vehicle.accidentHistory) && (
-                                <VehicleHistory serviceRecords={vehicle.serviceRecords || []} accidentHistory={vehicle.accidentHistory || []} />
+                            {(safeVehicle.serviceRecords || safeVehicle.accidentHistory) && (
+                                <VehicleHistory serviceRecords={safeVehicle.serviceRecords || []} accidentHistory={safeVehicle.accidentHistory || []} />
                             )}
-                            {vehicle.documents && vehicle.documents.length > 0 && <div className="mt-6">
+                            {safeVehicle.documents && safeVehicle.documents.length > 0 && <div className="mt-6">
                                 <h4 className="text-lg font-semibold text-spinny-text-dark dark:text-spinny-text-dark mb-4">Available Documents</h4>
                                 <div className="flex flex-wrap gap-4">
-                                    {vehicle.documents.map(doc => <DocumentChip key={doc.name} doc={doc} />)}
+                                    {safeVehicle.documents.map(doc => <DocumentChip key={doc.name} doc={doc} />)}
                                 </div>
                             </div>}
                         </CollapsibleSection>
@@ -467,3 +501,5 @@ export const VehicleDetail: React.FC<VehicleDetailProps> = ({ vehicle, onBack: o
     </>
   );
 };
+
+export default VehicleDetail;

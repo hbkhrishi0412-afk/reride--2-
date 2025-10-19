@@ -965,7 +965,15 @@ const AdminPanel: React.FC<AdminPanelProps> = (props) => {
                                     Admins
                                 </button>
                             </div>
-                            <button onClick={onExportUsers} className="bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600">
+                            <button 
+                                onClick={(e) => {
+                                    e.preventDefault();
+                                    e.stopPropagation();
+                                    console.log('🔄 Export Users button clicked');
+                                    onExportUsers();
+                                }} 
+                                className="bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600 cursor-pointer"
+                            >
                                 Export Users
                             </button>
                         </div>
@@ -1004,11 +1012,39 @@ const AdminPanel: React.FC<AdminPanelProps> = (props) => {
                                                 </span>
                                             </td>
                                             <td className="px-6 py-4 whitespace-nowrap text-sm font-medium space-x-2">
-                                                <button onClick={() => setEditingUser(user)} className="text-blue-600 hover:text-blue-800">Edit</button>
-                                                <button onClick={() => onToggleUserStatus(user.email)} className="text-yellow-600 hover:text-yellow-800">
+                                                <button 
+                                                    onClick={(e) => {
+                                                        e.preventDefault();
+                                                        e.stopPropagation();
+                                                        console.log('🔄 Edit button clicked for user:', user.email);
+                                                        setEditingUser(user);
+                                                    }} 
+                                                    className="text-blue-600 hover:text-blue-800 cursor-pointer"
+                                                >
+                                                    Edit
+                                                </button>
+                                                <button 
+                                                    onClick={(e) => {
+                                                        e.preventDefault();
+                                                        e.stopPropagation();
+                                                        console.log('🔄 Toggle status button clicked for user:', user.email);
+                                                        onToggleUserStatus(user.email);
+                                                    }} 
+                                                    className="text-yellow-600 hover:text-yellow-800 cursor-pointer"
+                                                >
                                                     {user.status === 'active' ? 'Suspend' : 'Activate'}
                                                 </button>
-                                                <button onClick={() => onDeleteUser(user.email)} className="text-red-600 hover:text-red-800">Delete</button>
+                                                <button 
+                                                    onClick={(e) => {
+                                                        e.preventDefault();
+                                                        e.stopPropagation();
+                                                        console.log('🔄 Delete button clicked for user:', user.email);
+                                                        onDeleteUser(user.email);
+                                                    }} 
+                                                    className="text-red-600 hover:text-red-800 cursor-pointer"
+                                                >
+                                                    Delete
+                                                </button>
                                     </td>
                                 </tr>
                             ))}
@@ -1064,11 +1100,39 @@ const AdminPanel: React.FC<AdminPanelProps> = (props) => {
                                                 </span>
                                     </td>
                                             <td className="px-6 py-4 whitespace-nowrap text-sm font-medium space-x-2">
-                                                <button onClick={() => setEditingVehicle(vehicle)} className="text-blue-600 hover:text-blue-800">Edit</button>
-                                                <button onClick={() => onToggleVehicleStatus(vehicle.id)} className="text-yellow-600 hover:text-yellow-800">
+                                                <button 
+                                                    onClick={(e) => {
+                                                        e.preventDefault();
+                                                        e.stopPropagation();
+                                                        console.log('🔄 Edit vehicle button clicked for vehicle:', vehicle.id);
+                                                        setEditingVehicle(vehicle);
+                                                    }} 
+                                                    className="text-blue-600 hover:text-blue-800 cursor-pointer"
+                                                >
+                                                    Edit
+                                                </button>
+                                                <button 
+                                                    onClick={(e) => {
+                                                        e.preventDefault();
+                                                        e.stopPropagation();
+                                                        console.log('🔄 Toggle vehicle status button clicked for vehicle:', vehicle.id);
+                                                        onToggleVehicleStatus(vehicle.id);
+                                                    }} 
+                                                    className="text-yellow-600 hover:text-yellow-800 cursor-pointer"
+                                                >
                                                     {vehicle.status === 'published' ? 'Unpublish' : 'Publish'}
                                                 </button>
-                                                <button onClick={() => onDeleteVehicle(vehicle.id)} className="text-red-600 hover:text-red-800">Delete</button>
+                                                <button 
+                                                    onClick={(e) => {
+                                                        e.preventDefault();
+                                                        e.stopPropagation();
+                                                        console.log('🔄 Delete vehicle button clicked for vehicle:', vehicle.id);
+                                                        onDeleteVehicle(vehicle.id);
+                                                    }} 
+                                                    className="text-red-600 hover:text-red-800 cursor-pointer"
+                                                >
+                                                    Delete
+                                                </button>
                                     </td>
                                 </tr>
                            ))}
@@ -1230,14 +1294,24 @@ const AdminPanel: React.FC<AdminPanelProps> = (props) => {
                                                     </td>
                                                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium space-x-2">
                                                         <button
-                                                            onClick={() => handleResolveFlag('vehicle', vehicle.id)}
-                                                            className="text-green-600 hover:text-green-800 font-medium"
+                                                            onClick={(e) => {
+                                                                e.preventDefault();
+                                                                e.stopPropagation();
+                                                                console.log('🔄 Resolve flag button clicked for vehicle:', vehicle.id);
+                                                                handleResolveFlag('vehicle', vehicle.id);
+                                                            }}
+                                                            className="text-green-600 hover:text-green-800 font-medium cursor-pointer"
                                                         >
                                                             Resolve Flag
                             </button>
                                                         <button
-                                                            onClick={() => onToggleVehicleStatus(vehicle.id)}
-                                                            className="text-yellow-600 hover:text-yellow-800 font-medium"
+                                                            onClick={(e) => {
+                                                                e.preventDefault();
+                                                                e.stopPropagation();
+                                                                console.log('🔄 Toggle flagged vehicle status button clicked for vehicle:', vehicle.id);
+                                                                onToggleVehicleStatus(vehicle.id);
+                                                            }}
+                                                            className="text-yellow-600 hover:text-yellow-800 font-medium cursor-pointer"
                                                         >
                                                             {vehicle.status === 'published' ? 'Unpublish' : 'Publish'}
                                                         </button>
@@ -1280,8 +1354,13 @@ const AdminPanel: React.FC<AdminPanelProps> = (props) => {
                                                         </td>
                                                         <td className="px-6 py-4 whitespace-nowrap text-sm font-medium space-x-2">
                                                             <button
-                                                                onClick={() => handleResolveFlag('conversation', conversation.id)}
-                                                                className="text-green-600 hover:text-green-800 font-medium"
+                                                                onClick={(e) => {
+                                                                    e.preventDefault();
+                                                                    e.stopPropagation();
+                                                                    console.log('🔄 Resolve conversation flag button clicked for conversation:', conversation.id);
+                                                                    handleResolveFlag('conversation', conversation.id);
+                                                                }}
+                                                                className="text-green-600 hover:text-green-800 font-medium cursor-pointer"
                                                             >
                                                                 Resolve Flag
                                                             </button>
@@ -1388,12 +1467,15 @@ const AdminPanel: React.FC<AdminPanelProps> = (props) => {
                                         </td>
                                         <td className="px-6 py-4 whitespace-nowrap text-sm font-medium space-x-2">
                                             <button
-                                                onClick={() => {
+                                                onClick={(e) => {
+                                                    e.preventDefault();
+                                                    e.stopPropagation();
                                                     const newStatus = ticket.status === 'Open' ? 'In Progress' : 
                                                                    ticket.status === 'In Progress' ? 'Closed' : 'Open';
+                                                    console.log('🔄 Support ticket status change:', ticket.id, 'from', ticket.status, 'to', newStatus);
                                                     onUpdateSupportTicket({ ...ticket, status: newStatus });
                                                 }}
-                                                className="text-blue-600 hover:text-blue-800 font-medium"
+                                                className="text-blue-600 hover:text-blue-800 font-medium cursor-pointer"
                                             >
                                                 {ticket.status === 'Open' ? 'Start Progress' : 
                                                  ticket.status === 'In Progress' ? 'Close' : 'Reopen'}

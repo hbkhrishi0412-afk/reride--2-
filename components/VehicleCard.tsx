@@ -47,9 +47,14 @@ const VehicleCard: React.FC<VehicleCardProps> = ({ vehicle, onSelect, onToggleCo
     onQuickView(vehicle);
   };
 
+  const handleCardClick = () => {
+    console.log('🚗 VehicleCard clicked for vehicle:', vehicle.id, vehicle.make, vehicle.model);
+    onSelect(vehicle);
+  };
+
   return (
     <div 
-      onClick={() => onSelect(vehicle)}
+      onClick={handleCardClick}
       className="vehicle-card flex flex-col cursor-pointer group"
       style={{ ['--hover-ring-color' as any]: 'var(--spinny-orange)' }}
     >

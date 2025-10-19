@@ -9,23 +9,52 @@ const API_BASE_URL = '/api';
  * Falls back to localStorage and then default data if API fails.
  */
 export const getVehicleData = async (): Promise<VehicleData> => {
+  // Try consolidated endpoint first
   try {
-    // Try to fetch from API first
-    const response = await fetch(`${API_BASE_URL}/vehicle-data`);
+    const response = await fetch(`${API_BASE_URL}/vehicles?type=data`);
     if (response.ok) {
-      const data = await response.json();
-      // Cache in localStorage
-      localStorage.setItem(VEHICLE_DATA_STORAGE_KEY, JSON.stringify(data));
-      return data;
+      const contentType = response.headers.get('content-type');
+      if (contentType && contentType.includes('application/json')) {
+        try {
+          const data = await response.json();
+          localStorage.setItem(VEHICLE_DATA_STORAGE_KEY, JSON.stringify(data));
+          return data;
+        } catch (jsonError) {
+          console.warn("Failed to parse JSON from consolidated endpoint, trying standalone endpoint", jsonError);
+        }
+      } else {
+        console.warn(`Consolidated endpoint returned non-JSON content type: ${contentType}, trying standalone endpoint`);
+      }
     } else {
-      console.warn(`API returned ${response.status}: ${response.statusText}`);
+      console.warn(`Consolidated endpoint returned ${response.status}: ${response.statusText}, trying standalone endpoint`);
     }
   } catch (error) {
-    // Only log the error if it's not a network/connection issue
-    if (error instanceof TypeError && error.message.includes('fetch')) {
-      console.info("API endpoint not available, using cached data");
+    console.warn("Consolidated endpoint failed, trying standalone endpoint", error);
+  }
+
+  // Try standalone endpoint as fallback
+  try {
+    const response = await fetch(`${API_BASE_URL}/vehicle-data`);
+    if (response.ok) {
+      const contentType = response.headers.get('content-type');
+      if (contentType && contentType.includes('application/json')) {
+        try {
+          const data = await response.json();
+          localStorage.setItem(VEHICLE_DATA_STORAGE_KEY, JSON.stringify(data));
+          return data;
+        } catch (jsonError) {
+          console.warn("Failed to parse JSON from standalone endpoint, falling back to localStorage", jsonError);
+        }
+      } else {
+        console.warn(`Standalone endpoint returned non-JSON content type: ${contentType}, falling back to localStorage`);
+      }
     } else {
-      console.warn("Failed to fetch vehicle data from API, falling back to localStorage", error);
+      console.warn(`Standalone endpoint returned ${response.status}: ${response.statusText}, falling back to localStorage`);
+    }
+  } catch (error) {
+    console.warn("Both API endpoints failed, falling back to localStorage", error);
+    if (error instanceof SyntaxError) {
+      console.warn("JSON parsing error - API likely returned HTML instead of JSON");
     }
   }
 
@@ -69,8 +98,26 @@ export const getVehicleDataSync = (): VehicleData => {
  * Saves vehicle data to both API and localStorage.
  */
 export const saveVehicleData = async (data: VehicleData): Promise<boolean> => {
+  // Try consolidated endpoint first
   try {
-    // Save to API
+    const response = await fetch(`${API_BASE_URL}/vehicles?type=data`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data)
+    });
+
+    if (response.ok) {
+      localStorage.setItem(VEHICLE_DATA_STORAGE_KEY, JSON.stringify(data));
+      return true;
+    } else {
+      console.warn(`Consolidated endpoint failed with ${response.status}, trying standalone endpoint`);
+    }
+  } catch (error) {
+    console.warn("Consolidated endpoint failed, trying standalone endpoint", error);
+  }
+
+  // Try standalone endpoint as fallback
+  try {
     const response = await fetch(`${API_BASE_URL}/vehicle-data`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -78,15 +125,14 @@ export const saveVehicleData = async (data: VehicleData): Promise<boolean> => {
     });
 
     if (response.ok) {
-      // Also save to localStorage as cache
       localStorage.setItem(VEHICLE_DATA_STORAGE_KEY, JSON.stringify(data));
       return true;
     } else {
-      console.error("Failed to save vehicle data to API");
+      console.error("Both API endpoints failed to save vehicle data");
       return false;
     }
   } catch (error) {
-    console.error("Failed to save vehicle data:", error);
+    console.error("Failed to save vehicle data to both endpoints:", error);
     // Still save to localStorage as fallback
     try {
       localStorage.setItem(VEHICLE_DATA_STORAGE_KEY, JSON.stringify(data));

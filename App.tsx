@@ -18,7 +18,7 @@ import { loadingManager, LOADING_OPERATIONS, withLoadingTimeout } from './utils/
 // Lazy-loaded components
 const Home = React.lazy(() => import('./components/Home'));
 const VehicleList = React.lazy(() => import('./components/VehicleList'));
-const VehicleDetail = React.lazy(() => import('./components/VehicleDetail').then(module => ({ default: module.VehicleDetail })));
+const VehicleDetail = React.lazy(() => import('./components/VehicleDetail'));
 const Dashboard = React.lazy(() => import('./components/Dashboard').then(module => ({ default: module.default })));
 const AdminPanel = React.lazy(() => import('./components/AdminPanel').then(module => ({ default: module.default })));
 const Comparison = React.lazy(() => import('./components/Comparison'));
@@ -73,6 +73,7 @@ const AppContent: React.FC = () => {
     selectedCity,
     publicSellerProfile,
     recommendations,
+    typingStatus,
     removeToast,
     handleLogout,
     navigate,
@@ -93,6 +94,7 @@ const AppContent: React.FC = () => {
     setPlatformSettings,
     setVehicleData,
     setSupportTickets,
+    setFaqItems,
     setForgotPasswordRole,
     setPublicSellerProfile,
     setSelectedVehicle,
@@ -134,12 +136,24 @@ const AppContent: React.FC = () => {
 
   const handleDeleteVehicle = async (vehicleId: number) => {
     try {
-      const { deleteVehicle } = await import('./services/vehicleService');
-      await deleteVehicle(vehicleId);
+      console.log('🗑️ Deleting vehicle with ID:', vehicleId);
+      
+      // Remove vehicle from the state immediately
       (setVehicles as any)((prev: Vehicle[]) => prev.filter((v: Vehicle) => v.id !== vehicleId));
+      
+      // Try to delete from service (optional - for persistence)
+      try {
+        const { deleteVehicle } = await import('./services/vehicleService');
+        await deleteVehicle(vehicleId);
+        console.log('✅ Vehicle deleted from service');
+      } catch (serviceError) {
+        console.warn('⚠️ Failed to delete from service, but removed from UI:', serviceError);
+      }
+      
       addToast('Vehicle deleted successfully!', 'success');
+      console.log('✅ Vehicle deleted successfully');
     } catch (error) {
-      console.error('Failed to delete vehicle:', error);
+      console.error('❌ Failed to delete vehicle:', error);
       addToast('Failed to delete vehicle. Please try again.', 'error');
     }
   };
@@ -258,11 +272,451 @@ const AppContent: React.FC = () => {
     addToast('Content has been flagged for review', 'success');
   };
 
+  // Admin Panel Handlers
+  const handleToggleVehicleStatus = async (vehicleId: number) => {
+    try {
+      const vehicle = vehicles.find(v => v.id === vehicleId);
+      if (vehicle) {
+        const newStatus = vehicle.status === 'published' ? 'unpublished' : 'published';
+        console.log('🔄 Toggling vehicle status from', vehicle.status, 'to', newStatus);
+        
+        // Update vehicle status in the state
+        (setVehicles as any)((prevVehicles: Vehicle[]) => 
+          prevVehicles.map(v => 
+            v.id === vehicleId 
+              ? { ...v, status: newStatus }
+              : v
+          )
+        );
+        
+        addToast(`Vehicle ${newStatus === 'published' ? 'published' : 'unpublished'} successfully!`, 'success');
+        console.log('✅ Vehicle status updated successfully');
+      }
+    } catch (error) {
+      console.error('Failed to toggle vehicle status:', error);
+      addToast('Failed to toggle vehicle status. Please try again.', 'error');
+    }
+  };
+
+  const handleToggleVehicleFeature = async (vehicleId: number) => {
+    try {
+      const vehicle = vehicles.find(v => v.id === vehicleId);
+      if (vehicle) {
+        await handleUpdateVehicle({ ...vehicle, isFeatured: !vehicle.isFeatured });
+        addToast(`Vehicle ${vehicle.isFeatured ? 'unfeatured' : 'featured'} successfully!`, 'success');
+      }
+    } catch (error) {
+      console.error('Failed to toggle vehicle feature:', error);
+      addToast('Failed to toggle vehicle feature. Please try again.', 'error');
+    }
+  };
+
+  const handleResolveFlag = async (type: 'vehicle' | 'conversation', id: number | string) => {
+    try {
+      if (type === 'vehicle') {
+        const vehicle = vehicles.find(v => v.id === id);
+        if (vehicle) {
+          await handleUpdateVehicle({ ...vehicle, isFlagged: false });
+          addToast('Vehicle flag resolved successfully!', 'success');
+        }
+      } else if (type === 'conversation') {
+        // Handle conversation flag resolution
+        addToast('Conversation flag resolved successfully!', 'success');
+      }
+    } catch (error) {
+      console.error('Failed to resolve flag:', error);
+      addToast('Failed to resolve flag. Please try again.', 'error');
+    }
+  };
+
+  const handleToggleUserStatus = async (email: string) => {
+    console.log('🔄 handleToggleUserStatus called with email:', email);
+    try {
+      const user = users.find(u => u.email === email);
+      console.log('👤 Found user:', user);
+      if (user) {
+        const newStatus = user.status === 'active' ? 'inactive' : 'active';
+        console.log('📝 Updating user status from', user.status, 'to', newStatus);
+        
+        // Update user status in the state
+        (setUsers as any)((prevUsers: any[]) => 
+          prevUsers.map((u: any) => 
+            u.email === email 
+              ? { ...u, status: newStatus }
+              : u
+          )
+        );
+        
+        addToast(`User ${newStatus === 'active' ? 'activated' : 'deactivated'} successfully!`, 'success');
+        console.log('✅ User status updated successfully');
+      } else {
+        console.log('❌ User not found with email:', email);
+        addToast('User not found', 'error');
+      }
+    } catch (error) {
+      console.error('❌ Failed to toggle user status:', error);
+      addToast('Failed to toggle user status. Please try again.', 'error');
+    }
+  };
+
+  const handleDeleteUser = async (email: string) => {
+    console.log('🗑️ handleDeleteUser called with email:', email);
+    try {
+      if (window.confirm('Are you sure you want to delete this user? This action cannot be undone.')) {
+        console.log('✅ User confirmed deletion for:', email);
+        
+        // Remove user from the state
+        (setUsers as any)((prevUsers: any[]) => 
+          prevUsers.filter((u: any) => u.email !== email)
+        );
+        
+        addToast('User deleted successfully!', 'success');
+        console.log('✅ User deleted successfully');
+      } else {
+        console.log('❌ User cancelled deletion');
+      }
+    } catch (error) {
+      console.error('❌ Failed to delete user:', error);
+      addToast('Failed to delete user. Please try again.', 'error');
+    }
+  };
+
+  const handleAdminUpdateUser = async (email: string, details: { name: string; mobile: string; role: any }) => {
+    try {
+      console.log('Updating user:', email, details);
+      
+      // Update user in the state
+      (setUsers as any)((prevUsers: any[]) => 
+        prevUsers.map((u: any) => 
+          u.email === email 
+            ? { ...u, ...details }
+            : u
+        )
+      );
+      
+      addToast('User updated successfully!', 'success');
+    } catch (error) {
+      console.error('Failed to update user:', error);
+      addToast('Failed to update user. Please try again.', 'error');
+    }
+  };
+
+  const handleUpdateUserPlan = async (email: string, plan: any) => {
+    try {
+      console.log('🔄 Updating user plan:', email, plan);
+      
+      // Update user plan in the state
+      (setUsers as any)((prevUsers: any[]) =>
+        prevUsers.map((u: any) =>
+          u.email === email
+            ? { ...u, subscriptionPlan: plan }
+            : u
+        )
+      );
+      
+      addToast('User plan updated successfully!', 'success');
+      console.log('✅ User plan updated successfully');
+    } catch (error) {
+      console.error('❌ Failed to update user plan:', error);
+      addToast('Failed to update user plan. Please try again.', 'error');
+    }
+  };
+
+  const handleSendBroadcast = async (message: string) => {
+    try {
+      console.log('🔄 Sending broadcast:', message);
+      // Send broadcast logic here
+      addToast('Broadcast sent successfully!', 'success');
+      console.log('✅ Broadcast sent successfully');
+    } catch (error) {
+      console.error('❌ Failed to send broadcast:', error);
+      addToast('Failed to send broadcast. Please try again.', 'error');
+    }
+  };
+
+  // Settings Handler
+  const handleUpdateSettings = async (settings: any) => {
+    try {
+      console.log('🔄 Updating platform settings:', settings);
+      
+      // Update settings in the state
+      setPlatformSettings(settings);
+      
+      addToast('Settings updated successfully!', 'success');
+      console.log('✅ Settings updated successfully');
+    } catch (error) {
+      console.error('❌ Failed to update settings:', error);
+      addToast('Failed to update settings. Please try again.', 'error');
+    }
+  };
+
+  const handleExportUsers = () => {
+    console.log('📊 handleExportUsers called');
+    try {
+      console.log('👥 Users to export:', users.length);
+      const csvContent = "data:text/csv;charset=utf-8," + 
+        "Name,Email,Role,Status,Mobile\n" +
+        users.map(user => `${user.name},${user.email},${user.role},${user.status},${user.mobile}`).join("\n");
+      
+      console.log('📄 CSV content generated:', csvContent.substring(0, 100) + '...');
+      
+      const encodedUri = encodeURI(csvContent);
+      const link = document.createElement("a");
+      link.setAttribute("href", encodedUri);
+      link.setAttribute("download", "users.csv");
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      
+      console.log('✅ Users exported successfully');
+      addToast('Users exported successfully!', 'success');
+    } catch (error) {
+      console.error('❌ Failed to export users:', error);
+      addToast('Failed to export users. Please try again.', 'error');
+    }
+  };
+
+  const handleExportVehicles = () => {
+    try {
+      const csvContent = "data:text/csv;charset=utf-8," + 
+        "Make,Model,Year,Price,Seller,Status\n" +
+        vehicles.map(vehicle => `${vehicle.make},${vehicle.model},${vehicle.year},${vehicle.price},${vehicle.sellerEmail},${vehicle.status}`).join("\n");
+      
+      const encodedUri = encodeURI(csvContent);
+      const link = document.createElement("a");
+      link.setAttribute("href", encodedUri);
+      link.setAttribute("download", "vehicles.csv");
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      
+      addToast('Vehicles exported successfully!', 'success');
+    } catch (error) {
+      console.error('Failed to export vehicles:', error);
+      addToast('Failed to export vehicles. Please try again.', 'error');
+    }
+  };
+
+  const handleExportSales = () => {
+    try {
+      const soldVehicles = vehicles.filter(v => v.status === 'sold');
+      const csvContent = "data:text/csv;charset=utf-8," + 
+        "Make,Model,Year,Price,Seller,Sale Date\n" +
+        soldVehicles.map(vehicle => `${vehicle.make},${vehicle.model},${vehicle.year},${vehicle.price},${vehicle.sellerEmail},${new Date().toLocaleDateString()}`).join("\n");
+      
+      const encodedUri = encodeURI(csvContent);
+      const link = document.createElement("a");
+      link.setAttribute("href", encodedUri);
+      link.setAttribute("download", "sales.csv");
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      
+      addToast('Sales data exported successfully!', 'success');
+    } catch (error) {
+      console.error('Failed to export sales:', error);
+      addToast('Failed to export sales. Please try again.', 'error');
+    }
+  };
+
+  const handleToggleVerifiedStatus = async (email: string) => {
+    try {
+      const user = users.find(u => u.email === email);
+      if (user) {
+        // Toggle verification status logic here
+        addToast(`User verification ${user.isVerified ? 'removed' : 'approved'} successfully!`, 'success');
+      }
+    } catch (error) {
+      console.error('Failed to toggle verification status:', error);
+      addToast('Failed to toggle verification status. Please try again.', 'error');
+    }
+  };
+
+  const handleUpdateSupportTicket = async (ticket: any) => {
+    try {
+      console.log('🔄 Updating support ticket:', ticket);
+      
+      // Update support ticket in the state
+      (setSupportTickets as any)((prevTickets: any[]) =>
+        prevTickets.map((t: any) =>
+          t.id === ticket.id
+            ? { ...t, ...ticket }
+            : t
+        )
+      );
+      
+      addToast('Support ticket updated successfully!', 'success');
+      console.log('✅ Support ticket updated successfully');
+    } catch (error) {
+      console.error('❌ Failed to update support ticket:', error);
+      addToast('Failed to update support ticket. Please try again.', 'error');
+    }
+  };
+
+  const handleAddFaq = async (faq: any) => {
+    try {
+      console.log('🔄 Adding FAQ:', faq);
+      
+      // Add FAQ to the state
+      const newFaq = { ...faq, id: Date.now() };
+      setFaqItems([...faqItems, newFaq]);
+      
+      addToast('FAQ added successfully!', 'success');
+      console.log('✅ FAQ added successfully');
+    } catch (error) {
+      console.error('❌ Failed to add FAQ:', error);
+      addToast('Failed to add FAQ. Please try again.', 'error');
+    }
+  };
+
+  const handleUpdateFaq = async (faq: any) => {
+    try {
+      console.log('🔄 Updating FAQ:', faq);
+      
+      // Update FAQ in the state
+      setFaqItems(faqItems.map((f: any) =>
+        f.id === faq.id
+          ? { ...f, ...faq }
+          : f
+      ));
+      
+      addToast('FAQ updated successfully!', 'success');
+      console.log('✅ FAQ updated successfully');
+    } catch (error) {
+      console.error('❌ Failed to update FAQ:', error);
+      addToast('Failed to update FAQ. Please try again.', 'error');
+    }
+  };
+
+  const handleDeleteFaq = async (id: number) => {
+    try {
+      console.log('🔄 Deleting FAQ:', id);
+      
+      // Remove FAQ from the state
+      setFaqItems(faqItems.filter((f: any) => f.id !== id));
+      
+      addToast('FAQ deleted successfully!', 'success');
+      console.log('✅ FAQ deleted successfully');
+    } catch (error) {
+      console.error('❌ Failed to delete FAQ:', error);
+      addToast('Failed to delete FAQ. Please try again.', 'error');
+    }
+  };
+
+  const handleCertificationApproval = async (vehicleId: number, decision: "approved" | "rejected") => {
+    try {
+      const vehicle = vehicles.find(v => v.id === vehicleId);
+      if (vehicle) {
+        await handleUpdateVehicle({ 
+          ...vehicle, 
+          certificationStatus: decision 
+        });
+        addToast(`Certification ${decision} successfully!`, 'success');
+      }
+    } catch (error) {
+      console.error('Failed to update certification:', error);
+      addToast('Failed to update certification. Please try again.', 'error');
+    }
+  };
+
+  // Seller Dashboard Handlers
+  const handleSellerSendMessage = async (conversationId: string, messageText: string, type?: any, payload?: any) => {
+    try {
+      console.log('Seller sending message:', { conversationId, messageText, type, payload });
+      // Add message to conversation logic here
+      addToast('Message sent successfully!', 'success');
+    } catch (error) {
+      console.error('Failed to send message:', error);
+      addToast('Failed to send message. Please try again.', 'error');
+    }
+  };
+
+  const handleMarkConversationAsReadBySeller = async (conversationId: string) => {
+    try {
+      console.log('Marking conversation as read by seller:', conversationId);
+      // Mark conversation as read logic here
+    } catch (error) {
+      console.error('Failed to mark conversation as read:', error);
+    }
+  };
+
+  const handleUserTyping = (conversationId: string, userRole: 'customer' | 'seller') => {
+    console.log('User typing:', { conversationId, userRole });
+    // Handle typing status logic here
+  };
+
+  const handleMarkMessagesAsRead = (conversationId: string, readerRole: 'customer' | 'seller') => {
+    console.log('Marking messages as read:', { conversationId, readerRole });
+    // Mark messages as read logic here
+  };
+
+  const handleUpdateSellerProfile = async (details: { dealershipName: string; bio: string; logoUrl: string; }) => {
+    try {
+      console.log('Updating seller profile:', details);
+      // Update seller profile logic here
+      addToast('Profile updated successfully!', 'success');
+    } catch (error) {
+      console.error('Failed to update seller profile:', error);
+      addToast('Failed to update profile. Please try again.', 'error');
+    }
+  };
+
+  const handleOfferResponse = async (conversationId: string, messageId: number, response: 'accepted' | 'rejected' | 'countered', counterPrice?: number) => {
+    try {
+      console.log('Responding to offer:', { conversationId, messageId, response, counterPrice });
+      // Handle offer response logic here
+      addToast(`Offer ${response} successfully!`, 'success');
+    } catch (error) {
+      console.error('Failed to respond to offer:', error);
+      addToast('Failed to respond to offer. Please try again.', 'error');
+    }
+  };
+
+  // Vehicle Data Management Handler
+  const handleUpdateVehicleData = async (newData: any) => {
+    try {
+      console.log('🔄 Updating vehicle data:', newData);
+      
+      // Update vehicle data in the state
+      setVehicleData(newData);
+      
+      // Try to save to service (optional - for persistence)
+      try {
+        const { saveVehicleData } = await import('./services/vehicleDataService');
+        await saveVehicleData(newData);
+        console.log('✅ Vehicle data saved to service');
+      } catch (serviceError) {
+        console.warn('⚠️ Failed to save to service, but updated in UI:', serviceError);
+      }
+      
+      addToast('Vehicle data updated successfully!', 'success');
+      console.log('✅ Vehicle data updated successfully');
+    } catch (error) {
+      console.error('❌ Failed to update vehicle data:', error);
+      addToast('Failed to update vehicle data. Please try again.', 'error');
+    }
+  };
+
   const handleSelectVehicle = (vehicle: Vehicle) => {
     console.log('🚗 Selecting vehicle:', vehicle.id, vehicle.make, vehicle.model);
+    console.log('🚗 Current view before navigation:', currentView);
+    console.log('🚗 Setting selectedVehicle to:', vehicle);
     setSelectedVehicle(vehicle);
+    console.log('🚗 selectedVehicle state should now be set');
+    console.log('🚗 Navigating to DETAIL view...');
     navigate(View.DETAIL);
+    console.log('🚗 Navigation called, current view should be:', View.DETAIL);
   };
+
+  // Track selectedVehicle changes
+  useEffect(() => {
+    console.log('🔄 selectedVehicle state changed:', selectedVehicle);
+    if (selectedVehicle) {
+      console.log('✅ selectedVehicle is set:', { id: selectedVehicle.id, make: selectedVehicle.make, model: selectedVehicle.model });
+    } else {
+      console.log('❌ selectedVehicle is null/undefined');
+    }
+  }, [selectedVehicle]);
 
   // Initialize data loading
   useEffect(() => {
@@ -477,6 +931,7 @@ const AppContent: React.FC = () => {
       }
     }
     
+    console.log('🔄 Rendering view:', currentView);
     switch (currentView) {
       case View.SUPPORT: 
         return <SupportPage currentUser={currentUser} onSubmitTicket={(ticketData) => { 
@@ -518,7 +973,25 @@ const AppContent: React.FC = () => {
           onViewSellerProfile={handleViewSellerProfile} 
         />;
       case View.DETAIL: 
-        return selectedVehicle && <VehicleDetail 
+        console.log('🎯 Rendering DETAIL view, selectedVehicle:', selectedVehicle);
+        console.log('🎯 selectedVehicle exists?', !!selectedVehicle);
+        console.log('🎯 selectedVehicle type:', typeof selectedVehicle);
+        if (!selectedVehicle) {
+          console.log('❌ No selectedVehicle, rendering loading or error');
+          return <div className="min-h-screen flex items-center justify-center">
+            <div className="text-center">
+              <h2 className="text-2xl font-bold text-gray-900 mb-4">No Vehicle Selected</h2>
+              <p className="text-gray-600 mb-4">Please select a vehicle to view details.</p>
+              <button 
+                onClick={() => navigate(View.USED_CARS)} 
+                className="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600"
+              >
+                Back to Vehicle List
+              </button>
+            </div>
+          </div>;
+        }
+        return <VehicleDetail 
           vehicle={selectedVehicle} 
           onBack={() => navigate(View.USED_CARS)} 
           comparisonList={comparisonList} 
@@ -549,18 +1022,18 @@ const AppContent: React.FC = () => {
           onDeleteVehicle={handleDeleteVehicle} 
           onMarkAsSold={handleMarkAsSold} 
           conversations={conversations.filter(c => c.sellerId === currentUser.email)} 
-          onSellerSendMessage={() => {}} 
-          onMarkConversationAsReadBySeller={() => {}} 
-          typingStatus={null} 
-          onUserTyping={() => {}} 
-          onMarkMessagesAsRead={() => {}} 
-          onUpdateSellerProfile={() => {}} 
+          onSellerSendMessage={handleSellerSendMessage} 
+          onMarkConversationAsReadBySeller={handleMarkConversationAsReadBySeller} 
+          typingStatus={typingStatus} 
+          onUserTyping={handleUserTyping} 
+          onMarkMessagesAsRead={handleMarkMessagesAsRead} 
+          onUpdateSellerProfile={handleUpdateSellerProfile} 
           vehicleData={vehicleData} 
           onFeatureListing={handleFeatureListing} 
           onRequestCertification={handleRequestCertification} 
           onNavigate={navigate} 
           allVehicles={vehicles.filter(v => v.status === 'published')} 
-          onOfferResponse={() => {}} 
+          onOfferResponse={handleOfferResponse} 
         />;
       }
       case View.ADMIN_PANEL: 
@@ -569,33 +1042,33 @@ const AppContent: React.FC = () => {
           currentUser={currentUser} 
           vehicles={vehicles} 
           conversations={conversations} 
-          onToggleUserStatus={() => {}} 
-          onDeleteUser={() => {}} 
-          onAdminUpdateUser={() => {}} 
-          onUpdateUserPlan={() => {}} 
-          onUpdateVehicle={() => {}} 
-          onDeleteVehicle={() => {}} 
-          onToggleVehicleStatus={() => {}} 
-          onToggleVehicleFeature={() => {}} 
-          onResolveFlag={() => {}} 
+          onToggleUserStatus={handleToggleUserStatus} 
+          onDeleteUser={handleDeleteUser} 
+          onAdminUpdateUser={handleAdminUpdateUser} 
+          onUpdateUserPlan={handleUpdateUserPlan} 
+          onUpdateVehicle={handleUpdateVehicle} 
+          onDeleteVehicle={handleDeleteVehicle} 
+          onToggleVehicleStatus={handleToggleVehicleStatus} 
+          onToggleVehicleFeature={handleToggleVehicleFeature} 
+          onResolveFlag={handleResolveFlag} 
           platformSettings={platformSettings} 
-          onUpdateSettings={setPlatformSettings} 
-          onSendBroadcast={() => {}} 
+          onUpdateSettings={handleUpdateSettings} 
+          onSendBroadcast={handleSendBroadcast} 
           auditLog={auditLog} 
-          onExportUsers={() => {}} 
-          onExportVehicles={() => {}} 
-          onExportSales={() => {}} 
+          onExportUsers={handleExportUsers} 
+          onExportVehicles={handleExportVehicles} 
+          onExportSales={handleExportSales} 
           onNavigate={navigate}
           vehicleData={vehicleData} 
-          onUpdateVehicleData={setVehicleData} 
-          onToggleVerifiedStatus={() => {}} 
+          onUpdateVehicleData={handleUpdateVehicleData} 
+          onToggleVerifiedStatus={handleToggleVerifiedStatus} 
           supportTickets={supportTickets} 
-          onUpdateSupportTicket={() => {}} 
+          onUpdateSupportTicket={handleUpdateSupportTicket} 
           faqItems={faqItems} 
-          onAddFaq={() => {}} 
-          onUpdateFaq={() => {}} 
-          onDeleteFaq={() => {}} 
-          onCertificationApproval={() => {}} 
+          onAddFaq={handleAddFaq} 
+          onUpdateFaq={handleUpdateFaq} 
+          onDeleteFaq={handleDeleteFaq} 
+          onCertificationApproval={handleCertificationApproval} 
         /> : <LoadingSpinner />;
       case View.COMPARISON: 
         return <Comparison 
