@@ -88,7 +88,8 @@ const vehicleSchema = new mongoose.Schema({
   timestamps: true
 });
 
-const Vehicle = mongoose.models.Vehicle || mongoose.model('Vehicle', vehicleSchema);
+// Ensure the model uses the correct collection name
+const Vehicle = mongoose.models.Vehicle || mongoose.model('Vehicle', vehicleSchema, 'vehicles');
 
 export default Vehicle;
 

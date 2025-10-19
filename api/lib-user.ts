@@ -64,7 +64,8 @@ const userSchema = new mongoose.Schema({
   timestamps: true
 });
 
-const User = mongoose.models.User || mongoose.model('User', userSchema);
+// Ensure the model uses the correct collection name
+const User = mongoose.models.User || mongoose.model('User', userSchema, 'users');
 
 export default User;
 
