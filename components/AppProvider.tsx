@@ -48,7 +48,7 @@ interface AppContextType {
   setCurrentView: (view: View) => void;
   setPreviousView: (view: View) => void;
   setSelectedVehicle: (vehicle: Vehicle | null) => void;
-  setVehicles: (vehicles: Vehicle[]) => void;
+  setVehicles: (vehicles: Vehicle[] | ((prev: Vehicle[]) => Vehicle[])) => void;
   setIsLoading: (loading: boolean) => void;
   setCurrentUser: (user: User | null) => void;
   setComparisonList: (list: number[]) => void;
@@ -210,7 +210,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     setCurrentView,
     setPreviousView,
     setSelectedVehicle,
-    setVehicles,
+    setVehicles: setVehicles as (vehicles: Vehicle[] | ((prev: Vehicle[]) => Vehicle[])) => void,
     setIsLoading,
     setCurrentUser,
     setComparisonList,

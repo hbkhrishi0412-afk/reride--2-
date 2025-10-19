@@ -94,7 +94,41 @@ const PlanStatusCard: React.FC<{
     activeListingsCount: number;
     onNavigate: (view: View) => void;
 }> = memo(({ seller, activeListingsCount, onNavigate }) => {
-    const plan = planService.getPlanDetails(seller.subscriptionPlan || 'free');
+    const [plan, setPlan] = useState<any>(null);
+    const [loading, setLoading] = useState(true);
+    
+    useEffect(() => {
+        const loadPlan = async () => {
+            try {
+                const planDetails = await planService.getPlanDetails(seller.subscriptionPlan || 'free');
+                setPlan(planDetails);
+            } catch (error) {
+                console.error('Failed to load plan details:', error);
+                // Fallback to basic plan info
+                setPlan({
+                    name: 'Free Plan',
+                    listingLimit: 3,
+                    price: 0
+                });
+            } finally {
+                setLoading(false);
+            }
+        };
+        loadPlan();
+    }, [seller.subscriptionPlan]);
+    
+    if (loading || !plan) {
+        return (
+            <div className="text-white p-6 rounded-lg shadow-lg flex flex-col h-full" style={{ background: 'linear-gradient(135deg, #FF6B35 0%, #FF8456 100%)' }}>
+                <div className="flex items-center justify-between mb-4">
+                    <h3 className="text-lg font-semibold">Plan Status</h3>
+                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                </div>
+                <p className="text-sm opacity-90">Loading plan details...</p>
+            </div>
+        );
+    }
+    
     const listingLimit = plan.listingLimit === 'unlimited' ? Infinity : plan.listingLimit;
     const usagePercentage = listingLimit === Infinity ? 0 : (activeListingsCount / listingLimit) * 100;
 

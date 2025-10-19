@@ -6,7 +6,7 @@ import Footer from './components/Footer';
 import ToastContainer from './components/ToastContainer';
 import CommandPalette from './components/CommandPalette';
 import { ChatWidget } from './components/ChatWidget';
-import { View, User, SupportTicket } from './types';
+import { View, User, SupportTicket, Vehicle } from './types';
 import { getConversations, saveConversations } from './services/chatService';
 import { getRatings, getSellerRatings } from './services/ratingService';
 import { saveSettings } from './services/settingsService';
@@ -103,6 +103,111 @@ const AppContent: React.FC = () => {
     setInitialSearchQuery,
     setRecommendations,
   } = useApp();
+
+  // Vehicle operation handlers
+  const handleAddVehicle = async (vehicleData: Omit<Vehicle, 'id' | 'averageRating' | 'ratingCount'>, isFeaturing: boolean = false) => {
+    try {
+      const { addVehicle } = await import('./services/vehicleService');
+      const newVehicle = await addVehicle({
+        ...vehicleData,
+        id: Date.now(),
+        averageRating: 0,
+        ratingCount: 0,
+        isFeatured: isFeaturing,
+        status: 'published'
+      } as Vehicle);
+      (setVehicles as any)((prev: Vehicle[]) => [...prev, newVehicle]);
+      addToast('Vehicle added successfully!', 'success');
+    } catch (error) {
+      console.error('Failed to add vehicle:', error);
+      addToast('Failed to add vehicle. Please try again.', 'error');
+    }
+  };
+
+  const handleUpdateVehicle = async (vehicleData: Vehicle) => {
+    try {
+      const { updateVehicle } = await import('./services/vehicleService');
+      const updatedVehicle = await updateVehicle(vehicleData);
+      (setVehicles as any)((prev: Vehicle[]) => prev.map((v: Vehicle) => v.id === vehicleData.id ? updatedVehicle : v));
+      addToast('Vehicle updated successfully!', 'success');
+    } catch (error) {
+      console.error('Failed to update vehicle:', error);
+      addToast('Failed to update vehicle. Please try again.', 'error');
+    }
+  };
+
+  const handleDeleteVehicle = async (vehicleId: number) => {
+    try {
+      const { deleteVehicle } = await import('./services/vehicleService');
+      await deleteVehicle(vehicleId);
+      (setVehicles as any)((prev: Vehicle[]) => prev.filter((v: Vehicle) => v.id !== vehicleId));
+      addToast('Vehicle deleted successfully!', 'success');
+    } catch (error) {
+      console.error('Failed to delete vehicle:', error);
+      addToast('Failed to delete vehicle. Please try again.', 'error');
+    }
+  };
+
+  const handleMarkAsSold = async (vehicleId: number) => {
+    try {
+      const vehicle = vehicles.find(v => v.id === vehicleId);
+      if (vehicle) {
+        await handleUpdateVehicle({ ...vehicle, status: 'sold' });
+        addToast('Vehicle marked as sold!', 'success');
+      }
+    } catch (error) {
+      console.error('Failed to mark vehicle as sold:', error);
+      addToast('Failed to mark vehicle as sold. Please try again.', 'error');
+    }
+  };
+
+  const handleFeatureListing = async (vehicleId: number) => {
+    try {
+      const vehicle = vehicles.find(v => v.id === vehicleId);
+      if (vehicle) {
+        await handleUpdateVehicle({ ...vehicle, isFeatured: true });
+        addToast('Listing featured successfully!', 'success');
+      }
+    } catch (error) {
+      console.error('Failed to feature listing:', error);
+      addToast('Failed to feature listing. Please try again.', 'error');
+    }
+  };
+
+  const handleRequestCertification = async (vehicleId: number) => {
+    try {
+      const vehicle = vehicles.find(v => v.id === vehicleId);
+      if (vehicle) {
+        await handleUpdateVehicle({ ...vehicle, certificationStatus: 'requested' });
+        addToast('Certification request submitted!', 'success');
+      }
+    } catch (error) {
+      console.error('Failed to request certification:', error);
+      addToast('Failed to request certification. Please try again.', 'error');
+    }
+  };
+
+  const handleAddMultipleVehicles = async (vehiclesData: Omit<Vehicle, 'id' | 'averageRating' | 'ratingCount'>[]) => {
+    try {
+      const { addVehicle } = await import('./services/vehicleService');
+      const newVehicles = await Promise.all(
+        vehiclesData.map(async (vehicleData) => {
+          return await addVehicle({
+            ...vehicleData,
+            id: Date.now() + Math.random(),
+            averageRating: 0,
+            ratingCount: 0,
+            status: 'published'
+          } as Vehicle);
+        })
+      );
+      (setVehicles as any)((prev: Vehicle[]) => [...prev, ...newVehicles]);
+      addToast(`${newVehicles.length} vehicles added successfully!`, 'success');
+    } catch (error) {
+      console.error('Failed to add multiple vehicles:', error);
+      addToast('Failed to add vehicles. Please try again.', 'error');
+    }
+  };
 
   // Initialize data loading
   useEffect(() => {
@@ -334,11 +439,11 @@ const AppContent: React.FC = () => {
           seller={users.find(u => u.email === currentUser.email)!} 
           sellerVehicles={vehicles.filter(v => v.sellerEmail === currentUser.email)} 
           reportedVehicles={vehicles.filter(v => v.sellerEmail === currentUser.email && v.isFlagged)} 
-          onAddVehicle={() => {}} 
-          onAddMultipleVehicles={() => {}} 
-          onUpdateVehicle={() => {}} 
-          onDeleteVehicle={() => {}} 
-          onMarkAsSold={() => {}} 
+          onAddVehicle={handleAddVehicle} 
+          onAddMultipleVehicles={handleAddMultipleVehicles} 
+          onUpdateVehicle={handleUpdateVehicle} 
+          onDeleteVehicle={handleDeleteVehicle} 
+          onMarkAsSold={handleMarkAsSold} 
           conversations={conversations.filter(c => c.sellerId === currentUser.email)} 
           onSellerSendMessage={() => {}} 
           onMarkConversationAsReadBySeller={() => {}} 
@@ -347,8 +452,8 @@ const AppContent: React.FC = () => {
           onMarkMessagesAsRead={() => {}} 
           onUpdateSellerProfile={() => {}} 
           vehicleData={vehicleData} 
-          onFeatureListing={() => {}} 
-          onRequestCertification={() => {}} 
+          onFeatureListing={handleFeatureListing} 
+          onRequestCertification={handleRequestCertification} 
           onNavigate={navigate} 
           allVehicles={vehicles.filter(v => v.status === 'published')} 
           onOfferResponse={() => {}} 
