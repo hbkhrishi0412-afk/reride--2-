@@ -72,14 +72,12 @@ const QuickViewModal: React.FC<QuickViewModalProps> = ({ vehicle, onClose, onSel
       console.warn('🔧 QuickViewModal: Failed to store vehicle in sessionStorage:', error);
     }
     
-    // Call onSelectVehicle first to set the state
+    // Call onSelectVehicle to set the state and navigate to DETAIL view
     onSelectVehicle(vehicle);
     
-    // Add small delay to ensure state is committed before closing modal
-    setTimeout(() => {
-      console.log('🔧 QuickViewModal: Closing modal after state commit');
-      onClose();
-    }, 50);
+    // Close modal after setting state and triggering navigation
+    console.log('🔧 QuickViewModal: Closing modal after state commit and navigation');
+    onClose();
   };
 
   return (

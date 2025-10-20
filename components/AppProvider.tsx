@@ -232,8 +232,14 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       setPublicSellerProfile(null); 
     }
     setInitialSearchQuery('');
-    const preserveSelectedVehicle = (view === View.SELLER_PROFILE && currentView === View.DETAIL) || (view === View.DETAIL && currentView === View.SELLER_PROFILE);
+    
+    // Fixed: Preserve selectedVehicle when navigating TO DETAIL view or between DETAIL and SELLER_PROFILE
+    const preserveSelectedVehicle = view === View.DETAIL || 
+      (view === View.SELLER_PROFILE && currentView === View.DETAIL) || 
+      (view === View.DETAIL && currentView === View.SELLER_PROFILE);
+    
     if (!preserveSelectedVehicle) setSelectedVehicle(null);
+    
     if (view === View.USED_CARS && currentView !== View.HOME) setSelectedCategory('ALL');
     if (view === View.CITY_LANDING && params?.city) {
       setSelectedCity(params.city);
@@ -626,6 +632,8 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     },
     selectVehicle: (vehicle: Vehicle) => {
       setSelectedVehicle(vehicle);
+      // Navigate to DETAIL view when a vehicle is selected
+      setCurrentView(View.DETAIL);
     },
     toggleWishlist: (vehicleId: number) => {
       setWishlist(prev => 

@@ -127,7 +127,7 @@ const AppContent: React.FC = () => {
             }}
             onSelectCategory={setSelectedCategory}
             featuredVehicles={vehicles.slice(0, 6)}
-            onSelectVehicle={setSelectedVehicle}
+            onSelectVehicle={selectVehicle}
             onToggleCompare={(id) => {
               setComparisonList(prev => 
                 prev.includes(id) 
@@ -158,7 +158,7 @@ const AppContent: React.FC = () => {
         return (
           <VehicleList
             vehicles={vehicles}
-            onSelectVehicle={setSelectedVehicle}
+            onSelectVehicle={selectVehicle}
             isLoading={isLoading}
             comparisonList={comparisonList}
             onToggleCompare={(id) => {
@@ -189,9 +189,25 @@ const AppContent: React.FC = () => {
         );
 
       case ViewEnum.DETAIL:
-        return selectedVehicle ? (
+        // State recovery mechanism - try to recover vehicle from sessionStorage if selectedVehicle is null
+        let vehicleToShow = selectedVehicle;
+        if (!vehicleToShow) {
+          try {
+            const storedVehicle = sessionStorage.getItem('selectedVehicle');
+            if (storedVehicle) {
+              vehicleToShow = JSON.parse(storedVehicle);
+              console.log('🔧 Recovered vehicle from sessionStorage:', vehicleToShow?.id, vehicleToShow?.make, vehicleToShow?.model);
+              // Update the state with recovered vehicle
+              setSelectedVehicle(vehicleToShow);
+            }
+          } catch (error) {
+            console.warn('🔧 Failed to recover vehicle from sessionStorage:', error);
+          }
+        }
+        
+        return vehicleToShow ? (
           <VehicleDetail
-            vehicle={selectedVehicle}
+            vehicle={vehicleToShow}
             onBack={() => navigate(ViewEnum.USED_CARS)}
             comparisonList={comparisonList}
             onToggleCompare={toggleCompare}
@@ -219,6 +235,7 @@ const AppContent: React.FC = () => {
           <div className="min-h-[calc(100vh-140px)] flex items-center justify-center">
             <div className="text-center">
               <h2 className="text-2xl font-bold text-gray-600 mb-4">Vehicle Not Found</h2>
+              <p className="text-gray-500 mb-4">Please select a vehicle to view details.</p>
               <button 
                 onClick={() => navigate(ViewEnum.USED_CARS)}
                 className="btn-brand-primary"
@@ -253,7 +270,7 @@ const AppContent: React.FC = () => {
         return (
           <VehicleList
             vehicles={vehicles.filter(v => wishlist.includes(v.id))}
-            onSelectVehicle={setSelectedVehicle}
+            onSelectVehicle={selectVehicle}
             isLoading={isLoading}
             comparisonList={comparisonList}
             onToggleCompare={(id) => {
@@ -331,7 +348,7 @@ const AppContent: React.FC = () => {
             wishlist={wishlist}
             conversations={conversations}
             onNavigate={navigate}
-            onSelectVehicle={setSelectedVehicle}
+            onSelectVehicle={selectVehicle}
             onToggleWishlist={(id) => {
               setWishlist(prev => 
                 prev.includes(id) 
