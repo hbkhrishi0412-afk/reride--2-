@@ -22,7 +22,8 @@ export default async function handler(
     
     // Get collection info
     const db = Vehicle.db;
-    const collections = await db.listCollections().toArray();
+    const collectionsCursor = db.listCollections();
+    const collections = await collectionsCursor.toArray();
     const vehiclesCollection = collections.find((c: any) => c.name === 'vehicles');
     
     // Get a sample vehicle if any exist
