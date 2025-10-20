@@ -8,6 +8,8 @@ import { getAuditLog, logAction, saveAuditLog } from '../services/auditLogServic
 import { showNotification } from '../services/notificationService';
 import { getFaqs, saveFaqs } from '../services/faqService';
 import { getSupportTickets, saveSupportTickets } from '../services/supportTicketService';
+import { getVehicles } from '../services/vehicleService';
+import { getVehicleData } from '../services/vehicleDataService';
 import { loadingManager, LOADING_OPERATIONS, withLoadingTimeout } from '../utils/loadingManager';
 import { useTimeout } from '../hooks/useCleanup';
 
@@ -174,6 +176,38 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     else if ((view === View.PROFILE || view === View.INBOX) && !currentUser) setCurrentView(View.LOGIN_PORTAL);
     else setCurrentView(view);
   }, [currentView, currentUser]);
+
+  // Load initial data
+  useEffect(() => {
+    const loadInitialData = async () => {
+      try {
+        console.log('🔧 AppProvider: Loading initial data...');
+        setIsLoading(true);
+        
+        // Load vehicles and vehicle data in parallel
+        const [vehiclesData, vehicleDataData] = await Promise.all([
+          getVehicles(),
+          getVehicleData()
+        ]);
+        
+        console.log('🔧 AppProvider: Loaded', vehiclesData.length, 'vehicles');
+        setVehicles(vehiclesData);
+        setVehicleData(vehicleDataData);
+        
+        // Set some recommendations (first 6 vehicles)
+        setRecommendations(vehiclesData.slice(0, 6));
+        
+        console.log('🔧 AppProvider: Initial data loaded successfully');
+      } catch (error) {
+        console.error('🔧 AppProvider: Error loading initial data:', error);
+        addToast('Failed to load vehicle data. Please refresh the page.', 'error');
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    loadInitialData();
+  }, [addToast]);
 
   // Add navigation event listener for dashboard navigation
   useEffect(() => {
