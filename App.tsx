@@ -518,7 +518,10 @@ const AppContent: React.FC = () => {
       <Footer onNavigate={navigate} />
       
       {/* Global Components */}
-      <ToastContainer />
+      <ToastContainer 
+        toasts={toasts} 
+        onRemove={removeToast} 
+      />
       <CommandPalette 
         isOpen={isCommandPaletteOpen}
         onClose={() => setIsCommandPaletteOpen(false)}
@@ -526,8 +529,19 @@ const AppContent: React.FC = () => {
         currentUser={currentUser}
         onLogout={handleLogout}
       />
-      {currentUser && (
-        <ChatWidget />
+      {currentUser && activeChat && (
+        <ChatWidget
+          conversation={activeChat}
+          currentUserRole={currentUser.role as 'customer' | 'seller'}
+          otherUserName={activeChat.otherUserName || 'User'}
+          onClose={() => setActiveChat(null)}
+          onSendMessage={() => {}}
+          typingStatus={typingStatus}
+          onUserTyping={() => {}}
+          onMarkMessagesAsRead={() => {}}
+          onFlagContent={() => {}}
+          onOfferResponse={() => {}}
+        />
       )}
     </div>
   );
