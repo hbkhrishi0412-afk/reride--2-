@@ -54,7 +54,7 @@ interface AppContextType {
   setCurrentUser: (user: User | null) => void;
   setComparisonList: (list: number[] | ((prev: number[]) => number[])) => void;
   setWishlist: (list: number[] | ((prev: number[]) => number[])) => void;
-  setConversations: (conversations: Conversation[]) => void;
+  setConversations: (conversations: Conversation[] | ((prev: Conversation[]) => Conversation[])) => void;
   setToasts: (toasts: ToastType[]) => void;
   setForgotPasswordRole: (role: 'customer' | 'seller' | null) => void;
   setTypingStatus: (status: { conversationId: string; userRole: 'customer' | 'seller' } | null) => void;
@@ -256,14 +256,16 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       try {
         setIsLoading(true);
         
-        // Load vehicles and vehicle data in parallel using unified service
-        const [vehiclesData, vehicleDataData] = await Promise.all([
+        // Load vehicles, vehicle data, and conversations in parallel
+        const [vehiclesData, vehicleDataData, conversationsData] = await Promise.all([
           dataService.getVehicles(),
-          dataService.getVehicleData()
+          dataService.getVehicleData(),
+          Promise.resolve(getConversations()) // Load conversations from localStorage
         ]);
         
         setVehicles(vehiclesData);
         setVehicleData(vehicleDataData);
+        setConversations(conversationsData);
         
         // Set some recommendations (first 6 vehicles)
         setRecommendations(vehiclesData.slice(0, 6));
@@ -277,6 +279,13 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
     loadInitialData();
   }, [addToast]);
+
+  // Save conversations to localStorage whenever they change
+  useEffect(() => {
+    if (conversations.length > 0) {
+      saveConversations(conversations);
+    }
+  }, [conversations]);
 
   // Add navigation event listener for dashboard navigation
   useEffect(() => {
@@ -362,7 +371,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     setCurrentUser,
     setComparisonList: setComparisonList as (list: number[] | ((prev: number[]) => number[])) => void,
     setWishlist: setWishlist as (list: number[] | ((prev: number[]) => number[])) => void,
-    setConversations,
+    setConversations: setConversations as (conversations: Conversation[] | ((prev: Conversation[]) => Conversation[])) => void,
     setToasts,
     setForgotPasswordRole,
     setTypingStatus,
@@ -573,19 +582,24 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       addToast('Seller rating added successfully', 'success');
     },
     sendMessage: (conversationId: string, message: string) => {
-      setConversations(prev => prev.map(conv => 
-        conv.id === conversationId ? {
-          ...conv,
-          messages: [...conv.messages, {
-            id: Date.now().toString(),
-            senderId: currentUser?.email || '',
-            senderRole: currentUser?.role || 'customer',
-            content: message,
-            timestamp: new Date(),
-            isRead: false
-          }]
-        } : conv
-      ));
+      console.log('🔧 sendMessage called:', { conversationId, message, currentUser: currentUser?.email });
+      setConversations(prev => {
+        const updated = prev.map(conv => 
+          conv.id === conversationId ? {
+            ...conv,
+            messages: [...conv.messages, {
+              id: Date.now(),
+              sender: currentUser?.role === 'seller' ? 'seller' : 'user',
+              text: message,
+              timestamp: new Date().toISOString(),
+              isRead: false,
+              type: 'text'
+            }]
+          } : conv
+        );
+        console.log('🔧 Updated conversations:', updated);
+        return updated;
+      });
     },
     markAsRead: (conversationId: string) => {
       setConversations(prev => prev.map(conv => 

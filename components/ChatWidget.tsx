@@ -66,6 +66,7 @@ export const ChatWidget: React.FC<ChatWidgetProps> = memo(({ conversation, curre
   const handleSendMessage = (e: React.FormEvent) => {
     e.preventDefault();
     if (!inputText.trim()) return;
+    console.log('🔧 ChatWidget sending message:', inputText);
     onSendMessage(inputText);
     setInputText('');
   };
@@ -143,6 +144,7 @@ export const ChatWidget: React.FC<ChatWidgetProps> = memo(({ conversation, curre
 
         {/* Messages */}
         <div className="flex-grow p-4 overflow-y-auto bg-spinny-off-white dark:bg-white space-y-4">
+            {console.log('🔧 ChatWidget rendering messages:', conversation.messages)}
             {conversation.messages.map((msg) => (
                 <div key={msg.id} className={`flex flex-col ${msg.sender === senderType ? 'items-end' : 'items-start'}`}>
                     {msg.sender === 'system' && <div className="text-center text-xs text-gray-600 dark:text-gray-400 italic py-2 w-full">{msg.text}</div>}
