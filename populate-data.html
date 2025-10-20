@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Populate Mock Data</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+            text-align: center;
+        }
+        .button {
+            background: #1E88E5;
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 10px;
+            display: block;
+            width: 100%;
+        }
+        .button:hover {
+            background: #1565C0;
+        }
+        .success {
+            background: #4CAF50;
+            color: white;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 10px 0;
+            display: none;
+        }
+        .info {
+            background: #E3F2FD;
+            border: 1px solid #1E88E5;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 20px 0;
+        }
+        .accounts {
+            background: #FFF3E0;
+            border: 1px solid #FF9800;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 20px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🚗 ReRide Mock Data Populator</h1>
+        
+        <div class="info">
+            <h3>📋 What this does:</h3>
+            <p>This tool will populate your browser's localStorage with mock vehicle and user data, allowing you to test the "Buy Cars" functionality and other features of the ReRide application.</p>
+        </div>
+
+        <button class="button" onclick="loadMockData()">🌱 Load Mock Data</button>
+        
+        <div class="success" id="success">
+            ✅ Mock data loaded successfully! You can now refresh the main application to see the vehicles.
+        </div>
+
+        <div class="accounts">
+            <h3>🔑 Test Accounts:</h3>
+            <p><strong>Admin:</strong> admin@test.com / password</p>
+            <p><strong>Customer:</strong> customer@test.com / password</p>
+            <p><strong>Seller:</strong> seller1@test.com / password</p>
+        </div>
+
+        <div class="info">
+            <h3>📝 Next Steps:</h3>
+            <ol>
+                <li>Click "Load Mock Data" button above</li>
+                <li>Go to <a href="http://localhost:5176/" target="_blank">http://localhost:5176/</a></li>
+                <li>Click "Buy Car" in the navigation</li>
+                <li>You should now see 50 mock vehicles!</li>
+            </ol>
+        </div>
+    </div>
+
+    <script>
+        async function loadMockData() {
+            try {
+                // Load the mock data files
+                const [vehiclesResponse, usersResponse] = await Promise.all([
+                    fetch('./mock-vehicles.json'),
+                    fetch('./mock-users.json')
+                ]);
+
+                const vehicles = await vehiclesResponse.json();
+                const users = await usersResponse.json();
+
+                // Store in localStorage
+                localStorage.setItem('reRideVehicles', JSON.stringify(vehicles));
+                localStorage.setItem('reRideUsers', JSON.stringify(users));
+
+                // Show success message
+                document.getElementById('success').style.display = 'block';
+                
+                console.log(`✅ Loaded ${vehicles.length} vehicles and ${users.length} users to localStorage`);
+                console.log('Sample vehicles:', vehicles.slice(0, 3));
+                
+            } catch (error) {
+                console.error('❌ Error loading mock data:', error);
+                alert('Error loading mock data. Please make sure the JSON files are in the same directory.');
+            }
+        }
+
+        // Check if data is already loaded
+        window.addEventListener('load', () => {
+            const existingVehicles = localStorage.getItem('reRideVehicles');
+            if (existingVehicles) {
+                const vehicles = JSON.parse(existingVehicles);
+                console.log(`📊 Found ${vehicles.length} existing vehicles in localStorage`);
+            }
+        });
+    </script>
+</body>
+</html>
