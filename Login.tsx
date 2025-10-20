@@ -49,6 +49,7 @@ const Login: React.FC<LoginProps> = ({ onLogin, onRegister, onNavigate, onForgot
                     email: 'seller@test.com',
                     mobile: '555-123-4567',
                     role: 'seller',
+                    location: 'Mumbai',
                     status: 'active',
                     createdAt: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString(),
                     dealershipName: 'Prestige Motors',
@@ -181,7 +182,7 @@ const Login: React.FC<LoginProps> = ({ onLogin, onRegister, onNavigate, onForgot
         {isLogin && (
           <div className="flex items-center justify-between">
             <div className="flex items-center">
-              <input id="remember-me" name="remember-me" type="checkbox" checked={rememberMe} onChange={(e) => setRememberMe(e.target.checked)} className="h-4 w-4 border-brand-gray-300 rounded" style={{ accentcolor: '#FF6B35' }} />
+              <input id="remember-me" name="remember-me" type="checkbox" checked={rememberMe} onChange={(e) => setRememberMe(e.target.checked)} className="h-4 w-4 border-brand-gray-300 rounded" style={{ accentColor: '#FF6B35' }} />
               <label htmlFor="remember-me" className="ml-2 block text-sm text-brand-gray-900 dark:text-brand-gray-300">Remember me</label>
             </div>
             <div className="text-sm">

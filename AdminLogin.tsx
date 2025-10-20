@@ -35,6 +35,7 @@ const AdminLogin: React.FC<AdminLoginProps> = ({ onLogin, onNavigate }) => {
                 email: 'admin@test.com',
                 mobile: '111-222-3333',
                 role: 'admin',
+                location: 'Bangalore',
                 status: 'active',
                 createdAt: new Date(Date.now() - 100 * 24 * 60 * 60 * 1000).toISOString(),
                 avatarUrl: 'https://i.pravatar.cc/150?u=admin@test.com',

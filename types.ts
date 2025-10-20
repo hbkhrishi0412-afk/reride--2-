@@ -8,7 +8,9 @@ export enum VehicleCategory {
   FOUR_WHEELER = 'four-wheeler',
   TWO_WHEELER = 'two-wheeler',
   THREE_WHEELER = 'three-wheeler',
-  COMMERCIAL = 'commercial'
+  COMMERCIAL = 'commercial',
+  FARM = 'farm',
+  CONSTRUCTION = 'construction'
 }
 
 export type BadgeType = 'verified' | 'top_seller' | 'high_rating';
@@ -85,6 +87,7 @@ export interface Vehicle {
   rto: string;
   city: string;
   state: string; // 2-letter state code
+  location: string; // Full location string
   noOfOwners: number;
   displacement: string; // e.g., "1086 cc"
   groundClearance: string; // e.g., "165 mm"
@@ -94,7 +97,7 @@ export interface Vehicle {
     fixesDone: string[];
   };
   certifiedInspection?: CertifiedInspection | null;
-  certificationStatus?: 'none' | 'requested' | 'approved' | 'rejected';
+  certificationStatus?: 'none' | 'requested' | 'approved' | 'rejected' | 'certified';
   // New features
   videoUrl?: string;
   serviceRecords?: ServiceRecord[];
@@ -148,10 +151,6 @@ export interface Vehicle {
   // ENHANCED: Additional Fields (from new features)
   activeBoosts?: ActiveBoost[];
   hideExactLocation?: boolean;
-  listingExpiresAt?: string;
-  listingAutoRenew?: boolean;
-  listingRenewalCount?: number;
-  listingLastRefreshed?: string;
 }
 
 export type SubscriptionPlan = 'free' | 'pro' | 'premium';
@@ -174,6 +173,7 @@ export interface User {
   password?: string;
   mobile: string;
   role: 'seller' | 'customer' | 'admin';
+  location: string;
   status: 'active' | 'inactive';
   createdAt: string; // ISO String
   avatarUrl?: string;
@@ -223,9 +223,6 @@ export interface User {
   
   // ENHANCED: Trust & Safety
   verificationStatus?: VerificationStatus;
-  trustScore?: number; // 0-100
-  responseTimeMinutes?: number;
-  responseRate?: number; // 0-100
 }
 
 export interface ChatMessage {
@@ -267,7 +264,7 @@ export interface Conversation {
 export interface Toast {
   id: number;
   message: string;
-  type: 'success' | 'error' | 'info';
+  type: 'success' | 'error' | 'info' | 'warning';
 }
 
 export enum View {
@@ -306,6 +303,16 @@ export interface SearchFilters {
     minPrice?: number;
     maxPrice?: number;
     features?: string[];
+    minYear?: number;
+    maxYear?: number;
+    year?: number;
+    minMileage?: number;
+    maxMileage?: number;
+    category?: VehicleCategory;
+    fuelType?: string;
+    transmission?: string;
+    location?: string;
+    selectedFeatures?: string[];
 }
 
 export interface PlatformSettings {
@@ -429,6 +436,7 @@ export interface SortOption {
 export interface PaymentRequest {
   id: string;
   sellerEmail: string;
+  sellerName?: string;
   planId: SubscriptionPlan;
   amount: number;
   status: 'pending' | 'approved' | 'rejected';

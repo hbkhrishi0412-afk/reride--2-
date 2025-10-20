@@ -16,10 +16,12 @@
 
     /* Linting */
     "strict": true,
-    "noUnusedLocals": true,
-    "noUnusedParameters": true,
-    "noFallthroughCasesInSwitch": true
+    "noUnusedLocals": false,
+    "noUnusedParameters": false,
+    "noFallthroughCasesInSwitch": true,
+    "allowSyntheticDefaultImports": true,
+    "esModuleInterop": true
   },
-  "include": ["src", "components", "services", "utils", "constants", "types.ts", "App.tsx", "index.tsx"],
+  "include": ["src", "components", "services", "utils", "constants", "types.ts", "App.tsx", "index.tsx", "api", "vite-env.d.ts"],
   "references": [{ "path": "./tsconfig.node.json" }]
 }

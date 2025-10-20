@@ -157,6 +157,37 @@ const Home: React.FC<HomeProps> = ({ onSearch, onSelectCategory, featuredVehicle
     const [quickViewVehicle, setQuickViewVehicle] = useState<Vehicle | null>(null);
     const [recentlyViewed, setRecentlyViewed] = useState<Vehicle[]>([]);
 
+    // Analytics tracking functions
+    const trackFeaturedCarsClick = (vehicleId: number, vehicleMake: string, vehicleModel: string) => {
+        console.log('Analytics: Featured Cars click', { 
+            vehicleId, 
+            vehicleMake, 
+            vehicleModel, 
+            section: 'premium_spotlight',
+            timestamp: new Date().toISOString()
+        });
+        // TODO: Integrate with your analytics service (Google Analytics, Mixpanel, etc.)
+    };
+
+    const trackPopularCarsClick = (vehicleId: number, vehicleMake: string, vehicleModel: string) => {
+        console.log('Analytics: Popular Cars click', { 
+            vehicleId, 
+            vehicleMake, 
+            vehicleModel, 
+            section: 'featured_badge',
+            timestamp: new Date().toISOString()
+        });
+        // TODO: Integrate with your analytics service (Google Analytics, Mixpanel, etc.)
+    };
+
+    const trackSectionView = (sectionName: string) => {
+        console.log('Analytics: Section view', { 
+            section: sectionName,
+            timestamp: new Date().toISOString()
+        });
+        // TODO: Integrate with your analytics service
+    };
+
     useEffect(() => {
         const observer = new IntersectionObserver((entries) => {
           entries.forEach(entry => {
@@ -371,35 +402,54 @@ const Home: React.FC<HomeProps> = ({ onSearch, onSelectCategory, featuredVehicle
                 return null;
             })()}
 
-            {/* Featured Vehicles Section */}
-            <section className="py-16 bg-white">
+            {/* Featured Cars Section - Premium Spotlight */}
+            <section 
+                className="py-16 bg-gradient-to-br from-blue-50 to-indigo-50 relative overflow-hidden"
+                onMouseEnter={() => trackSectionView('featured_cars')}
+            >
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="flex justify-between items-center mb-8">
-                        <h2 className="spinny-section-header" style={{ color: '#1A1A1A' }}>Featured Cars</h2>
+                        <div className="flex items-center gap-3">
+                            <h2 className="text-3xl font-bold text-gray-900 flex items-center gap-2">
+                                <span className="text-orange-500">🔥</span>
+                                Featured Cars
+                                <span className="bg-gradient-to-r from-orange-400 to-red-500 text-white text-xs px-2 py-1 rounded-full font-semibold">
+                                    SPOTLIGHT
+                                </span>
+                            </h2>
+                        </div>
                         <button 
                             onClick={() => onNavigate(ViewEnum.USED_CARS)}
-                            className="btn-brand-secondary"
+                            className="btn-brand-secondary bg-white border-2 border-blue-500 text-blue-600 hover:bg-blue-50"
                         >
                             View All
                         </button>
                     </div>
+                    <p className="text-gray-600 mb-8 text-center">Premium spotlight - our highest quality vehicles</p>
                     
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
                         {(featuredVehicles || []).slice(0, 8).map((vehicle) => (
-                            <FeaturedVehicleCard
+                            <div 
                                 key={vehicle.id}
-                                vehicle={vehicle}
-                                onSelectVehicle={onSelectVehicle}
-                                onToggleCompare={onToggleCompare}
-                                comparisonList={comparisonList}
-                                onToggleWishlist={onToggleWishlist}
-                                wishlist={wishlist}
-                                onViewSellerProfile={onViewSellerProfile}
-                                onQuickView={setQuickViewVehicle}
-                            />
+                                onClick={() => trackFeaturedCarsClick(vehicle.id, vehicle.make, vehicle.model)}
+                            >
+                                <FeaturedVehicleCard
+                                    vehicle={vehicle}
+                                    onSelectVehicle={onSelectVehicle}
+                                    onToggleCompare={onToggleCompare}
+                                    comparisonList={comparisonList}
+                                    onToggleWishlist={onToggleWishlist}
+                                    wishlist={wishlist}
+                                    onViewSellerProfile={onViewSellerProfile}
+                                    onQuickView={setQuickViewVehicle}
+                                />
+                            </div>
                         ))}
                     </div>
                 </div>
+                {/* Decorative elements */}
+                <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-orange-200 to-red-200 rounded-full opacity-20 animate-pulse"></div>
+                <div className="absolute bottom-0 left-0 w-24 h-24 bg-gradient-to-tr from-blue-200 to-indigo-200 rounded-full opacity-20 animate-pulse" style={{animationDelay: '1s'}}></div>
             </section>
 
             {/* Browse by City Section - NEW FEATURE */}
@@ -500,23 +550,39 @@ const Home: React.FC<HomeProps> = ({ onSearch, onSelectCategory, featuredVehicle
                 </section>
             )}
 
-            {/* Featured Listings */}
-            <section className="py-16 bg-white">
+            {/* Popular Cars Section */}
+            <section 
+                className="py-16 bg-gray-50"
+                onMouseEnter={() => trackSectionView('popular_cars')}
+            >
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                    <h2 className="text-3xl font-bold text-center mb-12 text-spinny-text-dark">Featured Collection</h2>
+                    <div className="flex justify-between items-center mb-8">
+                        <div className="text-center w-full">
+                            <h2 className="text-3xl font-bold mb-2 text-spinny-text-dark flex items-center justify-center gap-2">
+                                <span className="text-yellow-500">⭐</span>
+                                Popular Cars
+                                <span className="text-yellow-500">⭐</span>
+                            </h2>
+                            <p className="text-gray-600 text-sm">Trending now - what other buyers are choosing</p>
+                        </div>
+                    </div>
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                        {(featuredVehicles || []).map(vehicle => (
-                            <FeaturedVehicleCard
-                                key={vehicle.id} 
-                                vehicle={vehicle} 
-                                onSelectVehicle={onSelectVehicle} 
-                                onToggleCompare={onToggleCompare} 
-                                comparisonList={comparisonList} 
-                                onToggleWishlist={onToggleWishlist} 
-                                wishlist={wishlist} 
-                                onViewSellerProfile={onViewSellerProfile}
-                                onQuickView={setQuickViewVehicle}
-                            />
+                        {(featuredVehicles || []).slice(8, 20).map(vehicle => (
+                            <div 
+                                key={vehicle.id}
+                                onClick={() => trackPopularCarsClick(vehicle.id, vehicle.make, vehicle.model)}
+                            >
+                                <FeaturedVehicleCard
+                                    vehicle={vehicle} 
+                                    onSelectVehicle={onSelectVehicle} 
+                                    onToggleCompare={onToggleCompare} 
+                                    comparisonList={comparisonList} 
+                                    onToggleWishlist={onToggleWishlist} 
+                                    wishlist={wishlist} 
+                                    onViewSellerProfile={onViewSellerProfile}
+                                    onQuickView={setQuickViewVehicle}
+                                />
+                            </div>
                         ))}
                     </div>
                      <div className="text-center mt-12">

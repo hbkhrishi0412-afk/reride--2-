@@ -115,6 +115,7 @@ const AppContent: React.FC = () => {
     onUpdateFaq,
     onDeleteFaq,
     onCertificationApproval,
+    onOfferResponse,
   } = useApp();
 
   const renderView = () => {
@@ -356,11 +357,11 @@ const AppContent: React.FC = () => {
             onDeleteVehicle={() => {}}
             onMarkAsSold={() => {}}
             conversations={conversations}
-            onSellerSendMessage={() => {}}
-            onMarkConversationAsReadBySeller={() => {}}
+            onSellerSendMessage={(conversationId, messageText, type, payload) => sendMessage(conversationId, messageText)}
+            onMarkConversationAsReadBySeller={(conversationId) => markAsRead(conversationId)}
             typingStatus={typingStatus}
-            onUserTyping={() => {}}
-            onMarkMessagesAsRead={() => {}}
+            onUserTyping={(conversationId, userRole) => toggleTyping(conversationId, true)}
+            onMarkMessagesAsRead={(conversationId, readerRole) => markAsRead(conversationId)}
             onUpdateSellerProfile={() => {}}
             vehicleData={vehicleData}
             onFeatureListing={() => {}}
@@ -517,10 +518,33 @@ const AppContent: React.FC = () => {
         return currentUser ? (
           <CustomerInbox 
             conversations={conversations}
-            onSendMessage={(vehicleId, messageText) => {
+            onSendMessage={(vehicleId, messageText, type, payload) => {
               const conversation = conversations.find(c => c.vehicleId === vehicleId);
               if (conversation) {
-                sendMessage(conversation.id, messageText);
+                // Handle offer messages with proper structure
+                if (type === 'offer' && payload) {
+                  setConversations(prev => {
+                    const updated = prev.map(conv => 
+                      conv.id === conversation.id ? {
+                        ...conv,
+                        messages: [...conv.messages, {
+                          id: Date.now(),
+                          sender: 'user' as const,
+                          text: messageText,
+                          timestamp: new Date().toISOString(),
+                          isRead: false,
+                          type: 'offer' as const,
+                          payload: payload
+                        }],
+                        lastMessageAt: new Date().toISOString()
+                      } : conv
+                    );
+                    return updated;
+                  });
+                } else {
+                  // Handle regular text messages
+                  sendMessage(conversation.id, messageText);
+                }
               }
             }}
             onMarkAsRead={markAsRead}
@@ -531,8 +555,9 @@ const AppContent: React.FC = () => {
             }}
             onMarkMessagesAsRead={markAsRead}
             onFlagContent={(type, id, _reason) => flagContent(type, id)}
-            onOfferResponse={(_conversationId: string, _messageId: number, response: 'accepted' | 'rejected' | 'countered', _counterPrice?: number) => {
-              addToast(`Offer ${response}`, 'success');
+            onOfferResponse={(conversationId, messageId, response, counterPrice) => {
+              // Handle offer responses using the AppProvider function
+              onOfferResponse(conversationId, messageId, response, counterPrice);
             }}
           />
         ) : (
@@ -712,8 +737,24 @@ const AppContent: React.FC = () => {
   };
 
   const handleNotificationClick = (notification: any) => {
-    // Handle notification click
     console.log('Notification clicked:', notification);
+    
+    // Navigate based on notification type
+    if (notification.targetType === 'conversation') {
+      // Find the conversation
+      const conversation = conversations.find(conv => conv.id === notification.targetId);
+      if (conversation) {
+        // Set the active chat
+        setActiveChat(conversation);
+        
+        // Navigate to appropriate dashboard based on user role
+        if (currentUser?.role === 'seller') {
+          navigate(ViewEnum.SELLER_DASHBOARD);
+        } else if (currentUser?.role === 'customer') {
+          navigate(ViewEnum.BUYER_DASHBOARD);
+        }
+      }
+    }
   };
 
   const handleMarkNotificationsAsRead = (ids: number[]) => {
@@ -739,7 +780,7 @@ const AppContent: React.FC = () => {
         compareCount={comparisonList.length}
         wishlistCount={wishlist.length}
         inboxCount={conversations.filter(c => !c.isReadByCustomer).length}
-        notifications={notifications}
+        notifications={notifications.filter(n => n.recipientEmail === currentUser?.email)}
         onNotificationClick={handleNotificationClick}
         onMarkNotificationsAsRead={handleMarkNotificationsAsRead}
         onMarkAllNotificationsAsRead={handleMarkAllNotificationsAsRead}

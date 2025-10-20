@@ -451,10 +451,12 @@ const BuyerDashboard: React.FC<BuyerDashboardProps> = ({
                         vehicle={vehicle}
                         onSelect={onSelectVehicle}
                         onToggleCompare={onToggleCompare}
-                        comparisonList={comparisonList}
+                        isSelectedForCompare={comparisonList.includes(vehicle.id)}
                         onToggleWishlist={onToggleWishlist}
-                        wishlist={wishlist}
+                        isInWishlist={wishlist.includes(vehicle.id)}
+                        isCompareDisabled={comparisonList.length >= 3 && !comparisonList.includes(vehicle.id)}
                         onViewSellerProfile={onViewSellerProfile}
+                        onQuickView={onSelectVehicle}
                       />
                     ))}
                   </div>

@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Populate Chat Data</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .success { background-color: #d4edda; border: 1px solid #c3e6cb; padding: 15px; border-radius: 5px; margin: 10px 0; }
+        .error { background-color: #f8d7da; border: 1px solid #f5c6cb; padding: 15px; border-radius: 5px; margin: 10px 0; }
+        button { padding: 10px 15px; margin: 5px; background: #007bff; color: white; border: none; border-radius: 3px; cursor: pointer; }
+        button:hover { background: #0056b3; }
+        pre { background: #f8f9fa; padding: 10px; border-radius: 3px; overflow-x: auto; }
+    </style>
+</head>
+<body>
+    <h1>Populate Chat Data</h1>
+    
+    <div id="result"></div>
+    
+    <button onclick="populateChatData()">Populate Chat Data</button>
+    <button onclick="checkChatData()">Check Chat Data</button>
+    <button onclick="clearChatData()">Clear Chat Data</button>
+
+    <script>
+        const sampleConversations = [
+          {
+            id: "conv_test_1",
+            customerId: "customer@test.com",
+            customerName: "John Doe",
+            sellerId: "seller@test.com",
+            vehicleId: 1,
+            vehicleName: "2024 Mahindra Thar LX",
+            vehiclePrice: 1500000,
+            messages: [
+              {
+                id: 1,
+                sender: "user",
+                text: "Hi, I'm interested in this Mahindra Thar. Is it still available?",
+                timestamp: new Date(Date.now() - 3600000).toISOString(),
+                isRead: true,
+                type: "text"
+              },
+              {
+                id: 2,
+                sender: "seller",
+                text: "Yes, it's still available! The vehicle is in excellent condition with only 5,000 km on the odometer.",
+                timestamp: new Date(Date.now() - 3500000).toISOString(),
+                isRead: true,
+                type: "text"
+              },
+              {
+                id: 3,
+                sender: "user",
+                text: "That sounds great! Can I schedule a test drive?",
+                timestamp: new Date(Date.now() - 3400000).toISOString(),
+                isRead: true,
+                type: "text"
+              },
+              {
+                id: 4,
+                sender: "seller",
+                text: "Absolutely! I can arrange a test drive for you. What time works best for you?",
+                timestamp: new Date(Date.now() - 3300000).toISOString(),
+                isRead: false,
+                type: "text"
+              }
+            ],
+            lastMessageAt: new Date(Date.now() - 3300000).toISOString(),
+            isReadBySeller: false,
+            isReadByCustomer: true,
+            isFlagged: false
+          }
+        ];
+
+        function populateChatData() {
+            try {
+                localStorage.setItem('reRideConversations', JSON.stringify(sampleConversations));
+                document.getElementById('result').innerHTML = `
+                    <div class="success">
+                        <h3>✅ Chat Data Populated Successfully!</h3>
+                        <p>Created ${sampleConversations.length} conversations with sample messages.</p>
+                        <p>You can now test the chat functionality in the main application.</p>
+                    </div>
+                `;
+            } catch (error) {
+                document.getElementById('result').innerHTML = `
+                    <div class="error">
+                        <h3>❌ Error</h3>
+                        <p>${error.message}</p>
+                    </div>
+                `;
+            }
+        }
+
+        function checkChatData() {
+            try {
+                const conversations = localStorage.getItem('reRideConversations');
+                if (conversations) {
+                    const parsed = JSON.parse(conversations);
+                    document.getElementById('result').innerHTML = `
+                        <div class="success">
+                            <h3>✅ Chat Data Found!</h3>
+                            <p>Found ${parsed.length} conversations</p>
+                            <pre>${JSON.stringify(parsed, null, 2)}</pre>
+                        </div>
+                    `;
+                } else {
+                    document.getElementById('result').innerHTML = `
+                        <div class="error">
+                            <h3>❌ No Chat Data Found</h3>
+                            <p>No conversations exist in localStorage</p>
+                        </div>
+                    `;
+                }
+            } catch (error) {
+                document.getElementById('result').innerHTML = `
+                    <div class="error">
+                        <h3>❌ Error</h3>
+                        <p>${error.message}</p>
+                    </div>
+                `;
+            }
+        }
+
+        function clearChatData() {
+            try {
+                localStorage.removeItem('reRideConversations');
+                document.getElementById('result').innerHTML = `
+                    <div class="success">
+                        <h3>✅ Chat Data Cleared!</h3>
+                        <p>All conversations have been removed from localStorage.</p>
+                    </div>
+                `;
+            } catch (error) {
+                document.getElementById('result').innerHTML = `
+                    <div class="error">
+                        <h3>❌ Error</h3>
+                        <p>${error.message}</p>
+                    </div>
+                `;
+            }
+        }
+
+        // Auto-check on page load
+        window.onload = function() {
+            checkChatData();
+        };
+    </script>
+</body>
+</html>

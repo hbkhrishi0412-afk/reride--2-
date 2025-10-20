@@ -14,7 +14,7 @@ export interface LoadingState {
 export class LoadingManager {
   private static instance: LoadingManager;
   private loadingStates: Map<string, LoadingState> = new Map();
-  private timeouts: Map<string, NodeJS.Timeout> = new Map();
+  private timeouts: Map<string, ReturnType<typeof setTimeout>> = new Map();
   
   // Default timeout for loading operations (in milliseconds)
   private readonly DEFAULT_TIMEOUT = 10000; // 10 seconds

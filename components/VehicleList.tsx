@@ -109,7 +109,7 @@ const VehicleList: React.FC<VehicleListProps> = ({ vehicles, onSelectVehicle, is
   const [isFeaturesOpen, setIsFeaturesOpen] = useState(false);
   const [sortOrder, setSortOrder] = useState('YEAR_DESC');
   const [quickViewVehicle, setQuickViewVehicle] = useState<Vehicle | null>(null);
-  const [categoryFilter, setCategoryFilter] = useState<VehicleCategory | 'ALL'>(initialCategory);
+  const [categoryFilter, setCategoryFilter] = useState<VehicleCategory | 'ALL'>(initialCategory || 'ALL');
   const [currentPage, setCurrentPage] = useState(1);
   const [isDesktopFilterVisible, setIsDesktopFilterVisible] = useState(true);
   const [viewMode, setViewMode] = useState<'grid' | 'tile'>('grid');
@@ -126,7 +126,7 @@ const VehicleList: React.FC<VehicleListProps> = ({ vehicles, onSelectVehicle, is
     yearFilter: '0',
     colorFilter: '',
     stateFilter: '',
-    selectedFeatures: [],
+    selectedFeatures: [] as string[],
     featureSearch: ''
   });
   const [isMobileFeaturesOpen, setIsMobileFeaturesOpen] = useState(false);
@@ -207,7 +207,8 @@ const VehicleList: React.FC<VehicleListProps> = ({ vehicles, onSelectVehicle, is
       try {
         const { loadLocationData: loadLoc } = await import('../utils/dataLoaders');
         const locationData = await loadLoc();
-        const { INDIAN_STATES, FUEL_TYPES } = await locationData;
+        const { INDIAN_STATES } = await locationData;
+        const { FUEL_TYPES } = await import('../constants');
         
         setIndianStates(INDIAN_STATES);
         setFuelTypes(FUEL_TYPES);
@@ -354,11 +355,27 @@ const VehicleList: React.FC<VehicleListProps> = ({ vehicles, onSelectVehicle, is
   };
   
   const handleResetFilters = () => {
-    setAiSearchQuery(''); setCategoryFilter('ALL'); setMakeFilter(''); setModelFilter('');
-    setPriceRange({ min: MIN_PRICE, max: MAX_PRICE }); setYearFilter('0'); setColorFilter(''); setStateFilter('');
-    setSelectedFeatures([]); setFeatureSearch(''); setSortOrder('YEAR_DESC'); onClearCompare(); setCurrentPage(1);
-    setMileageRange({ min: MIN_MILEAGE, max: MAX_MILEAGE }); setFuelTypeFilter('');
+    setAiSearchQuery(''); 
+    setCategoryFilter('ALL'); 
+    setMakeFilter(''); 
+    setModelFilter('');
+    setPriceRange({ min: MIN_PRICE, max: MAX_PRICE }); 
+    setYearFilter('0'); 
+    setColorFilter(''); 
+    setStateFilter('');
+    setSelectedFeatures([]); 
+    setFeatureSearch(''); 
+    setSortOrder('YEAR_DESC'); 
+    onClearCompare(); 
+    setCurrentPage(1);
+    setMileageRange({ min: MIN_MILEAGE, max: MAX_MILEAGE }); 
+    setFuelTypeFilter('');
   };
+
+  // Reset model filter when make filter changes
+  useEffect(() => {
+    setModelFilter('');
+  }, [makeFilter]);
 
   const handleSaveSearch = () => {
     if (!currentUser) {
@@ -427,12 +444,33 @@ const VehicleList: React.FC<VehicleListProps> = ({ vehicles, onSelectVehicle, is
             filters: { categoryFilter, makeFilter, modelFilter, priceRange, mileageRange, fuelTypeFilter, yearFilter, colorFilter, stateFilter, selectedFeatures }
           };
           if (!matchesCategory || !matchesMake || !matchesModel || !matchesPrice || !matchesMileage || !matchesFuelType || !matchesYear || !matchesColor || !matchesState || !matchesFeatures) {
-            console.log('Filter debug:', debugInfo);
+            console.log('Filter debug - Vehicle filtered out:', debugInfo);
           }
         }
         
-        return matchesCategory && matchesMake && matchesModel && matchesPrice && matchesYear && matchesFeatures && matchesColor && matchesState && matchesMileage && matchesFuelType;
+        // Apply all filters with AND logic
+        return matchesCategory && matchesMake && matchesModel && matchesPrice && matchesMileage && matchesFuelType && matchesYear && matchesColor && matchesState && matchesFeatures;
     });
+
+    // Debug: Log filter results
+    if (process.env.NODE_ENV === 'development') {
+      console.log('Filter Results:', {
+        totalVehicles: sourceVehicles.length,
+        filteredCount: filtered.length,
+        activeFilters: {
+          category: categoryFilter,
+          make: makeFilter,
+          model: modelFilter,
+          priceRange,
+          mileageRange,
+          fuelType: fuelTypeFilter,
+          year: yearFilter,
+          color: colorFilter,
+          state: stateFilter,
+          features: selectedFeatures
+        }
+      });
+    }
 
     return [...filtered].sort((a, b) => {
         // Priority 1: Homepage Spotlight (highest priority)
@@ -690,7 +728,7 @@ const VehicleList: React.FC<VehicleListProps> = ({ vehicles, onSelectVehicle, is
                     <div className="absolute top-full mt-2 w-full bg-white dark:bg-brand-gray-700 rounded-lg shadow-soft-xl border border-gray-200-200 dark:border-gray-200-300 z-20 overflow-hidden animate-fade-in">
                         <div className="p-2"><input ref={featuresSearchInputRef} type="text" placeholder="Search features..." value={isMobile ? tempFilters.featureSearch : featureSearch} onChange={e => { isMobile ? setTempFilters(p => ({...p, featureSearch: e.target.value})) : setFeatureSearch(e.target.value) }} className="block w-full p-2 border border-gray-200-300 dark:border-gray-200-500 rounded-md bg-white text-sm focus:outline-none" onFocus={(e) => { e.currentTarget.style.borderColor = 'var(--spinny-orange)'; e.currentTarget.style.boxShadow = '0 0 0 2px rgba(255, 107, 53, 0.1)'; }} onBlur={(e) => { e.currentTarget.style.borderColor = ''; e.currentTarget.style.boxShadow = ''; }} /></div>
                         <div className="max-h-48 overflow-y-auto">
-                            {(isMobile ? tempFilteredFeatures : filteredFeatures).map(feature => ( <label key={feature} className="flex items-center space-x-3 cursor-pointer group p-3 transition-colors hover:bg-spinny-off-white dark:hover:bg-brand-gray-600"><input type="checkbox" checked={state.selectedFeatures.includes(feature)} onChange={() => handleFeatureToggleLocal(feature)} className="h-4 w-4 rounded border-gray-200-300 dark:border-gray-200-500 bg-transparent" style={{ accentcolor: '#FF6B35' }} /><span className="text-sm text-spinny-text-dark dark:text-brand-gray-200">{feature}</span></label> ))}
+                            {(isMobile ? tempFilteredFeatures : filteredFeatures).map(feature => ( <label key={feature} className="flex items-center space-x-3 cursor-pointer group p-3 transition-colors hover:bg-spinny-off-white dark:hover:bg-brand-gray-600"><input type="checkbox" checked={state.selectedFeatures.includes(feature)} onChange={() => handleFeatureToggleLocal(feature)} className="h-4 w-4 rounded border-gray-200-300 dark:border-gray-200-500 bg-transparent" style={{ accentColor: '#FF6B35' }} /><span className="text-sm text-spinny-text-dark dark:text-brand-gray-200">{feature}</span></label> ))}
                             {(isMobile ? tempFilteredFeatures.length === 0 : filteredFeatures.length === 0) && ( <p className="p-3 text-sm text-center text-spinny-text dark:text-spinny-text">No features found.</p> )}
                         </div>
                     </div>

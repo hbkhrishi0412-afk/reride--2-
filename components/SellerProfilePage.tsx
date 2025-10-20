@@ -59,7 +59,7 @@ const SellerProfilePage: React.FC<SellerProfilePageProps> = ({ seller, vehicles,
                 <img 
                     src={seller.logoUrl || `https://i.pravatar.cc/150?u=${seller.email}`} 
                     alt={`${seller.dealershipName || seller.name} logo`} 
-                    className="w-32 h-32 rounded-full object-cover border-4 shadow-lg" style={{ bordercolor: '#1E88E5' }}
+                    className="w-32 h-32 rounded-full object-cover border-4 shadow-lg" style={{ borderColor: '#1E88E5' }}
                 />
                 <div>
                     <h1 className="text-4xl font-extrabold text-spinny-text-dark dark:text-spinny-text-dark">{seller.dealershipName || seller.name}</h1>

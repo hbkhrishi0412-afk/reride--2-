@@ -17,7 +17,7 @@ export const planService = {
 
     // Get custom plan details
     getCustomPlanDetails: (planId: string): PlanDetails | null => {
-        const updates = planUpdates[planId];
+        const updates = planUpdates[planId as SubscriptionPlan];
         return updates ? { ...updates, id: planId } as PlanDetails : null;
     },
 
@@ -41,7 +41,7 @@ export const planService = {
 
     // Update plan details
     updatePlan: (planId: SubscriptionPlan | string, updates: Partial<PlanDetails>): void => {
-        planUpdates[planId] = { ...planUpdates[planId], ...updates };
+        planUpdates[planId as SubscriptionPlan] = { ...planUpdates[planId as SubscriptionPlan], ...updates };
         
         // Save to localStorage for persistence
         localStorage.setItem('planUpdates', JSON.stringify(planUpdates));
@@ -52,7 +52,7 @@ export const planService = {
         const planId = `custom_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
         const newPlan = { ...planData, id: planId };
         
-        planUpdates[planId] = newPlan;
+        planUpdates[planId as SubscriptionPlan] = newPlan;
         localStorage.setItem('planUpdates', JSON.stringify(planUpdates));
         
         return planId;
@@ -66,7 +66,7 @@ export const planService = {
             return false;
         }
         
-        delete planUpdates[planId];
+        delete planUpdates[planId as SubscriptionPlan];
         localStorage.setItem('planUpdates', JSON.stringify(planUpdates));
         return true;
     },

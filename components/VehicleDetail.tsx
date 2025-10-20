@@ -306,8 +306,8 @@ export const VehicleDetail: React.FC<VehicleDetailProps> = ({ vehicle, onBack: o
                   <div className="lg:col-span-2 space-y-4">
                     {safeVehicle.videoUrl && (
                       <div className="flex space-x-2 border-b-2 border-gray-200-200 dark:border-gray-200-200">
-                        <button onClick={() => setActiveMediaTab('images')} className={`py-2 px-4 font-semibold ${activeMediaTab === 'images' ? 'border-b-2' : 'text-spinny-text'}`} style={activeMediaTab === 'images' ? { bordercolor: '#FF6B35', color: '#FF6B35' } : undefined}>Images</button>
-                        <button onClick={() => setActiveMediaTab('video')} className={`py-2 px-4 font-semibold ${activeMediaTab === 'video' ? 'border-b-2' : 'text-spinny-text'}`} style={activeMediaTab === 'video' ? { bordercolor: '#FF6B35', color: '#FF6B35' } : undefined}>Video</button>
+                        <button onClick={() => setActiveMediaTab('images')} className={`py-2 px-4 font-semibold ${activeMediaTab === 'images' ? 'border-b-2' : 'text-spinny-text'}`} style={activeMediaTab === 'images' ? { borderColor: '#FF6B35', color: '#FF6B35' } : undefined}>Images</button>
+                        <button onClick={() => setActiveMediaTab('video')} className={`py-2 px-4 font-semibold ${activeMediaTab === 'video' ? 'border-b-2' : 'text-spinny-text'}`} style={activeMediaTab === 'video' ? { borderColor: '#FF6B35', color: '#FF6B35' } : undefined}>Video</button>
                       </div>
                     )}
                     {activeMediaTab === 'images' ? (
@@ -324,7 +324,7 @@ export const VehicleDetail: React.FC<VehicleDetailProps> = ({ vehicle, onBack: o
                         {safeVehicle.images.length > 1 && (
                             <div className="flex space-x-2 overflow-x-auto pb-2 -mt-2">
                                 {getValidImages(safeVehicle.images).map((img, index) => (
-                                    <img key={index} src={getSafeImageSrc(img)} alt={`Thumbnail ${index + 1}`} className={`cursor-pointer rounded-md border-2 h-20 w-28 object-cover flex-shrink-0 ${currentIndex === index ? '' : 'border-transparent'} transition`} style={currentIndex === index ? { bordercolor: '#FF6B35' } : undefined} onMouseEnter={(e) => currentIndex !== index && (e.currentTarget.style.borderColor = 'var(--spinny-blue)')} onMouseLeave={(e) => currentIndex !== index && (e.currentTarget.style.borderColor = '')} onClick={() => setCurrentIndex(index)} />
+                                    <img key={index} src={getSafeImageSrc(img)} alt={`Thumbnail ${index + 1}`} className={`cursor-pointer rounded-md border-2 h-20 w-28 object-cover flex-shrink-0 ${currentIndex === index ? '' : 'border-transparent'} transition`} style={currentIndex === index ? { borderColor: '#FF6B35' } : undefined} onMouseEnter={(e) => currentIndex !== index && (e.currentTarget.style.borderColor = 'var(--spinny-blue)')} onMouseLeave={(e) => currentIndex !== index && (e.currentTarget.style.borderColor = '')} onClick={() => setCurrentIndex(index)} />
                                 ))}
                             </div>
                         )}
@@ -442,7 +442,7 @@ export const VehicleDetail: React.FC<VehicleDetailProps> = ({ vehicle, onBack: o
                              <div>
                                 <h4 className="text-lg font-semibold text-spinny-text-dark dark:text-spinny-text-dark mb-4">AI Expert Analysis</h4>
                                 {isGeneratingProsCons ? (
-                                    <div className="flex items-center gap-2 text-spinny-text"><div className="w-5 h-5 border-2 border-dashed rounded-full animate-spin" style={{ bordercolor: '#FF6B35' }}></div> Generating...</div>
+                                    <div className="flex items-center gap-2 text-spinny-text"><div className="w-5 h-5 border-2 border-dashed rounded-full animate-spin" style={{ borderColor: '#FF6B35' }}></div> Generating...</div>
                                 ) : prosAndCons ? (
                                     <div className="grid grid-cols-2 gap-4">
                                         <div>

@@ -18,19 +18,31 @@ const PricingPage: React.FC<PricingPageProps> = ({ currentUser, onSelectPlan }) 
 
     // Load plans from service
     useEffect(() => {
-        setPlans(planService.getAllPlans());
+        const loadPlans = async () => {
+            try {
+                const plansData = await planService.getAllPlans();
+                setPlans(plansData);
+            } catch (error) {
+                console.error('Failed to load plans:', error);
+            }
+        };
+        loadPlans();
     }, []);
 
-    const handlePlanSelect = (planId: SubscriptionPlan) => {
+    const handlePlanSelect = async (planId: SubscriptionPlan) => {
         if (planId === 'free') {
             // Free plan - direct selection
             onSelectPlan(planId);
         } else {
             // Paid plan - show payment modal
             setSelectedPlan(planId);
-            const planDetails = planService.getPlanDetails(planId);
-            setSelectedAmount(planDetails.price);
-            setShowPaymentModal(true);
+            try {
+                const planDetails = await planService.getPlanDetails(planId);
+                setSelectedAmount(planDetails.price);
+                setShowPaymentModal(true);
+            } catch (error) {
+                console.error('Failed to get plan details:', error);
+            }
         }
     };
 
@@ -54,7 +66,7 @@ const PricingPage: React.FC<PricingPageProps> = ({ currentUser, onSelectPlan }) 
                     {plans.map((plan) => (
                         <div
                             key={plan.id}
-                            className={`bg-white rounded-2xl shadow-soft-lg p-8 flex flex-col transition-transform duration-300 ${plan.isMostPopular ? 'transform lg:scale-105 border-2 shadow-glow' : ''}`} style={plan.isMostPopular ? { bordercolor: '#FF6B35' } : undefined}
+                            className={`bg-white rounded-2xl shadow-soft-lg p-8 flex flex-col transition-transform duration-300 ${plan.isMostPopular ? 'transform lg:scale-105 border-2 shadow-glow' : ''}`} style={plan.isMostPopular ? { borderColor: '#FF6B35' } : undefined}
                         >
                             {plan.isMostPopular && (
                                 <div className="absolute top-0 -translate-y-1/2 left-1/2 -translate-x-1/2">

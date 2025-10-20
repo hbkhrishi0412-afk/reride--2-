@@ -155,11 +155,11 @@ const CustomerInbox: React.FC<CustomerInboxProps> = ({ conversations, onSendMess
                                   <li key={conv.id}>
                                       <button
                                           onClick={() => handleSelectConversation(conv)}
-                                          className={`w-full text-left p-4 border-l-4 transition-colors ${selectedConv?.id === conv.id ? 'bg-spinny-off-white dark:bg-white' : 'border-transparent hover:bg-spinny-off-white dark:hover:bg-brand-gray-700'}`} style={selectedConv?.id === conv.id ? { bordercolor: '#FF6B35' } : undefined}
+                                          className={`w-full text-left p-4 border-l-4 transition-colors ${selectedConv?.id === conv.id ? 'bg-spinny-off-white dark:bg-white' : 'border-transparent hover:bg-spinny-off-white dark:hover:bg-brand-gray-700'}`} style={selectedConv?.id === conv.id ? { borderColor: '#FF6B35' } : undefined}
                                       >
                                           <div className="flex justify-between items-center mb-1">
                                               <p className="font-bold text-spinny-text-dark dark:text-spinny-text-dark truncate">{conv.vehicleName}</p>
-                                              {!conv.isReadByCustomer && <div className="w-2.5 h-2.5 rounded-full flex-shrink-0 ml-2" style={{ backgroundcolor: '#FF6B35' }}></div>}
+                                              {!conv.isReadByCustomer && <div className="w-2.5 h-2.5 rounded-full flex-shrink-0 ml-2" style={{ backgroundColor: '#FF6B35' }}></div>}
                                           </div>
                                           <p className="text-sm text-brand-gray-600 dark:text-spinny-text-dark">With {getSellerName(conv.sellerId)}</p>
                                           <p className="text-xs text-gray-600 dark:text-gray-400 truncate mt-1">

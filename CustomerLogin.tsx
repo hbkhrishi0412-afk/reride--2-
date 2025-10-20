@@ -49,6 +49,7 @@ const CustomerLogin: React.FC<CustomerLoginProps> = ({ onLogin, onRegister, onNa
                     email: 'customer@test.com',
                     mobile: '555-987-6543',
                     role: 'customer',
+                    location: 'Delhi',
                     status: 'active',
                     createdAt: new Date(Date.now() - 15 * 24 * 60 * 60 * 1000).toISOString(),
                     avatarUrl: 'https://i.pravatar.cc/150?u=customer@test.com'

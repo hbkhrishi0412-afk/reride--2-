@@ -197,6 +197,7 @@ const initialFormState: Omit<Vehicle, 'id' | 'averageRating' | 'ratingCount'> = 
   rto: '',
   city: '',
   state: '',
+  location: '',
   noOfOwners: 1,
   displacement: '',
   groundClearance: '',
@@ -831,7 +832,7 @@ const VehicleForm: React.FC<VehicleFormProps> = memo(({ editingVehicle, onAddVeh
                                         <div className="space-y-2">
                                             {features.map(feature => (
                                                 <label key={feature} className="flex items-center space-x-3 cursor-pointer group">
-                                                    <input type="checkbox" checked={formData.features.includes(feature)} onChange={() => handleSuggestedFeatureToggle(feature)} className="h-4 w-4 rounded border-gray-200 dark:border-gray-500 bg-transparent" style={{ accentcolor: '#FF6B35' }} />
+                                                    <input type="checkbox" checked={formData.features.includes(feature)} onChange={() => handleSuggestedFeatureToggle(feature)} className="h-4 w-4 rounded border-gray-200 dark:border-gray-500 bg-transparent" style={{ accentColor: '#FF6B35' }} />
                                                     <span className="text-sm text-spinny-text-dark dark:text-spinny-text-dark transition-colors" onMouseEnter={(e) => e.currentTarget.style.color = 'var(--spinny-orange)'} onMouseLeave={(e) => e.currentTarget.style.color = ''}>{feature}</span>
                                                 </label>
                                             ))}
@@ -890,7 +891,7 @@ const InquiriesView: React.FC<{
             {sortedConversations.length > 0 ? sortedConversations.map(conv => (
               <div key={conv.id} onClick={() => handleSelectConversation(conv)} className="p-4 rounded-lg cursor-pointer hover:bg-brand-gray-light dark:hover:bg-white border-b dark:border-gray-200-200 flex items-center justify-between">
                 <div className="flex items-center gap-3">
-                    {!conv.isReadBySeller && <div className="w-3 h-3 rounded-full flex-shrink-0" style={{ backgroundcolor: '#FF6B35' }}></div>}
+                    {!conv.isReadBySeller && <div className="w-3 h-3 rounded-full flex-shrink-0" style={{ backgroundColor: '#FF6B35' }}></div>}
                     <div>
                       <p className="font-bold text-spinny-text-dark dark:text-spinny-text-dark">{conv.customerName} - <span className="font-normal text-spinny-text-dark dark:text-spinny-text-dark">{conv.vehicleName}</span></p>
                       <p className="text-sm text-spinny-text-dark dark:text-spinny-text-dark truncate max-w-md">{conv.messages[conv.messages.length - 1].text}</p>

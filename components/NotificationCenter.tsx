@@ -42,7 +42,7 @@ const NotificationItem: React.FC<{ notification: Notification; onClick: () => vo
     return (
         <li className="border-b border-gray-200-200 dark:border-gray-200-200 last:border-b-0">
             <button onClick={onClick} className="w-full text-left p-3 hover:bg-spinny-off-white dark:hover:bg-brand-gray-700 transition-colors flex items-start gap-3">
-                {!notification.isRead && <div className="w-2 h-2 rounded-full mt-2 flex-shrink-0" style={{ backgroundcolor: '#FF6B35' }}></div>}
+                {!notification.isRead && <div className="w-2 h-2 rounded-full mt-2 flex-shrink-0" style={{ backgroundColor: '#FF6B35' }}></div>}
                 <div className={`flex-shrink-0 ${notification.isRead ? 'ml-4' : ''}`}>
                     <NotificationIcon type={notification.targetType} />
                 </div>

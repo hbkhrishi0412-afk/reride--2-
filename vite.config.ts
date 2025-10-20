@@ -7,7 +7,8 @@ export default defineConfig({
   // Exclude API files and server-side dependencies from client bundling
   define: {
     // Prevent server-side code from being bundled in client
-    'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV || 'development')
+    'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV || 'development'),
+    global: 'globalThis'
   },
   build: {
     // Optimize chunk size - lower threshold to catch bloat earlier
@@ -16,7 +17,7 @@ export default defineConfig({
       // Exclude API files from client build
       external: (id) => {
         // Only exclude actual API files, not all files with /api/ in path
-        return id.includes('/api/') && (id.endsWith('.ts') || id.endsWith('.js'));
+        return id.includes('/api/') && (id.endsWith('.ts') || id.endsWith('.js')) && !id.includes('node_modules');
       },
       output: {
         // Aggressive code splitting for faster initial load
@@ -137,14 +138,25 @@ export default defineConfig({
     warmup: {
       clientFiles: ['./src/App.tsx', './src/components/Header.tsx', './src/components/Home.tsx']
     },
-    // No proxy needed - using Vercel serverless functions
-    // proxy: {
-    //   '/api': {
-    //     target: 'http://localhost:3000',
-    //     changeOrigin: true,
-    //     rewrite: (path) => path.replace(/^\/api/, '/api')
-    //   }
-    // }
+    // Proxy API requests to development server
+    proxy: {
+      '/api': {
+        target: 'http://localhost:3001',
+        changeOrigin: true,
+        secure: false,
+        configure: (proxy, _options) => {
+          proxy.on('error', (err, _req, _res) => {
+            console.log('proxy error', err);
+          });
+          proxy.on('proxyReq', (proxyReq, req, _res) => {
+            console.log('Sending Request to the Target:', req.method, req.url);
+          });
+          proxy.on('proxyRes', (proxyRes, req, _res) => {
+            console.log('Received Response from the Target:', proxyRes.statusCode, req.url);
+          });
+        },
+      }
+    }
   },
   // Optimize dependencies
   optimizeDeps: {

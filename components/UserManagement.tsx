@@ -18,7 +18,8 @@ const initialFormState: Omit<User, 'status' | 'createdAt'> = {
     email: '',
     password: '',
     mobile: '',
-    role: 'customer'
+    role: 'customer',
+    location: ''
 };
 
 // Create User Modal

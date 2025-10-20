@@ -131,6 +131,7 @@ class DataService {
       transmission: "Manual",
       city: "Mumbai",
       state: "MH",
+      location: "Mumbai, MH",
       sellerEmail: "demo@reride.com",
       images: ["https://picsum.photos/800/600?random=1"],
       description: "Well maintained Swift in excellent condition",
@@ -282,6 +283,7 @@ class DataService {
       email: 'demo@reride.com',
       mobile: '9876543210',
       role: 'customer',
+      location: 'Mumbai',
       status: 'active',
       createdAt: new Date().toISOString(),
     }];
@@ -374,7 +376,7 @@ class DataService {
     }
   }
 
-  private async registerLocal(credentials: { name: string; email: string; password: string; mobile: string; role: string }): Promise<{ success: boolean, user?: User, reason?: string }> {
+  private async registerLocal(credentials: { name: string; email: string; password: string; mobile: string; role: 'seller' | 'customer' | 'admin'; location?: string }): Promise<{ success: boolean, user?: User, reason?: string }> {
     const users = await this.getUsersLocal();
     
     if (users.find(u => u.email === credentials.email)) {
@@ -383,6 +385,7 @@ class DataService {
     
     const newUser: User = {
       ...credentials,
+      location: credentials.location || 'Mumbai', // Default location if not provided
       status: 'active',
       createdAt: new Date().toISOString(),
       avatarUrl: `https://i.pravatar.cc/150?u=${credentials.email}`,

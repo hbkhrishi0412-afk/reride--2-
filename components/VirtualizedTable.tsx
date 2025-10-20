@@ -56,6 +56,7 @@ const VirtualizedTable: React.FC<VirtualizedTableProps> = ({
     <div className={`w-full ${className}`}>
       <List
         height={height}
+        width="100%"
         itemCount={items.length}
         itemSize={itemHeight}
         itemData={itemData}

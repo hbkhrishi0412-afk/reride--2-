@@ -53,6 +53,7 @@ export const FALLBACK_USERS: User[] = [
     password: 'password',
     mobile: '555-123-4567',
     role: 'seller',
+    location: 'Mumbai',
     status: 'active',
     createdAt: daysAgo(30),
     dealershipName: 'Demo Motors',

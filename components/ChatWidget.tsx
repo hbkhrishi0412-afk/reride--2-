@@ -37,6 +37,17 @@ export const ChatWidget: React.FC<ChatWidgetProps> = memo(({ conversation, curre
   const [isExiting, setIsExiting] = useState(false);
   const [isOfferModalOpen, setIsOfferModalOpen] = useState(false);
   
+  // Debug logging
+  useEffect(() => {
+    console.log('🔧 ChatWidget mounted/updated:', {
+      conversationId: conversation.id,
+      messageCount: conversation.messages.length,
+      messages: conversation.messages,
+      currentUserRole,
+      otherUserName
+    });
+  }, [conversation, currentUserRole, otherUserName]);
+  
   const chatEndRef = useRef<HTMLDivElement>(null);
   const emojiPickerRef = useRef<HTMLDivElement>(null);
 
@@ -144,25 +155,37 @@ export const ChatWidget: React.FC<ChatWidgetProps> = memo(({ conversation, curre
 
         {/* Messages */}
         <div className="flex-grow p-4 overflow-y-auto bg-spinny-off-white dark:bg-white space-y-4">
-            {console.log('🔧 ChatWidget rendering messages:', conversation.messages)}
-            {conversation.messages.map((msg) => (
-                <div key={msg.id} className={`flex flex-col ${msg.sender === senderType ? 'items-end' : 'items-start'}`}>
-                    {msg.sender === 'system' && <div className="text-center text-xs text-gray-600 dark:text-gray-400 italic py-2 w-full">{msg.text}</div>}
-                    {msg.sender !== 'system' && (
-                        <>
-                            <div className={`px-4 py-3 max-w-xs ${ msg.sender === senderType ? 'text-white rounded-l-xl rounded-t-xl' : 'bg-white dark:bg-brand-gray-700 text-spinny-text-dark dark:text-white rounded-r-xl rounded-t-xl'}`} style={msg.sender === senderType ? { background: 'var(--gradient-primary)' } : undefined}>
-                                {msg.type === 'offer' ? <OfferMessage msg={msg} currentUserRole={currentUserRole} listingPrice={conversation.vehiclePrice} onRespond={(messageId, response, counterPrice) => onOfferResponse(conversation.id, messageId, response, counterPrice)} /> : <p className="text-sm break-words">{msg.text}</p>}
-                            </div>
-                            <div className="text-xs text-gray-400 mt-1 px-1 flex items-center">
-                                {new Date(msg.timestamp).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}
-                                {msg.sender === senderType && <ReadReceiptIcon isRead={msg.isRead} />}
-                            </div>
-                        </>
-                    )}
+            {conversation.messages.length === 0 ? (
+              <div className="flex items-center justify-center h-full text-gray-500">
+                <div className="text-center">
+                  <svg className="w-16 h-16 mx-auto mb-4 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+                  </svg>
+                  <p>No messages yet. Start the conversation!</p>
                 </div>
-            ))}
-            {typingStatus?.conversationId === conversation.id && typingStatus?.userRole === otherUserRole && <TypingIndicator name={otherUserName} />}
-            <div ref={chatEndRef} />
+              </div>
+            ) : (
+              <>
+                {conversation.messages.map((msg) => (
+                  <div key={msg.id} className={`flex flex-col ${msg.sender === senderType ? 'items-end' : 'items-start'}`}>
+                      {msg.sender === 'system' && <div className="text-center text-xs text-gray-600 dark:text-gray-400 italic py-2 w-full">{msg.text}</div>}
+                      {msg.sender !== 'system' && (
+                          <>
+                              <div className={`px-4 py-3 max-w-xs ${ msg.sender === senderType ? 'text-white rounded-l-xl rounded-t-xl' : 'bg-white dark:bg-brand-gray-700 text-spinny-text-dark dark:text-white rounded-r-xl rounded-t-xl'}`} style={msg.sender === senderType ? { background: 'var(--gradient-primary)' } : undefined}>
+                                  {msg.type === 'offer' ? <OfferMessage msg={msg} currentUserRole={currentUserRole} listingPrice={conversation.vehiclePrice} onRespond={(messageId, response, counterPrice) => onOfferResponse(conversation.id, messageId, response, counterPrice)} /> : <p className="text-sm break-words">{msg.text}</p>}
+                              </div>
+                              <div className="text-xs text-gray-400 mt-1 px-1 flex items-center">
+                                  {new Date(msg.timestamp).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}
+                                  {msg.sender === senderType && <ReadReceiptIcon isRead={msg.isRead} />}
+                              </div>
+                          </>
+                      )}
+                  </div>
+                ))}
+                {typingStatus?.conversationId === conversation.id && typingStatus?.userRole === otherUserRole && <TypingIndicator name={otherUserName} />}
+                <div ref={chatEndRef} />
+              </>
+            )}
         </div>
 
         {/* Input */}
@@ -194,7 +217,23 @@ export const ChatWidget: React.FC<ChatWidgetProps> = memo(({ conversation, curre
                     value={inputText}
                     onChange={handleInputChange}
                     placeholder="Type a message..."
-                    className="flex-grow bg-spinny-off-white dark:bg-brand-gray-700 rounded-full px-4 py-2 focus:outline-none" onFocus={(e) => { e.currentTarget.style.borderColor = 'var(--spinny-orange)'; e.currentTarget.style.boxShadow = '0 0 0 2px rgba(255, 107, 53, 0.1)'; }} onBlur={(e) => { e.currentTarget.style.borderColor = ''; e.currentTarget.style.boxShadow = ''; }}
+                    className="flex-grow bg-spinny-off-white dark:bg-brand-gray-700 rounded-full px-4 py-2 focus:outline-none border-0" 
+                    style={{ 
+                        border: 'none',
+                        outline: 'none',
+                        boxShadow: 'none',
+                        WebkitAppearance: 'none',
+                        MozAppearance: 'none',
+                        appearance: 'none'
+                    }}
+                    onFocus={(e) => { 
+                        e.currentTarget.style.borderColor = 'var(--spinny-orange)'; 
+                        e.currentTarget.style.boxShadow = '0 0 0 2px rgba(255, 107, 53, 0.1)'; 
+                    }} 
+                    onBlur={(e) => { 
+                        e.currentTarget.style.borderColor = ''; 
+                        e.currentTarget.style.boxShadow = ''; 
+                    }}
                 />
                 <button type="submit" className="p-2 transition-colors" aria-label="Send message" style={{ color: '#FF6B35' }} onMouseEnter={(e) => e.currentTarget.style.color = 'var(--spinny-blue)'} onMouseLeave={(e) => e.currentTarget.style.color = 'var(--spinny-orange)'}>
                     <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" /></svg>

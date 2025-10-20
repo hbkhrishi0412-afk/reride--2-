@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { VehicleData, VehicleCategoryData } from '../types';
-import { VehicleCategory } from '../types';
+import { VehicleData, VehicleCategory } from '../types';
 
 interface VehicleDataManagementProps {
   vehicleData: VehicleData;

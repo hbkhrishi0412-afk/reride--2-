@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useEffect, useCallback, useRef } from 'react';
-import type { Vehicle, User, Conversation, Toast as ToastType, PlatformSettings, AuditLogEntry, VehicleData, Notification, VehicleCategory, SupportTicket, FAQItem } from '../types';
+import type { Vehicle, User, Conversation, Toast as ToastType, PlatformSettings, AuditLogEntry, VehicleData, Notification, VehicleCategory, SupportTicket, FAQItem, SubscriptionPlan } from '../types';
 import { View, VehicleCategory as CategoryEnum } from '../types';
 import { getRatings, addRating, getSellerRatings, addSellerRating } from '../services/ratingService';
 import { getConversations, saveConversations } from '../services/chatService';
@@ -119,6 +119,7 @@ interface AppContextType {
   selectVehicle: (vehicle: Vehicle) => void;
   toggleWishlist: (vehicleId: number) => void;
   toggleCompare: (vehicleId: number) => void;
+  onOfferResponse: (conversationId: string, messageId: number, response: 'accepted' | 'rejected' | 'countered', counterPrice?: number) => void;
 }
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
@@ -170,7 +171,33 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const [notifications, setNotifications] = useState<Notification[]>(() => {
     try {
       const notificationsJson = localStorage.getItem('reRideNotifications');
-      return notificationsJson ? JSON.parse(notificationsJson) : [];
+      if (notificationsJson) {
+        return JSON.parse(notificationsJson);
+      } else {
+        // Create sample notifications for testing
+        const sampleNotifications: Notification[] = [
+          {
+            id: 1,
+            recipientEmail: 'seller@test.com',
+            message: 'New message from Mock Customer: Offer: 600000',
+            targetId: 'conv_1703123456789',
+            targetType: 'conversation',
+            isRead: false,
+            timestamp: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString() // 2 hours ago
+          },
+          {
+            id: 2,
+            recipientEmail: 'seller@test.com',
+            message: 'New message from Mock Customer: Offer: 123444',
+            targetId: 'conv_1703123456789',
+            targetType: 'conversation',
+            isRead: false,
+            timestamp: new Date(Date.now() - 1 * 60 * 60 * 1000).toISOString() // 1 hour ago
+          }
+        ];
+        localStorage.setItem('reRideNotifications', JSON.stringify(sampleNotifications));
+        return sampleNotifications;
+      }
     } catch { 
       return []; 
     }
@@ -203,7 +230,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     if (user.role === 'admin') {
       setCurrentView(View.ADMIN_PANEL);
     } else if (user.role === 'seller') {
-      setCurrentView(View.DASHBOARD);
+      setCurrentView(View.SELLER_DASHBOARD);
     } else {
       setCurrentView(View.HOME);
     }
@@ -219,7 +246,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     if (user.role === 'admin') {
       setCurrentView(View.ADMIN_PANEL);
     } else if (user.role === 'seller') {
-      setCurrentView(View.DASHBOARD);
+      setCurrentView(View.SELLER_DASHBOARD);
     } else {
       setCurrentView(View.HOME);
     }
@@ -286,6 +313,16 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       saveConversations(conversations);
     }
   }, [conversations]);
+
+  // Sync activeChat when conversations change
+  useEffect(() => {
+    if (activeChat) {
+      const updatedConversation = conversations.find(conv => conv.id === activeChat.id);
+      if (updatedConversation && JSON.stringify(updatedConversation) !== JSON.stringify(activeChat)) {
+        setActiveChat(updatedConversation);
+      }
+    }
+  }, [conversations, activeChat]);
 
   // Add navigation event listener for dashboard navigation
   useEffect(() => {
@@ -589,16 +626,67 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
             ...conv,
             messages: [...conv.messages, {
               id: Date.now(),
-              sender: currentUser?.role === 'seller' ? 'seller' : 'user',
+              sender: (currentUser?.role === 'seller' ? 'seller' : 'user') as 'seller' | 'user',
               text: message,
               timestamp: new Date().toISOString(),
               isRead: false,
               type: 'text'
-            }]
+            }],
+            lastMessageAt: new Date().toISOString()
           } : conv
         );
         console.log('🔧 Updated conversations:', updated);
         return updated;
+      });
+
+      // Create notification for the recipient
+      const conversation = conversations.find(conv => conv.id === conversationId);
+      if (conversation && currentUser) {
+        const recipientEmail = currentUser.role === 'seller' ? conversation.customerId : conversation.sellerId;
+        const senderName = currentUser.role === 'seller' ? 'Seller' : conversation.customerName;
+        
+        const newNotification: Notification = {
+          id: Date.now(),
+          recipientEmail,
+          message: `New message from ${senderName}: ${message.length > 50 ? message.substring(0, 50) + '...' : message}`,
+          targetId: conversationId,
+          targetType: 'conversation',
+          isRead: false,
+          timestamp: new Date().toISOString()
+        };
+
+        setNotifications(prev => {
+          const updated = [newNotification, ...prev];
+          // Save to localStorage
+          try {
+            localStorage.setItem('reRideNotifications', JSON.stringify(updated));
+          } catch (error) {
+            console.error('Failed to save notifications to localStorage:', error);
+          }
+          return updated;
+        });
+      }
+      
+      // Update activeChat if it's the same conversation
+      setActiveChat(prev => {
+        if (prev && prev.id === conversationId) {
+          const updatedConv = conversations.find(conv => conv.id === conversationId);
+          if (updatedConv) {
+            return {
+              ...updatedConv,
+              messages: [...updatedConv.messages, {
+                id: Date.now(),
+                sender: (currentUser?.role === 'seller' ? 'seller' : 'user') as 'seller' | 'user',
+                text: message,
+                timestamp: new Date().toISOString(),
+                isRead: false,
+                type: 'text'
+              }],
+              lastMessageAt: new Date().toISOString()
+            };
+          }
+        }
+        return prev;
       });
     },
     markAsRead: (conversationId: string) => {
@@ -610,7 +698,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       ));
     },
     toggleTyping: (conversationId: string, isTyping: boolean) => {
-      setTypingStatus(isTyping ? { conversationId, userRole: currentUser?.role || 'customer' } : null);
+      setTypingStatus(isTyping ? { conversationId, userRole: (currentUser?.role === 'seller' ? 'seller' : 'customer') as 'seller' | 'customer' } : null);
     },
     flagContent: (type: 'vehicle' | 'conversation', id: number | string) => {
       if (type === 'vehicle') {
@@ -662,6 +750,87 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
           ? prev.filter(id => id !== vehicleId)
           : prev.length < 3 ? [...prev, vehicleId] : prev
       );
+    },
+    onOfferResponse: (conversationId: string, messageId: number, response: 'accepted' | 'rejected' | 'countered', counterPrice?: number) => {
+      console.log('🔧 onOfferResponse called:', { conversationId, messageId, response, counterPrice });
+      
+      setConversations(prev => {
+        const updated = prev.map(conv => {
+          if (conv.id === conversationId) {
+            const updatedMessages = conv.messages.map(msg => {
+              if (msg.id === messageId) {
+                const updatedPayload = {
+                  ...msg.payload,
+                  status: response,
+                  ...(counterPrice && { counterPrice })
+                };
+                
+                return {
+                  ...msg,
+                  payload: updatedPayload
+                };
+              }
+              return msg;
+            });
+            
+            // Add a response message
+            const responseMessages = {
+              accepted: `✅ Offer accepted! The deal is confirmed.`,
+              rejected: `❌ Offer declined. Thank you for your interest.`,
+              countered: `💰 Counter-offer made: ₹${counterPrice?.toLocaleString('en-IN')}`
+            };
+            
+            const responseMessage = {
+              id: Date.now(),
+              sender: 'seller',
+              text: responseMessages[response],
+              timestamp: new Date().toISOString(),
+              isRead: false,
+              type: 'text'
+            };
+            
+            return {
+              ...conv,
+              messages: [...updatedMessages, responseMessage],
+              lastMessageAt: new Date().toISOString()
+            };
+          }
+          return conv;
+        });
+        
+        console.log('🔧 Updated conversations after offer response:', updated);
+        return updated;
+      });
+      
+      // Update activeChat if it's the same conversation
+      setActiveChat(prev => {
+        if (prev && prev.id === conversationId) {
+          const updatedConv = conversations.find(conv => conv.id === conversationId);
+          if (updatedConv) {
+            return {
+              ...updatedConv,
+              messages: updatedConv.messages.map(msg => {
+                if (msg.id === messageId) {
+                  const updatedPayload = {
+                    ...msg.payload,
+                    status: response,
+                    ...(counterPrice && { counterPrice })
+                  };
+                  
+                  return {
+                    ...msg,
+                    payload: updatedPayload
+                  };
+                }
+                return msg;
+              })
+            };
+          }
+        }
+        return prev;
+      });
+      
+      addToast(`Offer ${response} successfully`, 'success');
     },
   };
 

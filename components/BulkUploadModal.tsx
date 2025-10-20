@@ -80,6 +80,7 @@ const BulkUploadModal: React.FC<BulkUploadModalProps> = ({ onClose, onAddMultipl
                     noOfOwners: parseInt(row.noOfOwners, 10) || 1,
                     city: row.city,
                     state: row.state,
+                    location: `${row.city}, ${row.state}`,
                     rto: row.rto,
                     registrationYear: parseInt(row.registrationYear, 10) || parseInt(row.year, 10),
                     insuranceValidity: row.insuranceValidity,

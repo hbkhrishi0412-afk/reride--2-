@@ -53,9 +53,11 @@ const VehicleRow = memo<VehicleRowProps>(({ index, style, data }) => {
         onSelect={() => onSelectVehicle(vehicle)}
         onToggleCompare={() => onToggleCompare(vehicle.id)}
         onToggleWishlist={() => onToggleWishlist(vehicle.id)}
-        isInComparison={comparisonList.includes(vehicle.id)}
+        isSelectedForCompare={comparisonList.includes(vehicle.id)}
         isInWishlist={wishlist.includes(vehicle.id)}
+        isCompareDisabled={comparisonList.length >= 3 && !comparisonList.includes(vehicle.id)}
         onViewSellerProfile={onViewSellerProfile}
+        onQuickView={() => onSelectVehicle(vehicle)}
       />
     </div>
   );
@@ -96,6 +98,7 @@ const VirtualizedVehicleList: React.FC<VirtualizedVehicleListProps> = ({
     <div className="w-full">
       <List
         height={height}
+        width="100%"
         itemCount={vehicles.length}
         itemSize={itemHeight}
         itemData={itemData}

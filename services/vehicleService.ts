@@ -6,6 +6,7 @@ import { isVehicle, isApiResponse } from '../types';
 const FALLBACK_VEHICLES: Vehicle[] = [
   {
     id: 1,
+    category: "FOUR_WHEELER" as any,
     make: "Maruti Suzuki",
     model: "Swift",
     year: 2022,
@@ -14,14 +15,28 @@ const FALLBACK_VEHICLES: Vehicle[] = [
     fuelType: "Petrol",
     transmission: "Manual",
     location: "Mumbai",
+    city: "Mumbai",
+    state: "MH",
     sellerEmail: "demo@reride.com",
     images: ["https://picsum.photos/800/600?random=1"],
+    features: ["Air Conditioning", "Power Steering", "Music System"],
     description: "Well maintained Swift in excellent condition",
+    engine: "1.2L Petrol",
+    fuelEfficiency: "20 kmpl",
+    color: "White",
     status: "published",
     isFeatured: true,
     views: 150,
     inquiriesCount: 8,
-    certificationStatus: "none"
+    certificationStatus: "none",
+    registrationYear: 2022,
+    insuranceValidity: "2025-01-01",
+    insuranceType: "Comprehensive",
+    rto: "MH-01",
+    noOfOwners: 1,
+    displacement: "1197 cc",
+    groundClearance: "170 mm",
+    bootSpace: "268 litres"
   }
 ];
 

@@ -111,6 +111,17 @@ export const OfferMessage: React.FC<{
     const isRecipient = (currentUserRole === 'customer' && msg.sender === 'seller') || (currentUserRole === 'seller' && msg.sender === 'user');
     const showActions = isRecipient && status === 'pending';
     
+    // Debug logging
+    console.log('🔧 OfferMessage debug:', {
+        msgId: msg.id,
+        msgSender: msg.sender,
+        currentUserRole,
+        payload: msg.payload,
+        status,
+        isRecipient,
+        showActions
+    });
+    
     const statusInfo = {
         pending: { text: "Pending", color: "bg-spinny-blue-light text-spinny-text-dark dark:bg-spinny-blue/50 dark:text-spinny-text-dark border-gray-200" },
         accepted: { text: "Accepted", color: "bg-spinny-orange-light text-spinny-orange dark:bg-spinny-orange/50 dark:text-spinny-orange border-spinny-orange" },
@@ -126,7 +137,7 @@ export const OfferMessage: React.FC<{
     
     return (
         <>
-            <div className={`p-3 border-l-4 rounded-r-lg bg-spinny-off-white dark:bg-brand-gray-700/50 ${statusInfo[status || 'pending'].color.split(' ')[2]}`}>
+            <div className={`p-3 border-l-4 rounded-r-lg bg-spinny-off-white dark:bg-brand-gray-700/50 border-gray-200`}>
                 <div className="flex justify-between items-start">
                     <div>
                         <p className="font-semibold text-spinny-text-dark dark:text-spinny-text-dark">{msg.sender === 'user' ? 'Offer Made' : 'Counter-Offer'}</p>
@@ -137,7 +148,7 @@ export const OfferMessage: React.FC<{
                             </p>
                         )}
                     </div>
-                    <span className={`text-xs font-bold px-2 py-0.5 rounded-full whitespace-nowrap ${statusInfo[status || 'pending'].color.split(' ')[0]} ${statusInfo[status || 'pending'].color.split(' ')[1]}`}>
+                    <span className={`text-xs font-bold px-2 py-0.5 rounded-full whitespace-nowrap bg-spinny-blue-light text-spinny-text-dark`}>
                         {statusInfo[status || 'pending'].text}
                     </span>
                 </div>

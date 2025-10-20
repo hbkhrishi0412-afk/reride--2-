@@ -94,13 +94,13 @@ export const CITIES_BY_STATE: Record<string, string[]> = {
 };
 
 export const MOCK_USERS: User[] = [
-    { name: 'Prestige Motors', email: 'seller@test.com', password: 'password', mobile: '555-123-4567', role: 'seller', status: 'active', createdAt: daysAgo(30), dealershipName: 'Prestige Motors', bio: 'Specializing in luxury and performance electric vehicles since 2020.', logoUrl: 'https://i.pravatar.cc/100?u=seller', avatarUrl: 'https://i.pravatar.cc/150?u=seller@test.com', isVerified: true, subscriptionPlan: 'premium', featuredCredits: 5, usedCertifications: 1 },
-    { name: 'Mock Customer', email: 'customer@test.com', password: 'password', mobile: '555-987-6543', role: 'customer', status: 'active', createdAt: daysAgo(15), avatarUrl: 'https://i.pravatar.cc/150?u=customer@test.com' },
-    { name: 'Mock Admin', email: 'admin@test.com', password: 'password', mobile: '111-222-3333', role: 'admin', status: 'active', createdAt: daysAgo(100), avatarUrl: 'https://i.pravatar.cc/150?u=admin@test.com' },
-    { name: 'Jane Doe', email: 'jane.doe@customer.com', password: 'password', mobile: '555-111-2222', role: 'customer', status: 'active', createdAt: daysAgo(5), avatarUrl: 'https://i.pravatar.cc/150?u=jane.doe@customer.com' },
-    { name: 'Reliable Rides', email: 'john.smith@seller.com', password: 'password', mobile: '555-333-4444', role: 'seller', status: 'active', createdAt: daysAgo(60), dealershipName: 'Reliable Rides', bio: 'Your trusted source for pre-owned family cars and SUVs.', logoUrl: 'https://i.pravatar.cc/100?u=johnsmith', avatarUrl: 'https://i.pravatar.cc/150?u=john.smith@seller.com', isVerified: false, subscriptionPlan: 'pro', featuredCredits: 2, usedCertifications: 0 },
-    { name: 'Speedy Auto', email: 'speedy@auto.com', password: 'password', mobile: '555-555-1111', role: 'seller', status: 'active', createdAt: daysAgo(90), dealershipName: 'Speedy Auto', bio: 'Performance and sports cars for the enthusiast.', logoUrl: 'https://i.pravatar.cc/100?u=speedy', avatarUrl: 'https://i.pravatar.cc/150?u=speedy@auto.com', isVerified: true, subscriptionPlan: 'pro', featuredCredits: 1, usedCertifications: 1 },
-    { name: 'Eco Drive', email: 'eco@drive.com', password: 'password', mobile: '555-222-5555', role: 'seller', status: 'active', createdAt: daysAgo(45), dealershipName: 'Eco Drive', bio: 'The best deals on electric and hybrid vehicles.', logoUrl: 'https://i.pravatar.cc/100?u=eco', avatarUrl: 'https://i.pravatar.cc/150?u=eco@drive.com', isVerified: false, subscriptionPlan: 'free', featuredCredits: 0, usedCertifications: 0 },
+    { name: 'Prestige Motors', email: 'seller@test.com', password: 'password', mobile: '555-123-4567', role: 'seller', location: 'Mumbai', status: 'active', createdAt: daysAgo(30), dealershipName: 'Prestige Motors', bio: 'Specializing in luxury and performance electric vehicles since 2020.', logoUrl: 'https://i.pravatar.cc/100?u=seller', avatarUrl: 'https://i.pravatar.cc/150?u=seller@test.com', isVerified: true, subscriptionPlan: 'premium', featuredCredits: 5, usedCertifications: 1 },
+    { name: 'Mock Customer', email: 'customer@test.com', password: 'password', mobile: '555-987-6543', role: 'customer', location: 'Delhi', status: 'active', createdAt: daysAgo(15), avatarUrl: 'https://i.pravatar.cc/150?u=customer@test.com' },
+    { name: 'Mock Admin', email: 'admin@test.com', password: 'password', mobile: '111-222-3333', role: 'admin', location: 'Bangalore', status: 'active', createdAt: daysAgo(100), avatarUrl: 'https://i.pravatar.cc/150?u=admin@test.com' },
+    { name: 'Jane Doe', email: 'jane.doe@customer.com', password: 'password', mobile: '555-111-2222', role: 'customer', location: 'Chennai', status: 'active', createdAt: daysAgo(5), avatarUrl: 'https://i.pravatar.cc/150?u=jane.doe@customer.com' },
+    { name: 'Reliable Rides', email: 'john.smith@seller.com', password: 'password', mobile: '555-333-4444', role: 'seller', location: 'Pune', status: 'active', createdAt: daysAgo(60), dealershipName: 'Reliable Rides', bio: 'Your trusted source for pre-owned family cars and SUVs.', logoUrl: 'https://i.pravatar.cc/100?u=johnsmith', avatarUrl: 'https://i.pravatar.cc/150?u=john.smith@seller.com', isVerified: false, subscriptionPlan: 'pro', featuredCredits: 2, usedCertifications: 0 },
+    { name: 'Speedy Auto', email: 'speedy@auto.com', password: 'password', mobile: '555-555-1111', role: 'seller', location: 'Hyderabad', status: 'active', createdAt: daysAgo(90), dealershipName: 'Speedy Auto', bio: 'Performance and sports cars for the enthusiast.', logoUrl: 'https://i.pravatar.cc/100?u=speedy', avatarUrl: 'https://i.pravatar.cc/150?u=speedy@auto.com', isVerified: true, subscriptionPlan: 'pro', featuredCredits: 1, usedCertifications: 1 },
+    { name: 'Eco Drive', email: 'eco@drive.com', password: 'password', mobile: '555-222-5555', role: 'seller', location: 'Kolkata', status: 'active', createdAt: daysAgo(45), dealershipName: 'Eco Drive', bio: 'The best deals on electric and hybrid vehicles.', logoUrl: 'https://i.pravatar.cc/100?u=eco', avatarUrl: 'https://i.pravatar.cc/150?u=eco@drive.com', isVerified: false, subscriptionPlan: 'free', featuredCredits: 0, usedCertifications: 0 },
 
 ];
 
@@ -180,6 +180,7 @@ const generateMockVehicles = (count: number): Vehicle[] => {
             rto: `${state}${randomNumber(1, 20).toString().padStart(2, '0')}`,
             city,
             state,
+            location: `${city}, ${state}`,
             noOfOwners: randomNumber(1, 3),
             displacement: `${randomNumber(900, 2500)} cc`,
             groundClearance: `${randomNumber(160, 220)} mm`,
