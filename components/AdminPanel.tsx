@@ -817,6 +817,23 @@ const AdminPanel: React.FC<AdminPanelProps> = (props) => {
     // Modal states
     const [showPreviewModal, setShowPreviewModal] = useState(false);
     const [isBulkUploadOpen, setIsBulkUploadOpen] = useState(false);
+    
+    // Loading states for actions
+    const [loadingActions, setLoadingActions] = useState<Set<string>>(new Set());
+    
+    // Helper function to handle loading states
+    const handleActionWithLoading = async (actionKey: string, action: () => void | Promise<void>) => {
+        setLoadingActions(prev => new Set(prev).add(actionKey));
+        try {
+            await action();
+        } finally {
+            setLoadingActions(prev => {
+                const newSet = new Set(prev);
+                newSet.delete(actionKey);
+                return newSet;
+            });
+        }
+    };
 
     const analytics = useMemo(() => {
         const totalUsers = users.length;
@@ -970,11 +987,16 @@ const AdminPanel: React.FC<AdminPanelProps> = (props) => {
                                     e.preventDefault();
                                     e.stopPropagation();
                                     console.log('🔄 Export Users button clicked');
-                                    onExportUsers();
+                                    handleActionWithLoading('export-users', onExportUsers);
                                 }} 
-                                className="bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600 cursor-pointer"
+                                disabled={loadingActions.has('export-users')}
+                                className={`px-4 py-2 rounded-lg cursor-pointer ${
+                                    loadingActions.has('export-users') 
+                                        ? 'bg-gray-400 text-gray-200 cursor-not-allowed' 
+                                        : 'bg-green-500 text-white hover:bg-green-600'
+                                }`}
                             >
-                                Export Users
+                                {loadingActions.has('export-users') ? 'Exporting...' : 'Export Users'}
                             </button>
                         </div>
                         <TableContainer title={`User Management (${filteredUsers.length} users)`}>
@@ -1028,22 +1050,37 @@ const AdminPanel: React.FC<AdminPanelProps> = (props) => {
                                                         e.preventDefault();
                                                         e.stopPropagation();
                                                         console.log('🔄 Toggle status button clicked for user:', user.email);
-                                                        onToggleUserStatus(user.email);
+                                                        const action = user.status === 'active' ? 'suspend' : 'activate';
+                                                        if (window.confirm(`Are you sure you want to ${action} user ${user.email}?`)) {
+                                                            handleActionWithLoading(`toggle-user-${user.email}`, () => onToggleUserStatus(user.email));
+                                                        }
                                                     }} 
-                                                    className="text-yellow-600 hover:text-yellow-800 cursor-pointer"
+                                                    disabled={loadingActions.has(`toggle-user-${user.email}`)}
+                                                    className={`cursor-pointer ${
+                                                        loadingActions.has(`toggle-user-${user.email}`)
+                                                            ? 'text-gray-400 cursor-not-allowed'
+                                                            : 'text-yellow-600 hover:text-yellow-800'
+                                                    }`}
                                                 >
-                                                    {user.status === 'active' ? 'Suspend' : 'Activate'}
+                                                    {loadingActions.has(`toggle-user-${user.email}`) ? '...' : (user.status === 'active' ? 'Suspend' : 'Activate')}
                                                 </button>
                                                 <button 
                                                     onClick={(e) => {
                                                         e.preventDefault();
                                                         e.stopPropagation();
                                                         console.log('🔄 Delete button clicked for user:', user.email);
-                                                        onDeleteUser(user.email);
+                                                        if (window.confirm(`Are you sure you want to delete user ${user.email}? This action cannot be undone.`)) {
+                                                            handleActionWithLoading(`delete-user-${user.email}`, () => onDeleteUser(user.email));
+                                                        }
                                                     }} 
-                                                    className="text-red-600 hover:text-red-800 cursor-pointer"
+                                                    disabled={loadingActions.has(`delete-user-${user.email}`)}
+                                                    className={`cursor-pointer ${
+                                                        loadingActions.has(`delete-user-${user.email}`)
+                                                            ? 'text-gray-400 cursor-not-allowed'
+                                                            : 'text-red-600 hover:text-red-800'
+                                                    }`}
                                                 >
-                                                    Delete
+                                                    {loadingActions.has(`delete-user-${user.email}`) ? '...' : 'Delete'}
                                                 </button>
                                     </td>
                                 </tr>
@@ -1069,8 +1106,21 @@ const AdminPanel: React.FC<AdminPanelProps> = (props) => {
                                     <option value={100}>100 per page</option>
                                 </select>
                             </div>
-                            <button onClick={onExportVehicles} className="bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600">
-                                Export Vehicles
+                            <button 
+                                onClick={(e) => {
+                                    e.preventDefault();
+                                    e.stopPropagation();
+                                    console.log('🔄 Export Vehicles button clicked');
+                                    handleActionWithLoading('export-vehicles', onExportVehicles);
+                                }} 
+                                disabled={loadingActions.has('export-vehicles')}
+                                className={`px-4 py-2 rounded-lg cursor-pointer ${
+                                    loadingActions.has('export-vehicles') 
+                                        ? 'bg-gray-400 text-gray-200 cursor-not-allowed' 
+                                        : 'bg-green-500 text-white hover:bg-green-600'
+                                }`}
+                            >
+                                {loadingActions.has('export-vehicles') ? 'Exporting...' : 'Export Vehicles'}
                             </button>
                         </div>
                         <TableContainer title={`All Listings (${vehicles.length} total, showing ${paginatedVehicles.length})`}>
@@ -1116,22 +1166,37 @@ const AdminPanel: React.FC<AdminPanelProps> = (props) => {
                                                         e.preventDefault();
                                                         e.stopPropagation();
                                                         console.log('🔄 Toggle vehicle status button clicked for vehicle:', vehicle.id);
-                                                        onToggleVehicleStatus(vehicle.id);
+                                                        const action = vehicle.status === 'published' ? 'unpublish' : 'publish';
+                                                        if (window.confirm(`Are you sure you want to ${action} this vehicle listing?`)) {
+                                                            handleActionWithLoading(`toggle-vehicle-${vehicle.id}`, () => onToggleVehicleStatus(vehicle.id));
+                                                        }
                                                     }} 
-                                                    className="text-yellow-600 hover:text-yellow-800 cursor-pointer"
+                                                    disabled={loadingActions.has(`toggle-vehicle-${vehicle.id}`)}
+                                                    className={`cursor-pointer ${
+                                                        loadingActions.has(`toggle-vehicle-${vehicle.id}`)
+                                                            ? 'text-gray-400 cursor-not-allowed'
+                                                            : 'text-yellow-600 hover:text-yellow-800'
+                                                    }`}
                                                 >
-                                                    {vehicle.status === 'published' ? 'Unpublish' : 'Publish'}
+                                                    {loadingActions.has(`toggle-vehicle-${vehicle.id}`) ? '...' : (vehicle.status === 'published' ? 'Unpublish' : 'Publish')}
                                                 </button>
                                                 <button 
                                                     onClick={(e) => {
                                                         e.preventDefault();
                                                         e.stopPropagation();
                                                         console.log('🔄 Delete vehicle button clicked for vehicle:', vehicle.id);
-                                                        onDeleteVehicle(vehicle.id);
+                                                        if (window.confirm(`Are you sure you want to delete this vehicle listing? This action cannot be undone.`)) {
+                                                            handleActionWithLoading(`delete-vehicle-${vehicle.id}`, () => onDeleteVehicle(vehicle.id));
+                                                        }
                                                     }} 
-                                                    className="text-red-600 hover:text-red-800 cursor-pointer"
+                                                    disabled={loadingActions.has(`delete-vehicle-${vehicle.id}`)}
+                                                    className={`cursor-pointer ${
+                                                        loadingActions.has(`delete-vehicle-${vehicle.id}`)
+                                                            ? 'text-gray-400 cursor-not-allowed'
+                                                            : 'text-red-600 hover:text-red-800'
+                                                    }`}
                                                 >
-                                                    Delete
+                                                    {loadingActions.has(`delete-vehicle-${vehicle.id}`) ? '...' : 'Delete'}
                                                 </button>
                                     </td>
                                 </tr>

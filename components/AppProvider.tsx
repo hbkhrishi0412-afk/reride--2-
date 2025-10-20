@@ -402,13 +402,13 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     },
     onToggleUserStatus: (email: string) => {
       setUsers(prev => prev.map(user => 
-        user.email === email ? { ...user, isActive: !user.isActive } : user
+        user.email === email ? { ...user, status: user.status === 'active' ? 'suspended' : 'active' } : user
       ));
       addToast(`User status toggled for ${email}`, 'success');
     },
     onToggleVehicleStatus: (vehicleId: number) => {
       setVehicles(prev => prev.map(vehicle => 
-        vehicle.id === vehicleId ? { ...vehicle, isActive: !vehicle.isActive } : vehicle
+        vehicle.id === vehicleId ? { ...vehicle, status: vehicle.status === 'published' ? 'draft' : 'published' } : vehicle
       ));
       addToast(`Vehicle status toggled`, 'success');
     },
@@ -446,27 +446,71 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       addToast('Broadcast sent to all users', 'success');
     },
     onExportUsers: () => {
-      const csv = users.map(user => `${user.name},${user.email},${user.role},${user.isActive}`).join('\n');
-      const blob = new Blob([csv], { type: 'text/csv' });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = 'users.csv';
-      a.click();
-      addToast('Users exported successfully', 'success');
+      try {
+        const headers = 'Name,Email,Role,Status,Mobile,Join Date\n';
+        const csv = users.map(user => 
+          `"${user.name}","${user.email}","${user.role}","${user.status}","${user.mobile || ''}","${user.joinDate || ''}"`
+        ).join('\n');
+        const fullCsv = headers + csv;
+        const blob = new Blob([fullCsv], { type: 'text/csv;charset=utf-8;' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `users_export_${new Date().toISOString().split('T')[0]}.csv`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+        addToast(`Exported ${users.length} users successfully`, 'success');
+      } catch (error) {
+        console.error('Export failed:', error);
+        addToast('Export failed. Please try again.', 'error');
+      }
     },
     onExportVehicles: () => {
-      const csv = vehicles.map(vehicle => `${vehicle.make},${vehicle.model},${vehicle.year},${vehicle.price}`).join('\n');
-      const blob = new Blob([csv], { type: 'text/csv' });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = 'vehicles.csv';
-      a.click();
-      addToast('Vehicles exported successfully', 'success');
+      try {
+        const headers = 'Make,Model,Year,Price,Seller,Status,Mileage,Location,Features\n';
+        const csv = vehicles.map(vehicle => 
+          `"${vehicle.make}","${vehicle.model}","${vehicle.year}","${vehicle.price}","${vehicle.sellerEmail}","${vehicle.status}","${vehicle.mileage || ''}","${vehicle.location || ''}","${vehicle.features?.join('; ') || ''}"`
+        ).join('\n');
+        const fullCsv = headers + csv;
+        const blob = new Blob([fullCsv], { type: 'text/csv;charset=utf-8;' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `vehicles_export_${new Date().toISOString().split('T')[0]}.csv`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+        addToast(`Exported ${vehicles.length} vehicles successfully`, 'success');
+      } catch (error) {
+        console.error('Export failed:', error);
+        addToast('Export failed. Please try again.', 'error');
+      }
     },
     onExportSales: () => {
-      addToast('Sales data exported successfully', 'success');
+      try {
+        const soldVehicles = vehicles.filter(v => v.status === 'sold');
+        const headers = 'Make,Model,Year,Sale Price,Seller,Buyer,Sale Date\n';
+        const csv = soldVehicles.map(vehicle => 
+          `"${vehicle.make}","${vehicle.model}","${vehicle.year}","${vehicle.price}","${vehicle.sellerEmail}","${vehicle.buyerEmail || 'N/A'}","${vehicle.saleDate || 'N/A'}"`
+        ).join('\n');
+        const fullCsv = headers + csv;
+        const blob = new Blob([fullCsv], { type: 'text/csv;charset=utf-8;' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `sales_export_${new Date().toISOString().split('T')[0]}.csv`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+        addToast(`Exported ${soldVehicles.length} sales records successfully`, 'success');
+      } catch (error) {
+        console.error('Export failed:', error);
+        addToast('Export failed. Please try again.', 'error');
+      }
     },
     onUpdateVehicleData: (newData: VehicleData) => {
       setVehicleData(newData);
