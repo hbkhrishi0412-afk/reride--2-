@@ -61,6 +61,7 @@ const AppContent: React.FC = () => {
     selectedVehicle,
     isLoading,
     conversations,
+    setConversations,
     toasts,
     activeChat,
     users,
@@ -185,6 +186,10 @@ const AppContent: React.FC = () => {
               navigate(ViewEnum.SELLER_PROFILE);
             }}
             userLocation={userLocation}
+            currentUser={currentUser}
+            onSaveSearch={(search) => {
+              addToast(`Search "${search.name}" saved successfully!`, 'success');
+            }}
           />
         );
 
@@ -224,9 +229,45 @@ const AppContent: React.FC = () => {
                 navigate(ViewEnum.SELLER_PROFILE);
               }
             }}
-            onStartChat={(_vehicle) => {
+            onStartChat={(vehicle) => {
               // Start chat with seller
-              addToast('Starting chat with seller', 'success');
+              if (!currentUser) {
+                addToast('Please login to start a chat', 'info');
+                navigate(ViewEnum.LOGIN_PORTAL);
+                return;
+              }
+              
+              // Find or create conversation
+              let conversation = conversations.find(c => 
+                c.vehicleId === vehicle.id && 
+                c.customerId === currentUser.email
+              );
+              
+              if (!conversation) {
+                // Create new conversation
+                const newConversation = {
+                  id: `conv_${Date.now()}`,
+                  customerId: currentUser.email,
+                  customerName: currentUser.name,
+                  sellerId: vehicle.sellerEmail,
+                  vehicleId: vehicle.id,
+                  vehicleName: `${vehicle.year} ${vehicle.make} ${vehicle.model}`,
+                  vehiclePrice: vehicle.price,
+                  messages: [],
+                  lastMessageAt: new Date().toISOString(),
+                  isReadBySeller: false,
+                  isReadByCustomer: true,
+                  isFlagged: false
+                };
+                
+                // Add to conversations
+                setConversations([...conversations, newConversation]);
+                conversation = newConversation;
+              }
+              
+              // Set active chat to open the chat widget
+              setActiveChat(conversation);
+              addToast('Chat started with seller', 'success');
             }}
             recommendations={recommendations}
             onSelectVehicle={selectVehicle}
@@ -296,6 +337,10 @@ const AppContent: React.FC = () => {
               navigate(ViewEnum.SELLER_PROFILE);
             }}
             userLocation={userLocation}
+            currentUser={currentUser}
+            onSaveSearch={(search) => {
+              addToast(`Search "${search.name}" saved successfully!`, 'success');
+            }}
           />
         );
 
@@ -730,12 +775,22 @@ const AppContent: React.FC = () => {
           currentUserRole={currentUser.role as 'customer' | 'seller'}
           otherUserName={currentUser?.role === 'customer' ? activeChat.sellerId : activeChat.customerName}
           onClose={() => setActiveChat(null)}
-          onSendMessage={() => {}}
+          onSendMessage={(messageText, type, payload) => {
+            sendMessage(activeChat.id, messageText);
+          }}
           typingStatus={typingStatus}
-          onUserTyping={() => {}}
-          onMarkMessagesAsRead={() => {}}
-          onFlagContent={() => {}}
-          onOfferResponse={() => {}}
+          onUserTyping={(conversationId, userRole) => {
+            toggleTyping(conversationId, true);
+          }}
+          onMarkMessagesAsRead={(conversationId, readerRole) => {
+            markAsRead(conversationId);
+          }}
+          onFlagContent={(type, id, reason) => {
+            flagContent(type, id);
+          }}
+          onOfferResponse={(conversationId, messageId, response, counterPrice) => {
+            addToast(`Offer ${response}`, 'success');
+          }}
         />
       )}
     </div>

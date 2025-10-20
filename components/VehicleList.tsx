@@ -1,11 +1,12 @@
 import React, { useState, useMemo, useRef, useEffect } from 'react';
 import VehicleCard from './VehicleCard';
-import type { Vehicle, VehicleCategory } from '../types';
+import type { Vehicle, VehicleCategory, SavedSearch, SearchFilters } from '../types';
 import { VehicleCategory as CategoryEnum } from '../types';
 import { parseSearchQuery, getSearchSuggestions } from '../services/geminiService';
 import QuickViewModal from './QuickViewModal';
 import VehicleTile from './VehicleTile';
 import VehicleTileSkeleton from './VehicleTileSkeleton';
+import { saveSearch } from '../services/buyerEngagementService';
 // Lazy load location data when needed
 
 interface VehicleListProps {
@@ -23,6 +24,8 @@ interface VehicleListProps {
   isWishlistMode?: boolean;
   onViewSellerProfile: (sellerEmail: string) => void;
   userLocation?: string;
+  currentUser?: { email: string; name: string } | null;
+  onSaveSearch?: (search: SavedSearch) => void;
 }
 
 const ITEMS_PER_PAGE = 12;
@@ -83,7 +86,7 @@ const Pagination: React.FC<{ currentPage: number; totalPages: number; onPageChan
   );
 };
 
-const VehicleList: React.FC<VehicleListProps> = ({ vehicles, onSelectVehicle, isLoading, comparisonList, onToggleCompare, onClearCompare, wishlist, onToggleWishlist, categoryTitle, initialCategory = 'ALL', initialSearchQuery = '', isWishlistMode = false, onViewSellerProfile, userLocation = '' }) => {
+const VehicleList: React.FC<VehicleListProps> = ({ vehicles, onSelectVehicle, isLoading, comparisonList, onToggleCompare, onClearCompare, wishlist, onToggleWishlist, categoryTitle, initialCategory = 'ALL', initialSearchQuery = '', isWishlistMode = false, onViewSellerProfile, userLocation = '', currentUser, onSaveSearch }) => {
   const [aiSearchQuery, setAiSearchQuery] = useState(initialSearchQuery);
   const [isAiSearching, setIsAiSearching] = useState(false);
   const [suggestions, setSuggestions] = useState<string[]>([]);
@@ -355,6 +358,43 @@ const VehicleList: React.FC<VehicleListProps> = ({ vehicles, onSelectVehicle, is
     setPriceRange({ min: MIN_PRICE, max: MAX_PRICE }); setYearFilter('0'); setColorFilter(''); setStateFilter('');
     setSelectedFeatures([]); setFeatureSearch(''); setSortOrder('YEAR_DESC'); onClearCompare(); setCurrentPage(1);
     setMileageRange({ min: MIN_MILEAGE, max: MAX_MILEAGE }); setFuelTypeFilter('');
+  };
+
+  const handleSaveSearch = () => {
+    if (!currentUser) {
+      alert('Please login to save searches');
+      return;
+    }
+
+    const searchName = prompt('Enter a name for this search:');
+    if (!searchName) return;
+
+    const filters: SearchFilters = {
+      category: categoryFilter !== 'ALL' ? categoryFilter : undefined,
+      make: makeFilter || undefined,
+      model: modelFilter || undefined,
+      minPrice: priceRange.min !== MIN_PRICE ? priceRange.min : undefined,
+      maxPrice: priceRange.max !== MAX_PRICE ? priceRange.max : undefined,
+      minMileage: mileageRange.min !== MIN_MILEAGE ? mileageRange.min : undefined,
+      maxMileage: mileageRange.max !== MAX_MILEAGE ? mileageRange.max : undefined,
+      fuelType: fuelTypeFilter || undefined,
+      year: yearFilter !== '0' ? parseInt(yearFilter) : undefined,
+      color: colorFilter || undefined,
+      state: stateFilter || undefined,
+      features: selectedFeatures.length > 0 ? selectedFeatures : undefined,
+      query: aiSearchQuery || undefined
+    };
+
+    try {
+      const savedSearch = saveSearch(currentUser.email, searchName, filters, true);
+      if (onSaveSearch) {
+        onSaveSearch(savedSearch);
+      }
+      alert('Search saved successfully!');
+    } catch (error) {
+      console.error('Error saving search:', error);
+      alert('Failed to save search. Please try again.');
+    }
   };
 
   // Reset page to 1 when filters change
@@ -656,7 +696,22 @@ const VehicleList: React.FC<VehicleListProps> = ({ vehicles, onSelectVehicle, is
                     </div>
                 )}
             </div>
-            {!isMobile && <button onClick={handleResetFilters} className="w-full bg-spinny-light-gray dark:bg-brand-gray-700 text-spinny-text-dark dark:text-brand-gray-200 font-bold py-3 px-4 rounded-lg hover:bg-brand-gray-300 dark:hover:bg-brand-gray-600 transition-colors mt-2">Reset Filters</button>}
+            {!isMobile && (
+              <div className="space-y-2 mt-2">
+                <button onClick={handleResetFilters} className="w-full bg-spinny-light-gray dark:bg-brand-gray-700 text-spinny-text-dark dark:text-brand-gray-200 font-bold py-3 px-4 rounded-lg hover:bg-brand-gray-300 dark:hover:bg-brand-gray-600 transition-colors">
+                  Reset Filters
+                </button>
+                <button 
+                  onClick={handleSaveSearch} 
+                  className="w-full bg-spinny-orange text-white font-bold py-3 px-4 rounded-lg hover:bg-orange-600 transition-colors flex items-center justify-center gap-2"
+                >
+                  <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
+                  </svg>
+                  Save Search
+                </button>
+              </div>
+            )}
         </div>
     );
   };
