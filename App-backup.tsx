@@ -113,7 +113,7 @@ const AppContent: React.FC = () => {
       console.log('🚀 App.handleAddVehicle called with:', vehicleData);
       console.log('⭐ Is featuring:', isFeaturing);
       
-      const { addVehicle } = await import('./services/vehicleService');
+      const { addVehicle } = await import('./services/dataService');
       const vehicleToAdd = {
         ...vehicleData,
         id: Date.now(),
@@ -137,7 +137,7 @@ const AppContent: React.FC = () => {
 
   const handleUpdateVehicle = async (vehicleData: Vehicle) => {
     try {
-      const { updateVehicle } = await import('./services/vehicleService');
+      const { updateVehicle } = await import('./services/dataService');
       const updatedVehicle = await updateVehicle(vehicleData);
       (setVehicles as any)((prev: Vehicle[]) => prev.map((v: Vehicle) => v.id === vehicleData.id ? updatedVehicle : v));
       addToast('Vehicle updated successfully!', 'success');
@@ -156,7 +156,7 @@ const AppContent: React.FC = () => {
       
       // Try to delete from service (optional - for persistence)
       try {
-        const { deleteVehicle } = await import('./services/vehicleService');
+        const { deleteVehicle } = await import('./services/dataService');
         await deleteVehicle(vehicleId);
         console.log('✅ Vehicle deleted from service');
       } catch (serviceError) {
@@ -212,7 +212,7 @@ const AppContent: React.FC = () => {
 
   const handleAddMultipleVehicles = async (vehiclesData: Omit<Vehicle, 'id' | 'averageRating' | 'ratingCount'>[]) => {
     try {
-      const { addVehicle } = await import('./services/vehicleService');
+      const { addVehicle } = await import('./services/dataService');
       const newVehicles = await Promise.all(
         vehiclesData.map(async (vehicleData) => {
           return await addVehicle({
@@ -753,9 +753,9 @@ const AppContent: React.FC = () => {
             
             // Lazy load services
             const [vehicleService, userService, vehicleDataService] = await Promise.all([
-                import('./services/vehicleService'),
-                import('./services/userService'),
-                import('./services/vehicleDataService')
+                import('./services/dataService'),
+                import('./services/dataService'),
+                import('./services/dataService')
             ]);
             
             // Load critical data with timeout protection

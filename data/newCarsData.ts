@@ -35,7 +35,7 @@ export interface NewCarModel {
     image_url: string; 
 }
 
-const getImageUrl = (brand: string, model: string) => `https://via.placeholder.com/320x240.png/E5E7EB/4B5563?text=${encodeURIComponent(`${brand} ${model}`)}`;
+const getImageUrl = (brand: string, model: string) => `https://picsum.photos/320/240?random=${brand.length + model.length}`;
 
 const generateStatePrices = (basePrice: number): { [state: string]: number } => {
     const prices: { [state: string]: number } = {};

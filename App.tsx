@@ -6,7 +6,7 @@ import Footer from './components/Footer';
 import ToastContainer from './components/ToastContainer';
 import CommandPalette from './components/CommandPalette';
 import { ChatWidget } from './components/ChatWidget';
-import { View as ViewEnum } from './types';
+import { View as ViewEnum, Vehicle } from './types';
 
 // Simple loading component
 const LoadingSpinner: React.FC = () => (
@@ -64,12 +64,11 @@ const AppContent: React.FC = () => {
     toasts,
     activeChat,
     users,
-    platformSettings,
-    auditLog,
     vehicleData,
     faqItems,
+    platformSettings,
+    auditLog,
     supportTickets,
-    forgotPasswordRole,
     selectedCategory: currentCategory,
     initialSearchQuery,
     selectedCity,
@@ -78,19 +77,43 @@ const AppContent: React.FC = () => {
     removeToast,
     setActiveChat,
     isCommandPaletteOpen,
-    setCurrentUser,
-    setUsers,
-    setVehicles,
     setWishlist,
     setComparisonList,
-    setPlatformSettings,
-    setVehicleData,
-    setSupportTickets,
-    setFaqItems,
-    setAuditLog,
-    setForgotPasswordRole,
     setPublicSellerProfile: setPublicProfile,
-    setInitialSearchQuery
+    setInitialSearchQuery,
+    setForgotPasswordRole,
+    addSellerRating,
+    sendMessage,
+    markAsRead,
+    toggleTyping,
+    flagContent,
+    updateUser,
+    deleteUser,
+    updateVehicle,
+    deleteVehicle,
+    selectVehicle,
+    toggleWishlist,
+    toggleCompare,
+    handleLogin,
+    handleRegister,
+    onAdminUpdateUser,
+    onUpdateUserPlan,
+    onToggleUserStatus,
+    onToggleVehicleStatus,
+    onToggleVehicleFeature,
+    onResolveFlag,
+    onUpdateSettings,
+    onSendBroadcast,
+    onExportUsers,
+    onExportVehicles,
+    onExportSales,
+    onUpdateVehicleData,
+    onToggleVerifiedStatus,
+    onUpdateSupportTicket,
+    onAddFaq,
+    onUpdateFaq,
+    onDeleteFaq,
+    onCertificationApproval,
   } = useApp();
 
   const renderView = () => {
@@ -170,25 +193,27 @@ const AppContent: React.FC = () => {
           <VehicleDetail
             vehicle={selectedVehicle}
             onBack={() => navigate(ViewEnum.USED_CARS)}
-            onToggleCompare={(id: number) => {
-              setComparisonList(prev => 
-                prev.includes(id) 
-                  ? prev.filter(vId => vId !== id)
-                  : [...prev, id]
-              );
-            }}
-            onToggleWishlist={(id: number) => {
-              setWishlist(prev => 
-                prev.includes(id) 
-                  ? prev.filter(vId => vId !== id)
-                  : [...prev, id]
-              );
-            }}
-            onViewSellerProfile={(sellerEmail: string) => {
-              setPublicProfile({ email: sellerEmail } as any);
-              navigate(ViewEnum.SELLER_PROFILE);
-            }}
+            comparisonList={comparisonList}
+            onToggleCompare={toggleCompare}
+            onAddSellerRating={addSellerRating}
+            wishlist={wishlist}
+            onToggleWishlist={toggleWishlist}
             currentUser={currentUser}
+            onFlagContent={(type, id, _reason) => flagContent(type, id)}
+            users={users}
+            onViewSellerProfile={(sellerEmail: string) => {
+              const seller = users.find(u => u.email === sellerEmail);
+              if (seller) {
+                setPublicProfile(seller);
+                navigate(ViewEnum.SELLER_PROFILE);
+              }
+            }}
+            onStartChat={(_vehicle) => {
+              // Start chat with seller
+              addToast('Starting chat with seller', 'success');
+            }}
+            recommendations={recommendations}
+            onSelectVehicle={selectVehicle}
           />
         ) : (
           <div className="min-h-[calc(100vh-140px)] flex items-center justify-center">
@@ -211,7 +236,17 @@ const AppContent: React.FC = () => {
 
       case ViewEnum.COMPARISON:
         return (
-          <Comparison />
+          <Comparison 
+            vehicles={vehicles.filter(v => comparisonList.includes(v.id))}
+            onBack={() => navigate(ViewEnum.USED_CARS)}
+            onToggleCompare={(id: number) => {
+              setComparisonList(prev => 
+                prev.includes(id) 
+                  ? prev.filter(vId => vId !== id)
+                  : [...prev, id]
+              );
+            }}
+          />
         );
 
       case ViewEnum.WISHLIST:
@@ -334,7 +369,41 @@ const AppContent: React.FC = () => {
 
       case ViewEnum.ADMIN_PANEL:
         return currentUser?.role === 'admin' ? (
-          <AdminPanel />
+          <AdminPanel 
+            users={users}
+            currentUser={currentUser}
+            vehicles={vehicles}
+            conversations={conversations}
+            onAdminUpdateUser={onAdminUpdateUser}
+            onToggleUserStatus={onToggleUserStatus}
+            onDeleteUser={deleteUser}
+            onUpdateUserPlan={onUpdateUserPlan}
+            onUpdateVehicle={(vehicle: Vehicle) => {
+              updateVehicle(vehicle.id, vehicle);
+            }}
+            onDeleteVehicle={deleteVehicle}
+            onToggleVehicleStatus={onToggleVehicleStatus}
+            onToggleVehicleFeature={onToggleVehicleFeature}
+            onResolveFlag={onResolveFlag}
+            platformSettings={platformSettings}
+            onUpdateSettings={onUpdateSettings}
+            onSendBroadcast={onSendBroadcast}
+            auditLog={auditLog}
+            onExportUsers={onExportUsers}
+            onExportVehicles={onExportVehicles}
+            onExportSales={onExportSales}
+            onNavigate={navigate}
+            vehicleData={vehicleData}
+            onUpdateVehicleData={onUpdateVehicleData}
+            onToggleVerifiedStatus={onToggleVerifiedStatus}
+            supportTickets={supportTickets}
+            onUpdateSupportTicket={onUpdateSupportTicket}
+            faqItems={faqItems}
+            onAddFaq={onAddFaq}
+            onUpdateFaq={onUpdateFaq}
+            onDeleteFaq={onDeleteFaq}
+            onCertificationApproval={onCertificationApproval}
+          />
         ) : (
           <div className="min-h-[calc(100vh-140px)] flex items-center justify-center">
             <div className="text-center">
@@ -352,7 +421,21 @@ const AppContent: React.FC = () => {
 
       case ViewEnum.PROFILE:
         return currentUser ? (
-          <Profile />
+          <Profile 
+            currentUser={currentUser}
+            onUpdateProfile={(details) => {
+              if (currentUser) {
+                updateUser(currentUser.email, details);
+              }
+            }}
+            onUpdatePassword={async (passwords) => {
+              if (currentUser) {
+                updateUser(currentUser.email, { password: passwords.new });
+                return true;
+              }
+              return false;
+            }}
+          />
         ) : (
           <div className="min-h-[calc(100vh-140px)] flex items-center justify-center">
             <div className="text-center">
@@ -370,7 +453,26 @@ const AppContent: React.FC = () => {
 
       case ViewEnum.INBOX:
         return currentUser ? (
-          <CustomerInbox />
+          <CustomerInbox 
+            conversations={conversations}
+            onSendMessage={(vehicleId, messageText) => {
+              const conversation = conversations.find(c => c.vehicleId === vehicleId);
+              if (conversation) {
+                sendMessage(conversation.id, messageText);
+              }
+            }}
+            onMarkAsRead={markAsRead}
+            users={users}
+            typingStatus={typingStatus}
+            onUserTyping={(conversationId: string, _userRole: 'customer' | 'seller') => {
+              toggleTyping(conversationId, true);
+            }}
+            onMarkMessagesAsRead={markAsRead}
+            onFlagContent={(type, id, _reason) => flagContent(type, id)}
+            onOfferResponse={(_conversationId: string, _messageId: number, response: 'accepted' | 'rejected' | 'countered', _counterPrice?: number) => {
+              addToast(`Offer ${response}`, 'success');
+            }}
+          />
         ) : (
           <div className="min-h-[calc(100vh-140px)] flex items-center justify-center">
             <div className="text-center">
@@ -388,7 +490,23 @@ const AppContent: React.FC = () => {
 
       case ViewEnum.SELLER_PROFILE:
         return publicSellerProfile ? (
-          <SellerProfilePage />
+          <SellerProfilePage 
+            seller={publicSellerProfile}
+            vehicles={vehicles.filter(v => v.sellerEmail === publicSellerProfile?.email)}
+            onSelectVehicle={selectVehicle}
+            comparisonList={comparisonList}
+            onToggleCompare={toggleCompare}
+            wishlist={wishlist}
+            onToggleWishlist={toggleWishlist}
+            onBack={() => navigate(ViewEnum.HOME)}
+            onViewSellerProfile={(sellerEmail) => {
+              const seller = users.find(u => u.email === sellerEmail);
+              if (seller) {
+                setPublicProfile(seller);
+                navigate(ViewEnum.SELLER_PROFILE);
+              }
+            }}
+          />
         ) : (
           <div className="min-h-[calc(100vh-140px)] flex items-center justify-center">
             <div className="text-center">
@@ -405,52 +523,112 @@ const AppContent: React.FC = () => {
 
       case ViewEnum.DEALER_PROFILES:
         return (
-          <DealerProfiles />
+          <DealerProfiles 
+            sellers={users.filter(user => user.role === 'seller')} 
+            onViewProfile={(sellerEmail) => {
+              setPublicProfile({ email: sellerEmail } as any);
+              navigate(ViewEnum.SELLER_PROFILE);
+            }} 
+          />
         );
 
       case ViewEnum.PRICING:
         return (
-          <PricingPage />
+          <PricingPage 
+            currentUser={currentUser}
+            onSelectPlan={(planId) => {
+              // Handle plan selection
+              console.log('Selected plan:', planId);
+            }}
+          />
         );
 
       case ViewEnum.SUPPORT:
         return (
-          <SupportPage />
+          <SupportPage 
+            currentUser={currentUser}
+            onSubmitTicket={(ticket) => {
+              // Handle support ticket submission
+              console.log('Support ticket submitted:', ticket);
+            }}
+          />
         );
 
       case ViewEnum.FAQ:
         return (
-          <FAQPage />
+          <FAQPage 
+            faqItems={faqItems}
+          />
         );
 
       case ViewEnum.CITY_LANDING:
         return (
-          <CityLandingPage />
+          <CityLandingPage 
+            city={selectedCity}
+            vehicles={vehicles}
+            onSelectVehicle={selectVehicle}
+            onToggleWishlist={toggleWishlist}
+            onToggleCompare={toggleCompare}
+            wishlist={wishlist}
+            comparisonList={comparisonList}
+            onViewSellerProfile={(sellerEmail) => {
+              const seller = users.find(u => u.email === sellerEmail);
+              if (seller) {
+                setPublicProfile(seller);
+                navigate(ViewEnum.SELLER_PROFILE);
+              }
+            }}
+          />
         );
 
       case ViewEnum.LOGIN_PORTAL:
         return (
-          <LoginPortal />
+          <LoginPortal onNavigate={navigate} />
         );
 
       case ViewEnum.CUSTOMER_LOGIN:
         return (
-          <CustomerLogin />
+          <CustomerLogin 
+            onLogin={handleLogin}
+            onRegister={handleRegister}
+            onNavigate={navigate}
+            onForgotPassword={() => {
+              setForgotPasswordRole('customer');
+              navigate(ViewEnum.FORGOT_PASSWORD);
+            }}
+          />
         );
 
       case ViewEnum.SELLER_LOGIN:
         return (
-          <Login />
+          <Login 
+            onLogin={handleLogin}
+            onRegister={handleRegister}
+            onNavigate={navigate}
+            onForgotPassword={() => {
+              setForgotPasswordRole('customer');
+              navigate(ViewEnum.FORGOT_PASSWORD);
+            }}
+          />
         );
 
       case ViewEnum.ADMIN_LOGIN:
         return (
-          <AdminLogin />
+          <AdminLogin 
+            onLogin={handleLogin}
+            onNavigate={navigate}
+          />
         );
 
       case ViewEnum.FORGOT_PASSWORD:
         return (
-          <ForgotPassword />
+          <ForgotPassword 
+            onResetRequest={(email) => {
+              // Handle password reset request
+              console.log('Password reset requested for:', email);
+            }}
+            onBack={() => navigate(ViewEnum.LOGIN_PORTAL)}
+          />
         );
 
       default:
@@ -533,7 +711,7 @@ const AppContent: React.FC = () => {
         <ChatWidget
           conversation={activeChat}
           currentUserRole={currentUser.role as 'customer' | 'seller'}
-          otherUserName={activeChat.otherUserName || 'User'}
+          otherUserName={currentUser?.role === 'customer' ? activeChat.sellerId : activeChat.customerName}
           onClose={() => setActiveChat(null)}
           onSendMessage={() => {}}
           typingStatus={typingStatus}

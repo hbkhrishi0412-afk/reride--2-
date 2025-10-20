@@ -12,7 +12,7 @@ export interface VehicleMake {
 
 export type VehicleCategoryData = VehicleMake[];
 
-const DEFAULT_PLACEHOLDER = 'https://via.placeholder.com/800x600/E5E7EB/4B5563?text=ReRide';
+const DEFAULT_PLACEHOLDER = 'https://picsum.photos/800/600?random=1';
 
 export const getPlaceholderImage = (make?: string, model?: string): string => {
   if (make && model) {

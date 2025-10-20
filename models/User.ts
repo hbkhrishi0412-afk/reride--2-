@@ -68,7 +68,62 @@ const userSchema = new mongoose.Schema({
   usedCertifications: {
     type: Number,
     default: 0
-  }
+  },
+  
+  // Trust & Verification
+  phoneVerified: { type: Boolean, default: false },
+  emailVerified: { type: Boolean, default: false },
+  govtIdVerified: { type: Boolean, default: false },
+  verificationDate: String,
+  verificationStatus: {
+    phoneVerified: { type: Boolean, default: false },
+    emailVerified: { type: Boolean, default: false },
+    govtIdVerified: { type: Boolean, default: false },
+  },
+  
+  // Activity & Reputation
+  responseTime: Number, // in minutes
+  responseRate: Number, // percentage 0-100
+  responseTimeMinutes: Number,
+  joinedDate: String,
+  lastActiveAt: String,
+  activeListings: { type: Number, default: 0 },
+  soldListings: { type: Number, default: 0 },
+  totalViews: { type: Number, default: 0 },
+  
+  // Trust & Safety
+  reportedCount: { type: Number, default: 0 },
+  isBanned: { type: Boolean, default: false },
+  trustScore: { type: Number, default: 0 },
+  
+  // Contact Preferences
+  alternatePhone: String,
+  preferredContactHours: String,
+  showEmailPublicly: { type: Boolean, default: false },
+  
+  // Ratings & Reviews
+  averageRating: { type: Number, default: 0 },
+  ratingCount: { type: Number, default: 0 },
+  badges: [mongoose.Schema.Types.Mixed],
+  
+  // Payment Request System
+  pendingPlanUpgrade: {
+    id: String,
+    sellerEmail: String,
+    planId: String,
+    amount: Number,
+    status: { type: String, enum: ['pending', 'approved', 'rejected'], default: 'pending' },
+    paymentProof: String,
+    paymentMethod: String,
+    transactionId: String,
+    requestedAt: String,
+    approvedAt: String,
+    approvedBy: String,
+    rejectedAt: String,
+    rejectedBy: String,
+    rejectionReason: String,
+    notes: String,
+  },
 }, {
   timestamps: true // Adds createdAt and updatedAt managed by Mongoose
 });

@@ -21,7 +21,7 @@ export const FALLBACK_VEHICLES: Vehicle[] = [
     transmission: "Manual",
     location: "Mumbai",
     sellerEmail: "demo@reride.com",
-    images: ["https://via.placeholder.com/800x600/E5E7EB/4B5563?text=Swift"],
+    images: ["https://picsum.photos/800/600?random=1"],
     description: "Well maintained Swift in excellent condition",
     status: "published",
     isFeatured: true,

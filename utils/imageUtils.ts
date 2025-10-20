@@ -2,7 +2,7 @@
  * Image utility functions for handling image sources and validation
  */
 
-const DEFAULT_PLACEHOLDER = 'https://via.placeholder.com/800x600/E5E7EB/4B5563?text=ReRide';
+const DEFAULT_PLACEHOLDER = 'https://picsum.photos/800/600?random=1';
 
 /**
  * Validates and returns a safe image source

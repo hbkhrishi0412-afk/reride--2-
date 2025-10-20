@@ -14,7 +14,7 @@ const OptimizedVehicleImage: React.FC<OptimizedVehicleImageProps> = memo(({
   src,
   alt,
   className = '',
-  fallbackSrc = 'https://via.placeholder.com/800x600/E5E7EB/4B5563?text=Vehicle+Image',
+  fallbackSrc = 'https://picsum.photos/800/600?random=1',
   onLoad,
   onError
 }) => {

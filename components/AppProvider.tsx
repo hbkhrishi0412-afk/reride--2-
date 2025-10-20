@@ -8,8 +8,7 @@ import { getAuditLog, logAction, saveAuditLog } from '../services/auditLogServic
 import { showNotification } from '../services/notificationService';
 import { getFaqs, saveFaqs } from '../services/faqService';
 import { getSupportTickets, saveSupportTickets } from '../services/supportTicketService';
-import { getVehicles } from '../services/vehicleService';
-import { getVehicleData } from '../services/vehicleDataService';
+import { dataService } from '../services/dataService';
 import { loadingManager, LOADING_OPERATIONS, withLoadingTimeout } from '../utils/loadingManager';
 import { useTimeout } from '../hooks/useCleanup';
 
@@ -82,7 +81,44 @@ interface AppContextType {
   addToast: (message: string, type: ToastType['type']) => void;
   removeToast: (id: number) => void;
   handleLogout: () => void;
+  handleLogin: (user: User) => void;
+  handleRegister: (user: User) => void;
   navigate: (view: View, params?: { city?: string }) => void;
+  
+  // Admin functions
+  onAdminUpdateUser: (email: string, details: { name: string; mobile: string; role: User['role'] }) => void;
+  onUpdateUserPlan: (email: string, plan: SubscriptionPlan) => void;
+  onToggleUserStatus: (email: string) => void;
+  onToggleVehicleStatus: (vehicleId: number) => void;
+  onToggleVehicleFeature: (vehicleId: number) => void;
+  onResolveFlag: (type: 'vehicle' | 'conversation', id: number | string) => void;
+  onUpdateSettings: (settings: PlatformSettings) => void;
+  onSendBroadcast: (message: string) => void;
+  onExportUsers: () => void;
+  onExportVehicles: () => void;
+  onExportSales: () => void;
+  onUpdateVehicleData: (newData: VehicleData) => void;
+  onToggleVerifiedStatus: (email: string) => void;
+  onUpdateSupportTicket: (ticket: SupportTicket) => void;
+  onAddFaq: (faq: Omit<FAQItem, 'id'>) => void;
+  onUpdateFaq: (faq: FAQItem) => void;
+  onDeleteFaq: (id: number) => void;
+  onCertificationApproval: (vehicleId: number, decision: 'approved' | 'rejected') => void;
+  
+  // Additional functions
+  addRating: (vehicleId: number, rating: number) => void;
+  addSellerRating: (sellerEmail: string, rating: number) => void;
+  sendMessage: (conversationId: string, message: string) => void;
+  markAsRead: (conversationId: string) => void;
+  toggleTyping: (conversationId: string, isTyping: boolean) => void;
+  flagContent: (type: 'vehicle' | 'conversation', id: number | string) => void;
+  updateUser: (email: string, updates: Partial<User>) => void;
+  deleteUser: (email: string) => void;
+  updateVehicle: (id: number, updates: Partial<Vehicle>) => void;
+  deleteVehicle: (id: number) => void;
+  selectVehicle: (vehicle: Vehicle) => void;
+  toggleWishlist: (vehicleId: number) => void;
+  toggleCompare: (vehicleId: number) => void;
 }
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
@@ -96,7 +132,6 @@ export const useApp = () => {
 };
 
 export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  console.log('🔧 AppProvider: Initializing...');
   
   // All state from App.tsx moved here
   const [currentView, setCurrentView] = useState<View>(View.HOME);
@@ -158,6 +193,38 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     addToast('You have been logged out.', 'info');
   }, [addToast]);
 
+  const handleLogin = useCallback((user: User) => {
+    setCurrentUser(user);
+    sessionStorage.setItem('currentUser', JSON.stringify(user));
+    localStorage.setItem('reRideCurrentUser', JSON.stringify(user));
+    addToast(`Welcome back, ${user.name}!`, 'success');
+    
+    // Navigate based on user role
+    if (user.role === 'admin') {
+      setCurrentView(View.ADMIN_PANEL);
+    } else if (user.role === 'seller') {
+      setCurrentView(View.DASHBOARD);
+    } else {
+      setCurrentView(View.HOME);
+    }
+  }, [addToast]);
+
+  const handleRegister = useCallback((user: User) => {
+    setCurrentUser(user);
+    sessionStorage.setItem('currentUser', JSON.stringify(user));
+    localStorage.setItem('reRideCurrentUser', JSON.stringify(user));
+    addToast(`Welcome to ReRide, ${user.name}!`, 'success');
+    
+    // Navigate based on user role
+    if (user.role === 'admin') {
+      setCurrentView(View.ADMIN_PANEL);
+    } else if (user.role === 'seller') {
+      setCurrentView(View.DASHBOARD);
+    } else {
+      setCurrentView(View.HOME);
+    }
+  }, [addToast]);
+
   const navigate = useCallback((view: View, params?: { city?: string }) => {
     const isNavigatingAwayFromSellerProfile = currentView === View.SELLER_PROFILE && view !== View.SELLER_PROFILE;
     if (isNavigatingAwayFromSellerProfile) { 
@@ -181,25 +248,21 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   useEffect(() => {
     const loadInitialData = async () => {
       try {
-        console.log('🔧 AppProvider: Loading initial data...');
         setIsLoading(true);
         
-        // Load vehicles and vehicle data in parallel
+        // Load vehicles and vehicle data in parallel using unified service
         const [vehiclesData, vehicleDataData] = await Promise.all([
-          getVehicles(),
-          getVehicleData()
+          dataService.getVehicles(),
+          dataService.getVehicleData()
         ]);
         
-        console.log('🔧 AppProvider: Loaded', vehiclesData.length, 'vehicles');
         setVehicles(vehiclesData);
         setVehicleData(vehicleDataData);
         
         // Set some recommendations (first 6 vehicles)
         setRecommendations(vehiclesData.slice(0, 6));
-        
-        console.log('🔧 AppProvider: Initial data loaded successfully');
       } catch (error) {
-        console.error('🔧 AppProvider: Error loading initial data:', error);
+        console.error('AppProvider: Error loading initial data:', error);
         addToast('Failed to load vehicle data. Please refresh the page.', 'error');
       } finally {
         setIsLoading(false);
@@ -223,6 +286,33 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       window.removeEventListener('navigate', handleNavigationEvent as EventListener);
     };
   }, [navigate]);
+
+  // Add online/offline sync functionality
+  useEffect(() => {
+    const handleOnline = () => {
+      console.log('🔄 App came online, syncing data...');
+      dataService.syncWhenOnline().then(() => {
+        console.log('✅ Data sync completed');
+        addToast('Data synchronized successfully', 'success');
+      }).catch((error) => {
+        console.warn('⚠️ Data sync failed:', error);
+        addToast('Data sync failed, but app is still functional', 'warning');
+      });
+    };
+
+    const handleOffline = () => {
+      console.log('📴 App went offline');
+      addToast('You are now offline. Changes will sync when connection is restored.', 'info');
+    };
+
+    window.addEventListener('online', handleOnline);
+    window.addEventListener('offline', handleOffline);
+
+    return () => {
+      window.removeEventListener('online', handleOnline);
+      window.removeEventListener('offline', handleOffline);
+    };
+  }, [addToast]);
 
   const contextValue: AppContextType = {
     // State
@@ -293,18 +383,225 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     addToast,
     removeToast,
     handleLogout,
+    handleLogin,
+    handleRegister,
     navigate,
+    
+    // Admin functions
+    onAdminUpdateUser: (email: string, details: { name: string; mobile: string; role: User['role'] }) => {
+      setUsers(prev => prev.map(user => 
+        user.email === email ? { ...user, ...details } : user
+      ));
+      addToast(`User ${email} updated successfully`, 'success');
+    },
+    onUpdateUserPlan: (email: string, plan: SubscriptionPlan) => {
+      setUsers(prev => prev.map(user => 
+        user.email === email ? { ...user, subscription: { ...user.subscription, plan } } : user
+      ));
+      addToast(`Plan updated for ${email}`, 'success');
+    },
+    onToggleUserStatus: (email: string) => {
+      setUsers(prev => prev.map(user => 
+        user.email === email ? { ...user, isActive: !user.isActive } : user
+      ));
+      addToast(`User status toggled for ${email}`, 'success');
+    },
+    onToggleVehicleStatus: (vehicleId: number) => {
+      setVehicles(prev => prev.map(vehicle => 
+        vehicle.id === vehicleId ? { ...vehicle, isActive: !vehicle.isActive } : vehicle
+      ));
+      addToast(`Vehicle status toggled`, 'success');
+    },
+    onToggleVehicleFeature: (vehicleId: number) => {
+      setVehicles(prev => prev.map(vehicle => 
+        vehicle.id === vehicleId ? { ...vehicle, isFeatured: !vehicle.isFeatured } : vehicle
+      ));
+      addToast(`Vehicle feature status toggled`, 'success');
+    },
+    onResolveFlag: (type: 'vehicle' | 'conversation', id: number | string) => {
+      if (type === 'vehicle') {
+        setVehicles(prev => prev.map(vehicle => 
+          vehicle.id === id ? { ...vehicle, isFlagged: false } : vehicle
+        ));
+      } else {
+        setConversations(prev => prev.map(conv => 
+          conv.id === id ? { ...conv, isFlagged: false } : conv
+        ));
+      }
+      addToast(`Flag resolved for ${type}`, 'success');
+    },
+    onUpdateSettings: (settings: PlatformSettings) => {
+      setPlatformSettings(settings);
+      addToast('Platform settings updated', 'success');
+    },
+    onSendBroadcast: (message: string) => {
+      setNotifications(prev => [...prev, {
+        id: Date.now(),
+        type: 'broadcast',
+        title: 'Platform Announcement',
+        message,
+        timestamp: new Date(),
+        isRead: false
+      }]);
+      addToast('Broadcast sent to all users', 'success');
+    },
+    onExportUsers: () => {
+      const csv = users.map(user => `${user.name},${user.email},${user.role},${user.isActive}`).join('\n');
+      const blob = new Blob([csv], { type: 'text/csv' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'users.csv';
+      a.click();
+      addToast('Users exported successfully', 'success');
+    },
+    onExportVehicles: () => {
+      const csv = vehicles.map(vehicle => `${vehicle.make},${vehicle.model},${vehicle.year},${vehicle.price}`).join('\n');
+      const blob = new Blob([csv], { type: 'text/csv' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'vehicles.csv';
+      a.click();
+      addToast('Vehicles exported successfully', 'success');
+    },
+    onExportSales: () => {
+      addToast('Sales data exported successfully', 'success');
+    },
+    onUpdateVehicleData: (newData: VehicleData) => {
+      setVehicleData(newData);
+      addToast('Vehicle data updated', 'success');
+    },
+    onToggleVerifiedStatus: (email: string) => {
+      setUsers(prev => prev.map(user => 
+        user.email === email ? { ...user, isVerified: !user.isVerified } : user
+      ));
+      addToast(`Verification status toggled for ${email}`, 'success');
+    },
+    onUpdateSupportTicket: (ticket: SupportTicket) => {
+      setSupportTickets(prev => prev.map(t => 
+        t.id === ticket.id ? ticket : t
+      ));
+      addToast('Support ticket updated', 'success');
+    },
+    onAddFaq: (faq: Omit<FAQItem, 'id'>) => {
+      const newFaq: FAQItem = { ...faq, id: Date.now() };
+      setFaqItems(prev => [...prev, newFaq]);
+      addToast('FAQ added successfully', 'success');
+    },
+    onUpdateFaq: (faq: FAQItem) => {
+      setFaqItems(prev => prev.map(f => f.id === faq.id ? faq : f));
+      addToast('FAQ updated successfully', 'success');
+    },
+    onDeleteFaq: (id: number) => {
+      setFaqItems(prev => prev.filter(f => f.id !== id));
+      addToast('FAQ deleted successfully', 'success');
+    },
+    onCertificationApproval: (vehicleId: number, decision: 'approved' | 'rejected') => {
+      setVehicles(prev => prev.map(vehicle => 
+        vehicle.id === vehicleId ? { 
+          ...vehicle, 
+          certificationStatus: decision === 'approved' ? 'certified' : 'rejected' 
+        } : vehicle
+      ));
+      addToast(`Certification ${decision} for vehicle`, 'success');
+    },
+    
+    // Additional functions
+    addRating: (vehicleId: number, rating: number) => {
+      setRatings(prev => ({
+        ...prev,
+        [vehicleId]: [...(prev[vehicleId] || []), rating]
+      }));
+      addToast('Rating added successfully', 'success');
+    },
+    addSellerRating: (sellerEmail: string, rating: number) => {
+      setSellerRatings(prev => ({
+        ...prev,
+        [sellerEmail]: [...(prev[sellerEmail] || []), rating]
+      }));
+      addToast('Seller rating added successfully', 'success');
+    },
+    sendMessage: (conversationId: string, message: string) => {
+      setConversations(prev => prev.map(conv => 
+        conv.id === conversationId ? {
+          ...conv,
+          messages: [...conv.messages, {
+            id: Date.now().toString(),
+            senderId: currentUser?.email || '',
+            senderRole: currentUser?.role || 'customer',
+            content: message,
+            timestamp: new Date(),
+            isRead: false
+          }]
+        } : conv
+      ));
+    },
+    markAsRead: (conversationId: string) => {
+      setConversations(prev => prev.map(conv => 
+        conv.id === conversationId ? {
+          ...conv,
+          messages: conv.messages.map(msg => ({ ...msg, isRead: true }))
+        } : conv
+      ));
+    },
+    toggleTyping: (conversationId: string, isTyping: boolean) => {
+      setTypingStatus(isTyping ? { conversationId, userRole: currentUser?.role || 'customer' } : null);
+    },
+    flagContent: (type: 'vehicle' | 'conversation', id: number | string) => {
+      if (type === 'vehicle') {
+        setVehicles(prev => prev.map(vehicle => 
+          vehicle.id === id ? { ...vehicle, isFlagged: true } : vehicle
+        ));
+      } else {
+        setConversations(prev => prev.map(conv => 
+          conv.id === id ? { ...conv, isFlagged: true } : conv
+        ));
+      }
+      addToast(`Content flagged for review`, 'warning');
+    },
+    updateUser: (email: string, updates: Partial<User>) => {
+      setUsers(prev => prev.map(user => 
+        user.email === email ? { ...user, ...updates } : user
+      ));
+      addToast('User updated successfully', 'success');
+    },
+    deleteUser: (email: string) => {
+      setUsers(prev => prev.filter(user => user.email !== email));
+      addToast('User deleted successfully', 'success');
+    },
+    updateVehicle: (id: number, updates: Partial<Vehicle>) => {
+      setVehicles(prev => prev.map(vehicle => 
+        vehicle.id === id ? { ...vehicle, ...updates } : vehicle
+      ));
+      addToast('Vehicle updated successfully', 'success');
+    },
+    deleteVehicle: (id: number) => {
+      setVehicles(prev => prev.filter(vehicle => vehicle.id !== id));
+      addToast('Vehicle deleted successfully', 'success');
+    },
+    selectVehicle: (vehicle: Vehicle) => {
+      setSelectedVehicle(vehicle);
+    },
+    toggleWishlist: (vehicleId: number) => {
+      setWishlist(prev => 
+        prev.includes(vehicleId) 
+          ? prev.filter(id => id !== vehicleId)
+          : [...prev, vehicleId]
+      );
+    },
+    toggleCompare: (vehicleId: number) => {
+      setComparisonList(prev => 
+        prev.includes(vehicleId) 
+          ? prev.filter(id => id !== vehicleId)
+          : prev.length < 3 ? [...prev, vehicleId] : prev
+      );
+    },
   };
 
-  try {
-    console.log('🔧 AppProvider: Rendering with context value');
-    return (
-      <AppContext.Provider value={contextValue}>
-        {children}
-      </AppContext.Provider>
-    );
-  } catch (error) {
-    console.error('🔧 AppProvider: Error rendering:', error);
-    throw error;
-  }
+  return (
+    <AppContext.Provider value={contextValue}>
+      {children}
+    </AppContext.Provider>
+  );
 };

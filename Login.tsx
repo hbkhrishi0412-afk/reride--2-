@@ -41,8 +41,8 @@ const Login: React.FC<LoginProps> = ({ onLogin, onRegister, onNavigate, onForgot
         if (mode === 'login') {
             if (!email || !password) throw new Error('Please enter both email and password.');
             
-            // EMERGENCY FALLBACK for seller login
-            if (email === 'seller@test.com' && password === 'password') {
+            // EMERGENCY FALLBACK for seller login (development only)
+            if (process.env.NODE_ENV === 'development' && email === 'seller@test.com' && password === 'password') {
                 console.log('✅ Hardcoded seller credentials matched - logging in directly');
                 const hardcodedSeller: User = {
                     name: 'Prestige Motors',
