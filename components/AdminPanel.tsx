@@ -836,18 +836,23 @@ const AdminPanel: React.FC<AdminPanelProps> = (props) => {
     };
 
     const analytics = useMemo(() => {
-        const totalUsers = users.length;
-        const totalVehicles = vehicles.length;
-        const activeListings = vehicles.filter(v => v.status === 'published').length;
-        const soldListings = vehicles.filter(v => v.status === 'sold');
+        // Add null/undefined checks to prevent length errors
+        const safeUsers = users || [];
+        const safeVehicles = vehicles || [];
+        const safeConversations = conversations || [];
+        
+        const totalUsers = safeUsers.length;
+        const totalVehicles = safeVehicles.length;
+        const activeListings = safeVehicles.filter(v => v.status === 'published').length;
+        const soldListings = safeVehicles.filter(v => v.status === 'sold');
         // FIX: Added Number() to ensure v.price is treated as a number, preventing arithmetic errors on potentially mixed types.
         const totalSales = soldListings.reduce((sum: number, v) => sum + (Number(v.price) || 0), 0);
-        const flaggedVehiclesCount = vehicles.reduce((sum: number, v) => v.isFlagged ? sum + 1 : sum, 0);
-        const flaggedConversationsCount = conversations.reduce((sum: number, c) => c.isFlagged ? sum + 1 : sum, 0);
+        const flaggedVehiclesCount = safeVehicles.reduce((sum: number, v) => v.isFlagged ? sum + 1 : sum, 0);
+        const flaggedConversationsCount = safeConversations.reduce((sum: number, c) => c.isFlagged ? sum + 1 : sum, 0);
         const flaggedContent = flaggedVehiclesCount + flaggedConversationsCount;
-        const certificationRequests = vehicles.filter(v => v.certificationStatus === 'requested').length;
+        const certificationRequests = safeVehicles.filter(v => v.certificationStatus === 'requested').length;
         
-        const listingsByMake = vehicles.reduce((acc, v) => {
+        const listingsByMake = safeVehicles.reduce((acc, v) => {
             acc[v.make] = (acc[v.make] || 0) + 1;
             return acc;
         }, {} as Record<string, number>);
