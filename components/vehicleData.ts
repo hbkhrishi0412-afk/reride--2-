@@ -130,4 +130,68 @@ export const VEHICLE_DATA: Record<string, VehicleCategoryData> = {
             ],
         },
     ],
+    [VehicleCategory.THREE_WHEELER]: [
+        {
+            name: "Bajaj",
+            models: [
+                { name: "RE Auto", variants: ["Standard", "Deluxe"] },
+                { name: "Maxima C", variants: ["Standard", "Deluxe"] },
+            ],
+        },
+        {
+            name: "Piaggio",
+            models: [
+                { name: "Ape Xtra", variants: ["Standard", "Deluxe"] },
+                { name: "Ape City", variants: ["Standard", "Deluxe"] },
+            ],
+        },
+    ],
+    [VehicleCategory.COMMERCIAL]: [
+        {
+            name: "Tata",
+            models: [
+                { name: "Ace", variants: ["Standard", "Deluxe"] },
+                { name: "Intra", variants: ["V10", "V20", "V30"] },
+            ],
+        },
+        {
+            name: "Mahindra",
+            models: [
+                { name: "Bolero Pickup", variants: ["Standard", "Deluxe"] },
+                { name: "Jeeto", variants: ["Standard", "Deluxe"] },
+            ],
+        },
+    ],
+    [VehicleCategory.FARM]: [
+        {
+            name: "Mahindra",
+            models: [
+                { name: "Tractor 265", variants: ["Standard", "Deluxe"] },
+                { name: "Tractor 475", variants: ["Standard", "Deluxe"] },
+            ],
+        },
+        {
+            name: "Sonalika",
+            models: [
+                { name: "Tractor 35", variants: ["Standard", "Deluxe"] },
+                { name: "Tractor 50", variants: ["Standard", "Deluxe"] },
+            ],
+        },
+    ],
+    [VehicleCategory.CONSTRUCTION]: [
+        {
+            name: "JCB",
+            models: [
+                { name: "Excavator 3DX", variants: ["Standard", "Deluxe"] },
+                { name: "Backhoe Loader", variants: ["Standard", "Deluxe"] },
+            ],
+        },
+        {
+            name: "Caterpillar",
+            models: [
+                { name: "Excavator 320", variants: ["Standard", "Deluxe"] },
+                { name: "Bulldozer D6", variants: ["Standard", "Deluxe"] },
+            ],
+        },
+    ],
 };

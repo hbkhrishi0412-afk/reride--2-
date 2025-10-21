@@ -614,7 +614,12 @@ const VehicleForm: React.FC<VehicleFormProps> = memo(({ editingVehicle, onAddVeh
                 </div>
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-x-6 gap-y-4">
                     <FormInput label="Category" name="category" type="select" value={formData.category} onChange={handleChange} required>
-                        {Object.values(VehicleCategory).map(cat => (<option key={cat} value={cat}>{cat}</option>))}
+                        <option value="" disabled>Select Category</option>
+                        {Object.keys(vehicleData).map(cat => (
+                            <option key={cat} value={cat}>
+                                {cat.replace(/_/g, ' ').toLowerCase().replace(/\b\w/g, l => l.toUpperCase())}
+                            </option>
+                        ))}
                     </FormInput>
                     <FormInput label="Make" name="make" type="select" value={formData.make} onChange={handleChange} error={errors.make} disabled={!formData.category} required>
                         <option value="" disabled>Select Make</option>

@@ -34,6 +34,11 @@ const VehicleDataManagement: React.FC<VehicleDataManagementProps> = ({
 
   // Get available data based on selections
   const categories = Object.keys(vehicleData).sort();
+  
+  // Helper function to format category names for display
+  const formatCategoryName = (category: string) => {
+    return category.replace(/_/g, ' ').toLowerCase().replace(/\b\w/g, l => l.toUpperCase());
+  };
   const makes = selectedCategory ? (vehicleData[selectedCategory] || []).map(make => make.name).sort() : [];
   const models = selectedCategory && selectedMake ? 
     (vehicleData[selectedCategory]?.find(make => make.name === selectedMake)?.models || []).map(model => model.name).sort() : [];
@@ -236,8 +241,11 @@ const VehicleDataManagement: React.FC<VehicleDataManagementProps> = ({
     setNewItemValue('');
   };
 
-  const handleSelectCategory = (category: string | null) => {
-    setSelectedCategory(category);
+  const handleSelectCategory = (formattedCategory: string | null) => {
+    // Convert formatted category back to original key
+    const originalCategory = formattedCategory ? 
+      categories.find(cat => formatCategoryName(cat) === formattedCategory) || null : null;
+    setSelectedCategory(originalCategory);
     setSelectedMake(null);
     setSelectedModel(null);
   };
@@ -547,7 +555,7 @@ const VehicleDataManagement: React.FC<VehicleDataManagementProps> = ({
 
       {/* Data Management Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
-        {renderColumn("Categories", filteredCategories, [], selectedCategory, handleSelectCategory, "Categories")}
+        {renderColumn("Categories", filteredCategories.map(formatCategoryName), [], selectedCategory ? formatCategoryName(selectedCategory) : null, handleSelectCategory, "Categories")}
         {renderColumn("Makes", filteredMakes, selectedCategory ? [selectedCategory] : [], selectedMake, handleSelectMake, "Makes", !selectedCategory)}
         {renderColumn("Models", filteredModels, selectedCategory && selectedMake ? [selectedCategory, selectedMake] : [], selectedModel, handleSelectModel, "Models", !selectedMake)}
         {renderColumn("Variants", filteredVariants, selectedCategory && selectedMake && selectedModel ? [selectedCategory, selectedMake, selectedModel] : [], null, () => {}, "Variants", !selectedModel)}

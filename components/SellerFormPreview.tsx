@@ -128,7 +128,7 @@ const SellerFormPreview: React.FC<SellerFormPreviewProps> = ({ vehicleData, onCl
                   <option value="">Select Category</option>
                   {Object.keys(vehicleData).map(category => (
                     <option key={category} value={category}>
-                      {category}
+                      {category.replace(/_/g, ' ').toLowerCase().replace(/\b\w/g, l => l.toUpperCase())}
                     </option>
                   ))}
                 </select>
