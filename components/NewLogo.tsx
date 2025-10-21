@@ -7,10 +7,10 @@ interface LogoProps {
   showText?: boolean;
 }
 
-const Logo: React.FC<LogoProps> = ({ 
+const NewLogo: React.FC<LogoProps> = ({ 
   className = "", 
   onClick, 
-  size = 'lg',
+  size = 'md',
   showText = true 
 }) => {
   // Size configurations
@@ -122,4 +122,4 @@ const Logo: React.FC<LogoProps> = ({
   );
 };
 
-export default Logo;
+export default NewLogo;

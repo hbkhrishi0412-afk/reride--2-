@@ -56,9 +56,12 @@ const MobileHeader: React.FC<MobileHeaderProps> = ({
               </button>
             )}
             
-            <h1 className="text-base font-bold text-gray-900 truncate max-w-[180px]">
-              {title}
-            </h1>
+            <div className="flex items-center gap-2">
+              <Logo size="sm" showText={false} />
+              <h1 className="text-base font-bold text-gray-900 truncate max-w-[180px]">
+                {title}
+              </h1>
+            </div>
           </div>
 
           {/* Right Section */}
@@ -108,11 +111,7 @@ const MobileHeader: React.FC<MobileHeaderProps> = ({
               <div className="p-4 border-b border-gray-200 bg-gradient-to-r from-orange-500 to-orange-600">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 bg-white rounded-full flex items-center justify-center">
-                      <span className="text-orange-500 font-bold text-lg">
-                        {currentUser?.name?.charAt(0) || 'G'}
-                      </span>
-                    </div>
+                    <Logo size="sm" showText={false} />
                     <div>
                       <p className="text-white font-semibold text-sm">
                         {currentUser?.name || 'Guest'}
