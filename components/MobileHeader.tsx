@@ -30,53 +30,36 @@ const MobileHeader: React.FC<MobileHeaderProps> = ({
 
   return (
     <>
-      {/* Premium Mobile Header with Glassmorphism */}
-      <header 
-        className="fixed top-0 left-0 right-0 z-50 h-16"
-        style={{
-          background: 'linear-gradient(135deg, rgba(255, 107, 53, 0.95) 0%, rgba(255, 133, 85, 0.95) 100%)',
-          backdropFilter: 'blur(20px)',
-          WebkitBackdropFilter: 'blur(20px)',
-          boxShadow: '0 4px 30px rgba(255, 107, 53, 0.2)',
-          borderBottom: '1px solid rgba(255, 255, 255, 0.2)'
-        }}
-      >
+      {/* Compact Mobile Header - 56px height */}
+      <header className="fixed top-0 left-0 right-0 bg-white border-b border-gray-200 z-50 h-14">
         <div className="flex items-center justify-between h-full px-4">
           {/* Left Section */}
           <div className="flex items-center gap-3">
             {showBack ? (
               <button
                 onClick={onBack}
-                className="p-2 rounded-full transition-all active:scale-95"
-                style={{
-                  background: 'rgba(255, 255, 255, 0.2)',
-                  backdropFilter: 'blur(10px)'
-                }}
+                className="p-1.5 hover:bg-gray-100 rounded-full transition-colors"
                 aria-label="Go back"
               >
-                <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M15 19l-7-7 7-7" />
+                <svg className="w-5 h-5 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
                 </svg>
               </button>
             ) : (
               <button
                 onClick={() => setShowMenu(!showMenu)}
-                className="p-2 rounded-full transition-all active:scale-95"
-                style={{
-                  background: 'rgba(255, 255, 255, 0.2)',
-                  backdropFilter: 'blur(10px)'
-                }}
+                className="p-1.5 hover:bg-gray-100 rounded-full transition-colors"
                 aria-label="Menu"
               >
-                <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M4 6h16M4 12h16M4 18h16" />
+                <svg className="w-5 h-5 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
                 </svg>
               </button>
             )}
             
             <div className="flex items-center gap-2">
               <Logo size="sm" showText={false} />
-              <h1 className="text-base font-bold text-white truncate max-w-[180px]" style={{ textShadow: '0 2px 8px rgba(0,0,0,0.2)' }}>
+              <h1 className="text-base font-bold text-gray-900 truncate max-w-[180px]">
                 {title}
               </h1>
             </div>
@@ -86,45 +69,28 @@ const MobileHeader: React.FC<MobileHeaderProps> = ({
           <div className="flex items-center gap-2">
             {rightAction || (
               <>
-                {/* Search Icon */}
+                {/* Search Icon - Small */}
                 <button
                   onClick={() => onNavigate(ViewEnum.USED_CARS)}
-                  className="p-2 rounded-full transition-all active:scale-95"
-                  style={{
-                    background: 'rgba(255, 255, 255, 0.2)',
-                    backdropFilter: 'blur(10px)'
-                  }}
+                  className="p-1.5 hover:bg-gray-100 rounded-full transition-colors"
                   aria-label="Search"
                 >
-                  <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                  <svg className="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                   </svg>
                 </button>
 
-                {/* Notifications Icon */}
+                {/* Notifications Icon - Small */}
                 {currentUser && (
                   <button
-                    className="p-2 rounded-full transition-all active:scale-95 relative"
-                    style={{
-                      background: 'rgba(255, 255, 255, 0.2)',
-                      backdropFilter: 'blur(10px)'
-                    }}
+                    className="p-1.5 hover:bg-gray-100 rounded-full transition-colors relative"
                     aria-label="Notifications"
                   >
-                    <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
+                    <svg className="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
                     </svg>
-                    {/* Premium notification badge with pulse animation */}
-                    <span 
-                      className="absolute -top-0.5 -right-0.5 w-4 h-4 rounded-full flex items-center justify-center text-white text-[8px] font-bold"
-                      style={{
-                        background: 'linear-gradient(135deg, #EF4444 0%, #DC2626 100%)',
-                        boxShadow: '0 2px 8px rgba(239, 68, 68, 0.5)',
-                        animation: 'pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite'
-                      }}
-                    >
-                      3
-                    </span>
+                    {/* Notification badge */}
+                    <span className="absolute top-0.5 right-0.5 w-2 h-2 bg-orange-500 rounded-full"></span>
                   </button>
                 )}
               </>
@@ -133,62 +99,42 @@ const MobileHeader: React.FC<MobileHeaderProps> = ({
         </div>
       </header>
 
-      {/* Premium Slide-out Menu with Animation */}
+      {/* Slide-out Menu */}
       {showMenu && (
         <>
           <div
-            className="fixed inset-0 z-40 transition-opacity duration-300"
-            style={{ background: 'rgba(0, 0, 0, 0.6)', backdropFilter: 'blur(4px)' }}
+            className="fixed inset-0 bg-black bg-opacity-50 z-40"
             onClick={() => setShowMenu(false)}
           />
-          <div 
-            className="fixed top-0 left-0 bottom-0 w-80 z-50 shadow-2xl transform transition-all duration-300"
-            style={{
-              background: 'linear-gradient(180deg, #FFFFFF 0%, #F8FAFC 100%)',
-              animation: 'slideInLeft 0.3s ease-out'
-            }}
-          >
+          <div className="fixed top-0 left-0 bottom-0 w-72 bg-white z-50 shadow-xl transform transition-transform">
             <div className="h-full flex flex-col">
-              {/* Premium Menu Header with Gradient */}
-              <div 
-                className="p-6 relative overflow-hidden"
-                style={{
-                  background: 'linear-gradient(135deg, #FF6B35 0%, #6366F1 100%)',
-                  boxShadow: '0 4px 20px rgba(255, 107, 53, 0.3)'
-                }}
-              >
-                {/* Decorative circles */}
-                <div className="absolute -top-10 -right-10 w-32 h-32 rounded-full" style={{ background: 'rgba(255, 255, 255, 0.1)' }}></div>
-                <div className="absolute -bottom-8 -left-8 w-24 h-24 rounded-full" style={{ background: 'rgba(255, 255, 255, 0.1)' }}></div>
-                
-                <div className="flex items-center justify-between relative z-10">
+              {/* Menu Header */}
+              <div className="p-4 border-b border-gray-200 bg-gradient-to-r from-orange-500 to-orange-600">
+                <div className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
-                    <div className="w-12 h-12 rounded-full flex items-center justify-center" style={{ background: 'rgba(255, 255, 255, 0.2)', backdropFilter: 'blur(10px)' }}>
-                      <Logo size="sm" showText={false} />
-                    </div>
+                    <Logo size="sm" showText={false} />
                     <div>
-                      <p className="text-white font-bold text-base" style={{ textShadow: '0 2px 4px rgba(0,0,0,0.2)' }}>
-                        {currentUser?.name || 'Guest User'}
+                      <p className="text-white font-semibold text-sm">
+                        {currentUser?.name || 'Guest'}
                       </p>
-                      <p className="text-white/80 text-xs font-medium">
-                        {currentUser?.email || 'Sign in to continue'}
+                      <p className="text-orange-100 text-xs">
+                        {currentUser?.email || 'Not logged in'}
                       </p>
                     </div>
                   </div>
                   <button
                     onClick={() => setShowMenu(false)}
-                    className="p-2 rounded-full transition-all active:scale-95"
-                    style={{ background: 'rgba(255, 255, 255, 0.2)' }}
+                    className="p-1 hover:bg-orange-400 rounded-full transition-colors"
                   >
                     <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M6 18L18 6M6 6l12 12" />
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                     </svg>
                   </button>
                 </div>
               </div>
 
-              {/* Menu Items with Premium Design */}
-              <nav className="flex-1 overflow-y-auto py-4 px-3">
+              {/* Menu Items */}
+              <nav className="flex-1 overflow-y-auto py-2">
                 <MenuItem
                   icon={<HomeIcon />}
                   label="Home"
@@ -210,7 +156,6 @@ const MobileHeader: React.FC<MobileHeaderProps> = ({
                       icon={<MessageIcon />}
                       label="Messages"
                       onClick={() => { onNavigate(ViewEnum.INBOX); setShowMenu(false); }}
-                      badge={3}
                     />
                     {currentUser.role === 'seller' && (
                       <MenuItem
@@ -228,7 +173,7 @@ const MobileHeader: React.FC<MobileHeaderProps> = ({
                     )}
                   </>
                 )}
-                <div className="my-3 mx-2 border-t border-gray-200"></div>
+                <div className="border-t border-gray-200 my-2"></div>
                 <MenuItem
                   icon={<InfoIcon />}
                   label="Support"
@@ -243,12 +188,11 @@ const MobileHeader: React.FC<MobileHeaderProps> = ({
                 {/* Logout Option */}
                 {currentUser && (
                   <>
-                    <div className="my-3 mx-2 border-t border-gray-200"></div>
+                    <div className="border-t border-gray-200 my-2"></div>
                     <MenuItem
                       icon={<LogoutIcon />}
                       label="Logout"
                       onClick={() => { onLogout(); setShowMenu(false); }}
-                      danger
                     />
                   </>
                 )}
@@ -256,12 +200,11 @@ const MobileHeader: React.FC<MobileHeaderProps> = ({
                 {/* Login Option for Guests */}
                 {!currentUser && (
                   <>
-                    <div className="my-3 mx-2 border-t border-gray-200"></div>
+                    <div className="border-t border-gray-200 my-2"></div>
                     <MenuItem
                       icon={<LoginIcon />}
                       label="Login"
                       onClick={() => { onNavigate(ViewEnum.LOGIN_PORTAL); setShowMenu(false); }}
-                      primary
                     />
                   </>
                 )}
@@ -272,102 +215,25 @@ const MobileHeader: React.FC<MobileHeaderProps> = ({
       )}
 
       {/* Spacer for fixed header */}
-      <div className="h-16"></div>
-      
-      {/* Add keyframe animation */}
-      <style>{`
-        @keyframes slideInLeft {
-          from {
-            transform: translateX(-100%);
-            opacity: 0;
-          }
-          to {
-            transform: translateX(0);
-            opacity: 1;
-          }
-        }
-      `}</style>
+      <div className="h-14"></div>
     </>
   );
 };
 
-// Premium Menu Item Component
-const MenuItem: React.FC<{ 
-  icon: React.ReactNode; 
-  label: string; 
-  onClick: () => void;
-  badge?: number;
-  danger?: boolean;
-  primary?: boolean;
-}> = ({
+// Menu Item Component
+const MenuItem: React.FC<{ icon: React.ReactNode; label: string; onClick: () => void }> = ({
   icon,
   label,
-  onClick,
-  badge,
-  danger,
-  primary
-}) => {
-  const getStyle = () => {
-    if (danger) {
-      return {
-        background: 'rgba(239, 68, 68, 0.08)',
-        color: '#EF4444',
-        iconColor: '#EF4444'
-      };
-    }
-    if (primary) {
-      return {
-        background: 'linear-gradient(135deg, #FF6B35 0%, #FF8555 100%)',
-        color: 'white',
-        iconColor: 'white',
-        boxShadow: '0 4px 12px rgba(255, 107, 53, 0.3)'
-      };
-    }
-    return {
-      background: 'transparent',
-      color: '#0F172A',
-      iconColor: '#64748B'
-    };
-  };
-
-  const style = getStyle();
-
-  return (
-    <button
-      onClick={onClick}
-      className="w-full flex items-center gap-3 px-3 py-3 rounded-xl transition-all active:scale-98 mb-1 relative"
-      style={{
-        background: style.background,
-        color: style.color,
-        ...(primary ? { boxShadow: style.boxShadow } : {})
-      }}
-      onMouseEnter={(e) => {
-        if (!primary && !danger) {
-          e.currentTarget.style.background = 'rgba(255, 107, 53, 0.08)';
-        }
-      }}
-      onMouseLeave={(e) => {
-        if (!primary && !danger) {
-          e.currentTarget.style.background = 'transparent';
-        }
-      }}
-    >
-      <div className="w-5 h-5" style={{ color: style.iconColor }}>{icon}</div>
-      <span className="text-sm font-semibold flex-1">{label}</span>
-      {badge && badge > 0 && (
-        <span 
-          className="min-w-[20px] h-5 px-1.5 rounded-full flex items-center justify-center text-white text-xs font-bold"
-          style={{
-            background: 'linear-gradient(135deg, #EF4444 0%, #DC2626 100%)',
-            boxShadow: '0 2px 8px rgba(239, 68, 68, 0.4)'
-          }}
-        >
-          {badge > 9 ? '9+' : badge}
-        </span>
-      )}
-    </button>
-  );
-};
+  onClick
+}) => (
+  <button
+    onClick={onClick}
+    className="w-full flex items-center gap-3 px-4 py-3 hover:bg-gray-50 transition-colors text-left"
+  >
+    <div className="w-5 h-5 text-gray-600">{icon}</div>
+    <span className="text-gray-800 text-sm font-medium">{label}</span>
+  </button>
+);
 
 // Small Icon Components
 const HomeIcon = () => (
