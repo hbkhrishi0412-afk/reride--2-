@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import type { User } from '../types';
 import { View as ViewEnum } from '../types';
+import Logo from './Logo';
 
 interface MobileHeaderProps {
   onNavigate: (view: ViewEnum) => void;
