@@ -42,15 +42,27 @@ const EditVehicleModal: React.FC<EditVehicleModalProps> = ({ vehicle, onClose, o
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
         const { name, value } = e.target;
-        const numericFields = ['year', 'price', 'mileage', 'registrationYear', 'noOfOwners'];
-        const parsedValue = numericFields.includes(name) ? parseInt(value) || 0 : value;
         
         // Clear error when user starts typing
         if (errors[name]) {
             setErrors(prev => ({ ...prev, [name]: '' }));
         }
         
-        setFormData(prev => ({ ...prev, [name]: parsedValue }));
+        // For numeric fields, store as string during editing, parse only on blur or submit
+        setFormData(prev => ({ ...prev, [name]: value }));
+    };
+
+    const handleBlur = (e: React.FocusEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+        const { name, value } = e.target;
+        const numericFields = ['year', 'price', 'mileage', 'registrationYear', 'noOfOwners'];
+        
+        // Parse numeric fields only when user finishes editing
+        if (numericFields.includes(name)) {
+            const parsedValue = value === '' ? 0 : (name === 'price' ? parseFloat(value) : parseInt(value, 10));
+            if (!isNaN(parsedValue)) {
+                setFormData(prev => ({ ...prev, [name]: parsedValue }));
+            }
+        }
     };
 
     const handleQualityReportChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
@@ -161,6 +173,7 @@ const EditVehicleModal: React.FC<EditVehicleModalProps> = ({ vehicle, onClose, o
                 name={name as string} 
                 value={value} 
                 onChange={handleChange} 
+                onBlur={handleBlur}
                 required={required}
                 placeholder={placeholder}
                 className={`mt-1 block w-full px-3 py-2 border rounded-lg bg-white dark:bg-gray-800 text-spinny-text-dark dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-spinny-orange focus:border-transparent transition-all duration-200 ${

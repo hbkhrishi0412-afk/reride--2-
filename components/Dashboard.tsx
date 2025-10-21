@@ -406,19 +406,9 @@ const VehicleForm: React.FC<VehicleFormProps> = memo(({ editingVehicle, onAddVeh
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
       const { name, value } = e.target as { name: keyof typeof initialFormState; value: string };
       
-      const isNumeric = ['year', 'price', 'mileage', 'noOfOwners', 'registrationYear'].includes(name);
-      
-      // FIX: Properly handle numeric conversions - only parse if value is not empty
-      let parsedValue: any = value;
-      if (isNumeric && value !== '') {
-        const num = name === 'price' ? parseFloat(value) : parseInt(value, 10);
-        parsedValue = isNaN(num) ? value : num;
-      } else if (!isNumeric) {
-        parsedValue = value;
-      }
-
+      // Store as string during editing, parse only on blur
       setFormData(prev => {
-        const newState = { ...prev, [name]: parsedValue };
+        const newState = { ...prev, [name]: value };
         if (name === 'category') {
             newState.make = ''; newState.model = ''; newState.variant = '';
         } else if (name === 'make') {
@@ -431,8 +421,23 @@ const VehicleForm: React.FC<VehicleFormProps> = memo(({ editingVehicle, onAddVeh
         return newState;
       });
 
-      const error = validateField(name, parsedValue);
-      setErrors(prev => ({...prev, [name]: error}));
+      // Clear error when user starts typing
+      setErrors(prev => ({...prev, [name]: ''}));
+    };
+
+    const handleBlur = (e: React.FocusEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+      const { name, value } = e.target as { name: keyof typeof initialFormState; value: string };
+      const isNumeric = ['year', 'price', 'mileage', 'noOfOwners', 'registrationYear'].includes(name);
+      
+      // Parse numeric fields only when user finishes editing
+      if (isNumeric && value !== '') {
+        const num = name === 'price' ? parseFloat(value) : parseInt(value, 10);
+        if (!isNaN(num)) {
+          setFormData(prev => ({ ...prev, [name]: num }));
+          const error = validateField(name, num);
+          setErrors(prev => ({...prev, [name]: error}));
+        }
+      }
     };
 
     const handleQualityReportChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -444,18 +449,6 @@ const VehicleForm: React.FC<VehicleFormProps> = memo(({ editingVehicle, onAddVeh
                 [name]: value,
             },
         }));
-    };
-    
-    const handleBlur = (e: React.FocusEvent<HTMLInputElement>) => {
-        const { name, value } = e.target as { name: keyof typeof initialFormState; value: string };
-        let parsedValue: any = value;
-        if (['year', 'mileage', 'noOfOwners', 'registrationYear'].includes(name)) {
-            parsedValue = parseInt(value, 10) || 0;
-        } else if (name === 'price') {
-            parsedValue = parseFloat(value) || 0;
-        }
-        const error = validateField(name, parsedValue);
-        setErrors(prev => ({...prev, [name]: error}));
     };
   
     const handleAddFeature = () => {
@@ -694,13 +687,13 @@ const VehicleForm: React.FC<VehicleFormProps> = memo(({ editingVehicle, onAddVeh
                         {availableVariants.map(variant => <option key={variant} value={variant}>{variant}</option>)}
                     </FormInput>
                     <FormInput label="Make Year" name="year" type="number" value={formData.year} onChange={handleChange} onBlur={handleBlur} error={errors.year} required />
-                    <FormInput label="Registration Year" name="registrationYear" type="number" value={formData.registrationYear} onChange={handleChange} required />
+                    <FormInput label="Registration Year" name="registrationYear" type="number" value={formData.registrationYear} onChange={handleChange} onBlur={handleBlur} required />
                     <div>
                         <FormInput label="Price (₹)" name="price" type="number" value={formData.price} onChange={handleChange} onBlur={handleBlur} error={errors.price} tooltip="Enter the listing price without commas or symbols." required />
                         <PricingGuidance vehicleDetails={formData} allVehicles={allVehicles} />
                     </div>
                     <FormInput label="Km Driven" name="mileage" type="number" value={formData.mileage} onChange={handleChange} onBlur={handleBlur} error={errors.mileage} />
-                    <FormInput label="No. of Owners" name="noOfOwners" type="number" value={formData.noOfOwners} onChange={handleChange} />
+                    <FormInput label="No. of Owners" name="noOfOwners" type="number" value={formData.noOfOwners} onChange={handleChange} onBlur={handleBlur} />
                     <FormInput label="RTO" name="rto" value={formData.rto} onChange={handleChange} placeholder="e.g., MH01" />
                     <FormInput label="State" name="state" type="select" value={formData.state} onChange={handleChange} required>
                         <option value="" disabled>Select State</option>
