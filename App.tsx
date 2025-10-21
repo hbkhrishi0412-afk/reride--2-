@@ -2,11 +2,14 @@ import React, { Suspense } from 'react';
 import { AppProvider, useApp } from './components/AppProvider';
 import ErrorBoundary from './components/ErrorBoundary';
 import Header from './components/Header';
+import MobileHeader from './components/MobileHeader';
+import MobileBottomNav from './components/MobileBottomNav';
 import Footer from './components/Footer';
 import ToastContainer from './components/ToastContainer';
 import CommandPalette from './components/CommandPalette';
 import { ChatWidget } from './components/ChatWidget';
 import PWAInstallPrompt from './components/PWAInstallPrompt';
+import useIsMobileApp from './hooks/useIsMobileApp';
 import { View as ViewEnum, Vehicle } from './types';
 
 // Simple loading component
@@ -43,6 +46,9 @@ const Login = React.lazy(() => import('./Login'));
 const ForgotPassword = React.lazy(() => import('./components/ForgotPassword'));
 
 const AppContent: React.FC = () => {
+  // Detect if running as mobile app (standalone/installed PWA)
+  const { isMobileApp } = useIsMobileApp();
+  
   const { 
     currentView, 
     navigate, 
@@ -118,6 +124,21 @@ const AppContent: React.FC = () => {
     onCertificationApproval,
     onOfferResponse,
   } = useApp();
+  
+  // Get page title based on current view
+  const getPageTitle = () => {
+    switch (currentView) {
+      case ViewEnum.HOME: return 'ReRide';
+      case ViewEnum.USED_CARS: return 'Browse Cars';
+      case ViewEnum.WISHLIST: return 'My Wishlist';
+      case ViewEnum.INBOX: return 'Messages';
+      case ViewEnum.SELLER_DASHBOARD: return 'Dashboard';
+      case ViewEnum.BUYER_DASHBOARD: return 'My Account';
+      case ViewEnum.PROFILE: return 'Profile';
+      case ViewEnum.DETAIL: return selectedVehicle ? `${selectedVehicle.year} ${selectedVehicle.make}` : 'Car Details';
+      default: return 'ReRide';
+    }
+  };
 
   const renderView = () => {
     switch (currentView) {
@@ -772,6 +793,70 @@ const AppContent: React.FC = () => {
     setIsCommandPaletteOpen(true);
   };
 
+  // Render Mobile App Layout
+  if (isMobileApp) {
+    return (
+      <div className="min-h-screen bg-gray-50">
+        <MobileHeader
+          onNavigate={navigate}
+          currentUser={currentUser}
+          title={getPageTitle()}
+          showBack={currentView === ViewEnum.DETAIL}
+          onBack={() => navigate(ViewEnum.USED_CARS)}
+        />
+        
+        <main className="mobile-app-content bg-gray-50 mobile-page-transition">
+          <ErrorBoundary>
+            <Suspense fallback={<LoadingSpinner />}>
+              {renderView()}
+            </Suspense>
+          </ErrorBoundary>
+        </main>
+        
+        <MobileBottomNav
+          currentView={currentView}
+          onNavigate={navigate}
+          currentUser={currentUser}
+          wishlistCount={wishlist.length}
+          inboxCount={conversations.filter(c => !c.isReadByCustomer).length}
+        />
+        
+        {/* Mobile Global Components */}
+        <ToastContainer 
+          toasts={toasts} 
+          onRemove={removeToast} 
+        />
+        {currentUser && activeChat && (
+          <ChatWidget
+            conversation={activeChat}
+            currentUserRole={currentUser.role as 'customer' | 'seller'}
+            otherUserName={currentUser?.role === 'customer' ? activeChat.sellerId : activeChat.customerName}
+            onClose={() => setActiveChat(null)}
+            onSendMessage={(messageText, type, payload) => {
+              sendMessage(activeChat.id, messageText);
+            }}
+            typingStatus={typingStatus}
+            onUserTyping={(conversationId, userRole) => {
+              toggleTyping(conversationId, true);
+            }}
+            onMarkMessagesAsRead={(conversationId, readerRole) => {
+              markAsRead(conversationId);
+            }}
+            onFlagContent={(type, id, reason) => {
+              flagContent(type, id);
+            }}
+            onOfferResponse={(conversationId, messageId, response, counterPrice) => {
+              console.log('🔧 DashboardMessages onOfferResponse called:', { conversationId, messageId, response, counterPrice });
+              onOfferResponse(conversationId, messageId, response, counterPrice);
+              addToast(`Offer ${response}`, 'success');
+            }}
+          />
+        )}
+      </div>
+    );
+  }
+  
+  // Render Desktop/Website Layout
   return (
     <div className="min-h-screen bg-gray-50">
       <Header 
@@ -799,7 +884,7 @@ const AppContent: React.FC = () => {
       </main>
       <Footer onNavigate={navigate} />
       
-      {/* Global Components */}
+      {/* Desktop Global Components */}
       <PWAInstallPrompt />
       <ToastContainer 
         toasts={toasts} 

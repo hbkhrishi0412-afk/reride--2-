@@ -20,6 +20,187 @@
   animation: slide-up 0.3s ease-out;
 }
 
+/* Mobile App Specific Styles */
+@media (display-mode: standalone) {
+  /* Remove any browser-specific padding/margins when in app mode */
+  body {
+    overscroll-behavior-y: contain;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  /* Safe area padding for notched devices */
+  .pb-safe {
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+
+  .pt-safe {
+    padding-top: env(safe-area-inset-top);
+  }
+
+  /* Hide default scrollbars in app mode for cleaner look */
+  ::-webkit-scrollbar {
+    width: 4px;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 4px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+}
+
+/* Mobile App Layout Adjustments */
+.mobile-app-content {
+  min-height: calc(100vh - 56px - 64px); /* Header + Bottom Nav */
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
+/* Compact card design for mobile app */
+.mobile-card {
+  @apply bg-white rounded-lg shadow-sm border border-gray-100 overflow-hidden;
+}
+
+.mobile-card-compact {
+  @apply bg-white rounded-md shadow-sm p-3 mb-2;
+}
+
+/* Mobile-optimized button sizes */
+.mobile-btn-primary {
+  @apply bg-orange-500 text-white px-4 py-2.5 rounded-lg font-semibold text-sm active:bg-orange-600 transition-colors;
+}
+
+.mobile-btn-secondary {
+  @apply bg-gray-100 text-gray-700 px-4 py-2.5 rounded-lg font-semibold text-sm active:bg-gray-200 transition-colors;
+}
+
+/* Touch-friendly tap targets (min 44x44px) */
+.mobile-tap-target {
+  min-width: 44px;
+  min-height: 44px;
+}
+
+/* Mobile-optimized text sizes */
+.mobile-heading {
+  @apply text-lg font-bold text-gray-900;
+}
+
+.mobile-subheading {
+  @apply text-sm font-semibold text-gray-700;
+}
+
+.mobile-body {
+  @apply text-sm text-gray-600;
+}
+
+.mobile-caption {
+  @apply text-xs text-gray-500;
+}
+
+/* Pull-to-refresh indicator */
+@keyframes pull-refresh {
+  0% {
+    transform: translateY(-100%) scale(0);
+    opacity: 0;
+  }
+  50% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(0) scale(1);
+    opacity: 1;
+  }
+}
+
+.pull-refresh-indicator {
+  animation: pull-refresh 0.3s ease-out;
+}
+
+/* Mobile list optimizations */
+.mobile-list-item {
+  @apply flex items-center gap-3 p-3 active:bg-gray-50 transition-colors border-b border-gray-100 last:border-0;
+}
+
+/* Compact spacing for mobile */
+.mobile-spacing {
+  @apply space-y-2;
+}
+
+/* Mobile-optimized forms */
+.mobile-input {
+  @apply w-full px-3 py-2.5 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent;
+}
+
+/* Bottom sheet / modal for mobile */
+.mobile-sheet {
+  @apply fixed bottom-0 left-0 right-0 bg-white rounded-t-2xl shadow-2xl max-h-[85vh] overflow-hidden;
+  animation: slide-up-sheet 0.3s ease-out;
+}
+
+@keyframes slide-up-sheet {
+  from {
+    transform: translateY(100%);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+
+/* Mobile grid layouts */
+.mobile-grid-2 {
+  @apply grid grid-cols-2 gap-2;
+}
+
+.mobile-grid-3 {
+  @apply grid grid-cols-3 gap-2;
+}
+
+/* Status bar safe area (for iOS notch, etc.) */
+@supports (padding: max(0px)) {
+  .safe-top {
+    padding-top: max(16px, env(safe-area-inset-top));
+  }
+
+  .safe-bottom {
+    padding-bottom: max(16px, env(safe-area-inset-bottom));
+  }
+
+  .safe-left {
+    padding-left: max(16px, env(safe-area-inset-left));
+  }
+
+  .safe-right {
+    padding-right: max(16px, env(safe-area-inset-right));
+  }
+}
+
+/* Haptic feedback effect (visual) */
+.haptic-light {
+  @apply active:scale-95 transition-transform;
+}
+
+.haptic-medium {
+  @apply active:scale-90 transition-transform;
+}
+
+/* Mobile app specific transitions */
+.mobile-page-transition {
+  animation: fade-slide-in 0.2s ease-out;
+}
+
+@keyframes fade-slide-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
 /* Hide number input spinners */
 input[type="number"] {
   -moz-appearance: textfield;
