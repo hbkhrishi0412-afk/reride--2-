@@ -4,6 +4,7 @@ import ErrorBoundary from './components/ErrorBoundary';
 import Header from './components/Header';
 import MobileHeader from './components/MobileHeader';
 import MobileBottomNav from './components/MobileBottomNav';
+import MobileDashboard from './components/MobileDashboard';
 import Footer from './components/Footer';
 import ToastContainer from './components/ToastContainer';
 import CommandPalette from './components/CommandPalette';
@@ -816,6 +817,55 @@ const AppContent: React.FC = () => {
 
   // Render Mobile App Layout
   if (isMobileApp) {
+    // Check if we're on a dashboard view
+    const isDashboardView = [
+      ViewEnum.SELLER_DASHBOARD, 
+      ViewEnum.BUYER_DASHBOARD, 
+      ViewEnum.ADMIN_PANEL
+    ].includes(currentView);
+
+    if (isDashboardView && currentUser) {
+      return (
+        <div className="min-h-screen bg-gray-50">
+          <MobileDashboard
+            currentUser={currentUser}
+            userVehicles={vehicles.filter(v => v.sellerEmail === currentUser.email)}
+            conversations={conversations}
+            onNavigate={navigate}
+            onEditVehicle={(vehicle) => {
+              // Handle edit vehicle
+              console.log('Edit vehicle:', vehicle);
+            }}
+            onDeleteVehicle={(vehicleId) => {
+              // Handle delete vehicle
+              console.log('Delete vehicle:', vehicleId);
+            }}
+            onMarkAsSold={(vehicleId) => {
+              // Handle mark as sold
+              console.log('Mark as sold:', vehicleId);
+            }}
+            onFeatureListing={(vehicleId) => {
+              // Handle feature listing
+              console.log('Feature listing:', vehicleId);
+            }}
+            onSendMessage={sendMessage}
+            onMarkConversationAsRead={markAsRead}
+            onOfferResponse={(conversationId, messageId, response, counterPrice) => {
+              onOfferResponse(conversationId, messageId.toString(), response, counterPrice);
+            }}
+            typingStatus={typingStatus}
+            onUserTyping={(conversationId, userRole) => {
+              toggleTyping(conversationId, true);
+            }}
+            onMarkMessagesAsRead={(conversationId, readerRole) => {
+              markAsRead(conversationId);
+            }}
+            onFlagContent={flagContent}
+          />
+        </div>
+      );
+    }
+
     return (
       <div className="min-h-screen bg-gray-50">
         <MobileHeader

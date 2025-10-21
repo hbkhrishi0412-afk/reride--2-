@@ -66,14 +66,15 @@ const MobileBottomNav: React.FC<MobileBottomNavProps> = ({
       requiresAuth: true
     },
     {
-      id: 'profile',
-      label: 'Account',
+      id: 'dashboard',
+      label: currentUser ? 'Dashboard' : 'Account',
       view: currentUser?.role === 'seller' ? ViewEnum.SELLER_DASHBOARD : 
             currentUser?.role === 'customer' ? ViewEnum.BUYER_DASHBOARD :
+            currentUser?.role === 'admin' ? ViewEnum.ADMIN_PANEL :
             ViewEnum.LOGIN_PORTAL,
       icon: (active: boolean) => (
         <svg className={`w-5 h-5 ${active ? 'text-orange-500' : 'text-gray-600'}`} fill={active ? 'currentColor' : 'none'} stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={active ? 0 : 2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={active ? 0 : 2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
         </svg>
       )
     }
