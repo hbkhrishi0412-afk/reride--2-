@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Offer Fix</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .test-section { margin: 20px 0; padding: 15px; border: 1px solid #ddd; border-radius: 5px; }
+        .success { background-color: #d4edda; border-color: #c3e6cb; }
+        .error { background-color: #f8d7da; border-color: #f5c6cb; }
+        button { padding: 10px 15px; margin: 5px; background: #007bff; color: white; border: none; border-radius: 3px; cursor: pointer; }
+        button:hover { background: #0056b3; }
+        pre { background: #f8f9fa; padding: 10px; border-radius: 3px; overflow-x: auto; }
+    </style>
+</head>
+<body>
+    <h1>Test Offer Fix</h1>
+    
+    <div class="test-section">
+        <h2>Create Test Conversation with Offer for Seller Dashboard</h2>
+        <button onclick="createTestOfferConversation()">Create Test Offer Conversation</button>
+        <div id="result"></div>
+    </div>
+
+    <script>
+        const CONVERSATION_STORAGE_KEY = 'reRideConversations';
+        
+        function createTestOfferConversation() {
+            try {
+                const testConversation = {
+                    id: "test_offer_seller_" + Date.now(),
+                    customerId: "test@customer.com",
+                    customerName: "Test Customer",
+                    sellerId: "test@seller.com",
+                    vehicleId: 1,
+                    vehicleName: "2024 Mahindra Thar LX",
+                    vehiclePrice: 1500000,
+                    messages: [
+                        {
+                            id: 1,
+                            sender: "user",
+                            text: "Hi, I'm interested in this vehicle. What's the best price you can offer?",
+                            timestamp: new Date(Date.now() - 3600000).toISOString(),
+                            isRead: true,
+                            type: "text"
+                        },
+                        {
+                            id: 2,
+                            sender: "seller",
+                            text: "Hello! The listed price is ₹15,00,000, but I can offer you ₹14,50,000 if you're serious about buying.",
+                            timestamp: new Date(Date.now() - 3500000).toISOString(),
+                            isRead: true,
+                            type: "text"
+                        },
+                        {
+                            id: 3,
+                            sender: "user",
+                            text: "That's still a bit high for me. Would you consider ₹13,00,000?",
+                            timestamp: new Date(Date.now() - 3400000).toISOString(),
+                            isRead: true,
+                            type: "text"
+                        },
+                        {
+                            id: 4,
+                            sender: "user",
+                            text: "I'd like to make an offer for this vehicle.",
+                            timestamp: new Date(Date.now() - 3300000).toISOString(),
+                            isRead: false,
+                            type: "offer",
+                            payload: {
+                                offerPrice: 1300000,
+                                status: "pending"
+                            }
+                        }
+                    ],
+                    lastMessageAt: new Date(Date.now() - 3300000).toISOString(),
+                    isReadBySeller: false,
+                    isReadByCustomer: true,
+                    isFlagged: false
+                };
+                
+                // Get existing conversations or create new array
+                const existing = localStorage.getItem(CONVERSATION_STORAGE_KEY);
+                const conversations = existing ? JSON.parse(existing) : [];
+                conversations.push(testConversation);
+                
+                // Save to localStorage
+                localStorage.setItem(CONVERSATION_STORAGE_KEY, JSON.stringify(conversations));
+                
+                document.getElementById('result').innerHTML = `
+                    <div class="success">
+                        <h3>✅ Test conversation created successfully!</h3>
+                        <p><strong>Conversation ID:</strong> ${testConversation.id}</p>
+                        <p><strong>Customer:</strong> ${testConversation.customerName}</p>
+                        <p><strong>Vehicle:</strong> ${testConversation.vehicleName}</p>
+                        <p><strong>Offer Amount:</strong> ₹${testConversation.messages[3].payload.offerPrice.toLocaleString()}</p>
+                        <p><strong>Status:</strong> ${testConversation.messages[3].payload.status}</p>
+                        
+                        <h4>Next Steps:</h4>
+                        <ol>
+                            <li>Go to the main application</li>
+                            <li>Login as a seller</li>
+                            <li>Go to Dashboard → Inquiries</li>
+                            <li>Click on the conversation with "Test Customer - 2024 Mahindra Thar LX"</li>
+                            <li>You should see the offer message with Accept/Reject/Counter buttons</li>
+                        </ol>
+                    </div>
+                `;
+            } catch (error) {
+                document.getElementById('result').innerHTML = `
+                    <div class="error">
+                        <h3>❌ Error creating test conversation</h3>
+                        <p>${error.message}</p>
+                    </div>
+                `;
+            }
+        }
+    </script>
+</body>
+</html>

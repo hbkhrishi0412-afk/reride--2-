@@ -111,6 +111,17 @@ export const OfferMessage: React.FC<{
     const isRecipient = (currentUserRole === 'customer' && msg.sender === 'seller') || (currentUserRole === 'seller' && msg.sender === 'user');
     const showActions = isRecipient && status === 'pending';
     
+    // Additional debug logging
+    console.log('🔧 OfferMessage showActions debug:', {
+        msgId: msg.id,
+        currentUserRole,
+        msgSender: msg.sender,
+        isRecipient,
+        status,
+        showActions,
+        payload: msg.payload
+    });
+    
     // Debug logging
     console.log('🔧 OfferMessage debug:', {
         msgId: msg.id,
@@ -119,7 +130,8 @@ export const OfferMessage: React.FC<{
         payload: msg.payload,
         status,
         isRecipient,
-        showActions
+        showActions,
+        msgType: msg.type
     });
     
     const statusInfo = {
@@ -148,16 +160,34 @@ export const OfferMessage: React.FC<{
                             </p>
                         )}
                     </div>
-                    <span className={`text-xs font-bold px-2 py-0.5 rounded-full whitespace-nowrap bg-spinny-blue-light text-spinny-text-dark`}>
+                    <span className={`text-xs font-bold px-2 py-0.5 rounded-full whitespace-nowrap ${statusInfo[status || 'pending'].color}`}>
                         {statusInfo[status || 'pending'].text}
                     </span>
                 </div>
                 {showActions && (
-                    <div className="mt-3 pt-3 border-t border-gray-200-200 dark:border-gray-200-300 flex gap-2">
-                        <button onClick={() => onRespond(msg.id, 'accepted')} className="flex-1 text-sm bg-green-500 text-white font-bold py-1.5 px-3 rounded-md hover:bg-green-600 transition-colors">Accept</button>
-                        <button onClick={() => onRespond(msg.id, 'rejected')} className="flex-1 text-sm bg-red-500 text-white font-bold py-1.5 px-3 rounded-md hover:bg-red-600 transition-colors">Reject</button>
+                    <div className="mt-3 pt-3 border-t border-gray-200 dark:border-gray-300 flex gap-2" style={{ display: 'flex', gap: '8px' }}>
+                        <button 
+                            onClick={() => onRespond(msg.id, 'accepted')} 
+                            className="flex-1 text-sm bg-green-500 text-white font-bold py-1.5 px-3 rounded-md hover:bg-green-600 transition-colors"
+                            style={{ flex: 1, backgroundColor: '#10B981', color: 'white', padding: '6px 12px', borderRadius: '6px', border: 'none', cursor: 'pointer' }}
+                        >
+                            Accept
+                        </button>
+                        <button 
+                            onClick={() => onRespond(msg.id, 'rejected')} 
+                            className="flex-1 text-sm bg-red-500 text-white font-bold py-1.5 px-3 rounded-md hover:bg-red-600 transition-colors"
+                            style={{ flex: 1, backgroundColor: '#EF4444', color: 'white', padding: '6px 12px', borderRadius: '6px', border: 'none', cursor: 'pointer' }}
+                        >
+                            Reject
+                        </button>
                         {currentUserRole === 'seller' && (
-                            <button onClick={() => setIsCounterModalOpen(true)} className="flex-1 text-sm bg-blue-500 text-white font-bold py-1.5 px-3 rounded-md hover:bg-blue-600 transition-colors">Counter</button>
+                            <button 
+                                onClick={() => setIsCounterModalOpen(true)} 
+                                className="flex-1 text-sm bg-blue-500 text-white font-bold py-1.5 px-3 rounded-md hover:bg-blue-600 transition-colors"
+                                style={{ flex: 1, backgroundColor: '#3B82F6', color: 'white', padding: '6px 12px', borderRadius: '6px', border: 'none', cursor: 'pointer' }}
+                            >
+                                Counter
+                            </button>
                         )}
                     </div>
                 )}

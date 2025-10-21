@@ -166,22 +166,43 @@ export const ChatWidget: React.FC<ChatWidgetProps> = memo(({ conversation, curre
               </div>
             ) : (
               <>
-                {conversation.messages.map((msg) => (
-                  <div key={msg.id} className={`flex flex-col ${msg.sender === senderType ? 'items-end' : 'items-start'}`}>
-                      {msg.sender === 'system' && <div className="text-center text-xs text-gray-600 dark:text-gray-400 italic py-2 w-full">{msg.text}</div>}
-                      {msg.sender !== 'system' && (
-                          <>
-                              <div className={`px-4 py-3 max-w-xs ${ msg.sender === senderType ? 'text-white rounded-l-xl rounded-t-xl' : 'bg-white dark:bg-brand-gray-700 text-spinny-text-dark dark:text-white rounded-r-xl rounded-t-xl'}`} style={msg.sender === senderType ? { background: 'var(--gradient-primary)' } : undefined}>
-                                  {msg.type === 'offer' ? <OfferMessage msg={msg} currentUserRole={currentUserRole} listingPrice={conversation.vehiclePrice} onRespond={(messageId, response, counterPrice) => onOfferResponse(conversation.id, messageId, response, counterPrice)} /> : <p className="text-sm break-words">{msg.text}</p>}
-                              </div>
-                              <div className="text-xs text-gray-400 mt-1 px-1 flex items-center">
-                                  {new Date(msg.timestamp).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}
-                                  {msg.sender === senderType && <ReadReceiptIcon isRead={msg.isRead} />}
-                              </div>
-                          </>
-                      )}
-                  </div>
-                ))}
+                {conversation.messages.map((msg) => {
+                  // Debug logging for offer messages
+                  if (msg.type === 'offer') {
+                    console.log('🔧 ChatWidget rendering offer message:', {
+                      msgId: msg.id,
+                      msgType: msg.type,
+                      payload: msg.payload,
+                      sender: msg.sender,
+                      currentUserRole
+                    });
+                  }
+                  
+                  return (
+                    <div key={msg.id} className={`flex flex-col ${msg.sender === senderType ? 'items-end' : 'items-start'}`}>
+                        {msg.sender === 'system' && <div className="text-center text-xs text-gray-600 dark:text-gray-400 italic py-2 w-full">{msg.text}</div>}
+                        {msg.sender !== 'system' && (
+                            <>
+                                {msg.type === 'offer' ? (
+                                    <div className="w-full max-w-sm">
+                                        <OfferMessage msg={msg} currentUserRole={currentUserRole} listingPrice={conversation.vehiclePrice} onRespond={(messageId, response, counterPrice) => onOfferResponse(conversation.id, messageId, response, counterPrice)} />
+                                    </div>
+                                ) : (
+                                    <>
+                                        <div className={`px-4 py-3 max-w-xs ${ msg.sender === senderType ? 'text-white rounded-l-xl rounded-t-xl' : 'bg-white dark:bg-brand-gray-700 text-spinny-text-dark dark:text-white rounded-r-xl rounded-t-xl'}`} style={msg.sender === senderType ? { background: 'var(--gradient-primary)' } : undefined}>
+                                            <p className="text-sm break-words">{msg.text}</p>
+                                        </div>
+                                        <div className="text-xs text-gray-400 mt-1 px-1 flex items-center">
+                                            {new Date(msg.timestamp).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}
+                                            {msg.sender === senderType && <ReadReceiptIcon isRead={msg.isRead} />}
+                                        </div>
+                                    </>
+                                )}
+                            </>
+                        )}
+                    </div>
+                  );
+                })}
                 {typingStatus?.conversationId === conversation.id && typingStatus?.userRole === otherUserRole && <TypingIndicator name={otherUserName} />}
                 <div ref={chatEndRef} />
               </>
