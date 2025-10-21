@@ -851,7 +851,7 @@ const AppContent: React.FC = () => {
             onSendMessage={sendMessage}
             onMarkConversationAsRead={markAsRead}
             onOfferResponse={(conversationId, messageId, response, counterPrice) => {
-              onOfferResponse(conversationId, messageId.toString(), response, counterPrice);
+              onOfferResponse(conversationId, parseInt(messageId), response as "accepted" | "rejected" | "countered", counterPrice);
             }}
             typingStatus={typingStatus}
             onUserTyping={(conversationId, userRole) => {
