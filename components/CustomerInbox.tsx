@@ -135,10 +135,9 @@ const CustomerInbox: React.FC<CustomerInboxProps> = ({ conversations, onSendMess
   const formInputClass = "flex-grow p-3 border border-gray-200-300 dark:border-gray-200-300 rounded-lg focus:outline-none transition bg-white dark:text-spinny-text-dark";
 
   return (
-    <>
-      <div className="animate-fade-in container mx-auto py-8">
-        <h1 className="text-3xl font-extrabold text-spinny-text-dark dark:text-spinny-text-dark mb-6 border-b border-gray-200-200 dark:border-gray-200-200 pb-4">My Inbox</h1>
-        <div className="grid grid-cols-1 md:grid-cols-[320px_1fr] gap-6 bg-white rounded-xl shadow-soft-lg h-[75vh]">
+    <div className="animate-fade-in">
+      <h1 className="text-3xl font-extrabold text-gray-900 mb-6 border-b border-gray-200 pb-4">My Inbox</h1>
+      <div className="grid grid-cols-1 md:grid-cols-[320px_1fr] gap-6 bg-white rounded-xl shadow-lg h-[75vh]">
           {/* Conversation List */}
           <aside className="border-r border-gray-200-200 dark:border-gray-200-200 flex flex-col">
             <div className="p-4 border-b border-gray-200-200 dark:border-gray-200-200">
@@ -214,7 +213,6 @@ const CustomerInbox: React.FC<CustomerInboxProps> = ({ conversations, onSendMess
                   </div>
               )}
           </main>
-        </div>
       </div>
       {isOfferModalOpen && selectedConv && (
         <OfferModal
@@ -224,7 +222,7 @@ const CustomerInbox: React.FC<CustomerInboxProps> = ({ conversations, onSendMess
             onClose={() => setIsOfferModalOpen(false)}
         />
       )}
-    </>
+    </div>
   );
 };
 

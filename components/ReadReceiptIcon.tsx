@@ -154,10 +154,40 @@ export const OfferMessage: React.FC<{
                 </div>
                 {showActions && (
                     <div className="mt-3 pt-3 border-t border-gray-200-200 dark:border-gray-200-300 flex gap-2">
-                        <button onClick={() => onRespond(msg.id, 'accepted')} className="flex-1 text-sm bg-green-500 text-white font-bold py-1.5 px-3 rounded-md hover:bg-green-600 transition-colors">Accept</button>
-                        <button onClick={() => onRespond(msg.id, 'rejected')} className="flex-1 text-sm bg-red-500 text-white font-bold py-1.5 px-3 rounded-md hover:bg-red-600 transition-colors">Reject</button>
+                        <button 
+                            onClick={(e) => {
+                                e.preventDefault();
+                                e.stopPropagation();
+                                console.log('🔧 Accept button clicked for message:', msg.id);
+                                onRespond(msg.id, 'accepted');
+                            }} 
+                            className="flex-1 text-sm bg-green-500 text-white font-bold py-1.5 px-3 rounded-md hover:bg-green-600 transition-colors"
+                        >
+                            Accept
+                        </button>
+                        <button 
+                            onClick={(e) => {
+                                e.preventDefault();
+                                e.stopPropagation();
+                                console.log('🔧 Reject button clicked for message:', msg.id);
+                                onRespond(msg.id, 'rejected');
+                            }} 
+                            className="flex-1 text-sm bg-red-500 text-white font-bold py-1.5 px-3 rounded-md hover:bg-red-600 transition-colors"
+                        >
+                            Reject
+                        </button>
                         {currentUserRole === 'seller' && (
-                            <button onClick={() => setIsCounterModalOpen(true)} className="flex-1 text-sm bg-blue-500 text-white font-bold py-1.5 px-3 rounded-md hover:bg-blue-600 transition-colors">Counter</button>
+                            <button 
+                                onClick={(e) => {
+                                    e.preventDefault();
+                                    e.stopPropagation();
+                                    console.log('🔧 Counter button clicked for message:', msg.id);
+                                    setIsCounterModalOpen(true);
+                                }} 
+                                className="flex-1 text-sm bg-blue-500 text-white font-bold py-1.5 px-3 rounded-md hover:bg-blue-600 transition-colors"
+                            >
+                                Counter
+                            </button>
                         )}
                     </div>
                 )}

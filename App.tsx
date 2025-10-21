@@ -830,6 +830,8 @@ const AppContent: React.FC = () => {
             flagContent(type, id);
           }}
           onOfferResponse={(conversationId, messageId, response, counterPrice) => {
+            console.log('🔧 DashboardMessages onOfferResponse called:', { conversationId, messageId, response, counterPrice });
+            onOfferResponse(conversationId, messageId, response, counterPrice);
             addToast(`Offer ${response}`, 'success');
           }}
         />
