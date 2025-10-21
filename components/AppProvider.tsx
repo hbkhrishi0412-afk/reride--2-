@@ -11,6 +11,7 @@ import { getSupportTickets, saveSupportTickets } from '../services/supportTicket
 import { dataService } from '../services/dataService';
 import { loadingManager, LOADING_OPERATIONS, withLoadingTimeout } from '../utils/loadingManager';
 import { useTimeout } from '../hooks/useCleanup';
+import { VEHICLE_DATA } from './vehicleData';
 
 interface AppContextType {
   // State
@@ -161,11 +162,18 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const [users, setUsers] = useState<User[]>([]);
   const [platformSettings, setPlatformSettings] = useState<PlatformSettings>(() => getSettings());
   const [auditLog, setAuditLog] = useState<AuditLogEntry[]>(() => getAuditLog());
-  const [vehicleData, setVehicleData] = useState<VehicleData>(() => ({
-    FOUR_WHEELER: [],
-    TWO_WHEELER: [],
-    THREE_WHEELER: []
-  }));
+  const [vehicleData, setVehicleData] = useState<VehicleData>(() => {
+    // Try to load from localStorage first, fallback to static data
+    try {
+      const savedVehicleData = localStorage.getItem('reRideVehicleData');
+      if (savedVehicleData) {
+        return JSON.parse(savedVehicleData);
+      }
+    } catch (error) {
+      console.warn('Failed to load vehicle data from localStorage:', error);
+    }
+    return VEHICLE_DATA;
+  });
   const [faqItems, setFaqItems] = useState<FAQItem[]>(() => getFaqs() || []);
   const [supportTickets, setSupportTickets] = useState<SupportTicket[]>(() => getSupportTickets() || []);
   const [notifications, setNotifications] = useState<Notification[]>(() => {
@@ -566,6 +574,12 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     },
     onUpdateVehicleData: (newData: VehicleData) => {
       setVehicleData(newData);
+      // Save to localStorage for persistence
+      try {
+        localStorage.setItem('reRideVehicleData', JSON.stringify(newData));
+      } catch (error) {
+        console.warn('Failed to save vehicle data to localStorage:', error);
+      }
       addToast('Vehicle data updated', 'success');
     },
     onToggleVerifiedStatus: (email: string) => {
