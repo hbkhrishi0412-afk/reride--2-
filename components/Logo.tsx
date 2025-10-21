@@ -23,6 +23,10 @@ const Logo: React.FC<LogoProps> = ({
 
   const config = sizeConfig[size];
   const iconSize = config.icon;
+  
+  // Generate unique IDs for gradients to avoid conflicts
+  const pinGradientId = `pinGradient-${size}-${Math.random().toString(36).substr(2, 5)}`;
+  const carGradientId = `carGradient-${size}-${Math.random().toString(36).substr(2, 5)}`;
 
   return (
     <button 
@@ -52,7 +56,7 @@ const Logo: React.FC<LogoProps> = ({
             {/* Pin body - split blue/orange */}
             <path
               d="M-8,0 C-8,-8 -4,-12 0,-12 C4,-12 8,-8 8,0 L8,12 C8,16 4,20 0,20 C-4,20 -8,16 -8,12 Z"
-              fill="url(#pinGradient)"
+              fill={`url(#${pinGradientId})`}
             />
             {/* Pin center circle */}
             <circle cx="0" cy="4" r="3" fill="white" />
@@ -64,7 +68,7 @@ const Logo: React.FC<LogoProps> = ({
             <path
               d="M-20,-8 L-12,-16 L12,-16 L20,-8 L20,8 L-20,8 Z"
               fill="none"
-              stroke="url(#carGradient)"
+              stroke={`url(#${carGradientId})`}
               strokeWidth="2"
             />
             
@@ -80,7 +84,7 @@ const Logo: React.FC<LogoProps> = ({
             <path
               d="M-8,-8 L-4,-12 L4,-12 L8,-8"
               fill="none"
-              stroke="url(#carGradient)"
+              stroke={`url(#${carGradientId})`}
               strokeWidth="1.5"
             />
             
@@ -91,13 +95,13 @@ const Logo: React.FC<LogoProps> = ({
           {/* Gradients */}
           <defs>
             {/* Pin gradient - blue to orange */}
-            <linearGradient id="pinGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+            <linearGradient id={pinGradientId} x1="0%" y1="0%" x2="100%" y2="0%">
               <stop offset="0%" stopColor="#2196F3" />
               <stop offset="100%" stopColor="#FF6B35" />
             </linearGradient>
             
             {/* Car gradient - orange to blue */}
-            <linearGradient id="carGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+            <linearGradient id={carGradientId} x1="0%" y1="0%" x2="100%" y2="0%">
               <stop offset="0%" stopColor="#FF6B35" />
               <stop offset="100%" stopColor="#2196F3" />
             </linearGradient>
