@@ -917,13 +917,14 @@ const VehicleForm: React.FC<VehicleFormProps> = memo(({ editingVehicle, onAddVeh
 
 const InquiriesView: React.FC<{
   conversations: Conversation[];
+  sellerEmail: string;
   onMarkConversationAsReadBySeller: (conversationId: string) => void;
   onMarkMessagesAsRead: (conversationId: string, readerRole: 'customer' | 'seller') => void;
   onSelectConv: (conv: Conversation) => void;
   onTestDriveResponse?: (conversationId: string, messageId: number, newStatus: 'confirmed' | 'rejected') => void;
   onSellerSendMessage: (conversationId: string, messageText: string) => void;
 
-}> = memo(({ conversations, onMarkConversationAsReadBySeller, onMarkMessagesAsRead, onSelectConv, onTestDriveResponse, onSellerSendMessage }) => {
+}> = memo(({ conversations, sellerEmail, onMarkConversationAsReadBySeller, onMarkMessagesAsRead, onSelectConv, onTestDriveResponse, onSellerSendMessage }) => {
 
     const handleSelectConversation = (conv: Conversation) => {
       onSelectConv(conv);
@@ -946,8 +947,10 @@ const InquiriesView: React.FC<{
     }
 
     const sortedConversations = useMemo(() => {
-        return [...conversations].sort((a, b) => new Date(b.lastMessageAt).getTime() - new Date(a.lastMessageAt).getTime());
-    }, [conversations]);
+        // Filter conversations to only show those for the current seller
+        const sellerConversations = conversations.filter(conv => conv.sellerId === sellerEmail);
+        return [...sellerConversations].sort((a, b) => new Date(b.lastMessageAt).getTime() - new Date(a.lastMessageAt).getTime());
+    }, [conversations, sellerEmail]);
 
     return (
        <div className="bg-white p-6 sm:p-8 rounded-lg shadow-md">
@@ -1203,7 +1206,7 @@ const Dashboard: React.FC<DashboardProps> = ({ seller, sellerVehicles, reportedV
     }
   };
 
-  const unreadCount = useMemo(() => conversations.filter(c => !c.isReadBySeller).length, [conversations]);
+  const unreadCount = useMemo(() => conversations.filter(c => !c.isReadBySeller && c.sellerId === seller.email).length, [conversations, seller.email]);
   const activeListings = useMemo(() => sellerVehicles.filter(v => v.status !== 'sold'), [sellerVehicles]);
   const soldListings = useMemo(() => sellerVehicles.filter(v => v.status === 'sold'), [sellerVehicles]);
   const reportedCount = useMemo(() => reportedVehicles.length, [reportedVehicles]);
@@ -1266,7 +1269,7 @@ const Dashboard: React.FC<DashboardProps> = ({ seller, sellerVehicles, reportedV
             <PaymentStatusCard currentUser={seller} />
             <AiAssistant
               vehicles={activeListings}
-              conversations={conversations}
+              conversations={conversations.filter(c => c.sellerId === seller.email)}
               onNavigateToVehicle={handleNavigateToVehicle}
               onNavigateToInquiry={handleNavigateToInquiry}
             />
@@ -1697,6 +1700,7 @@ const Dashboard: React.FC<DashboardProps> = ({ seller, sellerVehicles, reportedV
       case 'inquiries':
         return <InquiriesView 
                     conversations={conversations} 
+                    sellerEmail={seller.email}
                     onMarkConversationAsReadBySeller={onMarkConversationAsReadBySeller} 
                     onMarkMessagesAsRead={onMarkMessagesAsRead}
                     onSelectConv={setSelectedConv}
