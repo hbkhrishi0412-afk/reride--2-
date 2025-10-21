@@ -20,7 +20,18 @@
   animation: slide-up 0.3s ease-out;
 }
 
-/* Mobile App Specific Styles */
+/* ============================================ */
+/* PREMIUM MOBILE APP STYLES */
+/* ============================================ */
+
+/* Premium App Background */
+body {
+  background: var(--app-bg-secondary);
+  overscroll-behavior-y: contain;
+  -webkit-overflow-scrolling: touch;
+  -webkit-tap-highlight-color: transparent;
+}
+
 @media (display-mode: standalone) {
   /* Remove any browser-specific padding/margins when in app mode */
   body {
@@ -37,14 +48,14 @@
     padding-top: env(safe-area-inset-top);
   }
 
-  /* Hide default scrollbars in app mode for cleaner look */
+  /* Premium scrollbars */
   ::-webkit-scrollbar {
-    width: 4px;
+    width: 6px;
   }
 
   ::-webkit-scrollbar-thumb {
-    background: rgba(0, 0, 0, 0.2);
-    border-radius: 4px;
+    background: linear-gradient(180deg, var(--app-primary) 0%, var(--app-secondary) 100%);
+    border-radius: 10px;
   }
 
   ::-webkit-scrollbar-track {
@@ -52,28 +63,238 @@
   }
 }
 
+/* Premium Card Styles */
+.app-card {
+  background: var(--app-surface);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-card);
+  overflow: hidden;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.app-card:active {
+  transform: scale(0.98);
+  box-shadow: var(--shadow-sm);
+}
+
+.app-card-elevated {
+  background: var(--gradient-card);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-md);
+  overflow: hidden;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  backdrop-filter: blur(10px);
+}
+
+.app-card-elevated:hover {
+  box-shadow: var(--shadow-card-hover);
+  transform: translateY(-2px);
+}
+
+/* Glassmorphism Card */
+.glass-card {
+  background: var(--glass-bg);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-md);
+}
+
+/* Premium Buttons */
+.app-btn-primary {
+  background: var(--gradient-primary);
+  color: white;
+  padding: 14px 28px;
+  border-radius: var(--radius-full);
+  font-weight: 700;
+  font-size: 15px;
+  border: none;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: var(--shadow-orange);
+  letter-spacing: 0.3px;
+  position: relative;
+  overflow: hidden;
+}
+
+.app-btn-primary::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(135deg, rgba(255,255,255,0.2) 0%, transparent 100%);
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+
+.app-btn-primary:hover::before {
+  opacity: 1;
+}
+
+.app-btn-primary:active {
+  transform: scale(0.96);
+  box-shadow: var(--shadow-sm);
+}
+
+.app-btn-secondary {
+  background: var(--gradient-secondary);
+  color: white;
+  padding: 14px 28px;
+  border-radius: var(--radius-full);
+  font-weight: 700;
+  font-size: 15px;
+  border: none;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: var(--shadow-blue);
+}
+
+.app-btn-secondary:active {
+  transform: scale(0.96);
+}
+
+.app-btn-ghost {
+  background: rgba(255, 107, 53, 0.08);
+  color: var(--app-primary);
+  padding: 12px 24px;
+  border-radius: var(--radius-full);
+  font-weight: 600;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.app-btn-ghost:active {
+  background: rgba(255, 107, 53, 0.15);
+  transform: scale(0.96);
+}
+
+/* Floating Action Button */
+.app-fab {
+  position: fixed;
+  bottom: 80px;
+  right: 20px;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: var(--gradient-primary);
+  color: white;
+  border: none;
+  box-shadow: var(--shadow-lg);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  z-index: 100;
+}
+
+.app-fab:hover {
+  transform: scale(1.1);
+  box-shadow: var(--shadow-xl);
+}
+
+.app-fab:active {
+  transform: scale(0.95);
+}
+
+/* Premium Badge */
+.app-badge {
+  background: var(--gradient-primary);
+  color: white;
+  padding: 4px 12px;
+  border-radius: var(--radius-full);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  box-shadow: var(--shadow-orange);
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.app-badge-secondary {
+  background: var(--gradient-secondary);
+  box-shadow: var(--shadow-blue);
+}
+
+.app-badge-success {
+  background: var(--gradient-success);
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+}
+
 /* Mobile App Layout Adjustments */
 .mobile-app-content {
   min-height: calc(100vh - 56px - 64px); /* Header + Bottom Nav */
   padding-bottom: env(safe-area-inset-bottom);
+  background: var(--app-bg-secondary);
 }
 
-/* Compact card design for mobile app */
+/* Premium Mobile Cards */
 .mobile-card {
-  @apply bg-white rounded-lg shadow-sm border border-gray-100 overflow-hidden;
+  background: var(--app-surface);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-card);
+  overflow: hidden;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  border: none;
+}
+
+.mobile-card:active {
+  transform: scale(0.98);
+  box-shadow: var(--shadow-sm);
 }
 
 .mobile-card-compact {
-  @apply bg-white rounded-md shadow-sm p-3 mb-2;
+  background: var(--app-surface);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-sm);
+  padding: 12px;
+  margin-bottom: 8px;
+  transition: all 0.2s;
 }
 
-/* Mobile-optimized button sizes */
+.mobile-card-compact:active {
+  transform: scale(0.98);
+}
+
+/* Premium Mobile Buttons */
 .mobile-btn-primary {
-  @apply bg-orange-500 text-white px-4 py-2.5 rounded-lg font-semibold text-sm active:bg-orange-600 transition-colors;
+  background: var(--gradient-primary);
+  color: white;
+  padding: 12px 24px;
+  border-radius: var(--radius-full);
+  font-weight: 700;
+  font-size: 14px;
+  border: none;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: var(--shadow-orange);
+  letter-spacing: 0.3px;
+}
+
+.mobile-btn-primary:active {
+  transform: scale(0.96);
+  box-shadow: var(--shadow-sm);
 }
 
 .mobile-btn-secondary {
-  @apply bg-gray-100 text-gray-700 px-4 py-2.5 rounded-lg font-semibold text-sm active:bg-gray-200 transition-colors;
+  background: rgba(99, 102, 241, 0.08);
+  color: var(--app-secondary);
+  padding: 12px 24px;
+  border-radius: var(--radius-full);
+  font-weight: 600;
+  font-size: 14px;
+  border: none;
+  transition: all 0.2s;
+}
+
+.mobile-btn-secondary:active {
+  background: rgba(99, 102, 241, 0.15);
+  transform: scale(0.96);
 }
 
 /* Touch-friendly tap targets (min 44x44px) */
@@ -256,55 +477,110 @@ code {
 }
 
 /* ============================================ */
-/* SPINNY THEME VARIABLES */
+/* PREMIUM APP THEME - Modern & Vibrant */
 /* ============================================ */
 :root {
-  /* Primary Blue - Modern Brand Color */
-  --spinny-orange: #2563EB;
-  --spinny-orange-hover: #3B82F6;
-  --spinny-orange-light: rgba(37, 99, 235, 0.1);
-  --spinny-orange-dark: #1D4ED8;
+  /* Primary Colors - Vibrant Gradient System */
+  --app-primary: #FF6B35;
+  --app-primary-dark: #E85A2B;
+  --app-primary-light: #FF8555;
+  --app-primary-glow: rgba(255, 107, 53, 0.3);
   
-  /* Trust Blue - Secondary */
-  --spinny-blue: #1E88E5;
-  --spinny-blue-hover: #42A5F5;
-  --spinny-blue-light: rgba(30, 136, 229, 0.1);
+  --spinny-orange: #FF6B35;
+  --spinny-orange-hover: #FF8555;
+  --spinny-orange-light: rgba(255, 107, 53, 0.12);
+  --spinny-orange-dark: #E85A2B;
+  
+  /* Secondary Colors - Premium Purple/Blue */
+  --app-secondary: #6366F1;
+  --app-secondary-light: #818CF8;
+  --app-secondary-dark: #4F46E5;
+  
+  --spinny-blue: #6366F1;
+  --spinny-blue-hover: #818CF8;
+  --spinny-blue-light: rgba(99, 102, 241, 0.12);
+  --spinny-blue-dark: #4F46E5;
+  
+  /* Accent Colors */
+  --app-accent-pink: #EC4899;
+  --app-accent-cyan: #06B6D4;
+  --app-accent-green: #10B981;
   
   /* Success Green */
   --spinny-green: #10B981;
   --spinny-green-hover: #059669;
-  --spinny-green-light: rgba(16, 185, 129, 0.1);
+  --spinny-green-light: rgba(16, 185, 129, 0.12);
   
-  /* Neutral Colors */
+  /* Neutral Colors - App Style */
+  --app-bg-primary: #FFFFFF;
+  --app-bg-secondary: #F8FAFC;
+  --app-bg-tertiary: #F1F5F9;
+  --app-surface: #FFFFFF;
+  --app-divider: #E2E8F0;
+  
   --spinny-white: #FFFFFF;
-  --spinny-off-white: #FAFAFA;
-  --spinny-light-gray: #F5F5F5;
-  --spinny-gray: #E0E0E0;
-  --spinny-medium-gray: #9E9E9E;
-  --spinny-dark-gray: #616161;
+  --spinny-off-white: #F8FAFC;
+  --spinny-light-gray: #F1F5F9;
+  --spinny-gray: #E2E8F0;
+  --spinny-medium-gray: #94A3B8;
+  --spinny-dark-gray: #64748B;
   
-  /* Text Colors - High Contrast */
-  --spinny-text: #2C2C2C;
-  --spinny-text-dark: #1A1A1A;
-  --spinny-text-medium: #616161;
-  --spinny-text-light: #9E9E9E;
+  /* Text Colors - High Contrast for Apps */
+  --app-text-primary: #0F172A;
+  --app-text-secondary: #475569;
+  --app-text-tertiary: #94A3B8;
+  --app-text-inverse: #FFFFFF;
   
-  /* Status Colors */
-  --spinny-success: #4CAF50;
-  --spinny-warning: #FFC107;
-  --spinny-error: #F44336;
+  --spinny-text: #0F172A;
+  --spinny-text-dark: #0F172A;
+  --spinny-text-medium: #475569;
+  --spinny-text-light: #94A3B8;
   
-  /* Gradients */
-  --gradient-primary: linear-gradient(135deg, #2563EB 0%, #3B82F6 100%);
-  --gradient-warm: linear-gradient(135deg, #2563EB 0%, #3B82F6 100%);
-  --gradient-hero: linear-gradient(135deg, #2563EB 0%, #1D4ED8 100%);
-  --gradient-soft: linear-gradient(180deg, #FFFFFF 0%, #F5F5F5 100%);
+  /* Status Colors - Vibrant */
+  --spinny-success: #10B981;
+  --spinny-warning: #F59E0B;
+  --spinny-error: #EF4444;
+  --spinny-info: #3B82F6;
   
-  /* Shadows */
+  /* Premium Gradients */
+  --gradient-primary: linear-gradient(135deg, #FF6B35 0%, #FF8555 100%);
+  --gradient-secondary: linear-gradient(135deg, #6366F1 0%, #818CF8 100%);
+  --gradient-warm: linear-gradient(135deg, #FF6B35 0%, #EC4899 100%);
+  --gradient-cool: linear-gradient(135deg, #6366F1 0%, #06B6D4 100%);
+  --gradient-hero: linear-gradient(135deg, #FF6B35 0%, #6366F1 100%);
+  --gradient-success: linear-gradient(135deg, #10B981 0%, #06B6D4 100%);
+  --gradient-soft: linear-gradient(180deg, #FFFFFF 0%, #F8FAFC 100%);
+  --gradient-card: linear-gradient(145deg, rgba(255,255,255,0.95) 0%, rgba(248,250,252,0.95) 100%);
+  
+  /* App-Style Shadows - More Depth */
+  --shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.05);
   --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.08);
   --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.1);
-  --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.12);
-  --shadow-orange: 0 4px 20px rgba(37, 99, 235, 0.3);
+  --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.15);
+  --shadow-xl: 0 20px 50px rgba(0, 0, 0, 0.2);
+  --shadow-orange: 0 8px 24px rgba(255, 107, 53, 0.3);
+  --shadow-blue: 0 8px 24px rgba(99, 102, 241, 0.3);
+  --shadow-card: 0 2px 12px rgba(0, 0, 0, 0.08);
+  --shadow-card-hover: 0 8px 30px rgba(0, 0, 0, 0.12);
+  
+  /* Border Radius - App Style */
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-xl: 24px;
+  --radius-full: 9999px;
+  
+  /* Spacing System */
+  --space-xs: 4px;
+  --space-sm: 8px;
+  --space-md: 16px;
+  --space-lg: 24px;
+  --space-xl: 32px;
+  
+  /* Glassmorphism */
+  --glass-bg: rgba(255, 255, 255, 0.8);
+  --glass-border: rgba(255, 255, 255, 0.2);
+  --glass-blur: blur(20px);
 }
 
 /* ============================================ */

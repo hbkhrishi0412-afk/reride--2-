@@ -826,7 +826,7 @@ const AppContent: React.FC = () => {
 
     if (isDashboardView && currentUser) {
       return (
-        <div className="min-h-screen bg-gray-50">
+        <div className="min-h-screen" style={{ background: '#F8FAFC' }}>
           <MobileDashboard
             currentUser={currentUser}
             userVehicles={vehicles.filter(v => v.sellerEmail === currentUser.email)}
@@ -867,7 +867,7 @@ const AppContent: React.FC = () => {
     }
 
     return (
-      <div className="min-h-screen bg-gray-50">
+      <div className="min-h-screen" style={{ background: '#F8FAFC' }}>
         <MobileHeader
           onNavigate={navigate}
           currentUser={currentUser}
@@ -877,7 +877,7 @@ const AppContent: React.FC = () => {
           onBack={() => navigate(ViewEnum.USED_CARS)}
         />
         
-        <main className="mobile-app-content bg-gray-50 mobile-page-transition">
+        <main className="mobile-app-content mobile-page-transition" style={{ background: '#F8FAFC' }}>
           <ErrorBoundary>
             <Suspense fallback={<LoadingSpinner />}>
               {renderView()}
