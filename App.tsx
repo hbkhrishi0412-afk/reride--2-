@@ -1,4 +1,4 @@
-import React, { Suspense } from 'react';
+import React, { Suspense, useEffect } from 'react';
 import { AppProvider, useApp } from './components/AppProvider';
 import ErrorBoundary from './components/ErrorBoundary';
 import Header from './components/Header';
@@ -125,6 +125,27 @@ const AppContent: React.FC = () => {
     onOfferResponse,
   } = useApp();
   
+  // Redirect logged-in users to their appropriate dashboard
+  useEffect(() => {
+    if (currentUser && currentView === ViewEnum.HOME) {
+      console.log('🔄 User is logged in, redirecting to appropriate dashboard:', currentUser.role);
+      switch (currentUser.role) {
+        case 'customer':
+          navigate(ViewEnum.BUYER_DASHBOARD);
+          break;
+        case 'seller':
+          navigate(ViewEnum.SELLER_DASHBOARD);
+          break;
+        case 'admin':
+          navigate(ViewEnum.ADMIN_PANEL);
+          break;
+        default:
+          // Keep on home page for other roles
+          break;
+      }
+    }
+  }, [currentUser, currentView, navigate]);
+
   // Get page title based on current view
   const getPageTitle = () => {
     switch (currentView) {

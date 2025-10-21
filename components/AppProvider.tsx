@@ -141,7 +141,20 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const [selectedVehicle, setSelectedVehicle] = useState<Vehicle | null>(null);
   const [vehicles, setVehicles] = useState<Vehicle[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
-  const [currentUser, setCurrentUser] = useState<User | null>(null);
+  const [currentUser, setCurrentUser] = useState<User | null>(() => {
+    // Check for existing logged-in user on app startup
+    try {
+      const savedUser = localStorage.getItem('reRideCurrentUser');
+      if (savedUser) {
+        const user = JSON.parse(savedUser);
+        console.log('🔄 Restoring logged-in user:', user.name, user.role);
+        return user;
+      }
+    } catch (error) {
+      console.warn('Failed to load user from localStorage:', error);
+    }
+    return null;
+  });
   const [comparisonList, setComparisonList] = useState<number[]>([]);
   const [ratings, setRatings] = useState<{ [key: string]: number[] }>({});
   const [sellerRatings, setSellerRatings] = useState<{ [key: string]: number[] }>({});
