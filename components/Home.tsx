@@ -52,8 +52,11 @@ const FeaturedVehicleCard: React.FC<Pick<HomeProps, 'onSelectVehicle' | 'onToggl
     }
 
     const handleQuickViewClick = (e: React.MouseEvent) => {
+      e.preventDefault();
       e.stopPropagation();
-      console.log('QuickView button clicked for vehicle:', vehicle.id, vehicle.make, vehicle.model);
+      console.log('🔍 QuickView button clicked for vehicle:', vehicle.id, vehicle.make, vehicle.model);
+      console.log('🔍 Event details:', e);
+      console.log('🔍 onQuickView function:', onQuickView);
       onQuickView(vehicle);
     }
   
@@ -155,6 +158,11 @@ const Home: React.FC<HomeProps> = ({ onSearch, onSelectCategory, featuredVehicle
     const [aiSearchQuery, setAiSearchQuery] = useState('');
     const [isAiSearching, setIsAiSearching] = useState(false);
     const [quickViewVehicle, setQuickViewVehicle] = useState<Vehicle | null>(null);
+    
+    const handleQuickView = (vehicle: Vehicle) => {
+      console.log('🔍 handleQuickView called with vehicle:', vehicle.id, vehicle.make, vehicle.model);
+      setQuickViewVehicle(vehicle);
+    };
     const [recentlyViewed, setRecentlyViewed] = useState<Vehicle[]>([]);
 
     // Analytics tracking functions
@@ -441,7 +449,7 @@ const Home: React.FC<HomeProps> = ({ onSearch, onSelectCategory, featuredVehicle
                                     onToggleWishlist={onToggleWishlist}
                                     wishlist={wishlist}
                                     onViewSellerProfile={onViewSellerProfile}
-                                    onQuickView={setQuickViewVehicle}
+                                    onQuickView={handleQuickView}
                                 />
                             </div>
                         ))}
@@ -537,7 +545,7 @@ const Home: React.FC<HomeProps> = ({ onSearch, onSelectCategory, featuredVehicle
                                         onToggleWishlist={onToggleWishlist} 
                                         wishlist={wishlist} 
                                         onViewSellerProfile={onViewSellerProfile}
-                                        onQuickView={setQuickViewVehicle}
+                                        onQuickView={handleQuickView}
                                     />
                                 </div>
                             ))}
@@ -580,7 +588,7 @@ const Home: React.FC<HomeProps> = ({ onSearch, onSelectCategory, featuredVehicle
                                     onToggleWishlist={onToggleWishlist} 
                                     wishlist={wishlist} 
                                     onViewSellerProfile={onViewSellerProfile}
-                                    onQuickView={setQuickViewVehicle}
+                                    onQuickView={handleQuickView}
                                 />
                             </div>
                         ))}
@@ -614,7 +622,7 @@ const Home: React.FC<HomeProps> = ({ onSearch, onSelectCategory, featuredVehicle
                                         onToggleWishlist={onToggleWishlist} 
                                         wishlist={wishlist} 
                                         onViewSellerProfile={onViewSellerProfile}
-                                        onQuickView={setQuickViewVehicle}
+                                        onQuickView={handleQuickView}
                                     />
                                 </div>
                             ))}

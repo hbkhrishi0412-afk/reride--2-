@@ -47,8 +47,8 @@ const QuickViewModal: React.FC<QuickViewModalProps> = ({ vehicle, onClose, onSel
     return null;
   }
 
-  console.log('QuickViewModal rendering for vehicle:', vehicle.id, vehicle.make, vehicle.model);
-  console.log('Vehicle data:', {
+  console.log('🔍 QuickViewModal rendering for vehicle:', vehicle.id, vehicle.make, vehicle.model);
+  console.log('🔍 Vehicle data:', {
     id: vehicle.id,
     make: vehicle.make,
     model: vehicle.model,
