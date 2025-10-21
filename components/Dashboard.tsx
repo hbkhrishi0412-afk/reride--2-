@@ -857,8 +857,9 @@ const InquiriesView: React.FC<{
   onSelectConv: (conv: Conversation) => void;
   onTestDriveResponse?: (conversationId: string, messageId: number, newStatus: 'confirmed' | 'rejected') => void;
   onSellerSendMessage: (conversationId: string, messageText: string) => void;
+  onOfferResponse: (conversationId: string, messageId: number, response: 'accepted' | 'rejected' | 'countered', counterPrice?: number) => void;
 
-}> = memo(({ conversations, onMarkConversationAsReadBySeller, onMarkMessagesAsRead, onSelectConv, onTestDriveResponse, onSellerSendMessage }) => {
+}> = memo(({ conversations, onMarkConversationAsReadBySeller, onMarkMessagesAsRead, onSelectConv, onTestDriveResponse, onSellerSendMessage, onOfferResponse }) => {
 
     const handleSelectConversation = (conv: Conversation) => {
       onSelectConv(conv);
@@ -1637,6 +1638,7 @@ const Dashboard: React.FC<DashboardProps> = ({ seller, sellerVehicles, reportedV
                     onSelectConv={setSelectedConv}
                     onTestDriveResponse={onTestDriveResponse}
                     onSellerSendMessage={onSellerSendMessage}
+                    onOfferResponse={onOfferResponse}
                 />;
       case 'reports':
         return <ReportsView
