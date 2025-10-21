@@ -95,50 +95,87 @@ export const getVehicleDataSync = (): VehicleData => {
 };
 
 /**
- * Saves vehicle data to both API and localStorage.
+ * Saves vehicle data to both API and localStorage with enhanced error handling and retry logic.
  */
 export const saveVehicleData = async (data: VehicleData): Promise<boolean> => {
-  // Try consolidated endpoint first
+  console.log('🔄 Starting vehicle data save process...');
+  
+  // Always save to localStorage first for immediate UI update
   try {
-    const response = await fetch(`${API_BASE_URL}/vehicles?type=data`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(data)
-    });
-
-    if (response.ok) {
-      localStorage.setItem(VEHICLE_DATA_STORAGE_KEY, JSON.stringify(data));
-      return true;
-    } else {
-      console.warn(`Consolidated endpoint failed with ${response.status}, trying standalone endpoint`);
-    }
+    localStorage.setItem(VEHICLE_DATA_STORAGE_KEY, JSON.stringify(data));
+    console.log('✅ Vehicle data saved to localStorage');
   } catch (error) {
-    console.warn("Consolidated endpoint failed, trying standalone endpoint", error);
+    console.error('❌ Failed to save to localStorage:', error);
   }
 
-  // Try standalone endpoint as fallback
-  try {
-    const response = await fetch(`${API_BASE_URL}/vehicle-data`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(data)
-    });
+  // Try to save to API with retry logic
+  const maxRetries = 3;
+  let lastError: Error | null = null;
 
-    if (response.ok) {
-      localStorage.setItem(VEHICLE_DATA_STORAGE_KEY, JSON.stringify(data));
-      return true;
-    } else {
-      console.error("Both API endpoints failed to save vehicle data");
-      return false;
-    }
-  } catch (error) {
-    console.error("Failed to save vehicle data to both endpoints:", error);
-    // Still save to localStorage as fallback
+  for (let attempt = 1; attempt <= maxRetries; attempt++) {
+    console.log(`🌐 Attempt ${attempt}/${maxRetries}: Trying to save to API...`);
+    
+    // Try consolidated endpoint first
     try {
-      localStorage.setItem(VEHICLE_DATA_STORAGE_KEY, JSON.stringify(data));
-    } catch (e) {
-      console.error("Failed to save vehicle data to localStorage", e);
+      const response = await fetch(`${API_BASE_URL}/vehicles?type=data`, {
+        method: 'POST',
+        headers: { 
+          'Content-Type': 'application/json',
+          'Accept': 'application/json'
+        },
+        body: JSON.stringify(data)
+      });
+
+      if (response.ok) {
+        const result = await response.json();
+        console.log('✅ Vehicle data saved to API via consolidated endpoint:', result);
+        return true;
+      } else {
+        console.warn(`⚠️ Consolidated endpoint failed with ${response.status}: ${response.statusText}`);
+        const errorText = await response.text();
+        console.warn('Response body:', errorText);
+      }
+    } catch (error) {
+      console.warn(`⚠️ Consolidated endpoint attempt ${attempt} failed:`, error);
+      lastError = error as Error;
     }
-    return false;
+
+    // Try standalone endpoint as fallback
+    try {
+      const response = await fetch(`${API_BASE_URL}/vehicle-data`, {
+        method: 'POST',
+        headers: { 
+          'Content-Type': 'application/json',
+          'Accept': 'application/json'
+        },
+        body: JSON.stringify(data)
+      });
+
+      if (response.ok) {
+        const result = await response.json();
+        console.log('✅ Vehicle data saved to API via standalone endpoint:', result);
+        return true;
+      } else {
+        console.warn(`⚠️ Standalone endpoint failed with ${response.status}: ${response.statusText}`);
+        const errorText = await response.text();
+        console.warn('Response body:', errorText);
+      }
+    } catch (error) {
+      console.warn(`⚠️ Standalone endpoint attempt ${attempt} failed:`, error);
+      lastError = error as Error;
+    }
+
+    // Wait before retry (exponential backoff)
+    if (attempt < maxRetries) {
+      const delay = Math.pow(2, attempt) * 1000; // 2s, 4s, 8s
+      console.log(`⏳ Waiting ${delay}ms before retry...`);
+      await new Promise(resolve => setTimeout(resolve, delay));
+    }
   }
+
+  console.error('❌ All API save attempts failed. Data saved locally only.');
+  console.error('Last error:', lastError);
+  
+  // Return false to indicate API save failed, but data is still in localStorage
+  return false;
 };

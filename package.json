@@ -15,7 +15,9 @@
     "clean": "node -e \"const fs = require('fs'); const path = require('path'); const dirs = ['node_modules/.vite', 'dist']; dirs.forEach(d => { try { fs.rmSync(d, { recursive: true, force: true }); console.log('Cleaned:', d); } catch(e) {} });\"",
     "perf": "node performance-optimize.js",
     "perf:clean": "node performance-optimize.js --clean",
-    "perf:analyze": "node performance-optimize.js --analyze"
+    "perf:analyze": "node performance-optimize.js --analyze",
+    "verify-deployment": "node scripts/verify-deployment.js",
+    "verify-deployment:local": "node scripts/verify-deployment.js http://localhost:5173"
   },
   "dependencies": {
     "@google/generative-ai": "^0.21.0",

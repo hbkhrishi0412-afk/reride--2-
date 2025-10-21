@@ -577,19 +577,23 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         // Update local state first
         setVehicleData(newData);
         
-        // Save to API for persistence
+        // Save to API for persistence with enhanced error handling
         const { saveVehicleData } = await import('../services/vehicleDataService');
         const success = await saveVehicleData(newData);
         
         if (success) {
-          addToast('Vehicle data updated successfully', 'success');
+          addToast('Vehicle data updated and synced successfully', 'success');
           console.log('✅ Vehicle data updated via API:', newData);
         } else {
           // Fallback to localStorage if API fails
           try {
             localStorage.setItem('reRideVehicleData', JSON.stringify(newData));
-            addToast('Vehicle data updated (saved locally)', 'warning');
+            addToast('Vehicle data updated (saved locally, will sync when online)', 'warning');
             console.warn('⚠️ API failed, saved to localStorage as fallback');
+            
+            // Import sync service to mark pending changes
+            const { syncService } = await import('../services/syncService');
+            syncService.markPendingChanges();
           } catch (error) {
             console.warn('Failed to save vehicle data to localStorage:', error);
             addToast('Failed to save vehicle data', 'error');
