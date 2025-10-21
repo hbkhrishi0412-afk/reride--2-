@@ -1,6 +1,7 @@
 import React, { memo, useState } from 'react';
 import type { Conversation } from '../types';
 import { ChatWidget } from './ChatWidget';
+import InlineChat from './InlineChat';
 
 interface DashboardMessagesProps {
   conversations: Conversation[];
@@ -139,17 +140,17 @@ const DashboardMessages: React.FC<DashboardMessagesProps> = memo(({
         {/* Chat Widget */}
         <div className="lg:col-span-2">
           {selectedConversation ? (
-            <ChatWidget
+            <InlineChat
               conversation={selectedConversation}
               currentUserRole="seller"
               otherUserName={selectedConversation.customerName}
-              onClose={() => setSelectedConversation(null)}
               onSendMessage={onSellerSendMessage}
               typingStatus={typingStatus}
               onUserTyping={onUserTyping}
               onMarkMessagesAsRead={onMarkMessagesAsRead}
               onFlagContent={() => {}}
               onOfferResponse={onOfferResponse}
+              height="h-96"
             />
           ) : (
             <div className="bg-white rounded-lg shadow-md h-96 flex items-center justify-center">

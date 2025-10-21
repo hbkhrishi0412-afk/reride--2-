@@ -1,6 +1,7 @@
 import React, { useState, useMemo, useEffect, useRef, useCallback } from 'react';
 import type { Conversation, User, ChatMessage } from '../types';
 import ReadReceiptIcon, { OfferMessage, OfferModal } from './ReadReceiptIcon';
+import InlineChat from './InlineChat';
 
 interface CustomerInboxProps {
   conversations: Conversation[];
@@ -187,62 +188,29 @@ const CustomerInbox: React.FC<CustomerInboxProps> = ({ conversations, onSendMess
           {/* Chat View */}
           <main className="flex flex-col">
               {selectedConv ? (
-                  <>
-                      <div className="p-4 border-b border-gray-200-200 dark:border-gray-200-200 flex justify-between items-center">
-                          <div>
-                              <h3 className="font-bold text-lg text-spinny-text-dark dark:text-spinny-text-dark">{selectedConv.vehicleName}</h3>
-                              <p className="text-sm text-gray-600 dark:text-gray-400">Conversation with {getSellerName(selectedConv.sellerId)}</p>
-                          </div>
-                          <button onClick={handleFlagClick} disabled={selectedConv.isFlagged} className="disabled:opacity-50 flex items-center gap-1 text-xs text-spinny-text hover:text-spinny-orange" title={selectedConv.isFlagged ? "This conversation has been reported" : "Report conversation"}>
-                              {selectedConv.isFlagged ? (
-                                  <>
-                                      <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-spinny-text-dark" viewBox="0 0 20 20" fill="currentColor"><path fillRule="evenodd" d="M3 6a3 3 0 013-3h10a1 1 0 01.8 1.6L14.25 8l2.55 3.4A1 1 0 0116 13H6a1 1 0 01-1-1V6z" clipRule="evenodd" /></svg>
-                                      Reported
-                                  </>
-                              ) : (
-                                  <>
-                                      <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor"><path fillRule="evenodd" d="M3 6a3 3 0 013-3h10a1 1 0 01.8 1.6L14.25 8l2.55 3.4A1 1 0 0116 13H6a1 1 0 01-1-1V6z" clipRule="evenodd" /></svg>
-                                      Report
-                                  </>
-                              )}
-                          </button>
-                      </div>
-                      <div className="flex-grow p-4 overflow-y-auto bg-white dark:bg-white space-y-4">
-                          {selectedConv.messages.map(msg => (
-                            <div key={msg.id} className={`flex flex-col animate-fade-in ${msg.sender === 'user' ? 'items-end' : 'items-start'}`}>
-                                  {msg.sender === 'seller' && <span className="text-xs font-bold text-spinny-text-dark dark:text-spinny-text-dark mb-1 ml-2">{getSellerName(selectedConv.sellerId)}</span>}
-                                  {msg.sender === 'system' && <div className="text-center text-xs text-gray-600 dark:text-gray-400 italic py-2 w-full">{msg.text}</div>}
-                                  {msg.sender !== 'system' && (
-                                      <>
-                                          <div className={`px-4 py-3 max-w-lg ${ msg.sender === 'user' ? 'text-white rounded-l-xl rounded-t-xl' : 'bg-spinny-light-gray dark:bg-brand-gray-700 text-spinny-text-dark dark:text-white rounded-r-xl rounded-t-xl'}`} style={msg.sender === 'user' ? { background: 'var(--gradient-primary)' } : undefined}>
-                                              {msg.type === 'test_drive_request' ? <TestDriveRequestMessage msg={msg} /> : msg.type === 'offer' ? <OfferMessage msg={msg} currentUserRole="customer" listingPrice={selectedConv.vehiclePrice} onRespond={(messageId, response, counterPrice) => { if (selectedConv) { onOfferResponse(selectedConv.id, messageId, response, counterPrice); }}} /> : <p className="text-sm">{msg.text}</p>}
-                                          </div>
-                                          <div className="text-xs text-gray-400 mt-1 px-1 flex items-center">
-                                              {new Date(msg.timestamp).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}
-                                              {msg.sender === 'user' && <ReadReceiptIcon isRead={msg.isRead} />}
-                                          </div>
-                                      </>
-                                  )}
-                              </div>
-                          ))}
-                          {typingStatus?.conversationId === selectedConv?.id && typingStatus?.userRole === 'seller' && <TypingIndicator name={getSellerName(selectedConv.sellerId)} />}
-                          <div ref={chatEndRef} />
-                      </div>
-                      <div className="p-4 border-t border-gray-200-200 dark:border-gray-200-200 bg-white">
-                          <form onSubmit={handleSendReply} className="flex gap-2">
-                          <button type="button" onClick={() => setIsOfferModalOpen(true)} className="bg-spinny-orange text-white font-bold p-3 rounded-lg hover:bg-spinny-orange transition-colors" aria-label="Make an offer">
-                               <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path d="M8.433 7.418c.155-.103.346-.196.567-.267v1.698a2.5 2.5 0 00-1.134 0V7.151c.22.07.412.164.567.267zM11.567 7.418c.155-.103.346-.196.567-.267v1.698a2.5 2.5 0 01-1.134 0V7.151c.22.07.412.164.567.267z" /><path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-13a1 1 0 10-2 0v.092a4.5 4.5 0 00-1.876.662C6.168 6.23 5.5 7.085 5.5 8.003v.486c0 .918.668 1.773 1.624 2.214.509.232.957.488 1.376.786V12.5a.5.5 0 01.5.5h1a.5.5 0 01.5-.5v-1.214c.419-.298.867-.554 1.376-.786C14.332 10.26 15 9.405 15 8.489v-.486c0-.918-.668-1.773-1.624-2.214A4.5 4.5 0 0011 5.092V5z" clipRule="evenodd" /></svg>
-                           </button>
-                          <input type="text" value={replyText} onChange={handleInputChange} placeholder="Type your message..." className={formInputClass} />
-                          <button type="submit" className="btn-brand-primary text-white font-bold py-2 px-6 rounded-lg">Send</button>
-                          </form>
-                      </div>
-                  </>
+                  <InlineChat
+                      conversation={selectedConv}
+                      currentUserRole="customer"
+                      otherUserName={getSellerName(selectedConv.sellerId)}
+                      onSendMessage={(messageText, type, payload) => {
+                          if (type === 'offer' && payload) {
+                              onSendMessage(selectedConv.vehicleId, messageText, type, payload);
+                          } else {
+                              onSendMessage(selectedConv.vehicleId, messageText);
+                          }
+                      }}
+                      typingStatus={typingStatus}
+                      onUserTyping={onUserTyping}
+                      onMarkMessagesAsRead={onMarkMessagesAsRead}
+                      onFlagContent={onFlagContent}
+                      onOfferResponse={onOfferResponse}
+                      height="h-96"
+                  />
               ) : (
-                  <div className="flex flex-col items-center justify-center h-full text-center p-8">
-                      <svg xmlns="http://www.w3.org/2000/svg" className="h-16 w-16 text-brand-gray-300 dark:text-brand-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" /></svg>
-                      <h3 className="mt-4 text-xl font-semibold text-spinny-text-dark dark:text-brand-gray-200">Select a Conversation</h3>
-                      <p className="text-gray-600 dark:text-gray-400 mt-1">Choose a conversation from the left to view messages.</p>
+                  <div className="flex flex-col items-center justify-center h-96 text-center p-8 bg-white rounded-lg shadow-md">
+                      <svg xmlns="http://www.w3.org/2000/svg" className="h-16 w-16 text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" /></svg>
+                      <h3 className="mt-4 text-xl font-semibold text-gray-900">Select a Conversation</h3>
+                      <p className="text-gray-600 mt-1">Choose a conversation from the left to view messages.</p>
                   </div>
               )}
           </main>
