@@ -119,7 +119,8 @@ export const OfferMessage: React.FC<{
         payload: msg.payload,
         status,
         isRecipient,
-        showActions
+        showActions,
+        onRespond: typeof onRespond
     });
     
     const statusInfo = {
@@ -159,9 +160,11 @@ export const OfferMessage: React.FC<{
                                 e.preventDefault();
                                 e.stopPropagation();
                                 console.log('🔧 Accept button clicked for message:', msg.id);
+                                alert('Accept button clicked!'); // Temporary test
                                 onRespond(msg.id, 'accepted');
                             }} 
-                            className="flex-1 text-sm bg-green-500 text-white font-bold py-1.5 px-3 rounded-md hover:bg-green-600 transition-colors"
+                            className="flex-1 text-sm bg-green-500 text-white font-bold py-1.5 px-3 rounded-md hover:bg-green-600 transition-colors cursor-pointer"
+                            style={{ pointerEvents: 'auto' }}
                         >
                             Accept
                         </button>
@@ -170,9 +173,11 @@ export const OfferMessage: React.FC<{
                                 e.preventDefault();
                                 e.stopPropagation();
                                 console.log('🔧 Reject button clicked for message:', msg.id);
+                                alert('Reject button clicked!'); // Temporary test
                                 onRespond(msg.id, 'rejected');
                             }} 
-                            className="flex-1 text-sm bg-red-500 text-white font-bold py-1.5 px-3 rounded-md hover:bg-red-600 transition-colors"
+                            className="flex-1 text-sm bg-red-500 text-white font-bold py-1.5 px-3 rounded-md hover:bg-red-600 transition-colors cursor-pointer"
+                            style={{ pointerEvents: 'auto' }}
                         >
                             Reject
                         </button>
