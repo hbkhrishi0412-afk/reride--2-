@@ -572,15 +572,33 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         addToast('Export failed. Please try again.', 'error');
       }
     },
-    onUpdateVehicleData: (newData: VehicleData) => {
-      setVehicleData(newData);
-      // Save to localStorage for persistence
+    onUpdateVehicleData: async (newData: VehicleData) => {
       try {
-        localStorage.setItem('reRideVehicleData', JSON.stringify(newData));
+        // Update local state first
+        setVehicleData(newData);
+        
+        // Save to API for persistence
+        const { saveVehicleData } = await import('../services/vehicleDataService');
+        const success = await saveVehicleData(newData);
+        
+        if (success) {
+          addToast('Vehicle data updated successfully', 'success');
+          console.log('✅ Vehicle data updated via API:', newData);
+        } else {
+          // Fallback to localStorage if API fails
+          try {
+            localStorage.setItem('reRideVehicleData', JSON.stringify(newData));
+            addToast('Vehicle data updated (saved locally)', 'warning');
+            console.warn('⚠️ API failed, saved to localStorage as fallback');
+          } catch (error) {
+            console.warn('Failed to save vehicle data to localStorage:', error);
+            addToast('Failed to save vehicle data', 'error');
+          }
+        }
       } catch (error) {
-        console.warn('Failed to save vehicle data to localStorage:', error);
+        console.error('❌ Failed to update vehicle data:', error);
+        addToast('Failed to update vehicle data. Please try again.', 'error');
       }
-      addToast('Vehicle data updated', 'success');
     },
     onToggleVerifiedStatus: (email: string) => {
       setUsers(prev => prev.map(user => 
@@ -736,15 +754,52 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       setUsers(prev => prev.filter(user => user.email !== email));
       addToast('User deleted successfully', 'success');
     },
-    updateVehicle: (id: number, updates: Partial<Vehicle>) => {
-      setVehicles(prev => prev.map(vehicle => 
-        vehicle.id === id ? { ...vehicle, ...updates } : vehicle
-      ));
-      addToast('Vehicle updated successfully', 'success');
+    updateVehicle: async (id: number, updates: Partial<Vehicle>) => {
+      try {
+        // Find the vehicle to update
+        const vehicleToUpdate = vehicles.find(v => v.id === id);
+        if (!vehicleToUpdate) {
+          addToast('Vehicle not found', 'error');
+          return;
+        }
+
+        // Create updated vehicle object
+        const updatedVehicle = { ...vehicleToUpdate, ...updates };
+        
+        // Call API to persist changes
+        const { updateVehicle: updateVehicleApi } = await import('../services/vehicleService');
+        const result = await updateVehicleApi(updatedVehicle);
+        
+        // Update local state with the result from API
+        setVehicles(prev => prev.map(vehicle => 
+          vehicle.id === id ? result : vehicle
+        ));
+        
+        addToast('Vehicle updated successfully', 'success');
+        console.log('✅ Vehicle updated via API:', result);
+      } catch (error) {
+        console.error('❌ Failed to update vehicle:', error);
+        addToast('Failed to update vehicle. Please try again.', 'error');
+      }
     },
-    deleteVehicle: (id: number) => {
-      setVehicles(prev => prev.filter(vehicle => vehicle.id !== id));
-      addToast('Vehicle deleted successfully', 'success');
+    deleteVehicle: async (id: number) => {
+      try {
+        // Call API to delete vehicle
+        const { deleteVehicle: deleteVehicleApi } = await import('../services/vehicleService');
+        const result = await deleteVehicleApi(id);
+        
+        if (result.success) {
+          // Update local state
+          setVehicles(prev => prev.filter(vehicle => vehicle.id !== id));
+          addToast('Vehicle deleted successfully', 'success');
+          console.log('✅ Vehicle deleted via API:', result);
+        } else {
+          addToast('Failed to delete vehicle', 'error');
+        }
+      } catch (error) {
+        console.error('❌ Failed to delete vehicle:', error);
+        addToast('Failed to delete vehicle. Please try again.', 'error');
+      }
     },
     selectVehicle: (vehicle: Vehicle) => {
       setSelectedVehicle(vehicle);
