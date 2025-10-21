@@ -292,8 +292,8 @@ class DataService {
     
     if (users.length === 0) {
       try {
-        const { MOCK_USERS } = await import('../constants');
-        users = MOCK_USERS;
+        const { FALLBACK_USERS } = await import('../constants/fallback');
+        users = FALLBACK_USERS;
         this.setLocalStorageData('reRideUsers', users);
       } catch {
         users = fallbackUsers;

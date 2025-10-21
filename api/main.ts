@@ -1,7 +1,7 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
-import connectToDatabase from './lib-db';
-import User from './lib-user';
-import Vehicle from './lib-vehicle';
+import connectToDatabase from '../lib/db';
+import User from '../models/User';
+import Vehicle from '../models/Vehicle';
 import VehicleDataModel from '../models/VehicleData';
 import type { VehicleData } from '../types';
 
@@ -252,44 +252,83 @@ async function handleVehicles(req: VercelRequest, res: VercelResponse) {
 
   // VEHICLE DATA ENDPOINTS (brands, models, variants)
   if (type === 'data') {
-    if (req.method === 'GET') {
-      let vehicleDataDoc = await VehicleDataModel.findOne();
-      if (!vehicleDataDoc) {
-        // Create default vehicle data if none exists
-        const defaultData = {
-          FOUR_WHEELER: [
-            {
-              name: "Maruti Suzuki",
-              models: [
-                { name: "Swift", variants: ["LXi", "VXi", "VXi (O)", "ZXi", "ZXi+"] },
-                { name: "Baleno", variants: ["Sigma", "Delta", "Zeta", "Alpha"] }
-              ]
-            }
-          ],
-          TWO_WHEELER: [
-            {
-              name: "Honda",
-              models: [
-                { name: "Activa 6G", variants: ["Standard", "DLX", "Smart"] }
-              ]
-            }
+    // Default vehicle data (fallback)
+    const defaultData = {
+      FOUR_WHEELER: [
+        {
+          name: "Maruti Suzuki",
+          models: [
+            { name: "Swift", variants: ["LXi", "VXi", "VXi (O)", "ZXi", "ZXi+"] },
+            { name: "Baleno", variants: ["Sigma", "Delta", "Zeta", "Alpha"] },
+            { name: "Dzire", variants: ["LXi", "VXi", "ZXi", "ZXi+"] }
           ]
-        };
+        },
+        {
+          name: "Hyundai",
+          models: [
+            { name: "i20", variants: ["Magna", "Sportz", "Asta", "Asta (O)"] },
+            { name: "Verna", variants: ["S", "SX", "SX (O)", "SX Turbo"] }
+          ]
+        },
+        {
+          name: "Tata",
+          models: [
+            { name: "Nexon", variants: ["XE", "XM", "XZ+", "XZ+ (O)"] },
+            { name: "Safari", variants: ["XE", "XM", "XZ", "XZ+"] }
+          ]
+        }
+      ],
+      TWO_WHEELER: [
+        {
+          name: "Honda",
+          models: [
+            { name: "Activa 6G", variants: ["Standard", "DLX", "Smart"] },
+            { name: "Shine", variants: ["Standard", "SP", "SP (Drum)"] }
+          ]
+        },
+        {
+          name: "Bajaj",
+          models: [
+            { name: "Pulsar 150", variants: ["Standard", "DTS-i", "NS"] },
+            { name: "CT 100", variants: ["Standard", "X"] }
+          ]
+        }
+      ]
+    };
+
+    if (req.method === 'GET') {
+      try {
+        let vehicleDataDoc = await VehicleDataModel.findOne();
+        if (!vehicleDataDoc) {
+          // Create default vehicle data if none exists
+          vehicleDataDoc = new VehicleDataModel({ data: defaultData });
+          await vehicleDataDoc.save();
+        }
         
-        vehicleDataDoc = new VehicleDataModel({ data: defaultData });
-        await vehicleDataDoc.save();
+        return res.status(200).json(vehicleDataDoc.data);
+      } catch (dbError) {
+        console.warn('⚠️ Database connection failed for vehicles data, returning default data:', dbError);
+        // Return default data as fallback
+        return res.status(200).json(defaultData);
       }
-      
-      return res.status(200).json(vehicleDataDoc.data);
     }
 
     if (req.method === 'POST') {
-      const vehicleData = await VehicleDataModel.findOneAndUpdate(
-        {},
-        { data: req.body },
-        { upsert: true, new: true }
-      );
-      return res.status(200).json({ success: true, data: vehicleData });
+      try {
+        const vehicleData = await VehicleDataModel.findOneAndUpdate(
+          {},
+          { data: req.body },
+          { upsert: true, new: true }
+        );
+        return res.status(200).json({ success: true, data: vehicleData });
+      } catch (dbError) {
+        console.warn('⚠️ Database connection failed for vehicles data save:', dbError);
+        return res.status(503).json({
+          success: false,
+          reason: 'Database temporarily unavailable. Vehicle data could not be saved.',
+          fallback: true
+        });
+      }
     }
   }
 
@@ -430,7 +469,8 @@ async function handleAdmin(req: VercelRequest, res: VercelResponse) {
       }
 
       await connectToDatabase();
-      const collections = await Vehicle.db.db.listCollections().toArray();
+      const db = Vehicle.db?.db;
+      const collections = db ? await db.listCollections().toArray() : [];
       
       return res.status(200).json({
         success: true,

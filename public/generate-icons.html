@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Generate PWA Icons</title>
+</head>
+<body>
+  <canvas id="canvas" style="display:none;"></canvas>
+  <script>
+    // Generate PWA icons from SVG
+    const sizes = [192, 512];
+    const canvas = document.getElementById('canvas');
+    const ctx = canvas.getContext('2d');
+    
+    // ReRide brand colors
+    const brandColor = '#FF6B35'; // Orange
+    
+    sizes.forEach(size => {
+      canvas.width = size;
+      canvas.height = size;
+      
+      // Background
+      ctx.fillStyle = '#FFFFFF';
+      ctx.fillRect(0, 0, size, size);
+      
+      // Draw ReRide logo (simplified)
+      ctx.fillStyle = brandColor;
+      ctx.beginPath();
+      ctx.arc(size/2, size/2, size/3, 0, Math.PI * 2);
+      ctx.fill();
+      
+      // Add 'R' letter
+      ctx.fillStyle = '#FFFFFF';
+      ctx.font = `bold ${size/2}px Arial`;
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText('R', size/2, size/2);
+      
+      // Download
+      canvas.toBlob(blob => {
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `icon-${size}.png`;
+        a.click();
+      });
+    });
+    
+    document.body.innerHTML = '<h1>Icons generated! Check your downloads.</h1>';
+  </script>
+</body>
+</html>
+

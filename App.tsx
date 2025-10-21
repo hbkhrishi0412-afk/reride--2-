@@ -6,6 +6,7 @@ import Footer from './components/Footer';
 import ToastContainer from './components/ToastContainer';
 import CommandPalette from './components/CommandPalette';
 import { ChatWidget } from './components/ChatWidget';
+import PWAInstallPrompt from './components/PWAInstallPrompt';
 import { View as ViewEnum, Vehicle } from './types';
 
 // Simple loading component
@@ -799,6 +800,7 @@ const AppContent: React.FC = () => {
       <Footer onNavigate={navigate} />
       
       {/* Global Components */}
+      <PWAInstallPrompt />
       <ToastContainer 
         toasts={toasts} 
         onRemove={removeToast} 

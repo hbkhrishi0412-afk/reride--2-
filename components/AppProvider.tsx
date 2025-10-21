@@ -291,15 +291,17 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       try {
         setIsLoading(true);
         
-        // Load vehicles, vehicle data, and conversations in parallel
-        const [vehiclesData, vehicleDataData, conversationsData] = await Promise.all([
+        // Load vehicles, vehicle data, users, and conversations in parallel
+        const [vehiclesData, vehicleDataData, usersData, conversationsData] = await Promise.all([
           dataService.getVehicles(),
           dataService.getVehicleData(),
+          dataService.getUsers(),
           Promise.resolve(getConversations()) // Load conversations from localStorage
         ]);
         
         setVehicles(vehiclesData);
         setVehicleData(vehicleDataData);
+        setUsers(usersData);
         setConversations(conversationsData);
         
         // Set some recommendations (first 6 vehicles)

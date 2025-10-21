@@ -17,70 +17,76 @@ export default async function handler(
   }
 
   try {
-    // Connect to database
-    await connectToDatabase();
-    console.log('📡 Connected to database for vehicle data operation');
+    // Default vehicle data (fallback)
+    const defaultData: VehicleData = {
+      FOUR_WHEELER: [
+        {
+          name: "Maruti Suzuki",
+          models: [
+            { name: "Swift", variants: ["LXi", "VXi", "VXi (O)", "ZXi", "ZXi+"] },
+            { name: "Baleno", variants: ["Sigma", "Delta", "Zeta", "Alpha"] },
+            { name: "Dzire", variants: ["LXi", "VXi", "ZXi", "ZXi+"] }
+          ]
+        },
+        {
+          name: "Hyundai",
+          models: [
+            { name: "i20", variants: ["Magna", "Sportz", "Asta", "Asta (O)"] },
+            { name: "Verna", variants: ["S", "SX", "SX (O)", "SX Turbo"] }
+          ]
+        },
+        {
+          name: "Tata",
+          models: [
+            { name: "Nexon", variants: ["XE", "XM", "XZ+", "XZ+ (O)"] },
+            { name: "Safari", variants: ["XE", "XM", "XZ", "XZ+"] }
+          ]
+        }
+      ],
+      TWO_WHEELER: [
+        {
+          name: "Honda",
+          models: [
+            { name: "Activa 6G", variants: ["Standard", "DLX", "Smart"] },
+            { name: "Shine", variants: ["Standard", "SP", "SP (Drum)"] }
+          ]
+        },
+        {
+          name: "Bajaj",
+          models: [
+            { name: "Pulsar 150", variants: ["Standard", "DTS-i", "NS"] },
+            { name: "CT 100", variants: ["Standard", "X"] }
+          ]
+        }
+      ]
+    };
 
     if (req.method === 'GET') {
       console.log('📥 Fetching vehicle data...');
       
-      // Try to find existing vehicle data
-      let vehicleDataDoc = await VehicleDataModel.findOne().sort({ updatedAt: -1 });
-      
-      if (!vehicleDataDoc) {
-        console.log('📝 No vehicle data found, creating default data...');
+      // Try to connect to database, but don't fail if it's not available
+      try {
+        await connectToDatabase();
+        console.log('📡 Connected to database for vehicle data operation');
         
-        // Create default vehicle data
-        const defaultData: VehicleData = {
-          FOUR_WHEELER: [
-            {
-              name: "Maruti Suzuki",
-              models: [
-                { name: "Swift", variants: ["LXi", "VXi", "VXi (O)", "ZXi", "ZXi+"] },
-                { name: "Baleno", variants: ["Sigma", "Delta", "Zeta", "Alpha"] },
-                { name: "Dzire", variants: ["LXi", "VXi", "ZXi", "ZXi+"] }
-              ]
-            },
-            {
-              name: "Hyundai",
-              models: [
-                { name: "i20", variants: ["Magna", "Sportz", "Asta", "Asta (O)"] },
-                { name: "Verna", variants: ["S", "SX", "SX (O)", "SX Turbo"] }
-              ]
-            },
-            {
-              name: "Tata",
-              models: [
-                { name: "Nexon", variants: ["XE", "XM", "XZ+", "XZ+ (O)"] },
-                { name: "Safari", variants: ["XE", "XM", "XZ", "XZ+"] }
-              ]
-            }
-          ],
-          TWO_WHEELER: [
-            {
-              name: "Honda",
-              models: [
-                { name: "Activa 6G", variants: ["Standard", "DLX", "Smart"] },
-                { name: "Shine", variants: ["Standard", "SP", "SP (Drum)"] }
-              ]
-            },
-            {
-              name: "Bajaj",
-              models: [
-                { name: "Pulsar 150", variants: ["Standard", "DTS-i", "NS"] },
-                { name: "CT 100", variants: ["Standard", "X"] }
-              ]
-            }
-          ]
-        };
+        // Try to find existing vehicle data
+        let vehicleDataDoc = await VehicleDataModel.findOne().sort({ updatedAt: -1 });
         
-        vehicleDataDoc = new VehicleDataModel({ data: defaultData });
-        await vehicleDataDoc.save();
-        console.log('✅ Default vehicle data created');
+        if (!vehicleDataDoc) {
+          console.log('📝 No vehicle data found, creating default data...');
+          vehicleDataDoc = new VehicleDataModel({ data: defaultData });
+          await vehicleDataDoc.save();
+          console.log('✅ Default vehicle data created');
+        }
+        
+        console.log('✅ Vehicle data fetched successfully from database');
+        return res.status(200).json(vehicleDataDoc.data);
+        
+      } catch (dbError) {
+        console.warn('⚠️ Database connection failed, returning default data:', dbError);
+        // Return default data as fallback
+        return res.status(200).json(defaultData);
       }
-      
-      console.log('✅ Vehicle data fetched successfully');
-      return res.status(200).json(vehicleDataDoc.data);
     }
 
     if (req.method === 'POST') {
@@ -103,27 +109,42 @@ export default async function handler(
         });
       }
 
-      // Update or create vehicle data document
-      const updatedDoc = await VehicleDataModel.findOneAndUpdate(
-        {},
-        { 
-          data: vehicleData,
-          updatedAt: new Date()
-        },
-        { 
-          upsert: true, 
-          new: true,
-          setDefaultsOnInsert: true
-        }
-      );
+      // Try to connect to database, but don't fail if it's not available
+      try {
+        await connectToDatabase();
+        console.log('📡 Connected to database for vehicle data save operation');
+        
+        // Update or create vehicle data document
+        const updatedDoc = await VehicleDataModel.findOneAndUpdate(
+          {},
+          { 
+            data: vehicleData,
+            updatedAt: new Date()
+          },
+          { 
+            upsert: true, 
+            new: true,
+            setDefaultsOnInsert: true
+          }
+        );
 
-      console.log('✅ Vehicle data saved successfully');
-      return res.status(200).json({
-        success: true,
-        data: updatedDoc.data,
-        message: 'Vehicle data updated successfully',
-        timestamp: new Date().toISOString()
-      });
+        console.log('✅ Vehicle data saved successfully to database');
+        return res.status(200).json({
+          success: true,
+          data: updatedDoc.data,
+          message: 'Vehicle data updated successfully',
+          timestamp: new Date().toISOString()
+        });
+        
+      } catch (dbError) {
+        console.warn('⚠️ Database connection failed, cannot save vehicle data:', dbError);
+        return res.status(503).json({
+          success: false,
+          reason: 'Database temporarily unavailable. Vehicle data could not be saved.',
+          fallback: true,
+          timestamp: new Date().toISOString()
+        });
+      }
     }
 
     if (req.method === 'PUT') {
@@ -146,50 +167,80 @@ export default async function handler(
         });
       }
 
-      // Update existing document
-      const updatedDoc = await VehicleDataModel.findOneAndUpdate(
-        {},
-        { 
-          data: vehicleData,
-          updatedAt: new Date()
-        },
-        { new: true }
-      );
+      // Try to connect to database, but don't fail if it's not available
+      try {
+        await connectToDatabase();
+        console.log('📡 Connected to database for vehicle data update operation');
+        
+        // Update existing document
+        const updatedDoc = await VehicleDataModel.findOneAndUpdate(
+          {},
+          { 
+            data: vehicleData,
+            updatedAt: new Date()
+          },
+          { new: true }
+        );
 
-      if (!updatedDoc) {
-        return res.status(404).json({
+        if (!updatedDoc) {
+          return res.status(404).json({
+            success: false,
+            reason: 'No vehicle data found to update'
+          });
+        }
+
+        console.log('✅ Vehicle data updated successfully in database');
+        return res.status(200).json({
+          success: true,
+          data: updatedDoc.data,
+          message: 'Vehicle data updated successfully',
+          timestamp: new Date().toISOString()
+        });
+        
+      } catch (dbError) {
+        console.warn('⚠️ Database connection failed, cannot update vehicle data:', dbError);
+        return res.status(503).json({
           success: false,
-          reason: 'No vehicle data found to update'
+          reason: 'Database temporarily unavailable. Vehicle data could not be updated.',
+          fallback: true,
+          timestamp: new Date().toISOString()
         });
       }
-
-      console.log('✅ Vehicle data updated successfully');
-      return res.status(200).json({
-        success: true,
-        data: updatedDoc.data,
-        message: 'Vehicle data updated successfully',
-        timestamp: new Date().toISOString()
-      });
     }
 
     if (req.method === 'DELETE') {
       console.log('🗑️ Deleting vehicle data...');
       
-      const deletedDoc = await VehicleDataModel.findOneAndDelete({});
-      
-      if (!deletedDoc) {
-        return res.status(404).json({
+      // Try to connect to database, but don't fail if it's not available
+      try {
+        await connectToDatabase();
+        console.log('📡 Connected to database for vehicle data delete operation');
+        
+        const deletedDoc = await VehicleDataModel.findOneAndDelete({});
+        
+        if (!deletedDoc) {
+          return res.status(404).json({
+            success: false,
+            reason: 'No vehicle data found to delete'
+          });
+        }
+
+        console.log('✅ Vehicle data deleted successfully from database');
+        return res.status(200).json({
+          success: true,
+          message: 'Vehicle data deleted successfully',
+          timestamp: new Date().toISOString()
+        });
+        
+      } catch (dbError) {
+        console.warn('⚠️ Database connection failed, cannot delete vehicle data:', dbError);
+        return res.status(503).json({
           success: false,
-          reason: 'No vehicle data found to delete'
+          reason: 'Database temporarily unavailable. Vehicle data could not be deleted.',
+          fallback: true,
+          timestamp: new Date().toISOString()
         });
       }
-
-      console.log('✅ Vehicle data deleted successfully');
-      return res.status(200).json({
-        success: true,
-        message: 'Vehicle data deleted successfully',
-        timestamp: new Date().toISOString()
-      });
     }
 
     return res.status(405).json({
