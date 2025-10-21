@@ -800,6 +800,7 @@ const AppContent: React.FC = () => {
         <MobileHeader
           onNavigate={navigate}
           currentUser={currentUser}
+          onLogout={handleLogout}
           title={getPageTitle()}
           showBack={currentView === ViewEnum.DETAIL}
           onBack={() => navigate(ViewEnum.USED_CARS)}

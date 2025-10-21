@@ -5,6 +5,7 @@ import { View as ViewEnum } from '../types';
 interface MobileHeaderProps {
   onNavigate: (view: ViewEnum) => void;
   currentUser: User | null;
+  onLogout: () => void;
   title: string;
   showBack?: boolean;
   onBack?: () => void;
@@ -18,6 +19,7 @@ interface MobileHeaderProps {
 const MobileHeader: React.FC<MobileHeaderProps> = ({
   onNavigate,
   currentUser,
+  onLogout,
   title,
   showBack = false,
   onBack,
@@ -182,6 +184,30 @@ const MobileHeader: React.FC<MobileHeaderProps> = ({
                   label="FAQ"
                   onClick={() => { onNavigate(ViewEnum.FAQ); setShowMenu(false); }}
                 />
+                
+                {/* Logout Option */}
+                {currentUser && (
+                  <>
+                    <div className="border-t border-gray-200 my-2"></div>
+                    <MenuItem
+                      icon={<LogoutIcon />}
+                      label="Logout"
+                      onClick={() => { onLogout(); setShowMenu(false); }}
+                    />
+                  </>
+                )}
+                
+                {/* Login Option for Guests */}
+                {!currentUser && (
+                  <>
+                    <div className="border-t border-gray-200 my-2"></div>
+                    <MenuItem
+                      icon={<LoginIcon />}
+                      label="Login"
+                      onClick={() => { onNavigate(ViewEnum.LOGIN_PORTAL); setShowMenu(false); }}
+                    />
+                  </>
+                )}
               </nav>
             </div>
           </div>
@@ -255,6 +281,18 @@ const InfoIcon = () => (
 const QuestionIcon = () => (
   <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+  </svg>
+);
+
+const LogoutIcon = () => (
+  <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+  </svg>
+);
+
+const LoginIcon = () => (
+  <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1" />
   </svg>
 );
 
