@@ -96,7 +96,7 @@ export default async function handler(
       }
 
       // Validate vehicle data structure
-      if (!this.validateVehicleData(vehicleData)) {
+      if (!validateVehicleData(vehicleData)) {
         return res.status(400).json({
           success: false,
           reason: 'Invalid vehicle data structure'
@@ -139,7 +139,7 @@ export default async function handler(
       }
 
       // Validate vehicle data structure
-      if (!this.validateVehicleData(vehicleData)) {
+      if (!validateVehicleData(vehicleData)) {
         return res.status(400).json({
           success: false,
           reason: 'Invalid vehicle data structure'

@@ -188,7 +188,7 @@ const initialFormState: Omit<Vehicle, 'id' | 'averageRating' | 'ratingCount'> = 
   description: '', engine: '', transmission: 'Automatic', fuelType: 'Petrol', fuelEfficiency: '',
   color: '', features: [], images: [], documents: [],
   sellerEmail: '',
-  category: VehicleCategory.FOUR_WHEELER,
+  category: '', // Start with empty category to avoid mismatch
   status: 'published',
   isFeatured: false,
   registrationYear: new Date().getFullYear(),
@@ -245,8 +245,29 @@ const VehicleForm: React.FC<VehicleFormProps> = memo(({ editingVehicle, onAddVeh
         sellerEmail: seller.email,
         formDataSellerEmail: formData.sellerEmail,
         formDataMake: formData.make,
-        formDataModel: formData.model
+        formDataModel: formData.model,
+        vehicleDataKeys: Object.keys(vehicleData),
+        vehicleDataStructure: vehicleData
     });
+
+    // Safety check for vehicleData
+    const safeVehicleData = useMemo(() => {
+        if (!vehicleData || Object.keys(vehicleData).length === 0) {
+            console.warn('⚠️ VehicleData is empty or undefined, using fallback');
+            // Use a minimal fallback structure
+            return {
+                'four-wheeler': [
+                    { name: 'Maruti Suzuki', models: [{ name: 'Swift', variants: ['LXI', 'VXI', 'ZXI'] }] },
+                    { name: 'Hyundai', models: [{ name: 'i20', variants: ['Magna', 'Sportz', 'Asta'] }] }
+                ],
+                'two-wheeler': [
+                    { name: 'Honda', models: [{ name: 'Activa', variants: ['Standard', 'Deluxe'] }] },
+                    { name: 'Bajaj', models: [{ name: 'Pulsar', variants: ['150', '180', '220'] }] }
+                ]
+            };
+        }
+        return vehicleData;
+    }, [vehicleData]);
     
     // Location data state for this component
     const [indianStates, setIndianStates] = useState<Array<{name: string, code: string}>>([]);
@@ -288,22 +309,36 @@ const VehicleForm: React.FC<VehicleFormProps> = memo(({ editingVehicle, onAddVeh
     }, []);
 
     const availableMakes = useMemo(() => {
-        if (!formData.category || !vehicleData[formData.category]) return [];
-        return (vehicleData[formData.category] || []).map(make => make.name).sort();
-    }, [formData.category, vehicleData]);
+        console.log('🔧 availableMakes calculation:', {
+            category: formData.category,
+            hasCategory: !!formData.category,
+            hasVehicleData: !!safeVehicleData,
+            vehicleDataKeys: Object.keys(safeVehicleData),
+            categoryData: safeVehicleData[formData.category]
+        });
+        
+        if (!formData.category || !safeVehicleData[formData.category]) {
+            console.log('⚠️ No category or category data available');
+            return [];
+        }
+        
+        const makes = (safeVehicleData[formData.category] || []).map(make => make.name).sort();
+        console.log('✅ Available makes:', makes);
+        return makes;
+    }, [formData.category, safeVehicleData]);
 
     const availableModels = useMemo(() => {
-        if (!formData.category || !formData.make || !vehicleData[formData.category]) return [];
-        const makeData = vehicleData[formData.category].find(m => m.name === formData.make);
+        if (!formData.category || !formData.make || !safeVehicleData[formData.category]) return [];
+        const makeData = safeVehicleData[formData.category].find(m => m.name === formData.make);
         return makeData ? makeData.models.map(model => model.name).sort() : [];
-    }, [formData.category, formData.make, vehicleData]);
+    }, [formData.category, formData.make, safeVehicleData]);
 
     const availableVariants = useMemo(() => {
-        if (!formData.category || !formData.make || !formData.model || !vehicleData[formData.category]) return [];
-        const makeData = vehicleData[formData.category].find(m => m.name === formData.make);
+        if (!formData.category || !formData.make || !formData.model || !safeVehicleData[formData.category]) return [];
+        const makeData = safeVehicleData[formData.category].find(m => m.name === formData.make);
         const modelData = makeData?.models.find(m => m.name === formData.model);
         return modelData ? [...modelData.variants].sort() : [];
-    }, [formData.category, formData.make, formData.model, vehicleData]);
+    }, [formData.category, formData.make, formData.model, safeVehicleData]);
 
     const availableCities = useMemo(() => {
         if (!formData.state || !citiesByState || !citiesByState[formData.state]) return [];
@@ -615,19 +650,44 @@ const VehicleForm: React.FC<VehicleFormProps> = memo(({ editingVehicle, onAddVeh
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-x-6 gap-y-4">
                     <FormInput label="Category" name="category" type="select" value={formData.category} onChange={handleChange} required>
                         <option value="" disabled>Select Category</option>
-                        {Object.keys(vehicleData).map(cat => (
-                            <option key={cat} value={cat}>
-                                {cat.replace(/_/g, ' ').toLowerCase().replace(/\b\w/g, l => l.toUpperCase())}
-                            </option>
-                        ))}
+                        {(() => {
+                            const categories = Object.keys(safeVehicleData);
+                            console.log('🔧 Rendering category dropdown:', {
+                                categories,
+                                vehicleDataKeys: Object.keys(safeVehicleData),
+                                vehicleDataEmpty: Object.keys(safeVehicleData).length === 0
+                            });
+                            
+                            if (categories.length === 0) {
+                                return <option value="" disabled>Loading categories...</option>;
+                            }
+                            
+                            return categories.map(cat => (
+                                <option key={cat} value={cat}>
+                                    {cat.replace(/_/g, ' ').toLowerCase().replace(/\b\w/g, l => l.toUpperCase())}
+                                </option>
+                            ));
+                        })()}
                     </FormInput>
                     <FormInput label="Make" name="make" type="select" value={formData.make} onChange={handleChange} error={errors.make} disabled={!formData.category} required>
-                        <option value="" disabled>Select Make</option>
-                        {availableMakes.map(make => <option key={make} value={make}>{make}</option>)}
+                        <option value="" disabled>
+                            {!formData.category ? 'Select Category First' : 'Select Make'}
+                        </option>
+                        {availableMakes.length === 0 && formData.category ? (
+                            <option value="" disabled>No makes available for this category</option>
+                        ) : (
+                            availableMakes.map(make => <option key={make} value={make}>{make}</option>)
+                        )}
                     </FormInput>
                     <FormInput label="Model" name="model" type="select" value={formData.model} onChange={handleChange} error={errors.model} disabled={!formData.make} required>
-                        <option value="" disabled>Select Model</option>
-                        {availableModels.map(model => <option key={model} value={model}>{model}</option>)}
+                        <option value="" disabled>
+                            {!formData.make ? 'Select Make First' : 'Select Model'}
+                        </option>
+                        {availableModels.length === 0 && formData.make ? (
+                            <option value="" disabled>No models available for this make</option>
+                        ) : (
+                            availableModels.map(model => <option key={model} value={model}>{model}</option>)
+                        )}
                     </FormInput>
                     <FormInput label="Variant" name="variant" type="select" value={formData.variant || ''} onChange={handleChange} disabled={!formData.model}>
                         <option value="">Select Variant (Optional)</option>
