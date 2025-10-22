@@ -801,7 +801,7 @@ const AdminPanel: React.FC<AdminPanelProps> = (props) => {
         users, currentUser, vehicles, conversations, onToggleUserStatus, onDeleteUser,
         onAdminUpdateUser, onUpdateUserPlan, onUpdateVehicle, onDeleteVehicle, onToggleVehicleStatus,
         onResolveFlag, platformSettings, onUpdateSettings, onSendBroadcast,
-        auditLog, onExportUsers, onExportVehicles, vehicleData, onUpdateVehicleData,
+        auditLog, onExportUsers, onExportVehicles, onNavigate, onLogout, vehicleData, onUpdateVehicleData,
         supportTickets, onUpdateSupportTicket, faqItems, onAddFaq, onUpdateFaq, onDeleteFaq,
         onCertificationApproval
     } = props;
