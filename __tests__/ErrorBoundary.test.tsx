@@ -61,8 +61,12 @@ describe('ErrorBoundary', () => {
 
   it('should show error details in development mode', () => {
     // Mock development environment
-    const originalEnv = process.env.NODE_ENV;
-    process.env.NODE_ENV = 'development';
+    // Mock import.meta.env.DEV to true
+    const originalEnv = import.meta.env.DEV;
+    Object.defineProperty(import.meta, 'env', {
+      value: { ...import.meta.env, DEV: true },
+      writable: true
+    });
 
     render(
       <ErrorBoundary>
@@ -74,13 +78,20 @@ describe('ErrorBoundary', () => {
     expect(screen.getByText('Test error')).toBeInTheDocument();
 
     // Restore original environment
-    process.env.NODE_ENV = originalEnv;
+    Object.defineProperty(import.meta, 'env', {
+      value: { ...import.meta.env, DEV: originalEnv },
+      writable: true
+    });
   });
 
   it('should not show error details in production mode', () => {
     // Mock production environment
-    const originalEnv = process.env.NODE_ENV;
-    process.env.NODE_ENV = 'production';
+    // Mock import.meta.env.DEV to false
+    const originalEnv = import.meta.env.DEV;
+    Object.defineProperty(import.meta, 'env', {
+      value: { ...import.meta.env, DEV: false },
+      writable: true
+    });
 
     render(
       <ErrorBoundary>
@@ -91,7 +102,10 @@ describe('ErrorBoundary', () => {
     expect(screen.queryByText('Error Details (Development)')).not.toBeInTheDocument();
 
     // Restore original environment
-    process.env.NODE_ENV = originalEnv;
+    Object.defineProperty(import.meta, 'env', {
+      value: { ...import.meta.env, DEV: originalEnv },
+      writable: true
+    });
   });
 
   it('should handle refresh page button click', () => {

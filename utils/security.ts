@@ -76,9 +76,9 @@ export const refreshAccessToken = (refreshToken: string): string => {
   }
   
   const user: Partial<User> = {
-    id: decoded.userId,
-    email: decoded.email,
-    role: 'customer' // Default role, should be fetched from database
+    id: decoded.userId as string,
+    email: decoded.email as string,
+    role: (decoded.role as 'customer' | 'seller' | 'admin') || 'customer' // Use role from token or default
   };
   
   return generateAccessToken(user as User);

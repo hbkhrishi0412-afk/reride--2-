@@ -41,13 +41,21 @@ jest.mock('../services/supportTicketService', () => ({
   saveSupportTickets: jest.fn(),
 }));
 
+// Mock DataService with proper implementation
+const mockDataService = {
+  getVehicles: jest.fn(() => Promise.resolve([])),
+  getVehicleData: jest.fn(() => Promise.resolve({})),
+  getUsers: jest.fn(() => Promise.resolve([])),
+  syncWhenOnline: jest.fn(() => Promise.resolve()),
+  addVehicle: jest.fn(() => Promise.resolve({ id: 1, make: 'Test', model: 'Car' })),
+  updateVehicle: jest.fn(() => Promise.resolve({ id: 1, make: 'Updated', model: 'Car' })),
+  deleteVehicle: jest.fn(() => Promise.resolve({ success: true })),
+  login: jest.fn(() => Promise.resolve({ success: true, user: { id: 1, email: 'test@test.com' } })),
+  register: jest.fn(() => Promise.resolve({ success: true, user: { id: 1, email: 'test@test.com' } })),
+};
+
 jest.mock('../services/dataService', () => ({
-  dataService: {
-    getVehicles: jest.fn(() => Promise.resolve([])),
-    getVehicleData: jest.fn(() => Promise.resolve({})),
-    getUsers: jest.fn(() => Promise.resolve([])),
-    syncWhenOnline: jest.fn(() => Promise.resolve()),
-  },
+  dataService: mockDataService,
 }));
 
 jest.mock('../utils/loadingManager', () => ({
@@ -69,7 +77,7 @@ jest.mock('../components/vehicleData', () => ({
 
 // Test component that uses the AppProvider
 const TestComponent: React.FC = () => {
-  const { addToast, currentView, navigate } = React.useContext(AppProvider);
+  const { addToast, currentView, navigate } = useApp();
   
   return (
     <div>
@@ -92,9 +100,19 @@ const TestComponent: React.FC = () => {
 
 describe('AppProvider', () => {
   beforeEach(() => {
-    // Clear localStorage before each test
+    // Clear localStorage and sessionStorage before each test
     localStorage.clear();
     sessionStorage.clear();
+    
+    // Reset all mocks
+    jest.clearAllMocks();
+    
+    // Reset mock implementations
+    Object.values(mockDataService).forEach(mockFn => {
+      if (jest.isMockFunction(mockFn)) {
+        mockFn.mockClear();
+      }
+    });
   });
 
   it('should provide initial state correctly', () => {
@@ -145,7 +163,7 @@ describe('AppProvider', () => {
     };
 
     const LoginTestComponent: React.FC = () => {
-      const { handleLogin, currentUser } = React.useContext(AppProvider);
+      const { handleLogin, currentUser } = useApp();
       
       return (
         <div>
@@ -190,7 +208,7 @@ describe('AppProvider', () => {
     };
 
     const MessageTestComponent: React.FC = () => {
-      const { sendMessage, conversations, setActiveChat } = React.useContext(AppProvider);
+      const { sendMessage, conversations, setActiveChat } = useApp();
       
       React.useEffect(() => {
         // Set up initial conversation

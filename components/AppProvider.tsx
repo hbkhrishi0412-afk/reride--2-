@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect, useCallback, useRef } from 'react';
+import React, { createContext, useContext, useState, useEffect, useCallback, useRef, useMemo } from 'react';
 import type { Vehicle, User, Conversation, Toast as ToastType, PlatformSettings, AuditLogEntry, VehicleData, Notification, VehicleCategory, SupportTicket, FAQItem, SubscriptionPlan } from '../types';
 import { View, VehicleCategory as CategoryEnum } from '../types';
 import { getRatings, addRating, getSellerRatings, addSellerRating } from '../services/ratingService';
@@ -225,7 +225,29 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   });
 
   const addToast = useCallback((message: string, type: ToastType['type']) => {
-    setToasts(prev => [...prev, { id: Date.now(), message, type }]);
+    try {
+      // Validate inputs
+      if (!message || typeof message !== 'string' || message.trim() === '') {
+        console.warn('Invalid toast message provided');
+        return;
+      }
+      
+      if (!['success', 'error', 'warning', 'info'].includes(type)) {
+        console.warn('Invalid toast type provided:', type);
+        return;
+      }
+
+      const id = Date.now();
+      const toast: ToastType = { id, message: message.trim(), type };
+      setToasts(prev => [...prev, toast]);
+      
+      // Auto-remove after 5 seconds
+      setTimeout(() => {
+        removeToast(id);
+      }, 5000);
+    } catch (error) {
+      console.error('Error adding toast:', error);
+    }
   }, []);
 
   const removeToast = useCallback((id: number) => {
@@ -354,7 +376,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         }
       }
     }
-  }, [conversations]); // Remove activeChat from dependencies to prevent infinite loops
+  }, [conversations, activeChat?.id]); // Added activeChat?.id for proper reactivity
 
   // Add navigation event listener for dashboard navigation
   useEffect(() => {
@@ -398,7 +420,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     };
   }, [addToast]);
 
-  const contextValue: AppContextType = {
+  const contextValue: AppContextType = useMemo(() => ({
     // State
     currentView,
     previousView,
@@ -681,36 +703,51 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     sendMessage: (conversationId: string, message: string) => {
       console.log('🔧 sendMessage called:', { conversationId, message, currentUser: currentUser?.email });
       
-      const newMessage = {
-        id: Date.now(),
-        sender: (currentUser?.role === 'seller' ? 'seller' : 'user') as 'seller' | 'user',
-        text: message,
-        timestamp: new Date().toISOString(),
-        isRead: false,
-        type: 'text' as const
-      };
+      try {
+        const newMessage = {
+          id: Date.now(),
+          sender: (currentUser?.role === 'seller' ? 'seller' : 'user') as 'seller' | 'user',
+          text: message,
+          timestamp: new Date().toISOString(),
+          isRead: false,
+          type: 'text' as const
+        };
 
-      // Update conversations and notifications atomically to prevent race conditions
-      setConversations(prev => {
-        const updated = prev.map(conv => 
-          conv.id === conversationId ? {
-            ...conv,
-            messages: [...conv.messages, newMessage],
-            lastMessageAt: newMessage.timestamp,
-            isReadBySeller: currentUser?.role === 'seller' ? true : conv.isReadBySeller,
-            isReadByCustomer: currentUser?.role === 'customer' ? true : conv.isReadByCustomer
-          } : conv
-        );
-        
-        // Update activeChat atomically with the same conversation update
-        const updatedConv = updated.find(conv => conv.id === conversationId);
-        if (updatedConv && activeChat?.id === conversationId) {
-          setActiveChat(updatedConv);
+        // Update conversations first
+        setConversations(prev => {
+          const updated = prev.map(conv => 
+            conv.id === conversationId ? {
+              ...conv,
+              messages: [...conv.messages, newMessage],
+              lastMessageAt: newMessage.timestamp,
+              isReadBySeller: currentUser?.role === 'seller' ? true : conv.isReadBySeller,
+              isReadByCustomer: currentUser?.role === 'customer' ? true : conv.isReadByCustomer
+            } : conv
+          );
+          
+          console.log('🔧 Updated conversations:', updated);
+          return updated;
+        });
+
+        // Update activeChat separately to avoid race conditions
+        if (activeChat?.id === conversationId) {
+          setActiveChat(prev => {
+            if (prev?.id === conversationId) {
+              return {
+                ...prev,
+                messages: [...prev.messages, newMessage],
+                lastMessageAt: newMessage.timestamp,
+                isReadBySeller: currentUser?.role === 'seller' ? true : prev.isReadBySeller,
+                isReadByCustomer: currentUser?.role === 'customer' ? true : prev.isReadByCustomer
+              };
+            }
+            return prev;
+          });
         }
-        
-        // Create notification for the recipient within the same state update
+
+        // Create notification for the recipient
         if (currentUser) {
-          const conversation = updated.find(conv => conv.id === conversationId);
+          const conversation = conversations.find(conv => conv.id === conversationId);
           if (conversation) {
             const recipientEmail = currentUser.role === 'seller' ? conversation.customerId : conversation.sellerId;
             const senderName = currentUser.role === 'seller' ? 'Seller' : conversation.customerName;
@@ -725,7 +762,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
               timestamp: new Date().toISOString()
             };
 
-            // Update notifications atomically
+            // Update notifications separately
             setNotifications(prevNotifications => {
               const updatedNotifications = [newNotification, ...prevNotifications];
               // Save to localStorage
@@ -738,10 +775,10 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
             });
           }
         }
-        
-        console.log('🔧 Updated conversations:', updated);
-        return updated;
-      });
+      } catch (error) {
+        console.error('Error in sendMessage:', error);
+        addToast('Failed to send message. Please try again.', 'error');
+      }
     },
     markAsRead: (conversationId: string) => {
       setConversations(prev => prev.map(conv => 
@@ -923,7 +960,26 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       
       addToast(`Offer ${response} successfully`, 'success');
     },
-  };
+  }), [
+    // Dependencies for useMemo
+    currentView, previousView, selectedVehicle, vehicles, isLoading, currentUser,
+    comparisonList, ratings, sellerRatings, wishlist, conversations, toasts,
+    forgotPasswordRole, typingStatus, selectedCategory, publicSellerProfile,
+    activeChat, isAnnouncementVisible, recommendations, initialSearchQuery,
+    isCommandPaletteOpen, userLocation, selectedCity, users, platformSettings,
+    auditLog, vehicleData, faqItems, supportTickets, notifications,
+    // Functions that don't change often
+    setCurrentView, setPreviousView, setSelectedVehicle, setVehicles, setIsLoading,
+    setCurrentUser, setComparisonList, setWishlist, setConversations, setToasts,
+    setForgotPasswordRole, setTypingStatus, setSelectedCategory, setPublicSellerProfile,
+    setActiveChat, setAnnouncementVisible, setRecommendations, setInitialSearchQuery,
+    setCommandPaletteOpen, setUserLocation, setSelectedCity, setUsers,
+    setPlatformSettings, setAuditLog, setVehicleData, setFaqItems, setSupportTickets,
+    setNotifications, addToast, removeToast, navigate, handleLogin, handleLogout,
+    addToComparison, removeFromComparison, clearComparison, addToWishlist,
+    removeFromWishlist, clearWishlist, addRating, addSellerRating, sendMessage,
+    markAsRead, startTyping, stopTyping, setSellerProfile, respondToOffer
+  ]);
 
   return (
     <AppContext.Provider value={contextValue}>

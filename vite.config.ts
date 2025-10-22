@@ -101,8 +101,12 @@ export default defineConfig({
     rollupOptions: {
       // Exclude API files from client build
       external: (id) => {
-        // Only exclude actual API files, not all files with /api/ in path
-        return id.includes('/api/') && (id.endsWith('.ts') || id.endsWith('.js')) && !id.includes('node_modules');
+        // More performant and specific check for API files
+        if (id.includes('node_modules')) return false;
+        if (id.startsWith('/api/') || id.includes('/api/')) {
+          return id.endsWith('.ts') || id.endsWith('.js');
+        }
+        return false;
       },
       output: {
         // Aggressive code splitting for faster initial load

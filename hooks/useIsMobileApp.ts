@@ -9,45 +9,64 @@ export const useIsMobileApp = () => {
   const [isMobile, setIsMobile] = useState(false);
 
   useEffect(() => {
-    // Check if running in standalone mode (installed PWA)
-    const isStandalone = window.matchMedia('(display-mode: standalone)').matches ||
-                        (window.navigator as any).standalone || // iOS
-                        document.referrer.includes('android-app://'); // Android
+    let mediaQuery: MediaQueryList | null = null;
+    let handleChange: ((e: MediaQueryListEvent) => void) | null = null;
 
-    // Check if device is mobile (more comprehensive)
-    const checkMobile = /iPhone|iPad|iPod|Android|webOS|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ||
-                       window.innerWidth <= 768 ||
-                       ('ontouchstart' in window); // Touch device
+    try {
+      // Check if running in standalone mode (installed PWA)
+      const isStandalone = window.matchMedia('(display-mode: standalone)').matches ||
+                          (window.navigator as any).standalone || // iOS
+                          document.referrer.includes('android-app://'); // Android
 
-    // Check if in mobile browser (not desktop)
-    const isMobileBrowser = checkMobile && !isStandalone;
-    
-    // Show mobile UI for both PWA and mobile browser
-    const shouldShowMobileUI = isStandalone || isMobileBrowser;
+      // Check if device is mobile (more comprehensive)
+      const checkMobile = /iPhone|iPad|iPod|Android|webOS|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ||
+                         window.innerWidth <= 768 ||
+                         ('ontouchstart' in window); // Touch device
 
-    setIsMobileApp(shouldShowMobileUI);
-    setIsMobile(checkMobile);
+      // Check if in mobile browser (not desktop)
+      const isMobileBrowser = checkMobile && !isStandalone;
+      
+      // Show mobile UI for both PWA and mobile browser
+      const shouldShowMobileUI = isStandalone || isMobileBrowser;
 
-    console.log('📱 Mobile Detection:', {
-      isStandalone,
-      checkMobile,
-      isMobileBrowser,
-      shouldShowMobileUI,
-      userAgent: navigator.userAgent,
-      windowWidth: window.innerWidth
-    });
+      setIsMobileApp(shouldShowMobileUI);
+      setIsMobile(checkMobile);
 
-    // Listen for display mode changes
-    const mediaQuery = window.matchMedia('(display-mode: standalone)');
-    const handleChange = (e: MediaQueryListEvent) => {
-      const newMobileApp = e.matches || isMobileBrowser;
-      setIsMobileApp(newMobileApp);
-    };
+      console.log('📱 Mobile Detection:', {
+        isStandalone,
+        checkMobile,
+        isMobileBrowser,
+        shouldShowMobileUI,
+        userAgent: navigator.userAgent,
+        windowWidth: window.innerWidth
+      });
 
-    mediaQuery.addEventListener('change', handleChange);
+      // Listen for display mode changes
+      mediaQuery = window.matchMedia('(display-mode: standalone)');
+      handleChange = (e: MediaQueryListEvent) => {
+        const newMobileApp = e.matches || isMobileBrowser;
+        setIsMobileApp(newMobileApp);
+      };
+
+      if (mediaQuery && handleChange) {
+        mediaQuery.addEventListener('change', handleChange);
+      }
+    } catch (error) {
+      console.error('Error in mobile detection:', error);
+      // Fallback to basic detection
+      setIsMobileApp(false);
+      setIsMobile(false);
+    }
 
     return () => {
-      mediaQuery.removeEventListener('change', handleChange);
+      // Proper cleanup
+      if (mediaQuery && handleChange) {
+        try {
+          mediaQuery.removeEventListener('change', handleChange);
+        } catch (error) {
+          console.warn('Error removing media query listener:', error);
+        }
+      }
     };
   }, []);
 

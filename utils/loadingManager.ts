@@ -32,6 +32,9 @@ export class LoadingManager {
    * Start loading for a specific operation
    */
   startLoading(operationId: string, timeout: number = this.DEFAULT_TIMEOUT): void {
+    // Clear any existing timeout for this operation
+    this.clearTimeout(operationId);
+    
     this.loadingStates.set(operationId, {
       isLoading: true,
       error: null,

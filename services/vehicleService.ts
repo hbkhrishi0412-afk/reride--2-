@@ -1,12 +1,12 @@
 
-import type { Vehicle, User } from '../types';
+import type { Vehicle, User, VehicleCategory } from '../types';
 import { isVehicle, isApiResponse } from '../types';
 
 // Fallback mock vehicles to prevent loading issues
 const FALLBACK_VEHICLES: Vehicle[] = [
   {
-    id: 1,
-    category: "FOUR_WHEELER" as any,
+    id: "fallback_1",
+    category: "FOUR_WHEELER" as VehicleCategory,
     make: "Maruti Suzuki",
     model: "Swift",
     year: 2022,
@@ -47,8 +47,18 @@ const getAuthHeader = () => {
     const userJson = localStorage.getItem('reRideCurrentUser') || sessionStorage.getItem('currentUser');
     if (!userJson) return {};
     const user: User = JSON.parse(userJson);
+    
+    // Check if user has access token
+    const accessToken = localStorage.getItem('reRideAccessToken') || sessionStorage.getItem('accessToken');
+    if (accessToken) {
+      return { 'Authorization': `Bearer ${accessToken}` };
+    }
+    
+    // Fallback to email for backward compatibility (not recommended for production)
+    console.warn('No access token found, using email for authorization (not secure)');
     return { 'Authorization': user.email };
-  } catch {
+  } catch (error) {
+    console.error('Failed to get auth header:', error);
     return {};
   }
 };

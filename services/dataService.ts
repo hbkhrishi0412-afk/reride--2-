@@ -58,8 +58,18 @@ class DataService {
       const userJson = localStorage.getItem('reRideCurrentUser') || sessionStorage.getItem('currentUser');
       if (!userJson) return {};
       const user: User = JSON.parse(userJson);
+      
+      // Check if user has access token
+      const accessToken = localStorage.getItem('reRideAccessToken') || sessionStorage.getItem('accessToken');
+      if (accessToken) {
+        return { 'Authorization': `Bearer ${accessToken}` };
+      }
+      
+      // Fallback to email for backward compatibility (not recommended for production)
+      console.warn('No access token found, using email for authorization (not secure)');
       return { 'Authorization': user.email };
-    } catch {
+    } catch (error) {
+      console.error('Failed to get auth headers:', error);
       return {};
     }
   }

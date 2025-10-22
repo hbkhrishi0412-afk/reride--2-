@@ -42,11 +42,22 @@ export const reportWebVitals = (onPerfEntry?: (metric: any) => void) => {
         });
         
         observer.observe({ entryTypes: ['navigation', 'paint', 'largest-contentful-paint'] });
+        
+        // Return cleanup function
+        return () => {
+          try {
+            observer.disconnect();
+          } catch (error) {
+            console.warn('Error disconnecting PerformanceObserver:', error);
+          }
+        };
       } catch (error) {
         console.log('PerformanceObserver not available');
+        return () => {}; // Return empty cleanup function
       }
     }
   }
+  return () => {}; // Return empty cleanup function
 };
 
 /**
@@ -85,7 +96,7 @@ export const throttle = <T extends (...args: any[]) => any>(
 /**
  * Memoize function results for performance
  */
-export const memoize = <T extends (...args: any[]) => any>(fn: T): T => {
+export const memoize = <T extends (...args: any[]) => any>(fn: T, maxCacheSize: number = 100): T => {
   const cache = new Map();
   
   return ((...args: Parameters<T>) => {
@@ -95,6 +106,13 @@ export const memoize = <T extends (...args: any[]) => any>(fn: T): T => {
     }
     
     const result = fn(...args);
+    
+    // Prevent memory leaks by limiting cache size
+    if (cache.size >= maxCacheSize) {
+      const firstKey = cache.keys().next().value;
+      cache.delete(firstKey);
+    }
+    
     cache.set(key, result);
     return result;
   }) as T;
