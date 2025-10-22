@@ -6,6 +6,8 @@
   "description": "A modern vehicle marketplace platform.",
   "scripts": {
     "dev": "vite",
+    "dev:api": "node dev-api-server.js",
+    "dev:full": "concurrently \"npm run dev:api\" \"npm run dev\"",
     "dev:clean": "npm run clean && vite",
     "dev:fast": "npm run clean && vite --force",
     "build": "vite build",

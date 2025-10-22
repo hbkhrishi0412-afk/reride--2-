@@ -10,6 +10,50 @@ const PORT = 3001;
 app.use(cors());
 app.use(express.json());
 
+// Mock vehicle data
+const mockVehicleData = {
+  FOUR_WHEELER: [
+    {
+      name: "Maruti Suzuki",
+      models: [
+        { name: "Swift", variants: ["LXi", "VXi", "VXi (O)", "ZXi", "ZXi+"] },
+        { name: "Baleno", variants: ["Sigma", "Delta", "Zeta", "Alpha"] },
+        { name: "Dzire", variants: ["LXi", "VXi", "ZXi", "ZXi+"] }
+      ]
+    },
+    {
+      name: "Hyundai",
+      models: [
+        { name: "i20", variants: ["Magna", "Sportz", "Asta", "Asta (O)"] },
+        { name: "Verna", variants: ["S", "SX", "SX (O)", "SX Turbo"] }
+      ]
+    },
+    {
+      name: "Tata",
+      models: [
+        { name: "Nexon", variants: ["XE", "XM", "XZ+", "XZ+ (O)"] },
+        { name: "Safari", variants: ["XE", "XM", "XZ", "XZ+"] }
+      ]
+    }
+  ],
+  TWO_WHEELER: [
+    {
+      name: "Honda",
+      models: [
+        { name: "Activa 6G", variants: ["Standard", "DLX", "Smart"] },
+        { name: "Shine", variants: ["Standard", "SP", "SP (Drum)"] }
+      ]
+    },
+    {
+      name: "Bajaj",
+      models: [
+        { name: "Pulsar 150", variants: ["Standard", "DTS-i", "NS"] },
+        { name: "CT 100", variants: ["Standard", "X"] }
+      ]
+    }
+  ]
+};
+
 // Mock plan data
 const mockPlans = [
   {
@@ -121,6 +165,60 @@ app.get('/api/admin', (req, res) => {
   });
 });
 
+// Vehicle Data API endpoints
+app.get('/api/vehicles', (req, res) => {
+  const { type } = req.query;
+  
+  if (type === 'data') {
+    console.log('🚗 GET /api/vehicles?type=data - Returning vehicle data');
+    res.json(mockVehicleData);
+  } else {
+    console.log('🚗 GET /api/vehicles - Returning empty vehicle list');
+    res.json([]);
+  }
+});
+
+app.post('/api/vehicles', (req, res) => {
+  const { type } = req.query;
+  
+  if (type === 'data') {
+    console.log('🚗 POST /api/vehicles?type=data - Updating vehicle data');
+    // In a real app, this would save to database
+    // For now, just return success
+    res.json({
+      success: true,
+      data: req.body,
+      message: 'Vehicle data updated successfully',
+      timestamp: new Date().toISOString()
+    });
+  } else {
+    console.log('🚗 POST /api/vehicles - Creating new vehicle');
+    const newVehicle = {
+      id: Date.now(),
+      ...req.body,
+      createdAt: new Date().toISOString()
+    };
+    res.status(201).json(newVehicle);
+  }
+});
+
+app.get('/api/vehicle-data', (req, res) => {
+  console.log('🚗 GET /api/vehicle-data - Returning vehicle data');
+  res.json(mockVehicleData);
+});
+
+app.post('/api/vehicle-data', (req, res) => {
+  console.log('🚗 POST /api/vehicle-data - Updating vehicle data');
+  // In a real app, this would save to database
+  // For now, just return success
+  res.json({
+    success: true,
+    data: req.body,
+    message: 'Vehicle data updated successfully',
+    timestamp: new Date().toISOString()
+  });
+});
+
 // Health check endpoint
 app.get('/api/health', (req, res) => {
   res.json({
@@ -130,6 +228,8 @@ app.get('/api/health', (req, res) => {
     endpoints: {
       plans: '/api/plans',
       admin: '/api/admin',
+      vehicles: '/api/vehicles',
+      vehicleData: '/api/vehicle-data',
       health: '/api/health'
     }
   });
@@ -143,9 +243,15 @@ app.listen(PORT, () => {
   console.log(`   - POST /api/plans - Create new plan`);
   console.log(`   - PUT  /api/plans - Update plan`);
   console.log(`   - DELETE /api/plans - Delete plan`);
+  console.log(`   - GET  /api/vehicles?type=data - Get vehicle data`);
+  console.log(`   - POST /api/vehicles?type=data - Update vehicle data`);
+  console.log(`   - GET  /api/vehicle-data - Get vehicle data`);
+  console.log(`   - POST /api/vehicle-data - Update vehicle data`);
   console.log(`   - GET  /api/admin - Admin health check`);
   console.log(`   - GET  /api/health - Server health check`);
   console.log(`\n🔗 Test the API:`);
   console.log(`   curl http://localhost:${PORT}/api/plans`);
+  console.log(`   curl http://localhost:${PORT}/api/vehicles?type=data`);
+  console.log(`   curl http://localhost:${PORT}/api/vehicle-data`);
   console.log(`   curl http://localhost:${PORT}/api/admin`);
 });

@@ -12,7 +12,8 @@ import {
   verifyToken,
   validateUserInput,
   getSecurityHeaders,
-  sanitizeObject
+  sanitizeObject,
+  validateEmail
 } from '../utils/security';
 
 // Helper: Calculate distance between coordinates
