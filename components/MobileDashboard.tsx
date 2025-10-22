@@ -18,6 +18,7 @@ interface MobileDashboardProps {
   onUserTyping: (conversationId: string, userRole: 'customer' | 'seller') => void;
   onMarkMessagesAsRead: (conversationId: string, readerRole: 'customer' | 'seller') => void;
   onFlagContent: (type: 'vehicle' | 'conversation', id: string, reason: string) => void;
+  onLogout?: () => void;
 }
 
 type DashboardTab = 'overview' | 'listings' | 'messages' | 'analytics' | 'profile';
@@ -37,7 +38,8 @@ const MobileDashboard: React.FC<MobileDashboardProps> = memo(({
   typingStatus,
   onUserTyping,
   onMarkMessagesAsRead,
-  onFlagContent
+  onFlagContent,
+  onLogout
 }) => {
   const [activeTab, setActiveTab] = useState<DashboardTab>('overview');
 
@@ -437,6 +439,17 @@ const MobileDashboard: React.FC<MobileDashboardProps> = memo(({
               <span className="text-gray-400">›</span>
             </div>
           </button>
+          {onLogout && (
+            <button 
+              onClick={onLogout}
+              className="w-full text-left p-3 hover:bg-red-50 rounded-lg"
+            >
+              <div className="flex items-center justify-between">
+                <span className="text-red-600">Log Out</span>
+                <span className="text-red-400">›</span>
+              </div>
+            </button>
+          )}
         </div>
       </div>
     </div>

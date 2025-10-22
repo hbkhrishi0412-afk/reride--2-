@@ -26,6 +26,9 @@ export default async function handler(
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+  
+  // Always set JSON content type to prevent HTML responses
+  res.setHeader('Content-Type', 'application/json');
 
   if (req.method === 'OPTIONS') {
     return res.status(200).end();
@@ -73,6 +76,9 @@ export default async function handler(
 
   } catch (error) {
     console.error('Main API Error:', error);
+    
+    // Ensure we always return JSON, never HTML
+    res.setHeader('Content-Type', 'application/json');
     
     if (error instanceof Error && error.message.includes('MONGODB_URI')) {
       return res.status(500).json({ 

@@ -33,6 +33,7 @@ interface AdminPanelProps {
     onExportVehicles: () => void;
     onExportSales: () => void;
     onNavigate?: (view: View) => void;
+    onLogout?: () => void;
     vehicleData: VehicleData;
     onUpdateVehicleData: (newData: VehicleData) => void;
     onToggleVerifiedStatus: (email: string) => void;
@@ -1411,7 +1412,9 @@ const AdminPanel: React.FC<AdminPanelProps> = (props) => {
                                         <tbody className="bg-white divide-y divide-gray-200 dark:divide-gray-700">
                                             {flaggedConversations.map(conversation => {
                                                 const vehicle = vehicles.find(v => v.id === conversation.vehicleId);
-                                                const lastMessage = conversation.messages[conversation.messages.length - 1];
+                                                const lastMessage = conversation.messages && conversation.messages.length > 0 
+                                                    ? conversation.messages[conversation.messages.length - 1] 
+                                                    : null;
                                                 return (
                                                     <tr key={conversation.id} className="bg-red-50">
                                                         <td className="px-6 py-4 whitespace-nowrap">{conversation.customerId}</td>
@@ -1460,7 +1463,7 @@ const AdminPanel: React.FC<AdminPanelProps> = (props) => {
     const SupportTicketsView = () => {
         const [statusFilter, setStatusFilter] = useState<'All' | 'Open' | 'In Progress' | 'Closed'>('All');
         
-        const filteredTickets = supportTickets.filter(ticket => 
+        const filteredTickets = (supportTickets || []).filter(ticket => 
             statusFilter === 'All' || ticket.status === statusFilter
         );
 
@@ -1491,7 +1494,7 @@ const AdminPanel: React.FC<AdminPanelProps> = (props) => {
                                     : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
                             }`}
                         >
-                            {status} ({status === 'All' ? supportTickets.length : supportTickets.filter(t => t.status === status).length})
+                            {status} ({status === 'All' ? (supportTickets || []).length : (supportTickets || []).filter(t => t.status === status).length})
                         </button>
                     ))}
                     </div>
@@ -1893,7 +1896,7 @@ const AdminPanel: React.FC<AdminPanelProps> = (props) => {
                         <div>
                             <h2 className="text-xl font-bold text-spinny-text-dark dark:text-spinny-text-dark">Plan Configuration</h2>
                             <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
-                                {plans.length}/4 plans configured
+                                {(plans || []).length}/4 plans configured
                             </p>
                         </div>
                         <div className="flex gap-2">
@@ -1909,20 +1912,20 @@ const AdminPanel: React.FC<AdminPanelProps> = (props) => {
                             </button>
                             <button 
                                 onClick={handleAddNewPlan}
-                                disabled={plans.length >= 4}
+                                disabled={(plans || []).length >= 4}
                                 className={`font-bold py-2 px-4 rounded-lg transition-colors ${
-                                    plans.length < 4
+                                    (plans || []).length < 4
                                         ? 'bg-spinny-orange text-white hover:bg-spinny-orange/90'
                                         : 'bg-gray-300 text-gray-500 cursor-not-allowed'
                                 }`}
                             >
-                                {plans.length < 4 ? '+ Add New Plan' : 'Max Plans Reached'}
+                                {(plans || []).length < 4 ? '+ Add New Plan' : 'Max Plans Reached'}
                             </button>
                         </div>
                     </div>
                     
-                    <div className={`grid gap-6 ${plans.length <= 2 ? 'grid-cols-1 md:grid-cols-2' : plans.length === 3 ? 'grid-cols-1 md:grid-cols-3' : 'grid-cols-1 md:grid-cols-2 lg:grid-cols-4'}`}>
-                        {plans.map(plan => (
+                    <div className={`grid gap-6 ${(plans || []).length <= 2 ? 'grid-cols-1 md:grid-cols-2' : (plans || []).length === 3 ? 'grid-cols-1 md:grid-cols-3' : 'grid-cols-1 md:grid-cols-2 lg:grid-cols-4'}`}>
+                        {(plans || []).map(plan => (
                             <PlanCard key={plan.id} plan={plan} />
                         ))}
                     </div>
@@ -2039,7 +2042,7 @@ const AdminPanel: React.FC<AdminPanelProps> = (props) => {
                             <NavItem view="listings" label="Listings" />
                             <NavItem view="moderation" label="Moderation Queue" count={analytics.flaggedContent} />
                             <NavItem view="certificationRequests" label="Certification Requests" count={analytics.certificationRequests} />
-                             <NavItem view="support" label="Support Tickets" count={supportTickets.filter(t => t.status === 'Open').length} />
+                             <NavItem view="support" label="Support Tickets" count={(supportTickets || []).filter(t => t.status === 'Open').length} />
                             <NavItem view="payments" label="Payment Requests" />
                             <NavItem view="planManagement" label="Plan Management" />
                             <NavItem view="faq" label="FAQ Management" />
@@ -2047,6 +2050,33 @@ const AdminPanel: React.FC<AdminPanelProps> = (props) => {
                             <NavItem view="auditLog" label="Audit Log" />
                             <NavItem view="settings" label="Settings" />
                         </nav>
+                        
+                        {/* Profile Section */}
+                        <div className="mt-8 pt-6 border-t border-gray-200 dark:border-gray-700">
+                            <div className="flex items-center space-x-3 mb-4">
+                                <div className="w-10 h-10 bg-orange-500 rounded-full flex items-center justify-center">
+                                    <span className="text-white font-bold text-sm">
+                                        {currentUser.name?.charAt(0)?.toUpperCase() || 'A'}
+                                    </span>
+                                </div>
+                                <div className="flex-1 min-w-0">
+                                    <p className="text-sm font-medium text-gray-900 dark:text-white truncate">
+                                        {currentUser.name}
+                                    </p>
+                                    <p className="text-xs text-gray-500 dark:text-gray-400 truncate">
+                                        {currentUser.email}
+                                    </p>
+                                </div>
+                            </div>
+                            {onLogout && (
+                                <button
+                                    onClick={onLogout}
+                                    className="w-full text-left px-3 py-2 text-sm text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors"
+                                >
+                                    Log Out
+                                </button>
+                            )}
+                        </div>
                     </div>
                 </aside>
                 <main className="flex-1 p-8">

@@ -55,6 +55,8 @@ export const getVehicleData = async (): Promise<VehicleData> => {
     console.warn("Both API endpoints failed, falling back to localStorage", error);
     if (error instanceof SyntaxError) {
       console.warn("JSON parsing error - API likely returned HTML instead of JSON");
+    } else if (error instanceof Error && error.message.includes('API returned non-JSON response')) {
+      console.warn("API returned HTML instead of JSON - likely a 404 or server error page");
     }
   }
 

@@ -500,6 +500,7 @@ const AppContent: React.FC = () => {
             onExportVehicles={onExportVehicles}
             onExportSales={onExportSales}
             onNavigate={navigate}
+            onLogout={handleLogout}
             vehicleData={vehicleData}
             onUpdateVehicleData={onUpdateVehicleData}
             onToggleVerifiedStatus={onToggleVerifiedStatus}
@@ -861,6 +862,7 @@ const AppContent: React.FC = () => {
               markAsRead(conversationId);
             }}
             onFlagContent={flagContent}
+            onLogout={handleLogout}
           />
         </div>
       );

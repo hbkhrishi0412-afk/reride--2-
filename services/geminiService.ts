@@ -20,12 +20,25 @@ async function callGeminiAPI(payload: any): Promise<string> {
         });
 
         if (!response.ok) {
-            const errorBody = await response.json().catch(() => ({ error: `API error: ${response.statusText}` }));
-            throw new Error(errorBody.error || `API error: ${response.statusText}`);
+            // Check if response is JSON before trying to parse
+            const contentType = response.headers.get('content-type');
+            if (contentType && contentType.includes('application/json')) {
+                const errorBody = await response.json().catch(() => ({ error: `API error: ${response.statusText}` }));
+                throw new Error(errorBody.error || `API error: ${response.statusText}`);
+            } else {
+                // If not JSON, return a generic error
+                throw new Error(`API error: ${response.status} - ${response.statusText}`);
+            }
+        }
+
+        // Check if response is JSON before parsing
+        const contentType = response.headers.get('content-type');
+        if (!contentType || !contentType.includes('application/json')) {
+            throw new Error('API returned non-JSON response');
         }
 
         const data = await response.json();
-        return data.result;
+        return data.response || data.result || 'No response generated';
     } catch (error) {
         console.error("Error calling Gemini proxy API:", error);
         // Return a default value that won't break the UI.
