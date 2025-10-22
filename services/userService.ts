@@ -313,6 +313,35 @@ export const login = async (credentials: any): Promise<{ success: boolean, user?
     return await loginLocal(credentials);
   }
 };
+export const register = async (credentials: any): Promise<{ success: boolean, user?: User, reason?: string }> => {
+  console.log('🚀 Register attempt:', { email: credentials.email, role: credentials.role, isDevelopment });
+  
+  // Always try API first for production, with fallback to local
+  if (!isDevelopment) {
+    try {
+      console.log('🌐 Trying API registration...');
+      const result = await authApi({ action: 'register', ...credentials });
+      
+      // Store JWT tokens if provided
+      if (result.success && result.accessToken && result.refreshToken) {
+        storeTokens(result.accessToken, result.refreshToken);
+        localStorage.setItem('reRideCurrentUser', JSON.stringify(result.user));
+      }
+      
+      console.log('✅ API registration successful');
+      return result;
+    } catch (error) {
+      console.warn('⚠️  API registration failed, falling back to local storage:', error);
+      // Fallback to local storage if API fails
+      return await registerLocal(credentials);
+    }
+  } else {
+    // Development mode - use local storage
+    console.log('💻 Development mode - using local storage');
+    return await registerLocal(credentials);
+  }
+};
+
 export const logout = (): void => {
   clearTokens();
   console.log('✅ User logged out and tokens cleared');
