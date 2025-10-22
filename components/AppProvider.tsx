@@ -973,12 +973,9 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     setCurrentUser, setComparisonList, setWishlist, setConversations, setToasts,
     setForgotPasswordRole, setTypingStatus, setSelectedCategory, setPublicSellerProfile,
     setActiveChat, setIsAnnouncementVisible, setRecommendations, setInitialSearchQuery,
-    setCommandPaletteOpen, setUserLocation, setSelectedCity, setUsers,
+    setIsCommandPaletteOpen, setUserLocation, setSelectedCity, setUsers,
     setPlatformSettings, setAuditLog, setVehicleData, setFaqItems, setSupportTickets,
     setNotifications, addToast, removeToast, navigate, handleLogin, handleLogout,
-    addToComparison, removeFromComparison, clearComparison, addToWishlist,
-    removeFromWishlist, clearWishlist, addRating, addSellerRating, sendMessage,
-    markAsRead, startTyping, stopTyping, setSellerProfile, respondToOffer
   ]);
 
   return (
