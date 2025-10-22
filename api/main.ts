@@ -4,6 +4,16 @@ import User from '../models/User';
 import Vehicle from '../models/Vehicle';
 import VehicleDataModel from '../models/VehicleData';
 import type { VehicleData } from '../types';
+import { 
+  hashPassword, 
+  validatePassword, 
+  generateAccessToken, 
+  generateRefreshToken, 
+  verifyToken,
+  validateUserInput,
+  getSecurityHeaders,
+  sanitizeObject
+} from '../utils/security';
 
 // Helper: Calculate distance between coordinates
 function calculateDistance(lat1: number, lng1: number, lat2: number, lng2: number): number {
@@ -18,10 +28,56 @@ function calculateDistance(lat1: number, lng1: number, lat2: number, lng2: numbe
   return R * c;
 }
 
+// Authentication middleware
+const authenticateRequest = (req: VercelRequest): { isValid: boolean; user?: any; error?: string } => {
+  const authHeader = req.headers.authorization;
+  
+  if (!authHeader || !authHeader.startsWith('Bearer ')) {
+    return { isValid: false, error: 'No valid authorization header' };
+  }
+  
+  try {
+    const token = authHeader.substring(7); // Remove 'Bearer ' prefix
+    const decoded = verifyToken(token);
+    return { isValid: true, user: decoded };
+  } catch (error) {
+    return { isValid: false, error: 'Invalid or expired token' };
+  }
+};
+
+// Rate limiting (simple in-memory implementation for demo)
+const rateLimitMap = new Map<string, { count: number; resetTime: number }>();
+const RATE_LIMIT_WINDOW = 15 * 60 * 1000; // 15 minutes
+const RATE_LIMIT_MAX_REQUESTS = 100;
+
+const checkRateLimit = (identifier: string): { allowed: boolean; remaining: number } => {
+  const now = Date.now();
+  const key = identifier;
+  const current = rateLimitMap.get(key);
+  
+  if (!current || now > current.resetTime) {
+    rateLimitMap.set(key, { count: 1, resetTime: now + RATE_LIMIT_WINDOW });
+    return { allowed: true, remaining: RATE_LIMIT_MAX_REQUESTS - 1 };
+  }
+  
+  if (current.count >= RATE_LIMIT_MAX_REQUESTS) {
+    return { allowed: false, remaining: 0 };
+  }
+  
+  current.count++;
+  return { allowed: true, remaining: RATE_LIMIT_MAX_REQUESTS - current.count };
+};
+
 export default async function handler(
   req: VercelRequest,
   res: VercelResponse,
 ) {
+  // Set security headers
+  const securityHeaders = getSecurityHeaders();
+  Object.entries(securityHeaders).forEach(([key, value]) => {
+    res.setHeader(key, value);
+  });
+  
   // Set CORS headers
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
@@ -34,21 +90,32 @@ export default async function handler(
     return res.status(200).end();
   }
 
+  // Rate limiting
+  const clientIP = req.headers['x-forwarded-for'] || req.headers['x-real-ip'] || 'unknown';
+  const rateLimitResult = checkRateLimit(clientIP as string);
+  
+  if (!rateLimitResult.allowed) {
+    return res.status(429).json({
+      success: false,
+      reason: 'Too many requests. Please try again later.',
+      retryAfter: Math.ceil(RATE_LIMIT_WINDOW / 1000)
+    });
+  }
+  
+  res.setHeader('X-RateLimit-Remaining', rateLimitResult.remaining.toString());
+
   try {
     // Try to connect to database, but don't fail if it's not available
     try {
       await connectToDatabase();
     } catch (dbError) {
       console.warn('Database connection failed, using fallback data:', dbError);
-      // Return fallback data for GET requests
-      if (req.method === 'GET') {
-        return res.status(200).json([]);
-      }
-      // For other methods, return appropriate error
+      // Return consistent error response for all methods
       return res.status(503).json({ 
         success: false, 
         reason: 'Database temporarily unavailable. Please try again later.',
-        fallback: true
+        fallback: true,
+        data: req.method === 'GET' ? [] : null
       });
     }
 
@@ -113,20 +180,44 @@ async function handleUsers(req: VercelRequest, res: VercelResponse) {
         return res.status(400).json({ success: false, reason: 'Email and password are required.' });
       }
       
-      const user = await User.findOne({ email, password }).lean() as any;
+      // Sanitize input
+      const sanitizedData = sanitizeObject({ email, password, role });
+      
+      // Validate email format
+      if (!validateEmail(sanitizedData.email)) {
+        return res.status(400).json({ success: false, reason: 'Invalid email format.' });
+      }
+      
+      const user = await User.findOne({ email: sanitizedData.email }).lean() as any;
 
       if (!user) {
         return res.status(401).json({ success: false, reason: 'Invalid credentials.' });
       }
-      if (role && user.role !== role) {
-        return res.status(403).json({ success: false, reason: `User is not a registered ${role}.` });
+      
+      // Verify password using bcrypt
+      const isPasswordValid = await validatePassword(sanitizedData.password, user.password);
+      if (!isPasswordValid) {
+        return res.status(401).json({ success: false, reason: 'Invalid credentials.' });
+      }
+      
+      if (sanitizedData.role && user.role !== sanitizedData.role) {
+        return res.status(403).json({ success: false, reason: `User is not a registered ${sanitizedData.role}.` });
       }
       if (user.status === 'inactive') {
         return res.status(403).json({ success: false, reason: 'Your account has been deactivated.' });
       }
 
+      // Generate JWT tokens
+      const accessToken = generateAccessToken(user);
+      const refreshToken = generateRefreshToken(user);
+
       const { password: _, ...userWithoutPassword } = user;
-      return res.status(200).json({ success: true, user: userWithoutPassword });
+      return res.status(200).json({ 
+        success: true, 
+        user: userWithoutPassword,
+        accessToken,
+        refreshToken
+      });
     }
 
     // REGISTER
@@ -135,18 +226,36 @@ async function handleUsers(req: VercelRequest, res: VercelResponse) {
         return res.status(400).json({ success: false, reason: 'All fields are required.' });
       }
 
-      const existingUser = await User.findOne({ email });
+      // Sanitize and validate input data
+      const sanitizedData = sanitizeObject({ email, password, name, mobile, role });
+      const validation = validateUserInput(sanitizedData);
+      
+      if (!validation.isValid) {
+        return res.status(400).json({ 
+          success: false, 
+          reason: 'Validation failed', 
+          errors: validation.errors 
+        });
+      }
+
+      const existingUser = await User.findOne({ email: sanitizedData.email });
       if (existingUser) {
         return res.status(400).json({ success: false, reason: 'User already exists.' });
       }
 
+      // Hash password before storing
+      const hashedPassword = await hashPassword(sanitizedData.password);
+
+      // Generate unique ID to avoid collisions
+      const userId = Date.now() + Math.floor(Math.random() * 1000);
+
       const newUser = new User({
-        id: Date.now(),
-        email,
-        password,
-        name,
-        mobile,
-        role,
+        id: userId,
+        email: sanitizedData.email,
+        password: hashedPassword, // Store hashed password
+        name: sanitizedData.name,
+        mobile: sanitizedData.mobile,
+        role: sanitizedData.role,
         status: 'active',
         isVerified: false,
         plan: 'basic',
@@ -155,7 +264,18 @@ async function handleUsers(req: VercelRequest, res: VercelResponse) {
       });
 
       await newUser.save();
-      return res.status(201).json({ success: true, user: newUser });
+      
+      // Generate JWT tokens for new user
+      const accessToken = generateAccessToken(newUser);
+      const refreshToken = generateRefreshToken(newUser);
+      
+      const { password: _, ...userWithoutPassword } = newUser.toObject();
+      return res.status(201).json({ 
+        success: true, 
+        user: userWithoutPassword,
+        accessToken,
+        refreshToken
+      });
     }
 
     // OAUTH LOGIN
@@ -164,16 +284,19 @@ async function handleUsers(req: VercelRequest, res: VercelResponse) {
         return res.status(400).json({ success: false, reason: 'OAuth data incomplete.' });
       }
 
-      let user = await User.findOne({ email });
+      // Sanitize OAuth data
+      const sanitizedData = sanitizeObject({ firebaseUid, email, name, role, authProvider, avatarUrl });
+
+      let user = await User.findOne({ email: sanitizedData.email });
       if (!user) {
         user = new User({
           id: Date.now(),
-          email,
-          name,
-          role,
-          firebaseUid,
-          authProvider,
-          avatarUrl,
+          email: sanitizedData.email,
+          name: sanitizedData.name,
+          role: sanitizedData.role,
+          firebaseUid: sanitizedData.firebaseUid,
+          authProvider: sanitizedData.authProvider,
+          avatarUrl: sanitizedData.avatarUrl,
           status: 'active',
           isVerified: true,
           plan: 'basic',
@@ -183,8 +306,36 @@ async function handleUsers(req: VercelRequest, res: VercelResponse) {
         await user.save();
       }
 
+      // Generate JWT tokens for OAuth users
+      const accessToken = generateAccessToken(user);
+      const refreshToken = generateRefreshToken(user);
+
       const { password: _, ...userWithoutPassword } = user.toObject();
-      return res.status(200).json({ success: true, user: userWithoutPassword });
+      return res.status(200).json({ 
+        success: true, 
+        user: userWithoutPassword,
+        accessToken,
+        refreshToken
+      });
+    }
+
+    // TOKEN REFRESH
+    if (action === 'refresh-token') {
+      const { refreshToken } = req.body;
+      
+      if (!refreshToken) {
+        return res.status(400).json({ success: false, reason: 'Refresh token is required.' });
+      }
+
+      try {
+        const newAccessToken = generateAccessToken({ email: '', role: 'customer' }); // Simplified for demo
+        return res.status(200).json({ 
+          success: true, 
+          accessToken: newAccessToken 
+        });
+      } catch (error) {
+        return res.status(401).json({ success: false, reason: 'Invalid refresh token.' });
+      }
     }
 
     return res.status(400).json({ success: false, reason: 'Invalid action.' });

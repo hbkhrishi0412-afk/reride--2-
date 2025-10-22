@@ -169,8 +169,7 @@ export interface PlanDetails {
 export interface User {
   name: string;
   email: string;
-  // FIX: Made password optional to align with auth services that strip the password before returning user data.
-  password?: string;
+  password?: string; // Optional for API responses, required for registration/login
   mobile: string;
   role: 'seller' | 'customer' | 'admin';
   location: string;
@@ -718,12 +717,28 @@ export const isVehicle = (obj: any): obj is Vehicle => {
     Array.isArray(obj.features);
 };
 
+// Enhanced type guards for User
+export const isUserWithPassword = (user: any): user is User & { password: string } => {
+  return isUser(user) && typeof user.password === 'string';
+};
+
+export const isUserWithoutPassword = (user: any): user is Omit<User, 'password'> => {
+  return isUser(user) && user.password === undefined;
+};
+
+// Discriminated union for authentication states
+export type AuthState = 
+  | { type: 'loading' }
+  | { type: 'authenticated'; user: User }
+  | { type: 'unauthenticated' }
+  | { type: 'error'; error: string };
+
 export const isUser = (obj: any): obj is User => {
   return obj &&
     typeof obj.email === 'string' &&
     typeof obj.name === 'string' &&
-    typeof obj.password === 'string' &&
-    typeof obj.mobile === 'string' &&
+    (obj.password === undefined || typeof obj.password === 'string') &&
+    (obj.mobile === undefined || typeof obj.mobile === 'string') &&
     ['customer', 'seller', 'admin'].includes(obj.role);
 };
 

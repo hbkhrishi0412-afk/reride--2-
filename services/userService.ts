@@ -21,13 +21,31 @@ const FALLBACK_USERS: User[] = [
 // --- API Helpers ---
 const getAuthHeader = () => {
   try {
-    // Try localStorage first for persistent login, fallback to sessionStorage
-    const userJson = localStorage.getItem('reRideCurrentUser') || sessionStorage.getItem('currentUser');
-    if (!userJson) return {};
-    const user: User = JSON.parse(userJson);
-    return { 'Authorization': user.email };
+    // Get JWT token from localStorage
+    const token = localStorage.getItem('reRideAccessToken');
+    if (!token) return {};
+    return { 'Authorization': `Bearer ${token}` };
   } catch {
     return {};
+  }
+};
+
+const storeTokens = (accessToken: string, refreshToken: string) => {
+  try {
+    localStorage.setItem('reRideAccessToken', accessToken);
+    localStorage.setItem('reRideRefreshToken', refreshToken);
+  } catch (error) {
+    console.warn('Failed to store tokens:', error);
+  }
+};
+
+const clearTokens = () => {
+  try {
+    localStorage.removeItem('reRideAccessToken');
+    localStorage.removeItem('reRideRefreshToken');
+    localStorage.removeItem('reRideCurrentUser');
+  } catch (error) {
+    console.warn('Failed to clear tokens:', error);
   }
 };
 
@@ -275,6 +293,13 @@ export const login = async (credentials: any): Promise<{ success: boolean, user?
     try {
       console.log('🌐 Trying API login...');
       const result = await authApi({ action: 'login', ...credentials });
+      
+      // Store JWT tokens if provided
+      if (result.success && result.accessToken && result.refreshToken) {
+        storeTokens(result.accessToken, result.refreshToken);
+        localStorage.setItem('reRideCurrentUser', JSON.stringify(result.user));
+      }
+      
       console.log('✅ API login successful');
       return result;
     } catch (error) {
@@ -288,18 +313,39 @@ export const login = async (credentials: any): Promise<{ success: boolean, user?
     return await loginLocal(credentials);
   }
 };
-export const register = async (credentials: any): Promise<{ success: boolean, user?: User, reason?: string }> => {
-  // Always try API first for production, with fallback to local
-  if (!isDevelopment) {
-    try {
-      return await authApi({ action: 'register', ...credentials });
-    } catch (error) {
-      console.warn('API register failed, falling back to local storage:', error);
-      // Fallback to local storage if API fails
-      return await registerLocal(credentials);
+export const logout = (): void => {
+  clearTokens();
+  console.log('✅ User logged out and tokens cleared');
+};
+
+// Token refresh function
+export const refreshAccessToken = async (): Promise<{ success: boolean; accessToken?: string; reason?: string }> => {
+  try {
+    const refreshToken = localStorage.getItem('reRideRefreshToken');
+    if (!refreshToken) {
+      return { success: false, reason: 'No refresh token available' };
     }
-  } else {
-    // Development mode - use local storage
-    return await registerLocal(credentials);
+
+    const response = await fetch('/api/users', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ action: 'refresh-token', refreshToken }),
+    });
+
+    if (!response.ok) {
+      throw new Error('Token refresh failed');
+    }
+
+    const result = await response.json();
+    
+    if (result.success && result.accessToken) {
+      localStorage.setItem('reRideAccessToken', result.accessToken);
+      return { success: true, accessToken: result.accessToken };
+    }
+
+    return { success: false, reason: 'Invalid refresh response' };
+  } catch (error) {
+    console.warn('Token refresh failed:', error);
+    return { success: false, reason: 'Token refresh failed' };
   }
 };

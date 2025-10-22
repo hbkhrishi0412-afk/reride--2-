@@ -1,6 +1,13 @@
 import React, { Suspense, useEffect } from 'react';
 import { AppProvider, useApp } from './components/AppProvider';
 import ErrorBoundary from './components/ErrorBoundary';
+import { 
+  VehicleListErrorBoundary, 
+  ChatErrorBoundary, 
+  DashboardErrorBoundary, 
+  AdminPanelErrorBoundary,
+  AuthenticationErrorBoundary 
+} from './components/ErrorBoundaries';
 import Header from './components/Header';
 import MobileHeader from './components/MobileHeader';
 import MobileBottomNav from './components/MobileBottomNav';
@@ -27,8 +34,8 @@ const LoadingSpinner: React.FC = () => (
 const Home = React.lazy(() => import('./components/Home'));
 const VehicleList = React.lazy(() => import('./components/VehicleList'));
 const VehicleDetail = React.lazy(() => import('./components/VehicleDetail'));
-const Dashboard = React.lazy(() => import('./components/Dashboard').then(module => ({ default: module.default })));
-const AdminPanel = React.lazy(() => import('./components/AdminPanel').then(module => ({ default: module.default })));
+const Dashboard = React.lazy(() => import('./components/Dashboard'));
+const AdminPanel = React.lazy(() => import('./components/AdminPanel'));
 const Comparison = React.lazy(() => import('./components/Comparison'));
 const Profile = React.lazy(() => import('./components/Profile'));
 const CustomerInbox = React.lazy(() => import('./components/CustomerInbox'));
@@ -147,6 +154,22 @@ const AppContent: React.FC = () => {
     }
   }, [currentUser, currentView, navigate]);
 
+  // Recover vehicle from sessionStorage on mount
+  useEffect(() => {
+    if (!selectedVehicle && currentView === ViewEnum.DETAIL) {
+      try {
+        const storedVehicle = sessionStorage.getItem('selectedVehicle');
+        if (storedVehicle) {
+          const vehicleToShow = JSON.parse(storedVehicle);
+          console.log('🔧 Recovered vehicle from sessionStorage:', vehicleToShow?.id, vehicleToShow?.make, vehicleToShow?.model);
+          setSelectedVehicle(vehicleToShow);
+        }
+      } catch (error) {
+        console.warn('🔧 Failed to recover vehicle from sessionStorage:', error);
+      }
+    }
+  }, [currentView, selectedVehicle]);
+
   // Get page title based on current view
   const getPageTitle = () => {
     switch (currentView) {
@@ -191,8 +214,11 @@ const AppContent: React.FC = () => {
             }}
             wishlist={wishlist}
             onViewSellerProfile={(sellerEmail) => {
-              setPublicProfile({ email: sellerEmail } as any);
-              navigate(ViewEnum.SELLER_PROFILE);
+              const seller = users.find(u => u.email === sellerEmail);
+              if (seller) {
+                setPublicProfile(seller);
+                navigate(ViewEnum.SELLER_PROFILE);
+              }
             }}
             recommendations={recommendations}
             allVehicles={vehicles}
@@ -202,62 +228,51 @@ const AppContent: React.FC = () => {
 
       case ViewEnum.USED_CARS:
         return (
-          <VehicleList
-            vehicles={vehicles}
-            onSelectVehicle={selectVehicle}
-            isLoading={isLoading}
-            comparisonList={comparisonList}
-            onToggleCompare={(id) => {
-              setComparisonList(prev => 
-                prev.includes(id) 
-                  ? prev.filter(vId => vId !== id)
-                  : [...prev, id]
-              );
-            }}
-            onClearCompare={() => setComparisonList([])}
-            wishlist={wishlist}
-            onToggleWishlist={(id) => {
-              setWishlist(prev => 
-                prev.includes(id) 
-                  ? prev.filter(vId => vId !== id)
-                  : [...prev, id]
-              );
-            }}
-            categoryTitle="Used Cars"
-            initialCategory={currentCategory}
-            initialSearchQuery={initialSearchQuery}
-            onViewSellerProfile={(sellerEmail) => {
-              setPublicProfile({ email: sellerEmail } as any);
-              navigate(ViewEnum.SELLER_PROFILE);
-            }}
-            userLocation={userLocation}
-            currentUser={currentUser}
-            onSaveSearch={(search) => {
-              addToast(`Search "${search.name}" saved successfully!`, 'success');
-            }}
-          />
+          <VehicleListErrorBoundary>
+            <VehicleList
+              vehicles={vehicles}
+              onSelectVehicle={selectVehicle}
+              isLoading={isLoading}
+              comparisonList={comparisonList}
+              onToggleCompare={(id) => {
+                setComparisonList(prev => 
+                  prev.includes(id) 
+                    ? prev.filter(vId => vId !== id)
+                    : [...prev, id]
+                );
+              }}
+              onClearCompare={() => setComparisonList([])}
+              wishlist={wishlist}
+              onToggleWishlist={(id) => {
+                setWishlist(prev => 
+                  prev.includes(id) 
+                    ? prev.filter(vId => vId !== id)
+                    : [...prev, id]
+                );
+              }}
+              categoryTitle="Used Cars"
+              initialCategory={currentCategory}
+              initialSearchQuery={initialSearchQuery}
+              onViewSellerProfile={(sellerEmail) => {
+                const seller = users.find(u => u.email === sellerEmail);
+                if (seller) {
+                  setPublicProfile(seller);
+                  navigate(ViewEnum.SELLER_PROFILE);
+                }
+              }}
+              userLocation={userLocation}
+              currentUser={currentUser}
+              onSaveSearch={(search) => {
+                addToast(`Search "${search.name}" saved successfully!`, 'success');
+              }}
+            />
+          </VehicleListErrorBoundary>
         );
 
       case ViewEnum.DETAIL:
-        // State recovery mechanism - try to recover vehicle from sessionStorage if selectedVehicle is null
-        let vehicleToShow = selectedVehicle;
-        if (!vehicleToShow) {
-          try {
-            const storedVehicle = sessionStorage.getItem('selectedVehicle');
-            if (storedVehicle) {
-              vehicleToShow = JSON.parse(storedVehicle);
-              console.log('🔧 Recovered vehicle from sessionStorage:', vehicleToShow?.id, vehicleToShow?.make, vehicleToShow?.model);
-              // Update the state with recovered vehicle
-              setSelectedVehicle(vehicleToShow);
-            }
-          } catch (error) {
-            console.warn('🔧 Failed to recover vehicle from sessionStorage:', error);
-          }
-        }
-        
-        return vehicleToShow ? (
+        return selectedVehicle ? (
           <VehicleDetail
-            vehicle={vehicleToShow}
+            vehicle={selectedVehicle}
             onBack={() => navigate(ViewEnum.USED_CARS)}
             comparisonList={comparisonList}
             onToggleCompare={toggleCompare}
@@ -378,8 +393,11 @@ const AppContent: React.FC = () => {
             categoryTitle="My Wishlist"
             isWishlistMode={true}
             onViewSellerProfile={(sellerEmail) => {
-              setPublicProfile({ email: sellerEmail } as any);
-              navigate(ViewEnum.SELLER_PROFILE);
+              const seller = users.find(u => u.email === sellerEmail);
+              if (seller) {
+                setPublicProfile(seller);
+                navigate(ViewEnum.SELLER_PROFILE);
+              }
             }}
             userLocation={userLocation}
             currentUser={currentUser}
@@ -391,30 +409,32 @@ const AppContent: React.FC = () => {
 
       case ViewEnum.SELLER_DASHBOARD:
         return currentUser?.role === 'seller' ? (
-          <Dashboard
-            seller={currentUser}
-            sellerVehicles={vehicles.filter(v => v.sellerEmail === currentUser.email)}
-            reportedVehicles={[]}
-            onAddVehicle={() => {}}
-            onAddMultipleVehicles={() => {}}
-            onUpdateVehicle={() => {}}
-            onDeleteVehicle={() => {}}
-            onMarkAsSold={() => {}}
-            conversations={conversations}
-            onSellerSendMessage={(conversationId, messageText, type, payload) => sendMessage(conversationId, messageText)}
-            onMarkConversationAsReadBySeller={(conversationId) => markAsRead(conversationId)}
-            typingStatus={typingStatus}
-            onUserTyping={(conversationId, userRole) => toggleTyping(conversationId, true)}
-            onMarkMessagesAsRead={(conversationId, readerRole) => markAsRead(conversationId)}
-            onUpdateSellerProfile={() => {}}
-            vehicleData={vehicleData}
-            onFeatureListing={() => {}}
-            onRequestCertification={() => {}}
-            onNavigate={navigate}
-            onTestDriveResponse={() => {}}
-            allVehicles={vehicles}
-            onOfferResponse={() => {}}
-          />
+          <DashboardErrorBoundary>
+            <Dashboard
+              seller={currentUser}
+              sellerVehicles={vehicles.filter(v => v.sellerEmail === currentUser.email)}
+              reportedVehicles={[]}
+              onAddVehicle={() => {}}
+              onAddMultipleVehicles={() => {}}
+              onUpdateVehicle={() => {}}
+              onDeleteVehicle={() => {}}
+              onMarkAsSold={() => {}}
+              conversations={conversations}
+              onSellerSendMessage={(conversationId, messageText, type, payload) => sendMessage(conversationId, messageText)}
+              onMarkConversationAsReadBySeller={(conversationId) => markAsRead(conversationId)}
+              typingStatus={typingStatus}
+              onUserTyping={(conversationId, userRole) => toggleTyping(conversationId, true)}
+              onMarkMessagesAsRead={(conversationId, readerRole) => markAsRead(conversationId)}
+              onUpdateSellerProfile={() => {}}
+              vehicleData={vehicleData}
+              onFeatureListing={() => {}}
+              onRequestCertification={() => {}}
+              onNavigate={navigate}
+              onTestDriveResponse={() => {}}
+              allVehicles={vehicles}
+              onOfferResponse={() => {}}
+            />
+          </DashboardErrorBoundary>
         ) : (
           <div className="min-h-[calc(100vh-140px)] flex items-center justify-center">
             <div className="text-center">
@@ -455,8 +475,11 @@ const AppContent: React.FC = () => {
             }}
             comparisonList={comparisonList}
             onViewSellerProfile={(sellerEmail) => {
-              setPublicProfile({ email: sellerEmail } as any);
-              navigate(ViewEnum.SELLER_PROFILE);
+              const seller = users.find(u => u.email === sellerEmail);
+              if (seller) {
+                setPublicProfile(seller);
+                navigate(ViewEnum.SELLER_PROFILE);
+              }
             }}
           />
         ) : (
@@ -476,42 +499,44 @@ const AppContent: React.FC = () => {
 
       case ViewEnum.ADMIN_PANEL:
         return currentUser?.role === 'admin' ? (
-          <AdminPanel 
-            users={users}
-            currentUser={currentUser}
-            vehicles={vehicles}
-            conversations={conversations}
-            onAdminUpdateUser={onAdminUpdateUser}
-            onToggleUserStatus={onToggleUserStatus}
-            onDeleteUser={deleteUser}
-            onUpdateUserPlan={onUpdateUserPlan}
-            onUpdateVehicle={(vehicle: Vehicle) => {
-              updateVehicle(vehicle.id, vehicle);
-            }}
-            onDeleteVehicle={deleteVehicle}
-            onToggleVehicleStatus={onToggleVehicleStatus}
-            onToggleVehicleFeature={onToggleVehicleFeature}
-            onResolveFlag={onResolveFlag}
-            platformSettings={platformSettings}
-            onUpdateSettings={onUpdateSettings}
-            onSendBroadcast={onSendBroadcast}
-            auditLog={auditLog}
-            onExportUsers={onExportUsers}
-            onExportVehicles={onExportVehicles}
-            onExportSales={onExportSales}
-            onNavigate={navigate}
-            onLogout={handleLogout}
-            vehicleData={vehicleData}
-            onUpdateVehicleData={onUpdateVehicleData}
-            onToggleVerifiedStatus={onToggleVerifiedStatus}
-            supportTickets={supportTickets}
-            onUpdateSupportTicket={onUpdateSupportTicket}
-            faqItems={faqItems}
-            onAddFaq={onAddFaq}
-            onUpdateFaq={onUpdateFaq}
-            onDeleteFaq={onDeleteFaq}
-            onCertificationApproval={onCertificationApproval}
-          />
+          <AdminPanelErrorBoundary>
+            <AdminPanel 
+              users={users}
+              currentUser={currentUser}
+              vehicles={vehicles}
+              conversations={conversations}
+              onAdminUpdateUser={onAdminUpdateUser}
+              onToggleUserStatus={onToggleUserStatus}
+              onDeleteUser={deleteUser}
+              onUpdateUserPlan={onUpdateUserPlan}
+              onUpdateVehicle={(vehicle: Vehicle) => {
+                updateVehicle(vehicle.id, vehicle);
+              }}
+              onDeleteVehicle={deleteVehicle}
+              onToggleVehicleStatus={onToggleVehicleStatus}
+              onToggleVehicleFeature={onToggleVehicleFeature}
+              onResolveFlag={onResolveFlag}
+              platformSettings={platformSettings}
+              onUpdateSettings={onUpdateSettings}
+              onSendBroadcast={onSendBroadcast}
+              auditLog={auditLog}
+              onExportUsers={onExportUsers}
+              onExportVehicles={onExportVehicles}
+              onExportSales={onExportSales}
+              onNavigate={navigate}
+              onLogout={handleLogout}
+              vehicleData={vehicleData}
+              onUpdateVehicleData={onUpdateVehicleData}
+              onToggleVerifiedStatus={onToggleVerifiedStatus}
+              supportTickets={supportTickets}
+              onUpdateSupportTicket={onUpdateSupportTicket}
+              faqItems={faqItems}
+              onAddFaq={onAddFaq}
+              onUpdateFaq={onUpdateFaq}
+              onDeleteFaq={onDeleteFaq}
+              onCertificationApproval={onCertificationApproval}
+            />
+          </AdminPanelErrorBoundary>
         ) : (
           <div className="min-h-[calc(100vh-140px)] flex items-center justify-center">
             <div className="text-center">
@@ -944,30 +969,32 @@ const AppContent: React.FC = () => {
           onRemove={removeToast} 
         />
         {currentUser && activeChat && (
-          <ChatWidget
-            conversation={activeChat}
-            currentUserRole={currentUser.role as 'customer' | 'seller'}
-            otherUserName={currentUser?.role === 'customer' ? activeChat.sellerId : activeChat.customerName}
-            onClose={() => setActiveChat(null)}
-            onSendMessage={(messageText, type, payload) => {
-              sendMessage(activeChat.id, messageText);
-            }}
-            typingStatus={typingStatus}
-            onUserTyping={(conversationId, userRole) => {
-              toggleTyping(conversationId, true);
-            }}
-            onMarkMessagesAsRead={(conversationId, readerRole) => {
-              markAsRead(conversationId);
-            }}
-            onFlagContent={(type, id, reason) => {
-              flagContent(type, id);
-            }}
-            onOfferResponse={(conversationId, messageId, response, counterPrice) => {
-              console.log('🔧 DashboardMessages onOfferResponse called:', { conversationId, messageId, response, counterPrice });
-              onOfferResponse(conversationId, messageId, response, counterPrice);
-              addToast(`Offer ${response}`, 'success');
-            }}
-          />
+          <ChatErrorBoundary>
+            <ChatWidget
+              conversation={activeChat}
+              currentUserRole={currentUser.role as 'customer' | 'seller'}
+              otherUserName={currentUser?.role === 'customer' ? activeChat.sellerId : activeChat.customerName}
+              onClose={() => setActiveChat(null)}
+              onSendMessage={(messageText, type, payload) => {
+                sendMessage(activeChat.id, messageText);
+              }}
+              typingStatus={typingStatus}
+              onUserTyping={(conversationId, userRole) => {
+                toggleTyping(conversationId, true);
+              }}
+              onMarkMessagesAsRead={(conversationId, readerRole) => {
+                markAsRead(conversationId);
+              }}
+              onFlagContent={(type, id, reason) => {
+                flagContent(type, id);
+              }}
+              onOfferResponse={(conversationId, messageId, response, counterPrice) => {
+                console.log('🔧 DashboardMessages onOfferResponse called:', { conversationId, messageId, response, counterPrice });
+                onOfferResponse(conversationId, messageId, response, counterPrice);
+                addToast(`Offer ${response}`, 'success');
+              }}
+            />
+          </ChatErrorBoundary>
         )}
       </div>
     );

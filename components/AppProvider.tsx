@@ -341,11 +341,20 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   useEffect(() => {
     if (activeChat) {
       const updatedConversation = conversations.find(conv => conv.id === activeChat.id);
-      if (updatedConversation && JSON.stringify(updatedConversation) !== JSON.stringify(activeChat)) {
-        setActiveChat(updatedConversation);
+      if (updatedConversation) {
+        // Use shallow comparison instead of deep JSON comparison to avoid infinite loops
+        const hasChanges = 
+          updatedConversation.messages.length !== activeChat.messages.length ||
+          updatedConversation.lastMessageAt !== activeChat.lastMessageAt ||
+          updatedConversation.isReadBySeller !== activeChat.isReadBySeller ||
+          updatedConversation.isReadByCustomer !== activeChat.isReadByCustomer;
+        
+        if (hasChanges) {
+          setActiveChat(updatedConversation);
+        }
       }
     }
-  }, [conversations, activeChat]);
+  }, [conversations]); // Remove activeChat from dependencies to prevent infinite loops
 
   // Add navigation event listener for dashboard navigation
   useEffect(() => {
@@ -471,7 +480,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     },
     onUpdateUserPlan: (email: string, plan: SubscriptionPlan) => {
       setUsers(prev => prev.map(user => 
-        user.email === email ? { ...user, subscription: { ...user.subscription, plan } } : user
+        user.email === email ? { ...user, subscriptionPlan: plan } : user
       ));
       addToast(`Plan updated for ${email}`, 'success');
     },
@@ -671,73 +680,67 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     },
     sendMessage: (conversationId: string, message: string) => {
       console.log('🔧 sendMessage called:', { conversationId, message, currentUser: currentUser?.email });
+      
+      const newMessage = {
+        id: Date.now(),
+        sender: (currentUser?.role === 'seller' ? 'seller' : 'user') as 'seller' | 'user',
+        text: message,
+        timestamp: new Date().toISOString(),
+        isRead: false,
+        type: 'text' as const
+      };
+
+      // Update conversations and notifications atomically to prevent race conditions
       setConversations(prev => {
         const updated = prev.map(conv => 
           conv.id === conversationId ? {
             ...conv,
-            messages: [...conv.messages, {
-              id: Date.now(),
-              sender: (currentUser?.role === 'seller' ? 'seller' : 'user') as 'seller' | 'user',
-              text: message,
-              timestamp: new Date().toISOString(),
-              isRead: false,
-              type: 'text'
-            }],
-            lastMessageAt: new Date().toISOString()
+            messages: [...conv.messages, newMessage],
+            lastMessageAt: newMessage.timestamp,
+            isReadBySeller: currentUser?.role === 'seller' ? true : conv.isReadBySeller,
+            isReadByCustomer: currentUser?.role === 'customer' ? true : conv.isReadByCustomer
           } : conv
         );
-        console.log('🔧 Updated conversations:', updated);
-        return updated;
-      });
-
-      // Create notification for the recipient
-      const conversation = conversations.find(conv => conv.id === conversationId);
-      if (conversation && currentUser) {
-        const recipientEmail = currentUser.role === 'seller' ? conversation.customerId : conversation.sellerId;
-        const senderName = currentUser.role === 'seller' ? 'Seller' : conversation.customerName;
         
-        const newNotification: Notification = {
-          id: Date.now(),
-          recipientEmail,
-          message: `New message from ${senderName}: ${message.length > 50 ? message.substring(0, 50) + '...' : message}`,
-          targetId: conversationId,
-          targetType: 'conversation',
-          isRead: false,
-          timestamp: new Date().toISOString()
-        };
-
-        setNotifications(prev => {
-          const updated = [newNotification, ...prev];
-          // Save to localStorage
-          try {
-            localStorage.setItem('reRideNotifications', JSON.stringify(updated));
-          } catch (error) {
-            console.error('Failed to save notifications to localStorage:', error);
-          }
-          return updated;
-        });
-      }
-      
-      // Update activeChat if it's the same conversation
-      setActiveChat(prev => {
-        if (prev && prev.id === conversationId) {
-          const updatedConv = conversations.find(conv => conv.id === conversationId);
-          if (updatedConv) {
-            return {
-              ...updatedConv,
-              messages: [...updatedConv.messages, {
-                id: Date.now(),
-                sender: (currentUser?.role === 'seller' ? 'seller' : 'user') as 'seller' | 'user',
-                text: message,
-                timestamp: new Date().toISOString(),
-                isRead: false,
-                type: 'text'
-              }],
-              lastMessageAt: new Date().toISOString()
+        // Update activeChat atomically with the same conversation update
+        const updatedConv = updated.find(conv => conv.id === conversationId);
+        if (updatedConv && activeChat?.id === conversationId) {
+          setActiveChat(updatedConv);
+        }
+        
+        // Create notification for the recipient within the same state update
+        if (currentUser) {
+          const conversation = updated.find(conv => conv.id === conversationId);
+          if (conversation) {
+            const recipientEmail = currentUser.role === 'seller' ? conversation.customerId : conversation.sellerId;
+            const senderName = currentUser.role === 'seller' ? 'Seller' : conversation.customerName;
+            
+            const newNotification: Notification = {
+              id: Date.now() + 1, // Ensure unique ID
+              recipientEmail,
+              message: `New message from ${senderName}: ${message.length > 50 ? message.substring(0, 50) + '...' : message}`,
+              targetId: conversationId,
+              targetType: 'conversation',
+              isRead: false,
+              timestamp: new Date().toISOString()
             };
+
+            // Update notifications atomically
+            setNotifications(prevNotifications => {
+              const updatedNotifications = [newNotification, ...prevNotifications];
+              // Save to localStorage
+              try {
+                localStorage.setItem('reRideNotifications', JSON.stringify(updatedNotifications));
+              } catch (error) {
+                console.error('Failed to save notifications to localStorage:', error);
+              }
+              return updatedNotifications;
+            });
           }
         }
-        return prev;
+        
+        console.log('🔧 Updated conversations:', updated);
+        return updated;
       });
     },
     markAsRead: (conversationId: string) => {

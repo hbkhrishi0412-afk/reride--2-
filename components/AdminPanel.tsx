@@ -992,7 +992,6 @@ const AdminPanel: React.FC<AdminPanelProps> = (props) => {
                                 onClick={(e) => {
                                     e.preventDefault();
                                     e.stopPropagation();
-                                    console.log('🔄 Export Users button clicked');
                                     handleActionWithLoading('export-users', onExportUsers);
                                 }} 
                                 disabled={loadingActions.has('export-users')}
@@ -1044,7 +1043,6 @@ const AdminPanel: React.FC<AdminPanelProps> = (props) => {
                                                     onClick={(e) => {
                                                         e.preventDefault();
                                                         e.stopPropagation();
-                                                        console.log('🔄 Edit button clicked for user:', user.email);
                                                         setEditingUser(user);
                                                     }} 
                                                     className="text-blue-600 hover:text-blue-800 cursor-pointer"
@@ -1055,7 +1053,6 @@ const AdminPanel: React.FC<AdminPanelProps> = (props) => {
                                                     onClick={(e) => {
                                                         e.preventDefault();
                                                         e.stopPropagation();
-                                                        console.log('🔄 Toggle status button clicked for user:', user.email);
                                                         const action = user.status === 'active' ? 'suspend' : 'activate';
                                                         if (window.confirm(`Are you sure you want to ${action} user ${user.email}?`)) {
                                                             handleActionWithLoading(`toggle-user-${user.email}`, () => onToggleUserStatus(user.email));
@@ -1074,7 +1071,6 @@ const AdminPanel: React.FC<AdminPanelProps> = (props) => {
                                                     onClick={(e) => {
                                                         e.preventDefault();
                                                         e.stopPropagation();
-                                                        console.log('🔄 Delete button clicked for user:', user.email);
                                                         if (window.confirm(`Are you sure you want to delete user ${user.email}? This action cannot be undone.`)) {
                                                             handleActionWithLoading(`delete-user-${user.email}`, () => onDeleteUser(user.email));
                                                         }
@@ -1116,7 +1112,6 @@ const AdminPanel: React.FC<AdminPanelProps> = (props) => {
                                 onClick={(e) => {
                                     e.preventDefault();
                                     e.stopPropagation();
-                                    console.log('🔄 Export Vehicles button clicked');
                                     handleActionWithLoading('export-vehicles', onExportVehicles);
                                 }} 
                                 disabled={loadingActions.has('export-vehicles')}
@@ -1160,7 +1155,6 @@ const AdminPanel: React.FC<AdminPanelProps> = (props) => {
                                                     onClick={(e) => {
                                                         e.preventDefault();
                                                         e.stopPropagation();
-                                                        console.log('🔄 Edit vehicle button clicked for vehicle:', vehicle.id);
                                                         setEditingVehicle(vehicle);
                                                     }} 
                                                     className="text-blue-600 hover:text-blue-800 cursor-pointer"
@@ -1171,7 +1165,6 @@ const AdminPanel: React.FC<AdminPanelProps> = (props) => {
                                                     onClick={(e) => {
                                                         e.preventDefault();
                                                         e.stopPropagation();
-                                                        console.log('🔄 Toggle vehicle status button clicked for vehicle:', vehicle.id);
                                                         const action = vehicle.status === 'published' ? 'unpublish' : 'publish';
                                                         if (window.confirm(`Are you sure you want to ${action} this vehicle listing?`)) {
                                                             handleActionWithLoading(`toggle-vehicle-${vehicle.id}`, () => onToggleVehicleStatus(vehicle.id));
@@ -1190,7 +1183,6 @@ const AdminPanel: React.FC<AdminPanelProps> = (props) => {
                                                     onClick={(e) => {
                                                         e.preventDefault();
                                                         e.stopPropagation();
-                                                        console.log('🔄 Delete vehicle button clicked for vehicle:', vehicle.id);
                                                         if (window.confirm(`Are you sure you want to delete this vehicle listing? This action cannot be undone.`)) {
                                                             handleActionWithLoading(`delete-vehicle-${vehicle.id}`, () => onDeleteVehicle(vehicle.id));
                                                         }
@@ -1368,7 +1360,6 @@ const AdminPanel: React.FC<AdminPanelProps> = (props) => {
                                                             onClick={(e) => {
                                                                 e.preventDefault();
                                                                 e.stopPropagation();
-                                                                console.log('🔄 Resolve flag button clicked for vehicle:', vehicle.id);
                                                                 handleResolveFlag('vehicle', vehicle.id);
                                                             }}
                                                             className="text-green-600 hover:text-green-800 font-medium cursor-pointer"
@@ -1423,7 +1414,7 @@ const AdminPanel: React.FC<AdminPanelProps> = (props) => {
                                                             {vehicle ? `${vehicle.year} ${vehicle.make} ${vehicle.model}` : 'Unknown Vehicle'}
                                                         </td>
                                                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
-                                                            {lastMessage ? (lastMessage as any).content?.substring(0, 50) + '...' : 'No messages'}
+                                                            {lastMessage ? lastMessage.text?.substring(0, 50) + '...' : 'No messages'}
                                                         </td>
                                                         <td className="px-6 py-4 whitespace-nowrap text-sm font-medium space-x-2">
                                                             <button
@@ -1937,7 +1928,7 @@ const AdminPanel: React.FC<AdminPanelProps> = (props) => {
                     actions={
                         <select 
                             value={planFilter} 
-                            onChange={(e) => setPlanFilter(e.target.value as any)}
+                            onChange={(e) => setPlanFilter(e.target.value as SubscriptionPlan)}
                             className="p-2 border border-gray-200 dark:border-gray-200-300 rounded-lg bg-white dark:text-spinny-text-dark"
                         >
                             <option value="all">All Plans</option>
