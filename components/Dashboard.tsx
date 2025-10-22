@@ -20,6 +20,7 @@ import { OfferModal, OfferMessage } from './ReadReceiptIcon';
 import BoostListingModal from './BoostListingModal';
 import ListingLifecycleIndicator from './ListingLifecycleIndicator';
 import PaymentStatusCard from './PaymentStatusCard';
+import VehicleFilterManagement from './VehicleFilterManagement';
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend, PointElement, LineElement, LineController, BarController);
 
@@ -1690,6 +1691,13 @@ const Dashboard: React.FC<DashboardProps> = ({ seller, sellerVehicles, reportedV
             onFeatureListing={onFeatureListing}
             allVehicles={allVehicles}
         />;
+      case 'vehicleFilters':
+        return <VehicleFilterManagement 
+            onDataUpdate={(data) => {
+              // Update vehicle data in parent component
+              console.log('Vehicle data updated:', data);
+            }}
+        />;
       case 'inquiries':
         return <InquiriesView 
                     conversations={conversations} 
@@ -1744,6 +1752,7 @@ const Dashboard: React.FC<DashboardProps> = ({ seller, sellerVehicles, reportedV
                 <NavItem view="reports" count={reportedCount}>Reports</NavItem>
                 <NavItem view="salesHistory">Sales History</NavItem>
                 <NavItem view="form">Add Vehicle</NavItem>
+                <NavItem view="vehicleFilters">Vehicle Filters</NavItem>
                 <NavItem view="inquiries" count={unreadCount}>Inquiries</NavItem>
                 <NavItem view="profile">My Profile</NavItem>
             </div>

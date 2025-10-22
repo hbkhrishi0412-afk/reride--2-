@@ -7,6 +7,7 @@ import QuickViewModal from './QuickViewModal';
 import VehicleTile from './VehicleTile';
 import VehicleTileSkeleton from './VehicleTileSkeleton';
 import { saveSearch } from '../services/buyerEngagementService';
+import { getVehicleData } from '../services/vehicleDataService';
 // Lazy load location data when needed
 
 interface VehicleListProps {
@@ -92,9 +93,31 @@ const VehicleList: React.FC<VehicleListProps> = ({ vehicles, onSelectVehicle, is
   const [suggestions, setSuggestions] = useState<string[]>([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
   
+  // Vehicle data for filters
+  const [vehicleData, setVehicleData] = useState<any>(null);
+  const [isLoadingVehicleData, setIsLoadingVehicleData] = useState(true);
+  
   // Lazy load location and fuel data
   const [indianStates, setIndianStates] = useState<Array<{name: string, code: string}>>([]);
   const [fuelTypes, setFuelTypes] = useState<string[]>([]);
+
+  // Load vehicle data for filters
+  useEffect(() => {
+    const loadVehicleDataForFilters = async () => {
+      try {
+        setIsLoadingVehicleData(true);
+        const data = await getVehicleData();
+        setVehicleData(data);
+        console.log('✅ Vehicle data loaded for filters:', data);
+      } catch (error) {
+        console.error('❌ Failed to load vehicle data for filters:', error);
+      } finally {
+        setIsLoadingVehicleData(false);
+      }
+    };
+
+    loadVehicleDataForFilters();
+  }, []);
   
   const [makeFilter, setMakeFilter] = useState('');
   const [modelFilter, setModelFilter] = useState('');
@@ -137,15 +160,64 @@ const VehicleList: React.FC<VehicleListProps> = ({ vehicles, onSelectVehicle, is
   const featuresSearchInputRef = useRef<HTMLInputElement>(null);
   const suggestionDebounceRef = useRef<number | null>(null);
 
-  const uniqueMakes = useMemo(() => [...new Set((vehicles || []).map(v => v.make))].sort(), [vehicles]);
+  // Get makes from admin database vehicle data
+  const uniqueMakes = useMemo(() => {
+    if (vehicleData && !isLoadingVehicleData) {
+      // Get makes from admin database
+      const makesFromDb = new Set<string>();
+      Object.values(vehicleData).forEach((categoryData: any) => {
+        categoryData.forEach((make: any) => {
+          makesFromDb.add(make.name);
+        });
+      });
+      return Array.from(makesFromDb).sort();
+    }
+    // Fallback to vehicle makes
+    return [...new Set((vehicles || []).map(v => v.make))].sort();
+  }, [vehicleData, isLoadingVehicleData, vehicles]);
+
   const availableModels = useMemo(() => {
     if (!makeFilter) return [];
+    
+    if (vehicleData && !isLoadingVehicleData) {
+      // Get models from admin database
+      const modelsFromDb = new Set<string>();
+      Object.values(vehicleData).forEach((categoryData: any) => {
+        categoryData.forEach((make: any) => {
+          if (make.name === makeFilter) {
+            make.models.forEach((model: any) => {
+              modelsFromDb.add(model.name);
+            });
+          }
+        });
+      });
+      return Array.from(modelsFromDb).sort();
+    }
+    
+    // Fallback to vehicle models
     return [...new Set((vehicles || []).filter(v => v.make === makeFilter).map(v => v.model))].sort();
-  }, [makeFilter, vehicles]);
+  }, [makeFilter, vehicleData, isLoadingVehicleData, vehicles]);
   const tempAvailableModels = useMemo(() => {
       if (!tempFilters.makeFilter) return [];
+      
+      if (vehicleData && !isLoadingVehicleData) {
+        // Get models from admin database
+        const modelsFromDb = new Set<string>();
+        Object.values(vehicleData).forEach((categoryData: any) => {
+          categoryData.forEach((make: any) => {
+            if (make.name === tempFilters.makeFilter) {
+              make.models.forEach((model: any) => {
+                modelsFromDb.add(model.name);
+              });
+            }
+          });
+        });
+        return Array.from(modelsFromDb).sort();
+      }
+      
+      // Fallback to vehicle models
       return [...new Set((vehicles || []).filter(v => v.make === tempFilters.makeFilter).map(v => v.model))].sort();
-  }, [tempFilters.makeFilter, vehicles]);
+  }, [tempFilters.makeFilter, vehicleData, isLoadingVehicleData, vehicles]);
   const uniqueYears = useMemo(() => [...new Set((vehicles || []).map(v => v.year))].sort((a, b) => Number(b) - Number(a)), [vehicles]);
   const uniqueColors = useMemo(() => [...new Set((vehicles || []).map(v => v.color))].sort(), [vehicles]);
   const uniqueStates = useMemo(() => indianStates, [indianStates]);

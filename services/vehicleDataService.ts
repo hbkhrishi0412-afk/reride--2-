@@ -5,11 +5,35 @@ const VEHICLE_DATA_STORAGE_KEY = 'reRideVehicleData';
 const API_BASE_URL = '/api';
 
 /**
- * Fetches vehicle data from the API.
+ * Fetches vehicle data from the admin database API.
  * Falls back to localStorage and then default data if API fails.
  */
 export const getVehicleData = async (): Promise<VehicleData> => {
-  // Try consolidated endpoint first
+  // Try new vehicle data management API first
+  try {
+    const response = await fetch(`${API_BASE_URL}/vehicle-data-management`);
+    if (response.ok) {
+      const contentType = response.headers.get('content-type');
+      if (contentType && contentType.includes('application/json')) {
+        try {
+          const result = await response.json();
+          if (result.success && result.data) {
+            console.log('✅ Vehicle data loaded from admin database:', result.source);
+            localStorage.setItem(VEHICLE_DATA_STORAGE_KEY, JSON.stringify(result.data));
+            return result.data;
+          }
+        } catch (jsonError) {
+          console.warn("Failed to parse JSON from vehicle-data-management endpoint", jsonError);
+        }
+      }
+    } else {
+      console.warn(`Vehicle data management API returned ${response.status}: ${response.statusText}`);
+    }
+  } catch (error) {
+    console.warn("Vehicle data management API failed, trying fallback endpoints", error);
+  }
+
+  // Try consolidated endpoint as fallback
   try {
     const response = await fetch(`${API_BASE_URL}/vehicles?type=data`);
     if (response.ok) {
@@ -74,6 +98,84 @@ export const getVehicleData = async (): Promise<VehicleData> => {
   const defaultData = VEHICLE_DATA;
   localStorage.setItem(VEHICLE_DATA_STORAGE_KEY, JSON.stringify(defaultData));
   return defaultData;
+};
+
+/**
+ * Creates new vehicle data in the admin database
+ */
+export const createVehicleData = async (vehicleData: {
+  category: string;
+  make: string;
+  model: string;
+  variants: string[];
+}): Promise<{ success: boolean; data?: any; error?: string }> => {
+  try {
+    const response = await fetch(`${API_BASE_URL}/vehicle-data-management`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(vehicleData),
+    });
+
+    const result = await response.json();
+    return result;
+  } catch (error) {
+    console.error('Error creating vehicle data:', error);
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : 'Unknown error'
+    };
+  }
+};
+
+/**
+ * Updates existing vehicle data in the admin database
+ */
+export const updateVehicleData = async (id: string, vehicleData: {
+  category?: string;
+  make?: string;
+  model?: string;
+  variants?: string[];
+}): Promise<{ success: boolean; data?: any; error?: string }> => {
+  try {
+    const response = await fetch(`${API_BASE_URL}/vehicle-data-management?id=${id}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(vehicleData),
+    });
+
+    const result = await response.json();
+    return result;
+  } catch (error) {
+    console.error('Error updating vehicle data:', error);
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : 'Unknown error'
+    };
+  }
+};
+
+/**
+ * Deletes vehicle data from the admin database
+ */
+export const deleteVehicleData = async (id: string): Promise<{ success: boolean; error?: string }> => {
+  try {
+    const response = await fetch(`${API_BASE_URL}/vehicle-data-management?id=${id}`, {
+      method: 'DELETE',
+    });
+
+    const result = await response.json();
+    return result;
+  } catch (error) {
+    console.error('Error deleting vehicle data:', error);
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : 'Unknown error'
+    };
+  }
 };
 
 /**
