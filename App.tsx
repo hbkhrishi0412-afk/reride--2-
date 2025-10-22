@@ -55,7 +55,7 @@ const ForgotPassword = React.lazy(() => import('./components/ForgotPassword'));
 
 const AppContent: React.FC = () => {
   // Detect if running as mobile app (standalone/installed PWA)
-  const { isMobileApp } = useIsMobileApp();
+  const { isMobileApp, isMobile } = useIsMobileApp();
   
   const { 
     currentView, 
@@ -132,6 +132,16 @@ const AppContent: React.FC = () => {
     onCertificationApproval,
     onOfferResponse,
   } = useApp();
+
+  // Debug logging (after destructuring)
+  console.log('🔧 AppContent Debug:', {
+    isMobileApp,
+    isMobile,
+    currentView,
+    userAgent: navigator.userAgent,
+    windowWidth: window.innerWidth,
+    displayMode: window.matchMedia('(display-mode: standalone)').matches
+  });
   
   // Redirect logged-in users to their appropriate dashboard
   useEffect(() => {
@@ -170,20 +180,6 @@ const AppContent: React.FC = () => {
     }
   }, [currentView, selectedVehicle]);
 
-  // Get page title based on current view
-  const getPageTitle = () => {
-    switch (currentView) {
-      case ViewEnum.HOME: return 'ReRide';
-      case ViewEnum.USED_CARS: return 'Browse Cars';
-      case ViewEnum.WISHLIST: return 'My Wishlist';
-      case ViewEnum.INBOX: return 'Messages';
-      case ViewEnum.SELLER_DASHBOARD: return 'Dashboard';
-      case ViewEnum.BUYER_DASHBOARD: return 'My Account';
-      case ViewEnum.PROFILE: return 'Profile';
-      case ViewEnum.DETAIL: return selectedVehicle ? `${selectedVehicle.year} ${selectedVehicle.make}` : 'Car Details';
-      default: return 'ReRide';
-    }
-  };
 
   const renderView = () => {
     switch (currentView) {
@@ -841,8 +837,49 @@ const AppContent: React.FC = () => {
     setIsCommandPaletteOpen(true);
   };
 
+  const getPageTitle = () => {
+    switch (currentView) {
+      case ViewEnum.HOME:
+        return 'Home';
+      case ViewEnum.USED_CARS:
+        return 'Browse Cars';
+      case ViewEnum.DETAIL:
+        return selectedVehicle ? selectedVehicle.make + ' ' + selectedVehicle.model : 'Vehicle Details';
+      case ViewEnum.SELLER_DASHBOARD:
+        return 'My Dashboard';
+      case ViewEnum.BUYER_DASHBOARD:
+        return 'My Account';
+      case ViewEnum.ADMIN_PANEL:
+        return 'Admin Panel';
+      case ViewEnum.LOGIN_PORTAL:
+        return 'Login';
+      case ViewEnum.CUSTOMER_LOGIN:
+        return 'Login';
+      case ViewEnum.SELLER_LOGIN:
+        return 'Seller Login';
+      case ViewEnum.ADMIN_LOGIN:
+        return 'Admin Login';
+      case ViewEnum.REGISTER:
+        return 'Register';
+      case ViewEnum.FORGOT_PASSWORD:
+        return 'Reset Password';
+      case ViewEnum.SUPPORT:
+        return 'Support';
+      case ViewEnum.FAQ:
+        return 'FAQ';
+      case ViewEnum.CITY_LANDING:
+        return selectedCity || 'City';
+      case ViewEnum.SELLER_PROFILE:
+        return publicSellerProfile?.name || 'Seller Profile';
+      default:
+        return 'ReRide';
+    }
+  };
+
   // Render Mobile App Layout
   if (isMobileApp) {
+    console.log('📱 Rendering Mobile App UI for view:', currentView);
+    
     // Check if we're on a dashboard view
     const isDashboardView = [
       ViewEnum.SELLER_DASHBOARD, 
@@ -931,11 +968,46 @@ const AppContent: React.FC = () => {
             }}
             onFlagContent={flagContent}
             onLogout={handleLogout}
+            onAddVehicle={async (vehicleData, isFeaturing = false) => {
+              try {
+                console.log('🚀 Mobile Add Vehicle called with:', vehicleData);
+                const { addVehicle } = await import('./services/vehicleService');
+                const vehicleToAdd = {
+                  ...vehicleData,
+                  id: Date.now(),
+                  averageRating: 0,
+                  ratingCount: 0,
+                  isFeatured: isFeaturing,
+                  status: 'published'
+                } as Vehicle;
+                
+                const newVehicle = await addVehicle(vehicleToAdd);
+                console.log('✅ Vehicle added successfully:', newVehicle);
+                addToast('Vehicle added successfully!', 'success');
+              } catch (error) {
+                console.error('❌ Failed to add vehicle:', error);
+                addToast('Failed to add vehicle. Please try again.', 'error');
+              }
+            }}
+            onUpdateVehicle={async (vehicleData) => {
+              try {
+                console.log('🚀 Mobile Update Vehicle called with:', vehicleData);
+                const { updateVehicle } = await import('./services/vehicleService');
+                const updatedVehicle = await updateVehicle(vehicleData);
+                console.log('✅ Vehicle updated successfully:', updatedVehicle);
+                addToast('Vehicle updated successfully!', 'success');
+              } catch (error) {
+                console.error('❌ Failed to update vehicle:', error);
+                addToast('Failed to update vehicle. Please try again.', 'error');
+              }
+            }}
+            vehicleData={vehicleData}
           />
         </div>
       );
     }
 
+    // For ALL other views (Home, Browse, Detail, etc.), show mobile UI
     return (
       <div className="min-h-screen bg-gray-50">
         <MobileHeader

@@ -4,6 +4,85 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Mobile App Specific Styles */
+.mobile-app-content {
+  padding-bottom: 80px; /* Space for bottom navigation */
+  min-height: calc(100vh - 56px); /* Full height minus header */
+}
+
+.mobile-page-transition {
+  transition: transform 0.3s ease-in-out;
+}
+
+.mobile-card {
+  @apply bg-white rounded-lg shadow-sm border border-gray-200 p-4 mb-3;
+}
+
+.mobile-card-compact {
+  @apply bg-white rounded-lg shadow-sm border border-gray-200 p-3 mb-2;
+}
+
+.mobile-btn-primary {
+  @apply bg-blue-600 text-white px-4 py-2 rounded-lg font-medium text-sm;
+}
+
+.mobile-btn-secondary {
+  @apply bg-gray-200 text-gray-800 px-4 py-2 rounded-lg font-medium text-sm;
+}
+
+.mobile-heading {
+  @apply text-lg font-semibold text-gray-900;
+}
+
+.mobile-subheading {
+  @apply text-base font-medium text-gray-700;
+}
+
+.mobile-body {
+  @apply text-sm text-gray-600;
+}
+
+.mobile-caption {
+  @apply text-xs text-gray-500;
+}
+
+.mobile-input {
+  @apply w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent;
+}
+
+.mobile-grid-2 {
+  @apply grid grid-cols-2 gap-3;
+}
+
+.mobile-grid-3 {
+  @apply grid grid-cols-3 gap-2;
+}
+
+.mobile-list-item {
+  @apply flex items-center justify-between p-3 bg-white rounded-lg shadow-sm border border-gray-200 mb-2;
+}
+
+.mobile-tap-target {
+  @apply min-h-[44px] min-w-[44px]; /* Apple's minimum touch target size */
+}
+
+/* Safe area support for notched devices */
+.pb-safe {
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
+.pt-safe {
+  padding-top: env(safe-area-inset-top);
+}
+
+.safe-top {
+  padding-top: max(env(safe-area-inset-top), 0px);
+}
+
+.safe-bottom {
+  padding-bottom: max(env(safe-area-inset-bottom), 0px);
+}
+
 /* PWA Install Prompt Animation */
 @keyframes slide-up {
   from {

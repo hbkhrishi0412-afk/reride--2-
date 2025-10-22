@@ -19,9 +19,13 @@ interface MobileDashboardProps {
   onMarkMessagesAsRead: (conversationId: string, readerRole: 'customer' | 'seller') => void;
   onFlagContent: (type: 'vehicle' | 'conversation', id: string, reason: string) => void;
   onLogout?: () => void;
+  // Add vehicle form handlers
+  onAddVehicle?: (vehicleData: Omit<Vehicle, 'id' | 'averageRating' | 'ratingCount'>, isFeaturing?: boolean) => void;
+  onUpdateVehicle?: (vehicleData: Vehicle) => void;
+  vehicleData?: any; // Vehicle data for form
 }
 
-type DashboardTab = 'overview' | 'listings' | 'messages' | 'analytics' | 'profile';
+type DashboardTab = 'overview' | 'listings' | 'messages' | 'analytics' | 'profile' | 'addVehicle' | 'editVehicle';
 
 const MobileDashboard: React.FC<MobileDashboardProps> = memo(({
   currentUser,
@@ -39,9 +43,13 @@ const MobileDashboard: React.FC<MobileDashboardProps> = memo(({
   onUserTyping,
   onMarkMessagesAsRead,
   onFlagContent,
-  onLogout
+  onLogout,
+  onAddVehicle,
+  onUpdateVehicle,
+  vehicleData
 }) => {
   const [activeTab, setActiveTab] = useState<DashboardTab>('overview');
+  const [editingVehicle, setEditingVehicle] = useState<Vehicle | null>(null);
 
   const isSeller = currentUser.role === 'seller';
   const isAdmin = currentUser.role === 'admin';
@@ -133,7 +141,10 @@ const MobileDashboard: React.FC<MobileDashboardProps> = memo(({
           {isSeller && (
             <>
               <button 
-                onClick={() => onNavigate(ViewEnum.SELLER_DASHBOARD)}
+                onClick={() => {
+                  setEditingVehicle(null);
+                  setActiveTab('addVehicle');
+                }}
                 className="flex items-center gap-2 p-3 bg-orange-50 rounded-lg text-orange-700 font-medium"
               >
                 <span>➕</span>
@@ -228,7 +239,10 @@ const MobileDashboard: React.FC<MobileDashboardProps> = memo(({
                 {isSeller && (
                   <div className="flex flex-col gap-1">
                     <button 
-                      onClick={() => onEditVehicle(vehicle)}
+                      onClick={() => {
+                        setEditingVehicle(vehicle);
+                        setActiveTab('editVehicle');
+                      }}
                       className="p-1 text-gray-400 hover:text-gray-600"
                     >
                       ✏️
@@ -455,6 +469,70 @@ const MobileDashboard: React.FC<MobileDashboardProps> = memo(({
     </div>
   );
 
+  const renderAddVehicle = () => (
+    <div className="space-y-4">
+      <div className="flex items-center justify-between">
+        <h3 className="text-lg font-semibold text-gray-900">Add New Vehicle</h3>
+        <button 
+          onClick={() => setActiveTab('overview')}
+          className="p-2 text-gray-400 hover:text-gray-600"
+        >
+          ✕
+        </button>
+      </div>
+      
+      <div className="bg-white rounded-lg p-4 shadow-sm">
+        <div className="text-center py-8">
+          <div className="w-16 h-16 bg-orange-100 rounded-full flex items-center justify-center mx-auto mb-4">
+            <span className="text-2xl">🚗</span>
+          </div>
+          <h4 className="text-lg font-medium text-gray-900 mb-2">Vehicle Form Coming Soon</h4>
+          <p className="text-gray-500 text-sm mb-4">
+            We're working on a mobile-optimized vehicle form. For now, please use the desktop version.
+          </p>
+          <button 
+            onClick={() => onNavigate(ViewEnum.SELLER_DASHBOARD)}
+            className="px-4 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700"
+          >
+            Go to Desktop Dashboard
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+
+  const renderEditVehicle = () => (
+    <div className="space-y-4">
+      <div className="flex items-center justify-between">
+        <h3 className="text-lg font-semibold text-gray-900">Edit Vehicle</h3>
+        <button 
+          onClick={() => setActiveTab('listings')}
+          className="p-2 text-gray-400 hover:text-gray-600"
+        >
+          ✕
+        </button>
+      </div>
+      
+      <div className="bg-white rounded-lg p-4 shadow-sm">
+        <div className="text-center py-8">
+          <div className="w-16 h-16 bg-orange-100 rounded-full flex items-center justify-center mx-auto mb-4">
+            <span className="text-2xl">✏️</span>
+          </div>
+          <h4 className="text-lg font-medium text-gray-900 mb-2">Edit Vehicle Coming Soon</h4>
+          <p className="text-gray-500 text-sm mb-4">
+            We're working on a mobile-optimized vehicle edit form. For now, please use the desktop version.
+          </p>
+          <button 
+            onClick={() => onNavigate(ViewEnum.SELLER_DASHBOARD)}
+            className="px-4 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700"
+          >
+            Go to Desktop Dashboard
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+
   const renderContent = () => {
     switch (activeTab) {
       case 'overview': return renderOverview();
@@ -462,6 +540,8 @@ const MobileDashboard: React.FC<MobileDashboardProps> = memo(({
       case 'messages': return renderMessages();
       case 'analytics': return renderAnalytics();
       case 'profile': return renderProfile();
+      case 'addVehicle': return renderAddVehicle();
+      case 'editVehicle': return renderEditVehicle();
       default: return renderOverview();
     }
   };

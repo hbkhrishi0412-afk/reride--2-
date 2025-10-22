@@ -14,17 +14,34 @@ export const useIsMobileApp = () => {
                         (window.navigator as any).standalone || // iOS
                         document.referrer.includes('android-app://'); // Android
 
-    // Check if device is mobile
-    const checkMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent) ||
-                       window.innerWidth <= 768;
+    // Check if device is mobile (more comprehensive)
+    const checkMobile = /iPhone|iPad|iPod|Android|webOS|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ||
+                       window.innerWidth <= 768 ||
+                       ('ontouchstart' in window); // Touch device
 
-    setIsMobileApp(isStandalone);
+    // Check if in mobile browser (not desktop)
+    const isMobileBrowser = checkMobile && !isStandalone;
+    
+    // Show mobile UI for both PWA and mobile browser
+    const shouldShowMobileUI = isStandalone || isMobileBrowser;
+
+    setIsMobileApp(shouldShowMobileUI);
     setIsMobile(checkMobile);
+
+    console.log('📱 Mobile Detection:', {
+      isStandalone,
+      checkMobile,
+      isMobileBrowser,
+      shouldShowMobileUI,
+      userAgent: navigator.userAgent,
+      windowWidth: window.innerWidth
+    });
 
     // Listen for display mode changes
     const mediaQuery = window.matchMedia('(display-mode: standalone)');
     const handleChange = (e: MediaQueryListEvent) => {
-      setIsMobileApp(e.matches);
+      const newMobileApp = e.matches || isMobileBrowser;
+      setIsMobileApp(newMobileApp);
     };
 
     mediaQuery.addEventListener('change', handleChange);
@@ -35,9 +52,9 @@ export const useIsMobileApp = () => {
   }, []);
 
   return {
-    isMobileApp,     // True if installed as PWA
+    isMobileApp,     // True if should show mobile UI (PWA or mobile browser)
     isMobile,        // True if mobile device
-    isWebsite: !isMobileApp && isMobile // Mobile browser (not installed)
+    isWebsite: !isMobileApp && !isMobile // Desktop browser
   };
 };
 
