@@ -826,6 +826,49 @@ const AppContent: React.FC = () => {
     ].includes(currentView);
 
     if (isDashboardView && currentUser) {
+      // For admin users, show the full AdminPanel (which is responsive)
+      if (currentUser.role === 'admin') {
+        return (
+          <AdminPanel 
+            users={users}
+            currentUser={currentUser}
+            vehicles={vehicles}
+            conversations={conversations}
+            onAdminUpdateUser={onAdminUpdateUser}
+            onToggleUserStatus={onToggleUserStatus}
+            onDeleteUser={deleteUser}
+            onUpdateUserPlan={onUpdateUserPlan}
+            onUpdateVehicle={(vehicle: Vehicle) => {
+              updateVehicle(vehicle.id, vehicle);
+            }}
+            onDeleteVehicle={deleteVehicle}
+            onToggleVehicleStatus={onToggleVehicleStatus}
+            onToggleVehicleFeature={onToggleVehicleFeature}
+            onResolveFlag={onResolveFlag}
+            platformSettings={platformSettings}
+            onUpdateSettings={onUpdateSettings}
+            onSendBroadcast={onSendBroadcast}
+            auditLog={auditLog}
+            onExportUsers={onExportUsers}
+            onExportVehicles={onExportVehicles}
+            onExportSales={onExportSales}
+            onNavigate={navigate}
+            onLogout={handleLogout}
+            vehicleData={vehicleData}
+            onUpdateVehicleData={onUpdateVehicleData}
+            onToggleVerifiedStatus={onToggleVerifiedStatus}
+            supportTickets={supportTickets}
+            onUpdateSupportTicket={onUpdateSupportTicket}
+            faqItems={faqItems}
+            onAddFaq={onAddFaq}
+            onUpdateFaq={onUpdateFaq}
+            onDeleteFaq={onDeleteFaq}
+            onCertificationApproval={onCertificationApproval}
+          />
+        );
+      }
+      
+      // For seller/customer users, show MobileDashboard
       return (
         <div className="min-h-screen bg-gray-50">
           <MobileDashboard
