@@ -972,7 +972,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     setCurrentView, setPreviousView, setSelectedVehicle, setVehicles, setIsLoading,
     setCurrentUser, setComparisonList, setWishlist, setConversations, setToasts,
     setForgotPasswordRole, setTypingStatus, setSelectedCategory, setPublicSellerProfile,
-    setActiveChat, setAnnouncementVisible, setRecommendations, setInitialSearchQuery,
+    setActiveChat, setIsAnnouncementVisible, setRecommendations, setInitialSearchQuery,
     setCommandPaletteOpen, setUserLocation, setSelectedCity, setUsers,
     setPlatformSettings, setAuditLog, setVehicleData, setFaqItems, setSupportTickets,
     setNotifications, addToast, removeToast, navigate, handleLogin, handleLogout,
