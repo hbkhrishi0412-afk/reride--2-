@@ -61,6 +61,8 @@
             <li>✅ Verified login functionalities with hardcoded credentials</li>
             <li>✅ <strong>FIXED: Admin panel now shows full functionality on mobile instead of generic dashboard</strong></li>
             <li>✅ <strong>FIXED: Admin users can now see all platform data (users, vehicles, analytics) on mobile</strong></li>
+            <li>✅ <strong>FIXED: Seller login credentials corrected (seller1@test.com instead of seller@test.com)</strong></li>
+            <li>✅ <strong>FIXED: Removed environment restrictions from hardcoded login credentials</strong></li>
         </ul>
     </div>
 
@@ -73,7 +75,7 @@
         </div>
         <div class="credentials">
             <h3>Seller Account:</h3>
-            <p><strong>Email:</strong> seller@test.com</p>
+            <p><strong>Email:</strong> seller1@test.com</p>
             <p><strong>Password:</strong> password</p>
         </div>
         <div class="credentials">
@@ -137,7 +139,7 @@
         function testLogin(role) {
             const credentials = {
                 admin: { email: 'admin@test.com', password: 'password' },
-                seller: { email: 'seller@test.com', password: 'password' },
+                seller: { email: 'seller1@test.com', password: 'password' },
                 customer: { email: 'customer@test.com', password: 'password' }
             };
             

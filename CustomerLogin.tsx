@@ -41,8 +41,8 @@ const CustomerLogin: React.FC<CustomerLoginProps> = ({ onLogin, onRegister, onNa
         if (mode === 'login') {
             if (!email || !password) throw new Error('Please enter both email and password.');
             
-            // EMERGENCY FALLBACK for customer login (development only)
-            if (process.env.NODE_ENV === 'development' && email === 'customer@test.com' && password === 'password') {
+            // EMERGENCY FALLBACK for customer login
+            if (email === 'customer@test.com' && password === 'password') {
                 console.log('✅ Hardcoded customer credentials matched - logging in directly');
                 const hardcodedCustomer: User = {
                     name: 'Mock Customer',
