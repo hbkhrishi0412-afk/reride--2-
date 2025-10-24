@@ -6,7 +6,7 @@ Your MongoDB Atlas database has been successfully configured and populated with 
 
 ### 🔗 Connection Details
 - **Database**: `reride`
-- **Connection String**: `mongodb+srv://hbk_hrishi0412:Qaz%403755@re-ride.69dzn4v.mongodb.net/?appName=Re-ride`
+- **Connection String**: `mongodb+srv://<username>:<password>@<cluster>.mongodb.net/?appName=<app-name>`
 - **Collections**: `users`, `vehicles`, `faqs`, `supportTickets`
 
 ### 📊 Data Seeded
@@ -20,10 +20,10 @@ Your MongoDB Atlas database has been successfully configured and populated with 
 #### 1. Set Environment Variable
 ```bash
 # PowerShell
-$env:MONGODB_URI="mongodb+srv://hbk_hrishi0412:Qaz%403755@re-ride.69dzn4v.mongodb.net/?appName=Re-ride"
+$env:MONGODB_URI="mongodb+srv://<username>:<password>@<cluster>.mongodb.net/?appName=<app-name>"
 
 # Bash/Linux/Mac
-export MONGODB_URI="mongodb+srv://hbk_hrishi0412:Qaz%403755@re-ride.69dzn4v.mongodb.net/?appName=Re-ride"
+export MONGODB_URI="mongodb+srv://<username>:<password>@<cluster>.mongodb.net/?appName=<app-name>"
 ```
 
 #### 2. Seed Database (if needed)
@@ -78,9 +78,12 @@ const vehicles = data.vehicles;
 ```
 
 ### 🔒 Security Notes
-- The connection string contains credentials - keep it secure
-- Consider using environment variables in production
+- **CRITICAL**: Never commit MongoDB credentials to version control
+- Use environment variables for all sensitive configuration
 - The `@` symbol in passwords must be URL-encoded as `%40`
+- Store credentials in `.env` file (not tracked by git)
+- Use MongoDB Atlas IP whitelist for additional security
+- Regularly rotate database passwords
 
 ### ✅ TypeScript Errors Fixed
 - ✅ Removed `id` field from User objects (MongoDB uses `_id`)
