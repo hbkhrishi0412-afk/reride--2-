@@ -169,22 +169,20 @@ class DataService {
     
     if (vehicles.length === 0) {
       try {
-        const { MOCK_VEHICLES } = await import('../constants');
-        // Try to fetch from MongoDB API first, fallback to local data
-        try {
-            const response = await fetch('/api/vehicles');
-            if (response.ok) {
-                const data = await response.json();
-                vehicles = data.vehicles || [];
-            } else {
-                vehicles = await MOCK_VEHICLES();
-            }
-        } catch (error) {
-            console.error('Error fetching vehicles from API:', error);
-            vehicles = await MOCK_VEHICLES();
+        // Try to load mock data first
+        const mockVehicles = await import('../mock-vehicles.json');
+        if (mockVehicles.default && mockVehicles.default.length > 0) {
+          vehicles = mockVehicles.default;
+          this.setLocalStorageData('reRideVehicles', vehicles);
+          console.log('✅ Loaded mock vehicles data:', vehicles.length, 'vehicles');
+        } else {
+          // Fallback to constants if mock data not available
+          const { MOCK_VEHICLES } = await import('../constants');
+          vehicles = await MOCK_VEHICLES();
+          this.setLocalStorageData('reRideVehicles', vehicles);
         }
-        this.setLocalStorageData('reRideVehicles', vehicles);
-      } catch {
+      } catch (error) {
+        console.log('⚠️ Could not load mock vehicles, using fallback:', error);
         vehicles = fallbackVehicles;
         this.setLocalStorageData('reRideVehicles', vehicles);
       }
@@ -314,10 +312,20 @@ class DataService {
     
     if (users.length === 0) {
       try {
-        const { FALLBACK_USERS } = await import('../constants/fallback');
-        users = FALLBACK_USERS;
-        this.setLocalStorageData('reRideUsers', users);
-      } catch {
+        // Try to load mock data first
+        const mockUsers = await import('../mock-users.json');
+        if (mockUsers.default && mockUsers.default.length > 0) {
+          users = mockUsers.default;
+          this.setLocalStorageData('reRideUsers', users);
+          console.log('✅ Loaded mock users data:', users.length, 'users');
+        } else {
+          // Fallback to constants if mock data not available
+          const { FALLBACK_USERS } = await import('../constants/fallback');
+          users = FALLBACK_USERS;
+          this.setLocalStorageData('reRideUsers', users);
+        }
+      } catch (error) {
+        console.log('⚠️ Could not load mock users, using fallback:', error);
         users = fallbackUsers;
         this.setLocalStorageData('reRideUsers', users);
       }
