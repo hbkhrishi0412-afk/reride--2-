@@ -30,6 +30,7 @@ const VehicleDataManagement: React.FC<VehicleDataManagementProps> = ({
   const [newItemValue, setNewItemValue] = useState('');
   const [searchTerm, setSearchTerm] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [isSyncing, setIsSyncing] = useState(false);
   const [syncStatus, setSyncStatus] = useState<SyncStatus>(syncService.getStatus());
 
   // Get available data based on selections
@@ -78,10 +79,17 @@ const VehicleDataManagement: React.FC<VehicleDataManagementProps> = ({
     const newData = { ...vehicleData };
     updater(newData);
     console.log('📝 New vehicle data:', newData);
+    
+    // Update localStorage immediately
+    localStorage.setItem('reRideVehicleData', JSON.stringify(newData));
+    console.log('💾 Vehicle data saved to localStorage');
+    
+    // Update parent component
     onUpdate(newData);
+    
     // Mark that there are pending changes for sync
     syncService.markPendingChanges();
-    console.log('✅ Vehicle data update sent to parent');
+    console.log('✅ Vehicle data update sent to parent and marked for sync');
   };
 
   const handleEdit = (type: EditingState['type'], path: string[], value: string) => {
@@ -488,6 +496,11 @@ const VehicleDataManagement: React.FC<VehicleDataManagementProps> = ({
                   ({syncStatus.lastSyncTime.toLocaleTimeString()})
                 </span>
               )}
+              {syncStatus.error && (
+                <span className="text-xs text-red-300 cursor-help" title={syncStatus.error}>
+                  ⚠️
+                </span>
+              )}
             </div>
             <button
               onClick={onPreview}
@@ -496,16 +509,28 @@ const VehicleDataManagement: React.FC<VehicleDataManagementProps> = ({
               📋 Show Seller Form Preview
             </button>
             <button
-              onClick={() => syncService.performSync()}
-              disabled={!syncStatus.isOnline}
+              onClick={async () => {
+                setIsSyncing(true);
+                try {
+                  const success = await syncService.forceSync();
+                  if (success) {
+                    console.log('✅ Force sync completed successfully');
+                  } else {
+                    console.warn('⚠️ Force sync failed');
+                  }
+                } finally {
+                  setIsSyncing(false);
+                }
+              }}
+              disabled={!syncStatus.isOnline || isSyncing}
               className={`px-4 py-2 rounded-lg font-semibold transition-all duration-200 ${
-                syncStatus.isOnline
+                syncStatus.isOnline && !isSyncing
                   ? 'bg-white/10 hover:bg-white/20 text-white border border-white/20'
                   : 'bg-gray-500/20 text-gray-400 cursor-not-allowed'
               }`}
               title={syncStatus.isOnline ? 'Force sync now' : 'No internet connection'}
             >
-              🔄 {syncStatus.pendingChanges ? 'Sync Now' : 'Force Sync'}
+              {isSyncing ? '⏳ Syncing...' : `🔄 ${syncStatus.pendingChanges ? 'Sync Now' : 'Force Sync'}`}
             </button>
             <button
               onClick={onBulkUpload}

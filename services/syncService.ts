@@ -127,6 +127,22 @@ class SyncService {
     }
   }
 
+  public async forceSync(): Promise<boolean> {
+    console.log('🔄 Force sync initiated...');
+    this.syncStatus.error = null;
+    this.notifyListeners();
+    
+    const success = await this.performSync();
+    
+    if (success) {
+      console.log('✅ Force sync completed successfully');
+    } else {
+      console.warn('⚠️ Force sync failed');
+    }
+    
+    return success;
+  }
+
   private async saveToServer(data: VehicleData): Promise<boolean> {
     const maxRetries = 2;
     
