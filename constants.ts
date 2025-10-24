@@ -93,29 +93,96 @@ export const CITIES_BY_STATE: Record<string, string[]> = {
     'DD': ['Daman'], 'LD': ['Kavaratti'], 'PY': ['Puducherry'],
 };
 
-export const MOCK_USERS: User[] = [
-    { id: 'user_1', name: 'Prestige Motors', email: 'seller@test.com', password: 'hashed_password_here', mobile: '+91-98765-43210', role: 'seller', location: 'Mumbai', status: 'active', createdAt: daysAgo(30), dealershipName: 'Prestige Motors', bio: 'Specializing in luxury and performance electric vehicles since 2020.', logoUrl: 'https://i.pravatar.cc/100?u=seller', avatarUrl: 'https://i.pravatar.cc/150?u=seller@test.com', isVerified: true, subscriptionPlan: 'premium', featuredCredits: 5, usedCertifications: 1 },
-    { name: 'Mock Customer', email: 'customer@test.com', password: 'password', mobile: '555-987-6543', role: 'customer', location: 'Delhi', status: 'active', createdAt: daysAgo(15), avatarUrl: 'https://i.pravatar.cc/150?u=customer@test.com' },
-    { name: 'Mock Admin', email: 'admin@test.com', password: 'password', mobile: '111-222-3333', role: 'admin', location: 'Bangalore', status: 'active', createdAt: daysAgo(100), avatarUrl: 'https://i.pravatar.cc/150?u=admin@test.com' },
-    { name: 'Jane Doe', email: 'jane.doe@customer.com', password: 'password', mobile: '555-111-2222', role: 'customer', location: 'Chennai', status: 'active', createdAt: daysAgo(5), avatarUrl: 'https://i.pravatar.cc/150?u=jane.doe@customer.com' },
-    { name: 'Reliable Rides', email: 'john.smith@seller.com', password: 'password', mobile: '555-333-4444', role: 'seller', location: 'Pune', status: 'active', createdAt: daysAgo(60), dealershipName: 'Reliable Rides', bio: 'Your trusted source for pre-owned family cars and SUVs.', logoUrl: 'https://i.pravatar.cc/100?u=johnsmith', avatarUrl: 'https://i.pravatar.cc/150?u=john.smith@seller.com', isVerified: false, subscriptionPlan: 'pro', featuredCredits: 2, usedCertifications: 0 },
-    { name: 'Speedy Auto', email: 'speedy@auto.com', password: 'password', mobile: '555-555-1111', role: 'seller', location: 'Hyderabad', status: 'active', createdAt: daysAgo(90), dealershipName: 'Speedy Auto', bio: 'Performance and sports cars for the enthusiast.', logoUrl: 'https://i.pravatar.cc/100?u=speedy', avatarUrl: 'https://i.pravatar.cc/150?u=speedy@auto.com', isVerified: true, subscriptionPlan: 'pro', featuredCredits: 1, usedCertifications: 1 },
-    { name: 'Eco Drive', email: 'eco@drive.com', password: 'password', mobile: '555-222-5555', role: 'seller', location: 'Kolkata', status: 'active', createdAt: daysAgo(45), dealershipName: 'Eco Drive', bio: 'The best deals on electric and hybrid vehicles.', logoUrl: 'https://i.pravatar.cc/100?u=eco', avatarUrl: 'https://i.pravatar.cc/150?u=eco@drive.com', isVerified: false, subscriptionPlan: 'free', featuredCredits: 0, usedCertifications: 0 },
+// Fetch users from MongoDB API
+export async function getMockUsers(): Promise<User[]> {
+    try {
+        const response = await fetch('/api/users');
+        const data = await response.json();
+        return data.users || [];
+    } catch (error) {
+        console.error('Error fetching users:', error);
+        return getFallbackUsers();
+    }
+}
 
+// Fallback users for when API is not available
+export const getFallbackUsers = (): User[] => [
+    { 
+        name: 'Demo User', 
+        email: 'demo@test.com', 
+        password: 'password', 
+        mobile: '555-000-0000', 
+        role: 'customer', 
+        location: 'Demo City',
+        status: 'active', 
+        createdAt: new Date().toISOString(), 
+        avatarUrl: 'https://i.pravatar.cc/150?u=demo' 
+    }
 ];
 
-export const MOCK_FAQS: FAQItem[] = [
-    { id: 1, question: "How do I list my car for sale?", answer: "Navigate to the 'Sell' section, log in or register as a seller, and follow the on-screen instructions to create a new vehicle listing. You'll need details like make, model, year, and photos.", category: "Selling" },
-    { id: 2, question: "What is AI Price Suggestion?", answer: "Our AI Price Suggestion tool analyzes your vehicle's details and compares them with current market listings to recommend a fair and competitive price, helping you sell faster.", category: "Selling" },
-    { id: 3, question: "How can I contact a seller?", answer: "On any vehicle detail page, you can use the 'Chat with Seller' button to start a direct conversation with the seller to ask questions or schedule a test drive.", category: "Buying" },
-    { id: 4, question: "Is my personal information secure?", answer: "Yes, we take data security very seriously. All personal information is encrypted and stored securely. We do not share your details with third parties without your consent.", category: "General" },
+// For backward compatibility, export a function that returns users
+export const MOCK_USERS = getMockUsers;
+
+// Fetch FAQs from MongoDB API
+export async function getMockFAQs(): Promise<FAQItem[]> {
+    try {
+        const response = await fetch('/api/faqs');
+        const data = await response.json();
+        return data.faqs || [];
+    } catch (error) {
+        console.error('Error fetching FAQs:', error);
+        return getFallbackFAQs();
+    }
+}
+
+// Fallback FAQs for when API is not available
+export const getFallbackFAQs = (): FAQItem[] => [
+    { 
+        id: 1,
+        question: "How do I list my car for sale?", 
+        answer: "Navigate to the 'Sell' section, log in or register as a seller, and follow the on-screen instructions to create a new vehicle listing. You'll need details like make, model, year, and photos.", 
+        category: "Selling" 
+    },
+    { 
+        id: 2,
+        question: "What is AI Price Suggestion?", 
+        answer: "Our AI Price Suggestion tool analyzes your vehicle's details and compares them with current market listings to recommend a fair and competitive price, helping you sell faster.", 
+        category: "Selling" 
+    }
 ];
 
-export const MOCK_SUPPORT_TICKETS: SupportTicket[] = [
-    { id: 1, userEmail: 'customer@test.com', userName: 'Mock Customer', subject: 'Issue with chat', message: 'I am unable to see messages from a seller.', status: 'Open', createdAt: daysAgo(2), updatedAt: daysAgo(2), replies: [] },
-    { id: 2, userEmail: 'jane.doe@customer.com', userName: 'Jane Doe', subject: 'Payment failed for inspection', message: 'I tried to purchase a certified inspection report but my payment failed. My card is working fine elsewhere.', status: 'In Progress', createdAt: daysAgo(1), updatedAt: daysAgo(0), replies: [{ author: 'admin@test.com', message: 'We are looking into this issue and will get back to you shortly.', timestamp: daysAgo(0) }] },
-    { id: 3, userEmail: 'seller@test.com', userName: 'Prestige Motors', subject: 'How to feature a listing?', message: 'I have upgraded my plan but cannot find the option to feature my new listing.', status: 'Closed', createdAt: daysAgo(5), updatedAt: daysAgo(4), replies: [{ author: 'admin@test.com', message: 'You can feature a listing from your Seller Dashboard under the "My Listings" tab. There is a "Feature" button in the actions column.', timestamp: daysAgo(4) }] },
+// For backward compatibility, export a function that returns FAQs
+export const MOCK_FAQS = getMockFAQs;
+
+// Fetch Support Tickets from MongoDB API
+export async function getMockSupportTickets(): Promise<SupportTicket[]> {
+    try {
+        const response = await fetch('/api/support-tickets');
+        const data = await response.json();
+        return data.tickets || [];
+    } catch (error) {
+        console.error('Error fetching support tickets:', error);
+        return getFallbackSupportTickets();
+    }
+}
+
+// Fallback support tickets for when API is not available
+export const getFallbackSupportTickets = (): SupportTicket[] => [
+    { 
+        id: 1,
+        userEmail: 'customer@test.com', 
+        userName: 'Mock Customer', 
+        subject: 'Issue with chat', 
+        message: 'I am unable to see messages from a seller.', 
+        status: 'Open', 
+        createdAt: daysAgo(2), 
+        updatedAt: daysAgo(2), 
+        replies: [] 
+    }
 ];
+
+// For backward compatibility, export a function that returns support tickets
+export const MOCK_SUPPORT_TICKETS = getMockSupportTickets;
 
 
 const COLORS = ['White', 'Black', 'Silver', 'Grey', 'Red', 'Blue', 'Brown', 'Beige'];
@@ -128,7 +195,7 @@ const randomNumber = (min: number, max: number) => Math.floor(Math.random() * (m
 
 const generateMockVehicles = (count: number): Vehicle[] => {
     const vehicles: Vehicle[] = [];
-    const sellers = MOCK_USERS.filter(u => u.role === 'seller');
+    const sellers = getFallbackUsers().filter(u => u.role === 'seller');
 
     for (let i = 1; i <= count; i++) {
         const category = VehicleCategory.FOUR_WHEELER;
@@ -159,56 +226,53 @@ const generateMockVehicles = (count: number): Vehicle[] => {
             year,
             price,
             mileage,
+            location: `${city}, ${state}`,
             images: [getPlaceholderImage(make, model), getPlaceholderImage(make, `${model}${i}`)],
             videoUrl: Math.random() > 0.7 ? 'https://cdn.coverr.co/videos/coverr-a-porsche-911-on-a-bridge-638/1080p.mp4' : undefined,
-            features: [...new Set(Array.from({ length: randomNumber(3, 7) }, () => randomItem(FEATURES)))],
+            features: Array.from(new Set(Array.from({ length: randomNumber(3, 7) }, () => randomItem(FEATURES)))),
             description: `A well-maintained ${year} ${make} ${model} ${variant || ''}. Comes with features like ${randomItem(FEATURES)} and ${randomItem(FEATURES)}. Available in ${city}.`,
             sellerEmail: seller.email,
+            status: 'published',
+            isFeatured: Math.random() < 0.1,
+            views: randomNumber(0, 500),
+            inquiriesCount: randomNumber(0, 50),
+            certificationStatus: randomItem(['none', 'requested', 'approved', 'rejected', 'certified']),
             engine: `${randomNumber(1, 2)}.${randomNumber(0, 9)}L ${randomItem(FUEL_TYPES)}`,
             transmission: randomItem(TRANSMISSIONS),
             fuelType: randomItem(FUEL_TYPES),
             fuelEfficiency: `${randomNumber(12, 25)} KMPL`,
             color: randomItem(COLORS),
-            status: Math.random() > 0.1 ? 'sold' : 'published',
-            isFeatured: Math.random() > 0.85,
-            views: randomNumber(100, 5000),
-            inquiriesCount: randomNumber(1, 50),
-            isFlagged: Math.random() > 0.98,
-            registrationYear: year,
-            insuranceValidity: `Aug ${year + 3}`,
-            insuranceType: 'Comprehensive',
-            rto: `${state}${randomNumber(1, 20).toString().padStart(2, '0')}`,
+            noOfOwners: randomNumber(1, 3),
+            registrationYear: randomNumber(2015, 2024),
+            insuranceValidity: `${randomNumber(2024, 2026)}-${String(randomNumber(1, 12)).padStart(2, '0')}`,
+            insuranceType: randomItem(['Comprehensive', 'Third Party']),
+            rto: `${randomItem(['MH', 'DL', 'KA', 'TN', 'GJ'])}${randomNumber(10, 99)}`,
             city,
             state,
-            location: `${city}, ${state}`,
-            noOfOwners: randomNumber(1, 3),
-            displacement: `${randomNumber(900, 2500)} cc`,
-            groundClearance: `${randomNumber(160, 220)} mm`,
-            bootSpace: `${randomNumber(250, 550)} litres`,
-            certificationStatus: 'none',
-            certifiedInspection: Math.random() > 0.8 ? {
-                reportId: `RR-${Date.now()}-${i}`,
-                summary: 'This vehicle has passed our comprehensive 200-point inspection with flying colors. Key areas like engine, transmission, and brakes are in excellent condition. Minor cosmetic wear noted on the rear bumper, consistent with age. Overall, a reliable and well-maintained vehicle.',
-                date: daysAgo(randomNumber(5, 30)),
-                inspector: 'Ravi Kumar',
-                scores: { 'Engine': 92, 'Transmission': 95, 'Suspension': 88, 'Brakes': 91, 'Exterior': 85, 'Interior': 90 },
-                details: { 'Engine': 'No leaks or abnormal noises. OBD scan clear.', 'Exterior': 'Minor scuff on rear bumper. No signs of major bodywork.', 'Interior': 'Clean interior with all electronics functional.' }
-            } : null,
-            serviceRecords: [
-                { date: daysAgo(90), service: "General Service & Oil Change", mileage: mileage - 5000, location: `${city} Service Center` },
-                { date: daysAgo(400), service: "Brake Pad Replacement", mileage: mileage - 25000, location: `${city} Service Center` }
-            ],
-            accidentHistory: Math.random() > 0.9 ? [
-                { date: daysAgo(600), description: "Minor dent on front right fender, repaired and repainted.", severity: "Minor" }
-            ] : []
+            displacement: `${randomNumber(1000, 3000)} cc`,
+            groundClearance: `${randomNumber(150, 200)} mm`,
+            bootSpace: `${randomNumber(300, 600)} litres`
         };
-        if(vehicle.certifiedInspection) vehicle.certificationStatus = 'approved';
+
         vehicles.push(vehicle);
     }
     return vehicles;
 };
 
-export const MOCK_VEHICLES: Vehicle[] = generateMockVehicles(50);
+// Fetch Vehicles from MongoDB API
+export async function getMockVehicles(): Promise<Vehicle[]> {
+    try {
+        const response = await fetch('/api/vehicles');
+        const data = await response.json();
+        return data.vehicles || [];
+    } catch (error) {
+        console.error('Error fetching vehicles:', error);
+        return generateMockVehicles(10); // Fallback to generated vehicles
+    }
+}
+
+// For backward compatibility, export a function that returns vehicles
+export const MOCK_VEHICLES = getMockVehicles;
 
 // ============================================
 // LOCATION & DISCOVERY CONSTANTS

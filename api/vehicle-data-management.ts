@@ -1,17 +1,17 @@
-import { NextApiRequest, NextApiResponse } from 'next';
-import { connectToDatabase } from '../lib/mongodb';
-import { VehicleData } from '../types';
+import type { VercelRequest, VercelResponse } from '@vercel/node';
+import connectToDatabase from '../lib/db';
 
 export default async function handler(
-  req: NextApiRequest,
-  res: NextApiResponse
+  req: VercelRequest,
+  res: VercelResponse
 ) {
   if (req.method !== 'GET' && req.method !== 'POST' && req.method !== 'PUT' && req.method !== 'DELETE') {
     return res.status(405).json({ error: 'Method not allowed' });
   }
 
   try {
-    const { db } = await connectToDatabase();
+    const mongoose = await connectToDatabase();
+    const db = mongoose.connection.db;
     const collection = db.collection('vehicleData');
 
     switch (req.method) {
@@ -33,7 +33,7 @@ export default async function handler(
   }
 }
 
-async function handleGetVehicleData(req: NextApiRequest, res: NextApiResponse, collection: any) {
+async function handleGetVehicleData(req: VercelRequest, res: VercelResponse, collection: any) {
   try {
     const { category, make, model } = req.query;
     
@@ -128,7 +128,7 @@ async function handleGetVehicleData(req: NextApiRequest, res: NextApiResponse, c
   }
 }
 
-async function handleCreateVehicleData(req: NextApiRequest, res: NextApiResponse, collection: any) {
+async function handleCreateVehicleData(req: VercelRequest, res: VercelResponse, collection: any) {
   try {
     const { category, make, model, variants } = req.body;
 
@@ -188,7 +188,7 @@ async function handleCreateVehicleData(req: NextApiRequest, res: NextApiResponse
   }
 }
 
-async function handleUpdateVehicleData(req: NextApiRequest, res: NextApiResponse, collection: any) {
+async function handleUpdateVehicleData(req: VercelRequest, res: VercelResponse, collection: any) {
   try {
     const { id } = req.query;
     const { category, make, model, variants } = req.body;
@@ -236,7 +236,7 @@ async function handleUpdateVehicleData(req: NextApiRequest, res: NextApiResponse
   }
 }
 
-async function handleDeleteVehicleData(req: NextApiRequest, res: NextApiResponse, collection: any) {
+async function handleDeleteVehicleData(req: VercelRequest, res: VercelResponse, collection: any) {
   try {
     const { id } = req.query;
 

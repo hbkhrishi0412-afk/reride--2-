@@ -5,7 +5,7 @@ import { isVehicle, isApiResponse } from '../types';
 // Fallback mock vehicles to prevent loading issues
 const FALLBACK_VEHICLES: Vehicle[] = [
   {
-    id: "fallback_1",
+    id: 1,
     category: "FOUR_WHEELER" as VehicleCategory,
     make: "Maruti Suzuki",
     model: "Swift",

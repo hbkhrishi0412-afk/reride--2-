@@ -1,5 +1,5 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
-import connectToDatabase from './lib-db';
+import connectToDatabase from '../lib/db';
 
 // This file consolidates utility functions and test connections
 export default async function handler(
@@ -34,7 +34,7 @@ export default async function handler(
 }
 
 // Test connection handler - preserves exact functionality from test-connection.ts
-async function handleTestConnection(req: VercelRequest, res: VercelResponse) {
+async function handleTestConnection(_req: VercelRequest, res: VercelResponse) {
   try {
     console.log('🔍 Testing MongoDB connection and collection...');
     

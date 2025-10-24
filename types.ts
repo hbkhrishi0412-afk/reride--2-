@@ -167,6 +167,7 @@ export interface PlanDetails {
 }
 
 export interface User {
+  id?: string; // MongoDB _id as string
   name: string;
   email: string;
   password?: string; // Optional for API responses, required for registration/login

@@ -170,7 +170,19 @@ class DataService {
     if (vehicles.length === 0) {
       try {
         const { MOCK_VEHICLES } = await import('../constants');
-        vehicles = MOCK_VEHICLES;
+        // Try to fetch from MongoDB API first, fallback to local data
+        try {
+            const response = await fetch('/api/vehicles');
+            if (response.ok) {
+                const data = await response.json();
+                vehicles = data.vehicles || [];
+            } else {
+                vehicles = await MOCK_VEHICLES();
+            }
+        } catch (error) {
+            console.error('Error fetching vehicles from API:', error);
+            vehicles = await MOCK_VEHICLES();
+        }
         this.setLocalStorageData('reRideVehicles', vehicles);
       } catch {
         vehicles = fallbackVehicles;
