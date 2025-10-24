@@ -132,8 +132,8 @@ class SyncService {
     
     for (let attempt = 1; attempt <= maxRetries; attempt++) {
       try {
-        // Try consolidated endpoint first
-        const response = await fetch(`${this.API_BASE_URL}/vehicles?type=data`, {
+        // Try standalone endpoint first (correct for production)
+        const response = await fetch(`${this.API_BASE_URL}/vehicle-data`, {
           method: 'POST',
           headers: { 
             'Content-Type': 'application/json',
@@ -143,12 +143,12 @@ class SyncService {
         });
 
         if (response.ok) {
-          console.log('✅ Data synced via consolidated endpoint');
+          console.log('✅ Data synced via vehicle-data endpoint');
           return true;
         }
 
-        // Try standalone endpoint
-        const fallbackResponse = await fetch(`${this.API_BASE_URL}/vehicle-data`, {
+        // Try consolidated endpoint as fallback
+        const fallbackResponse = await fetch(`${this.API_BASE_URL}/vehicles?type=data`, {
           method: 'POST',
           headers: { 
             'Content-Type': 'application/json',
@@ -158,7 +158,7 @@ class SyncService {
         });
 
         if (fallbackResponse.ok) {
-          console.log('✅ Data synced via standalone endpoint');
+          console.log('✅ Data synced via consolidated endpoint');
           return true;
         }
 
@@ -177,14 +177,27 @@ class SyncService {
 
   private async fetchFromServer(): Promise<boolean> {
     try {
-      const response = await fetch(`${this.API_BASE_URL}/vehicles?type=data`);
+      // Try standalone endpoint first
+      const response = await fetch(`${this.API_BASE_URL}/vehicle-data`);
       if (response.ok) {
         const data = await response.json();
         localStorage.setItem('reRideVehicleData', JSON.stringify(data));
         this.syncStatus.lastSyncTime = new Date();
         this.syncStatus.error = null;
         this.notifyListeners();
-        console.log('✅ Data fetched from server');
+        console.log('✅ Data fetched from vehicle-data endpoint');
+        return true;
+      }
+      
+      // Try consolidated endpoint as fallback
+      const fallbackResponse = await fetch(`${this.API_BASE_URL}/vehicles?type=data`);
+      if (fallbackResponse.ok) {
+        const data = await fallbackResponse.json();
+        localStorage.setItem('reRideVehicleData', JSON.stringify(data));
+        this.syncStatus.lastSyncTime = new Date();
+        this.syncStatus.error = null;
+        this.notifyListeners();
+        console.log('✅ Data fetched from consolidated endpoint');
         return true;
       }
     } catch (error) {

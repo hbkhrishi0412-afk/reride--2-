@@ -431,7 +431,8 @@ class DataService {
     }
 
     try {
-      const vehicleData = await this.makeApiRequest<VehicleData>('/vehicles?type=data');
+      // Try the correct API endpoint for vehicle data
+      const vehicleData = await this.makeApiRequest<VehicleData>('/vehicle-data');
       this.setLocalStorageData('reRideVehicleData', vehicleData);
       return vehicleData;
     } catch (error) {
@@ -470,7 +471,7 @@ class DataService {
     }
 
     try {
-      await this.makeApiRequest('/vehicles?type=data', {
+      await this.makeApiRequest('/vehicle-data', {
         method: 'POST',
         body: JSON.stringify(data),
       });

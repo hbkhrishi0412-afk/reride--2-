@@ -6,7 +6,7 @@ Your MongoDB Atlas database has been successfully configured and populated with 
 
 ### 🔗 Connection Details
 - **Database**: `reride`
-- **Connection String**: `mongodb+srv://hbk_hrishi0412:Qaz%403755@cluster0.nmiwnl7.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0`
+- **Connection String**: `mongodb+srv://hbk_hrishi0412:Qaz%403755@re-ride.69dzn4v.mongodb.net/?appName=Re-ride`
 - **Collections**: `users`, `vehicles`, `faqs`, `supportTickets`
 
 ### 📊 Data Seeded
@@ -20,10 +20,10 @@ Your MongoDB Atlas database has been successfully configured and populated with 
 #### 1. Set Environment Variable
 ```bash
 # PowerShell
-$env:MONGODB_URI="mongodb+srv://hbk_hrishi0412:Qaz%403755@cluster0.nmiwnl7.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0"
+$env:MONGODB_URI="mongodb+srv://hbk_hrishi0412:Qaz%403755@re-ride.69dzn4v.mongodb.net/?appName=Re-ride"
 
 # Bash/Linux/Mac
-export MONGODB_URI="mongodb+srv://hbk_hrishi0412:Qaz%403755@cluster0.nmiwnl7.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0"
+export MONGODB_URI="mongodb+srv://hbk_hrishi0412:Qaz%403755@re-ride.69dzn4v.mongodb.net/?appName=Re-ride"
 ```
 
 #### 2. Seed Database (if needed)

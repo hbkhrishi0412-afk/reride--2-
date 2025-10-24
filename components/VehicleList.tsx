@@ -160,6 +160,17 @@ const VehicleList: React.FC<VehicleListProps> = ({ vehicles, onSelectVehicle, is
   const featuresSearchInputRef = useRef<HTMLInputElement>(null);
   const suggestionDebounceRef = useRef<number | null>(null);
 
+  // Get categories from admin database vehicle data
+  const uniqueCategories = useMemo(() => {
+    if (vehicleData && !isLoadingVehicleData) {
+      // Get categories from admin database
+      const categoriesFromDb = Object.keys(vehicleData).sort();
+      return categoriesFromDb;
+    }
+    // Fallback to enum values
+    return Object.values(CategoryEnum);
+  }, [vehicleData, isLoadingVehicleData]);
+
   // Get makes from admin database vehicle data
   const uniqueMakes = useMemo(() => {
     if (vehicleData && !isLoadingVehicleData) {
@@ -714,7 +725,11 @@ const VehicleList: React.FC<VehicleListProps> = ({ vehicles, onSelectVehicle, is
                 <label htmlFor="category-select" className="block text-sm font-medium text-spinny-text-dark dark:text-spinny-text-dark mb-1">Category</label>
                 <select id="category-select" name="categoryFilter" value={state.categoryFilter} onChange={handleSelectChange} className={formElementClass}>
                     <option value="ALL">All Categories</option>
-                    {Object.values(CategoryEnum).map(cat => (<option key={cat} value={cat}>{cat}</option>))}
+                    {uniqueCategories.map(cat => (
+                        <option key={cat} value={cat}>
+                            {cat.replace(/_/g, ' ').toLowerCase().replace(/\b\w/g, l => l.toUpperCase())}
+                        </option>
+                    ))}
                 </select>
             </div>
             <div>

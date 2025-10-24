@@ -9,56 +9,31 @@ const API_BASE_URL = '/api';
  * Falls back to localStorage and then default data if API fails.
  */
 export const getVehicleData = async (): Promise<VehicleData> => {
-  // Try new vehicle data management API first
+  // Try standalone endpoint first (correct for production)
   try {
-    const response = await fetch(`${API_BASE_URL}/vehicle-data-management`);
-    if (response.ok) {
-      const contentType = response.headers.get('content-type');
-      if (contentType && contentType.includes('application/json')) {
-        try {
-          const result = await response.json();
-          if (result.success && result.data) {
-            console.log('✅ Vehicle data loaded from admin database:', result.source);
-            localStorage.setItem(VEHICLE_DATA_STORAGE_KEY, JSON.stringify(result.data));
-            return result.data;
-          }
-        } catch (jsonError) {
-          console.warn("Failed to parse JSON from vehicle-data-management endpoint", jsonError);
-        }
-      }
-    } else {
-      console.warn(`Vehicle data management API returned ${response.status}: ${response.statusText}`);
-    }
-  } catch (error) {
-    console.warn("Vehicle data management API failed, trying fallback endpoints", error);
-  }
-
-  // Try consolidated endpoint as fallback
-  try {
-    const response = await fetch(`${API_BASE_URL}/vehicles?type=data`);
+    const response = await fetch(`${API_BASE_URL}/vehicle-data`);
     if (response.ok) {
       const contentType = response.headers.get('content-type');
       if (contentType && contentType.includes('application/json')) {
         try {
           const data = await response.json();
+          console.log('✅ Vehicle data loaded from vehicle-data endpoint');
           localStorage.setItem(VEHICLE_DATA_STORAGE_KEY, JSON.stringify(data));
           return data;
         } catch (jsonError) {
-          console.warn("Failed to parse JSON from consolidated endpoint, trying standalone endpoint", jsonError);
+          console.warn("Failed to parse JSON from vehicle-data endpoint", jsonError);
         }
-      } else {
-        console.warn(`Consolidated endpoint returned non-JSON content type: ${contentType}, trying standalone endpoint`);
       }
     } else {
-      console.warn(`Consolidated endpoint returned ${response.status}: ${response.statusText}, trying standalone endpoint`);
+      console.warn(`Vehicle-data endpoint returned ${response.status}: ${response.statusText}`);
     }
   } catch (error) {
-    console.warn("Consolidated endpoint failed, trying standalone endpoint", error);
+    console.warn("Vehicle-data endpoint failed, trying consolidated endpoint", error);
   }
 
-  // Try standalone endpoint as fallback
+  // Try consolidated endpoint as fallback
   try {
-    const response = await fetch(`${API_BASE_URL}/vehicle-data`);
+    const response = await fetch(`${API_BASE_URL}/vehicles?type=data`);
     if (response.ok) {
       const contentType = response.headers.get('content-type');
       if (contentType && contentType.includes('application/json')) {
@@ -110,7 +85,7 @@ export const createVehicleData = async (vehicleData: {
   variants: string[];
 }): Promise<{ success: boolean; data?: any; error?: string }> => {
   try {
-    const response = await fetch(`${API_BASE_URL}/vehicle-data-management`, {
+    const response = await fetch(`${API_BASE_URL}/vehicle-data`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -139,7 +114,7 @@ export const updateVehicleData = async (id: string, vehicleData: {
   variants?: string[];
 }): Promise<{ success: boolean; data?: any; error?: string }> => {
   try {
-    const response = await fetch(`${API_BASE_URL}/vehicle-data-management?id=${id}`, {
+    const response = await fetch(`${API_BASE_URL}/vehicle-data?id=${id}`, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
@@ -163,7 +138,7 @@ export const updateVehicleData = async (id: string, vehicleData: {
  */
 export const deleteVehicleData = async (id: string): Promise<{ success: boolean; error?: string }> => {
   try {
-    const response = await fetch(`${API_BASE_URL}/vehicle-data-management?id=${id}`, {
+    const response = await fetch(`${API_BASE_URL}/vehicle-data?id=${id}`, {
       method: 'DELETE',
     });
 

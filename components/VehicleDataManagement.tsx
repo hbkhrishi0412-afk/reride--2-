@@ -545,7 +545,7 @@ const VehicleDataManagement: React.FC<VehicleDataManagementProps> = ({
             </div>
             <div className="flex items-center gap-2">
               <span className="font-medium">
-                {Object.values(vehicleData).flat().reduce((acc, make) => acc + make.models.length, 0)}
+                {Object.values(vehicleData).flat().reduce((acc, make: any) => acc + (make.models?.length || 0), 0)}
               </span>
               <span>Models</span>
             </div>
