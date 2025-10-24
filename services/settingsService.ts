@@ -20,8 +20,7 @@ export const getSettings = (): PlatformSettings => {
 export const saveSettings = (settings: PlatformSettings) => {
   try {
     localStorage.setItem(SETTINGS_STORAGE_KEY, JSON.stringify(settings));
-  } catch (error)
-    {
+  } catch (error) {
     console.error("Failed to save settings to localStorage", error);
   }
 };

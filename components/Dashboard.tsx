@@ -1,7 +1,7 @@
 
 import React, { useState, useMemo, useEffect, memo } from 'react';
 import type { Vehicle, User, Conversation, VehicleData, ChatMessage, VehicleDocument } from '../types';
-import { View } from '../types';
+import { View, VehicleCategory } from '../types';
 import { generateVehicleDescription, getAiVehicleSuggestions } from '../services/geminiService';
 import { getSafeImageSrc } from '../utils/imageUtils';
 import VehicleCard from './VehicleCard';

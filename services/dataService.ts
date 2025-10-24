@@ -460,7 +460,7 @@ class DataService {
     
     if (Object.keys(vehicleData).length === 0) {
       try {
-        const { VEHICLE_DATA } = await import('../components/vehicleData');
+        const { VEHICLE_DATA } = await import('../components/vehicleData.ts');
         vehicleData = VEHICLE_DATA;
         this.setLocalStorageData('reRideVehicleData', vehicleData);
       } catch {
