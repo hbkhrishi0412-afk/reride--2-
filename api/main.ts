@@ -473,12 +473,29 @@ async function handleVehicles(req: VercelRequest, res: VercelResponse) {
 
     if (req.method === 'POST') {
       try {
+        await connectToDatabase();
+        console.log('📡 Connected to database for vehicles data save operation');
+        
         const vehicleData = await VehicleDataModel.findOneAndUpdate(
           {},
-          { data: req.body },
-          { upsert: true, new: true }
+          { 
+            data: req.body,
+            updatedAt: new Date()
+          },
+          { 
+            upsert: true, 
+            new: true,
+            setDefaultsOnInsert: true
+          }
         );
-        return res.status(200).json({ success: true, data: vehicleData });
+        
+        console.log('✅ Vehicle data saved successfully to database');
+        return res.status(200).json({ 
+          success: true, 
+          data: vehicleData.data,
+          message: 'Vehicle data updated successfully',
+          timestamp: new Date().toISOString()
+        });
       } catch (dbError) {
         console.warn('⚠️ Database connection failed for vehicles data save:', dbError);
         

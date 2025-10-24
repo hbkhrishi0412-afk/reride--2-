@@ -2,16 +2,9 @@ import mongoose from 'mongoose';
 
 // Schema for vehicle data structure (categories, makes, models, variants)
 const vehicleDataSchema = new mongoose.Schema({
-  // We'll use a single document with _id to store all vehicle data
+  // Store vehicle data as a flexible object
   data: {
-    type: Map,
-    of: [{
-      name: { type: String, required: true },
-      models: [{
-        name: { type: String, required: true },
-        variants: [String]
-      }]
-    }],
+    type: mongoose.Schema.Types.Mixed,
     required: true
   }
 }, {
