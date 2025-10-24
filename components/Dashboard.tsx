@@ -5,7 +5,7 @@ import { View } from '../types';
 import { generateVehicleDescription, getAiVehicleSuggestions } from '../services/geminiService';
 import { getSafeImageSrc } from '../utils/imageUtils';
 import VehicleCard from './VehicleCard';
-import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend } from 'chart.js';
+import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend, PointElement, LineElement, LineController, BarController } from 'chart.js';
 import { Bar } from 'react-chartjs-2';
 import AiAssistant from './AiAssistant';
 // FIX: ChatWidget is a named export, not a default. Corrected the import syntax.
