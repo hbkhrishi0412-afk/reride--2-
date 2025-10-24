@@ -100,6 +100,16 @@ async function handleHealth(req: VercelRequest, res: VercelResponse) {
     
     // Get database info
     const db = mongoose.connection.db;
+    
+    if (!db) {
+      return res.status(500).json({
+        success: false,
+        status: 'error',
+        message: 'Database connection not available',
+        error: 'Database connection is undefined'
+      });
+    }
+    
     const collections = await db.listCollections().toArray();
     const collectionNames = collections.map(c => c.name);
     

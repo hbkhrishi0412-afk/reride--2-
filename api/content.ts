@@ -18,6 +18,13 @@ export default async function handler(
     const mongoose = await connectToDatabase();
     const db = mongoose.connection.db;
     
+    if (!db) {
+      return res.status(500).json({ 
+        success: false, 
+        error: 'Database connection not available' 
+      });
+    }
+    
     // Route based on content type
     const { type } = req.query;
     

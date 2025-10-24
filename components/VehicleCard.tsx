@@ -137,12 +137,7 @@ const VehicleCard: React.FC<VehicleCardProps> = ({ vehicle, onSelect, onToggleCo
         </div>
         
         <div className="mt-2 text-xs text-spinny-text dark:text-spinny-text truncate">
-           By: <button onClick={handleSellerClick} className="font-semibold hover:underline focus:outline-none transition-colors" style={{ color: '#FF6B35' }} onMouseEnter={(e) => e.currentTarget.style.color = 'var(--spinny-blue)'} onMouseLeave={(e) => e.currentTarget.style.color = 'var(--spinny-orange)'}>
-             {(() => {
-               console.log('🔍 VehicleCard sellerName:', { vehicleId: vehicle.id, sellerName: vehicle.sellerName, sellerEmail: vehicle.sellerEmail });
-               return vehicle.sellerName || 'Seller';
-             })()}
-           </button>
+           By: <button onClick={handleSellerClick} className="font-semibold hover:underline focus:outline-none transition-colors" style={{ color: '#FF6B35' }} onMouseEnter={(e) => e.currentTarget.style.color = 'var(--spinny-blue)'} onMouseLeave={(e) => e.currentTarget.style.color = 'var(--spinny-orange)'}>{vehicle.sellerName || 'Seller'}</button>
         </div>
 
         {vehicle.sellerBadges && vehicle.sellerBadges.length > 0 && (
