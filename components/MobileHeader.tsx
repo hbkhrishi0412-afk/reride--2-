@@ -31,7 +31,7 @@ const MobileHeader: React.FC<MobileHeaderProps> = ({
   return (
     <>
       {/* Compact Mobile Header - 56px height */}
-      <header className="fixed top-0 left-0 right-0 bg-white border-b border-gray-200 z-50 h-14">
+      <header className="fixed top-0 left-0 right-0 bg-white border-b border-gray-200 z-50 h-14" data-testid="mobile-header">
         <div className="flex items-center justify-between h-full px-4">
           {/* Left Section */}
           <div className="flex items-center gap-3">
@@ -50,6 +50,7 @@ const MobileHeader: React.FC<MobileHeaderProps> = ({
                 onClick={() => setShowMenu(!showMenu)}
                 className="p-1.5 hover:bg-gray-100 rounded-full transition-colors"
                 aria-label="Menu"
+                data-testid="mobile-menu-button"
               >
                 <svg className="w-5 h-5 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
@@ -74,6 +75,7 @@ const MobileHeader: React.FC<MobileHeaderProps> = ({
                   onClick={() => onNavigate(ViewEnum.USED_CARS)}
                   className="p-1.5 hover:bg-gray-100 rounded-full transition-colors"
                   aria-label="Search"
+                  data-testid="mobile-search-button"
                 >
                   <svg className="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
@@ -106,7 +108,7 @@ const MobileHeader: React.FC<MobileHeaderProps> = ({
             className="fixed inset-0 bg-black bg-opacity-50 z-40"
             onClick={() => setShowMenu(false)}
           />
-          <div className="fixed top-0 left-0 bottom-0 w-72 bg-white z-50 shadow-xl transform transition-transform">
+          <div className="fixed top-0 left-0 bottom-0 w-72 bg-white z-50 shadow-xl transform transition-transform" data-testid="mobile-drawer">
             <div className="h-full flex flex-col">
               {/* Menu Header */}
               <div className="p-4 border-b border-gray-200 bg-gradient-to-r from-orange-500 to-orange-600">
@@ -125,6 +127,7 @@ const MobileHeader: React.FC<MobileHeaderProps> = ({
                   <button
                     onClick={() => setShowMenu(false)}
                     className="p-1 hover:bg-orange-400 rounded-full transition-colors"
+                    data-testid="mobile-drawer-close"
                   >
                     <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />

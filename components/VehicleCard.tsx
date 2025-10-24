@@ -57,9 +57,10 @@ const VehicleCard: React.FC<VehicleCardProps> = ({ vehicle, onSelect, onToggleCo
       onClick={handleCardClick}
       className="vehicle-card flex flex-col cursor-pointer group"
       style={{ ['--hover-ring-color' as any]: 'var(--spinny-orange)' }}
+      data-testid="vehicle-card"
     >
       <div className="relative overflow-hidden">
-        <img className="w-full h-40 sm:h-56 object-cover group-hover:scale-105 transition-transform duration-500 ease-in-out" src={getFirstValidImage(vehicle.images)} alt={`${vehicle.make} ${vehicle.model}`} loading="lazy" />
+        <img className="w-full h-40 sm:h-56 object-cover group-hover:scale-105 transition-transform duration-500 ease-in-out" src={getFirstValidImage(vehicle.images)} alt={`${vehicle.make} ${vehicle.model}`} loading="lazy" data-testid="vehicle-image" />
         <div className="absolute top-0 left-0 right-0 h-20 bg-gradient-to-b from-black/50 to-transparent"></div>
         {/* Boost Indicators */}
         <div className="absolute top-3 left-3 flex flex-col gap-1">

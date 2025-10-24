@@ -12,6 +12,7 @@ import Header from './components/Header';
 import MobileHeader from './components/MobileHeader';
 import MobileBottomNav from './components/MobileBottomNav';
 import MobileDashboard from './components/MobileDashboard';
+import MobileSearch from './components/MobileSearch';
 import Footer from './components/Footer';
 import ToastContainer from './components/ToastContainer';
 import CommandPalette from './components/CommandPalette';
@@ -1036,6 +1037,13 @@ const AppContent: React.FC = () => {
         />
         
         {/* Mobile Global Components */}
+        <MobileSearch 
+          onNavigate={navigate}
+          onSearch={(query) => {
+            setInitialSearchQuery(query);
+            navigate(ViewEnum.USED_CARS);
+          }}
+        />
         <ToastContainer 
           toasts={toasts} 
           onRemove={removeToast} 

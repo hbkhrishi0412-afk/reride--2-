@@ -1,0 +1,236 @@
+name: E2E Tests
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+
+jobs:
+  e2e-tests:
+    timeout-minutes: 60
+    runs-on: ubuntu-latest
+    
+    strategy:
+      matrix:
+        node-version: [18.x, 20.x]
+        
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Setup Node.js ${{ matrix.node-version }}
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ matrix.node-version }}
+        cache: 'npm'
+        
+    - name: Install dependencies
+      run: npm ci
+      
+    - name: Install Playwright browsers
+      run: npx playwright install --with-deps
+      
+    - name: Build application
+      run: npm run build
+      
+    - name: Run E2E tests
+      run: npm run test:e2e
+      env:
+        CI: true
+        
+    - name: Upload test results
+      uses: actions/upload-artifact@v4
+      if: always()
+      with:
+        name: playwright-report-${{ matrix.node-version }}
+        path: playwright-report/
+        retention-days: 30
+        
+    - name: Upload test results JSON
+      uses: actions/upload-artifact@v4
+      if: always()
+      with:
+        name: test-results-${{ matrix.node-version }}
+        path: test-results/
+        retention-days: 30
+
+  unit-tests:
+    timeout-minutes: 30
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18.x'
+        cache: 'npm'
+        
+    - name: Install dependencies
+      run: npm ci
+      
+    - name: Run unit tests
+      run: npm run test:ci
+      
+    - name: Upload coverage reports
+      uses: codecov/codecov-action@v3
+      with:
+        file: ./coverage/lcov.info
+        flags: unittests
+        name: codecov-umbrella
+
+  security-tests:
+    timeout-minutes: 30
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18.x'
+        cache: 'npm'
+        
+    - name: Install dependencies
+      run: npm ci
+      
+    - name: Run security audit
+      run: npm audit --audit-level=moderate
+      
+    - name: Run security tests
+      run: npm run test -- --testPathPattern=security
+
+  performance-tests:
+    timeout-minutes: 45
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18.x'
+        cache: 'npm'
+        
+    - name: Install dependencies
+      run: npm ci
+      
+    - name: Install Playwright browsers
+      run: npx playwright install --with-deps
+      
+    - name: Run performance tests
+      run: npm run test:e2e -- --grep="Performance"
+      
+    - name: Upload performance results
+      uses: actions/upload-artifact@v4
+      if: always()
+      with:
+        name: performance-results
+        path: test-results/
+        retention-days: 30
+
+  cross-browser-tests:
+    timeout-minutes: 60
+    runs-on: ubuntu-latest
+    
+    strategy:
+      matrix:
+        browser: [chromium, firefox, webkit]
+        
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18.x'
+        cache: 'npm'
+        
+    - name: Install dependencies
+      run: npm ci
+      
+    - name: Install Playwright browsers
+      run: npx playwright install --with-deps ${{ matrix.browser }}
+      
+    - name: Run cross-browser tests
+      run: npx playwright test --project=${{ matrix.browser }}
+      env:
+        CI: true
+        
+    - name: Upload cross-browser results
+      uses: actions/upload-artifact@v4
+      if: always()
+      with:
+        name: ${{ matrix.browser }}-results
+        path: playwright-report/
+        retention-days: 30
+
+  mobile-tests:
+    timeout-minutes: 45
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18.x'
+        cache: 'npm'
+        
+    - name: Install dependencies
+      run: npm ci
+      
+    - name: Install Playwright browsers
+      run: npx playwright install --with-deps
+      
+    - name: Run mobile tests
+      run: npx playwright test --project="Mobile Chrome" --project="Mobile Safari"
+      env:
+        CI: true
+        
+    - name: Upload mobile test results
+      uses: actions/upload-artifact@v4
+      if: always()
+      with:
+        name: mobile-test-results
+        path: playwright-report/
+        retention-days: 30
+
+  notify:
+    needs: [e2e-tests, unit-tests, security-tests, performance-tests, cross-browser-tests, mobile-tests]
+    runs-on: ubuntu-latest
+    if: always()
+    
+    steps:
+    - name: Notify on success
+      if: ${{ needs.e2e-tests.result == 'success' && needs.unit-tests.result == 'success' && needs.security-tests.result == 'success' }}
+      run: |
+        echo "✅ All tests passed successfully!"
+        echo "E2E Tests: ${{ needs.e2e-tests.result }}"
+        echo "Unit Tests: ${{ needs.unit-tests.result }}"
+        echo "Security Tests: ${{ needs.security-tests.result }}"
+        echo "Performance Tests: ${{ needs.performance-tests.result }}"
+        echo "Cross-browser Tests: ${{ needs.cross-browser-tests.result }}"
+        echo "Mobile Tests: ${{ needs.mobile-tests.result }}"
+        
+    - name: Notify on failure
+      if: ${{ needs.e2e-tests.result == 'failure' || needs.unit-tests.result == 'failure' || needs.security-tests.result == 'failure' }}
+      run: |
+        echo "❌ Some tests failed!"
+        echo "E2E Tests: ${{ needs.e2e-tests.result }}"
+        echo "Unit Tests: ${{ needs.unit-tests.result }}"
+        echo "Security Tests: ${{ needs.security-tests.result }}"
+        echo "Performance Tests: ${{ needs.performance-tests.result }}"
+        echo "Cross-browser Tests: ${{ needs.cross-browser-tests.result }}"
+        echo "Mobile Tests: ${{ needs.mobile-tests.result }}"
+        exit 1

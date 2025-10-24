@@ -77,7 +77,7 @@ const PWAInstallPrompt: React.FC = () => {
   }
 
   return (
-    <div className="fixed bottom-4 left-4 right-4 md:left-auto md:right-4 md:max-w-md z-50 animate-slide-up">
+    <div className="fixed bottom-4 left-4 right-4 md:left-auto md:right-4 md:max-w-md z-50 animate-slide-up" data-testid="pwa-install-prompt">
       <div className="bg-white rounded-lg shadow-2xl border border-gray-200 p-4">
         <div className="flex items-start gap-4">
           {/* Icon */}
