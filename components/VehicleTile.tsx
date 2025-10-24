@@ -45,7 +45,7 @@ const VehicleTile: React.FC<VehicleTileProps> = ({ vehicle, onSelect, onToggleCo
         </div>
         
         <div className="mt-1 text-xs text-spinny-text dark:text-spinny-text truncate">
-           By: <button onClick={handleSellerClick} className="font-semibold hover:underline focus:outline-none transition-colors" style={{ color: '#FF6B35' }} onMouseEnter={(e) => e.currentTarget.style.color = 'var(--spinny-blue)'} onMouseLeave={(e) => e.currentTarget.style.color = 'var(--spinny-orange)'}>{vehicle.sellerName}</button>
+           By: <button onClick={handleSellerClick} className="font-semibold hover:underline focus:outline-none transition-colors" style={{ color: '#FF6B35' }} onMouseEnter={(e) => e.currentTarget.style.color = 'var(--spinny-blue)'} onMouseLeave={(e) => e.currentTarget.style.color = 'var(--spinny-orange)'}>{vehicle.sellerName || 'Seller'}</button>
         </div>
         
         <div className="mt-2 flex-grow grid grid-cols-2 sm:grid-cols-3 gap-x-4 gap-y-1 text-xs text-brand-gray-600 dark:text-spinny-text">

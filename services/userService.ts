@@ -19,14 +19,14 @@ const FALLBACK_USERS: User[] = [
 ];
 
 // --- API Helpers ---
-const getAuthHeader = () => {
+const getAuthHeader = (): Record<string, string> => {
   try {
     // Get JWT token from localStorage
     const token = localStorage.getItem('reRideAccessToken');
-    if (!token) return {};
-    return { 'Authorization': `Bearer ${token}` };
+    if (!token) return { 'Content-Type': 'application/json' };
+    return { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` };
   } catch {
-    return {};
+    return { 'Content-Type': 'application/json' };
   }
 };
 
@@ -112,42 +112,51 @@ const deleteUserLocal = async (email: string): Promise<{ success: boolean, email
 };
 
 const loginLocal = async (credentials: any): Promise<{ success: boolean, user?: User, reason?: string }> => {
-    console.log('🔐 loginLocal called with:', { email: credentials.email, role: credentials.role });
+    // SECURITY: Reduced logging to prevent information disclosure
     const { email, password, role } = credentials;
     const users = await getUsersLocal();
-    console.log('📋 Total users loaded:', users.length);
-    console.log('🔍 Looking for user with email:', email);
     
-    const user = users.find(u => u.email === email && u.password === password);
+    // SECURITY: Find user by email first, then validate password securely
+    const user = users.find(u => u.email === email);
     
     if (!user) {
-        console.log('❌ User not found with provided credentials');
-        // Try to find user by email only to help debug
-        const userByEmail = users.find(u => u.email === email);
-        if (userByEmail) {
-            console.log('⚠️  User exists with this email but password doesn\'t match');
-            console.log('User role:', userByEmail.role, 'Expected role:', role);
-        } else {
-            console.log('⚠️  No user found with email:', email);
-            console.log('Available emails:', users.map(u => u.email).join(', '));
-        }
         return { success: false, reason: 'Invalid credentials.' };
     }
     
-    console.log('✅ User found:', user.name, 'Role:', user.role);
+    // SECURITY: For local storage, we need to handle both hashed and plain text passwords
+    // This is a fallback system, so we check both formats
+    let isPasswordValid = false;
+    
+    if (user.password && user.password.startsWith('$2')) {
+        // Password is hashed with bcrypt
+        try {
+            const bcrypt = require('bcryptjs');
+            isPasswordValid = await bcrypt.compare(password, user.password);
+        } catch (error) {
+            // SECURITY: Don't log password validation errors
+            isPasswordValid = false;
+        }
+    } else {
+        // SECURITY WARNING: Plain text password - this should only be used in development
+        // In production, all passwords should be hashed
+        console.warn('⚠️ SECURITY WARNING: Using plain text password comparison in local storage');
+        isPasswordValid = user.password === password;
+    }
+    
+    if (!isPasswordValid) {
+        return { success: false, reason: 'Invalid credentials.' };
+    }
     
     if (role && user.role !== role) {
-        console.log('❌ Role mismatch. User role:', user.role, 'Expected:', role);
         return { success: false, reason: `User is not a registered ${role}.` };
     }
     
     if (user.status === 'inactive') {
-        console.log('❌ User account is inactive');
         return { success: false, reason: 'Your account has been deactivated.' };
     }
     
+    // SECURITY: Remove password from response
     const { password: _, ...userWithoutPassword } = user;
-    console.log('✅ Login successful for:', user.name);
     return { success: true, user: userWithoutPassword };
 };
 
@@ -179,7 +188,7 @@ const getUsersApi = async (): Promise<User[]> => {
 const updateUserApi = async (userData: Partial<User> & { email: string }): Promise<User> => {
     const response = await fetch('/api/users', {
         method: 'PUT',
-        headers: { 'Content-Type': 'application/json', ...getAuthHeader() },
+        headers: getAuthHeader(),
         body: JSON.stringify(userData),
     });
     return handleResponse(response);
@@ -188,7 +197,7 @@ const updateUserApi = async (userData: Partial<User> & { email: string }): Promi
 const deleteUserApi = async (email: string): Promise<{ success: boolean, email: string }> => {
     const response = await fetch('/api/users', {
         method: 'DELETE',
-        headers: { 'Content-Type': 'application/json', ...getAuthHeader() },
+        headers: getAuthHeader(),
         body: JSON.stringify({ email }),
     });
     return handleResponse(response);

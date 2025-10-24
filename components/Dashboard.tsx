@@ -1,12 +1,12 @@
 
-import React, { useState, useMemo, useEffect, useRef, memo } from 'react';
+import React, { useState, useMemo, useEffect, memo } from 'react';
 import type { Vehicle, User, Conversation, VehicleData, ChatMessage, VehicleDocument } from '../types';
-import { VehicleCategory, View } from '../types';
+import { View } from '../types';
 import { generateVehicleDescription, getAiVehicleSuggestions } from '../services/geminiService';
 import { getSafeImageSrc } from '../utils/imageUtils';
 import VehicleCard from './VehicleCard';
-import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend, PointElement, LineElement, LineController, BarController } from 'chart.js';
-import { Bar, Line } from 'react-chartjs-2';
+import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend } from 'chart.js';
+import { Bar } from 'react-chartjs-2';
 import AiAssistant from './AiAssistant';
 // FIX: ChatWidget is a named export, not a default. Corrected the import syntax.
 import { ChatWidget } from './ChatWidget';
@@ -15,7 +15,7 @@ import { planService } from '../services/planService';
 import BulkUploadModal from './BulkUploadModal';
 import { getPlaceholderImage } from './vehicleData';
 import PricingGuidance from './PricingGuidance';
-import { OfferModal, OfferMessage } from './ReadReceiptIcon';
+// Removed unused OfferModal import
 // NEW FEATURES
 import BoostListingModal from './BoostListingModal';
 import ListingLifecycleIndicator from './ListingLifecycleIndicator';
@@ -160,7 +160,7 @@ const PlanStatusCard: React.FC<{
                 <div className="mt-4 pt-4 border-t border-spinny-white/20">
                     <h4 className="font-semibold mb-2">Plan Features:</h4>
                     <ul className="space-y-2 text-xs">
-                        {(plan.features || []).map(feature => (
+                        {(plan.features || []).map((feature: string) => (
                             <li key={feature} className="flex items-start">
                                 <svg className="w-4 h-4 text-spinny-orange mr-2 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
                                     <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd"></path>
@@ -188,7 +188,7 @@ const initialFormState: Omit<Vehicle, 'id' | 'averageRating' | 'ratingCount'> = 
   description: '', engine: '', transmission: 'Automatic', fuelType: 'Petrol', fuelEfficiency: '',
   color: '', features: [], images: [], documents: [],
   sellerEmail: '',
-  category: '', // Start with empty category to avoid mismatch
+  category: VehicleCategory.FOUR_WHEELER, // Start with default category
   status: 'published',
   isFeatured: false,
   registrationYear: new Date().getFullYear(),
@@ -237,7 +237,16 @@ interface VehicleFormProps {
 }
 
 const VehicleForm: React.FC<VehicleFormProps> = memo(({ editingVehicle, onAddVehicle, onUpdateVehicle, onCancel, vehicleData, seller, onFeatureListing, allVehicles }) => {
-    const [formData, setFormData] = useState(editingVehicle ? { ...initialFormState, ...editingVehicle, sellerEmail: editingVehicle.sellerEmail } : { ...initialFormState, sellerEmail: seller.email });
+    const [formData, setFormData] = useState(editingVehicle ? { 
+        ...initialFormState, 
+        ...editingVehicle, 
+        sellerEmail: editingVehicle.sellerEmail,
+        sellerName: editingVehicle.sellerName || seller.name || seller.dealershipName || 'Seller'
+    } : { 
+        ...initialFormState, 
+        sellerEmail: seller.email,
+        sellerName: seller.name || seller.dealershipName || 'Seller'
+    });
     
     // Debug logging for form initialization
     console.log('🔧 VehicleForm initialized:', {
@@ -440,7 +449,7 @@ const VehicleForm: React.FC<VehicleFormProps> = memo(({ editingVehicle, onAddVeh
       }
     };
 
-    const handleQualityReportChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const handleQualityReportChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
         const { name, value } = e.target;
         setFormData(prev => ({
             ...prev,
@@ -612,7 +621,7 @@ const VehicleForm: React.FC<VehicleFormProps> = memo(({ editingVehicle, onAddVeh
     };
 
     const applyAiSpec = (specKey: keyof typeof aiSuggestions.structuredSpecs) => {
-        if (aiSuggestions?.structuredSpecs[specKey]) {
+        if (aiSuggestions?.structuredSpecs?.[specKey]) {
             setFormData(prev => ({ ...prev, [specKey]: aiSuggestions.structuredSpecs[specKey] }));
         }
     };
@@ -927,17 +936,7 @@ const InquiriesView: React.FC<{
       }
     };
     
-    const handleAcceptTestDrive = (convId: string, msgId: number, date: string, time: string) => {
-        if(onTestDriveResponse) onTestDriveResponse(convId, msgId, 'confirmed');
-        const confirmationText = `Sounds great! Your test drive for the ${conversations.find(c=>c.id === convId)?.vehicleName} is confirmed for ${new Date(date).toLocaleDateString()} at ${time}. We look forward to seeing you.`;
-        onSellerSendMessage(convId, confirmationText);
-    };
-    
-    const handleDeclineTestDrive = (convId: string, msgId: number) => {
-        if(onTestDriveResponse) onTestDriveResponse(convId, msgId, 'rejected');
-        const declineText = `Apologies, but we are unable to accommodate your test drive request at this time. Please suggest an alternative date or time.`;
-        onSellerSendMessage(convId, declineText);
-    }
+    // Removed unused test drive handlers
 
     const sortedConversations = useMemo(() => {
         // Filter conversations to only show those for the current seller
@@ -1725,12 +1724,7 @@ const Dashboard: React.FC<DashboardProps> = ({ seller, sellerVehicles, reportedV
     </button>
   );
 
-  const AppNavItem: React.FC<{ view: View, children: React.ReactNode, count?: number }> = ({ view, children, count }) => (
-    <button onClick={() => onNavigate(view)} className={`flex justify-between items-center w-full text-left px-4 py-3 rounded-lg transition-colors hover:bg-brand-gray-light dark:hover:bg-white text-gray-700 dark:text-gray-300`}>
-      <span>{children}</span>
-      {count && count > 0 && <span className="bg-spinny-orange-light0 text-white text-xs font-bold rounded-full px-2 py-0.5">{count}</span>}
-    </button>
-  );
+  // Removed unused AppNavItem component
 
   return (
     <div className="container mx-auto py-8 animate-fade-in">

@@ -508,13 +508,13 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     },
     onToggleUserStatus: (email: string) => {
       setUsers(prev => prev.map(user => 
-        user.email === email ? { ...user, status: user.status === 'active' ? 'suspended' : 'active' } : user
+        user.email === email ? { ...user, status: user.status === 'active' ? 'inactive' : 'active' } : user
       ));
       addToast(`User status toggled for ${email}`, 'success');
     },
     onToggleVehicleStatus: (vehicleId: number) => {
       setVehicles(prev => prev.map(vehicle => 
-        vehicle.id === vehicleId ? { ...vehicle, status: vehicle.status === 'published' ? 'draft' : 'published' } : vehicle
+        vehicle.id === vehicleId ? { ...vehicle, status: vehicle.status === 'published' ? 'unpublished' : 'published' } : vehicle
       ));
       addToast(`Vehicle status toggled`, 'success');
     },
@@ -543,10 +543,11 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     onSendBroadcast: (message: string) => {
       setNotifications(prev => [...prev, {
         id: Date.now(),
-        type: 'broadcast',
-        title: 'Platform Announcement',
+        recipientEmail: 'all',
         message,
-        timestamp: new Date(),
+        targetId: 'broadcast',
+        targetType: 'general_admin' as const,
+        timestamp: new Date().toISOString(),
         isRead: false
       }]);
       addToast('Broadcast sent to all users', 'success');
@@ -555,7 +556,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       try {
         const headers = 'Name,Email,Role,Status,Mobile,Join Date\n';
         const csv = users.map(user => 
-          `"${user.name}","${user.email}","${user.role}","${user.status}","${user.mobile || ''}","${user.joinDate || ''}"`
+          `"${user.name}","${user.email}","${user.role}","${user.status}","${user.mobile || ''}","${user.joinedDate || ''}"`
         ).join('\n');
         const fullCsv = headers + csv;
         const blob = new Blob([fullCsv], { type: 'text/csv;charset=utf-8;' });
@@ -600,7 +601,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         const soldVehicles = vehicles.filter(v => v.status === 'sold');
         const headers = 'Make,Model,Year,Sale Price,Seller,Buyer,Sale Date\n';
         const csv = soldVehicles.map(vehicle => 
-          `"${vehicle.make}","${vehicle.model}","${vehicle.year}","${vehicle.price}","${vehicle.sellerEmail}","${vehicle.buyerEmail || 'N/A'}","${vehicle.saleDate || 'N/A'}"`
+          `"${vehicle.make}","${vehicle.model}","${vehicle.year}","${vehicle.price}","${vehicle.sellerEmail}","N/A","N/A"`
         ).join('\n');
         const fullCsv = headers + csv;
         const blob = new Blob([fullCsv], { type: 'text/csv;charset=utf-8;' });
@@ -908,13 +909,13 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
               countered: `💰 Counter-offer made: ₹${counterPrice?.toLocaleString('en-IN')}`
             };
             
-            const responseMessage = {
+            const responseMessage: ChatMessage = {
               id: Date.now(),
-              sender: 'seller',
+              sender: 'seller' as const,
               text: responseMessages[response],
               timestamp: new Date().toISOString(),
               isRead: false,
-              type: 'text'
+              type: 'text' as const
             };
             
             return {

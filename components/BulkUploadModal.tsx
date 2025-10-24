@@ -1,5 +1,5 @@
 import React, { useState, useCallback } from 'react';
-import type { Vehicle, VehicleDocument } from '../types';
+import type { Vehicle } from '../types';
 import { VehicleCategory } from '../types';
 
 interface BulkUploadModalProps {

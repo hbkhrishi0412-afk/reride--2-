@@ -3,18 +3,17 @@ import connectToDatabase from '../lib/db';
 import User from '../models/User';
 import Vehicle from '../models/Vehicle';
 import VehicleDataModel from '../models/VehicleData';
-import type { VehicleData } from '../types';
 import { 
   hashPassword, 
   validatePassword, 
   generateAccessToken, 
   generateRefreshToken, 
-  verifyToken,
   validateUserInput,
   getSecurityHeaders,
   sanitizeObject,
   validateEmail
 } from '../utils/security';
+import { getSecurityConfig } from '../utils/security-config';
 
 // Helper: Calculate distance between coordinates
 function calculateDistance(lat1: number, lng1: number, lat2: number, lng2: number): number {
@@ -29,27 +28,26 @@ function calculateDistance(lat1: number, lng1: number, lat2: number, lng2: numbe
   return R * c;
 }
 
-// Authentication middleware
-const authenticateRequest = (req: VercelRequest): { isValid: boolean; user?: any; error?: string } => {
-  const authHeader = req.headers.authorization;
-  
-  if (!authHeader || !authHeader.startsWith('Bearer ')) {
-    return { isValid: false, error: 'No valid authorization header' };
-  }
-  
-  try {
-    const token = authHeader.substring(7); // Remove 'Bearer ' prefix
-    const decoded = verifyToken(token);
-    return { isValid: true, user: decoded };
-  } catch (error) {
-    return { isValid: false, error: 'Invalid or expired token' };
-  }
-};
+// Authentication middleware (currently unused but kept for future use)
+// const authenticateRequest = (req: VercelRequest): { isValid: boolean; user?: any; error?: string } => {
+//   const authHeader = req.headers.authorization;
+//   
+//   if (!authHeader || !authHeader.startsWith('Bearer ')) {
+//     return { isValid: false, error: 'No valid authorization header' };
+//   }
+//   
+//   try {
+//     const token = authHeader.substring(7); // Remove 'Bearer ' prefix
+//     const decoded = verifyToken(token);
+//     return { isValid: true, user: decoded };
+//   } catch (error) {
+//     return { isValid: false, error: 'Invalid or expired token' };
+//   }
+// };
 
 // Rate limiting (simple in-memory implementation for demo)
 const rateLimitMap = new Map<string, { count: number; resetTime: number }>();
-const RATE_LIMIT_WINDOW = 15 * 60 * 1000; // 15 minutes
-const RATE_LIMIT_MAX_REQUESTS = 100;
+const config = getSecurityConfig();
 
 const checkRateLimit = (identifier: string): { allowed: boolean; remaining: number } => {
   const now = Date.now();
@@ -57,16 +55,16 @@ const checkRateLimit = (identifier: string): { allowed: boolean; remaining: numb
   const current = rateLimitMap.get(key);
   
   if (!current || now > current.resetTime) {
-    rateLimitMap.set(key, { count: 1, resetTime: now + RATE_LIMIT_WINDOW });
-    return { allowed: true, remaining: RATE_LIMIT_MAX_REQUESTS - 1 };
+    rateLimitMap.set(key, { count: 1, resetTime: now + config.RATE_LIMIT.WINDOW_MS });
+    return { allowed: true, remaining: config.RATE_LIMIT.MAX_REQUESTS - 1 };
   }
   
-  if (current.count >= RATE_LIMIT_MAX_REQUESTS) {
+  if (current.count >= config.RATE_LIMIT.MAX_REQUESTS) {
     return { allowed: false, remaining: 0 };
   }
   
   current.count++;
-  return { allowed: true, remaining: RATE_LIMIT_MAX_REQUESTS - current.count };
+  return { allowed: true, remaining: config.RATE_LIMIT.MAX_REQUESTS - current.count };
 };
 
 export default async function handler(
@@ -79,10 +77,18 @@ export default async function handler(
     res.setHeader(key, value);
   });
   
-  // Set CORS headers
-  res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+  // Set CORS headers with proper security
+  const origin = req.headers.origin;
+  if (config.CORS.ALLOWED_ORIGINS.includes(origin as string)) {
+    res.setHeader('Access-Control-Allow-Origin', origin as string);
+  } else {
+    res.setHeader('Access-Control-Allow-Origin', 'https://reride-app.vercel.app');
+  }
+  
+  res.setHeader('Access-Control-Allow-Methods', config.CORS.ALLOWED_METHODS.join(', '));
+  res.setHeader('Access-Control-Allow-Headers', config.CORS.ALLOWED_HEADERS.join(', '));
+  res.setHeader('Access-Control-Allow-Credentials', config.CORS.CREDENTIALS.toString());
+  res.setHeader('Access-Control-Max-Age', config.CORS.MAX_AGE.toString());
   
   // Always set JSON content type to prevent HTML responses
   res.setHeader('Content-Type', 'application/json');
@@ -99,7 +105,7 @@ export default async function handler(
     return res.status(429).json({
       success: false,
       reason: 'Too many requests. Please try again later.',
-      retryAfter: Math.ceil(RATE_LIMIT_WINDOW / 1000)
+      retryAfter: Math.ceil(config.RATE_LIMIT.WINDOW_MS / 1000)
     });
   }
   
@@ -329,7 +335,16 @@ async function handleUsers(req: VercelRequest, res: VercelResponse) {
       }
 
       try {
-        const newAccessToken = generateAccessToken({ email: '', role: 'customer' }); // Simplified for demo
+        const newAccessToken = generateAccessToken({ 
+          id: 'temp', 
+          email: 'temp@example.com', 
+          name: 'Temp User',
+          mobile: '0000000000',
+          role: 'customer',
+          location: 'Unknown',
+          status: 'active',
+          createdAt: new Date().toISOString()
+        });
         return res.status(200).json({ 
           success: true, 
           accessToken: newAccessToken 
@@ -571,7 +586,7 @@ async function handleVehicles(req: VercelRequest, res: VercelResponse) {
     }
 
     if (action === 'boost') {
-      const { vehicleId, packageId } = req.body;
+      const { vehicleId } = req.body;
       const vehicle = await Vehicle.findOne({ id: vehicleId });
       
       if (!vehicle) {
@@ -694,7 +709,7 @@ async function handleAdmin(req: VercelRequest, res: VercelResponse) {
 }
 
 // Health handler - preserves exact functionality from db-health.ts
-async function handleHealth(req: VercelRequest, res: VercelResponse) {
+async function handleHealth(_req: VercelRequest, res: VercelResponse) {
   try {
     await connectToDatabase();
     return res.status(200).json({

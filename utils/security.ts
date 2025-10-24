@@ -3,17 +3,15 @@ import jwt from 'jsonwebtoken';
 import DOMPurify from 'dompurify';
 import validator from 'validator';
 import type { User } from '../types';
+import { getSecurityConfig } from './security-config';
 
-// Security configuration
-const SALT_ROUNDS = 12;
-const JWT_SECRET = process.env.JWT_SECRET || 'fallback-secret-change-in-production';
-const JWT_EXPIRES_IN = '24h';
-const REFRESH_TOKEN_EXPIRES_IN = '7d';
+// Get security configuration
+const config = getSecurityConfig();
 
 // Password hashing utilities
 export const hashPassword = async (password: string): Promise<string> => {
   try {
-    return await bcrypt.hash(password, SALT_ROUNDS);
+    return await bcrypt.hash(password, 12); // Use secure salt rounds
   } catch (error) {
     throw new Error('Password hashing failed');
   }
@@ -36,10 +34,11 @@ export const generateAccessToken = (user: User): string => {
     type: 'access'
   };
   
-  return jwt.sign(payload, JWT_SECRET, { 
-    expiresIn: JWT_EXPIRES_IN,
-    issuer: 'reride-app',
-    audience: 'reride-users'
+  const secret = config.JWT.SECRET || 'fallback-secret-change-in-production';
+  return jwt.sign(payload, secret, { 
+    expiresIn: config.JWT.ACCESS_TOKEN_EXPIRES_IN,
+    issuer: config.JWT.ISSUER,
+    audience: config.JWT.AUDIENCE
   });
 };
 
@@ -50,18 +49,20 @@ export const generateRefreshToken = (user: User): string => {
     type: 'refresh'
   };
   
-  return jwt.sign(payload, JWT_SECRET, { 
-    expiresIn: REFRESH_TOKEN_EXPIRES_IN,
-    issuer: 'reride-app',
-    audience: 'reride-users'
+  const secret = config.JWT.SECRET || 'fallback-secret-change-in-production';
+  return jwt.sign(payload, secret, { 
+    expiresIn: config.JWT.REFRESH_TOKEN_EXPIRES_IN,
+    issuer: config.JWT.ISSUER,
+    audience: config.JWT.AUDIENCE
   });
 };
 
 export const verifyToken = (token: string): any => {
   try {
-    return jwt.verify(token, JWT_SECRET, {
-      issuer: 'reride-app',
-      audience: 'reride-users'
+    const secret = config.JWT.SECRET || 'fallback-secret-change-in-production';
+    return jwt.verify(token, secret, {
+      issuer: config.JWT.ISSUER,
+      audience: config.JWT.AUDIENCE
     });
   } catch (error) {
     throw new Error('Invalid or expired token');
@@ -125,39 +126,38 @@ export const sanitizeObject = (obj: any): any => {
 
 // Validation utilities
 export const validateEmail = (email: string): boolean => {
-  return validator.isEmail(email) && email.length <= 254;
+  return validator.isEmail(email) && email.length <= config.VALIDATION.EMAIL_MAX_LENGTH;
 };
 
 export const validatePasswordStrength = (password: string): { isValid: boolean; errors: string[] } => {
   const errors: string[] = [];
   
-  if (password.length < 8) {
-    errors.push('Password must be at least 8 characters long');
+  if (password.length < config.PASSWORD.MIN_LENGTH) {
+    errors.push(`Password must be at least ${config.PASSWORD.MIN_LENGTH} characters long`);
   }
   
-  if (password.length > 128) {
-    errors.push('Password must be less than 128 characters');
+  if (password.length > config.PASSWORD.MAX_LENGTH) {
+    errors.push(`Password must be less than ${config.PASSWORD.MAX_LENGTH} characters`);
   }
   
-  if (!/[A-Z]/.test(password)) {
+  if (config.PASSWORD.REQUIRE_UPPERCASE && !/[A-Z]/.test(password)) {
     errors.push('Password must contain at least one uppercase letter');
   }
   
-  if (!/[a-z]/.test(password)) {
+  if (config.PASSWORD.REQUIRE_LOWERCASE && !/[a-z]/.test(password)) {
     errors.push('Password must contain at least one lowercase letter');
   }
   
-  if (!/\d/.test(password)) {
+  if (config.PASSWORD.REQUIRE_NUMBERS && !/\d/.test(password)) {
     errors.push('Password must contain at least one number');
   }
   
-  if (!/[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(password)) {
+  if (config.PASSWORD.REQUIRE_SPECIAL_CHARS && !/[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(password)) {
     errors.push('Password must contain at least one special character');
   }
   
   // Check for common weak passwords
-  const commonPasswords = ['password', '123456', 'qwerty', 'abc123', 'password123'];
-  if (commonPasswords.includes(password.toLowerCase())) {
+  if (config.PASSWORD.COMMON_PASSWORDS.includes(password.toLowerCase())) {
     errors.push('Password is too common, please choose a stronger password');
   }
   
@@ -168,7 +168,7 @@ export const validatePasswordStrength = (password: string): { isValid: boolean; 
 };
 
 export const validateMobile = (mobile: string): boolean => {
-  return validator.isMobilePhone(mobile, 'en-IN') && mobile.length === 10;
+  return validator.isMobilePhone(mobile, 'en-IN') && mobile.length === config.VALIDATION.MOBILE_LENGTH;
 };
 
 export const validateUserInput = (userData: any): { isValid: boolean; errors: string[]; sanitizedData?: any } => {
@@ -200,22 +200,22 @@ export const validateUserInput = (userData: any): { isValid: boolean; errors: st
   }
   
   // Validate name
-  if (!sanitizedData.name || sanitizedData.name.trim().length < 2) {
-    errors.push('Name must be at least 2 characters long');
+  if (!sanitizedData.name || sanitizedData.name.trim().length < config.VALIDATION.NAME_MIN_LENGTH) {
+    errors.push(`Name must be at least ${config.VALIDATION.NAME_MIN_LENGTH} characters long`);
   }
   
-  if (sanitizedData.name && sanitizedData.name.length > 100) {
-    errors.push('Name must be less than 100 characters');
+  if (sanitizedData.name && sanitizedData.name.length > config.VALIDATION.NAME_MAX_LENGTH) {
+    errors.push(`Name must be less than ${config.VALIDATION.NAME_MAX_LENGTH} characters`);
   }
   
   // Validate mobile
   if (!sanitizedData.mobile || !validateMobile(sanitizedData.mobile)) {
-    errors.push('Valid 10-digit mobile number is required');
+    errors.push(`Valid ${config.VALIDATION.MOBILE_LENGTH}-digit mobile number is required`);
   }
   
   // Validate role
-  if (!sanitizedData.role || !['customer', 'seller', 'admin'].includes(sanitizedData.role)) {
-    errors.push('Valid role (customer, seller, admin) is required');
+  if (!sanitizedData.role || !config.VALIDATION.ALLOWED_ROLES.includes(sanitizedData.role)) {
+    errors.push(`Valid role (${config.VALIDATION.ALLOWED_ROLES.join(', ')}) is required`);
   }
   
   return {
@@ -232,15 +232,7 @@ export const createRateLimitKey = (identifier: string, action: string): string =
 
 // Security headers
 export const getSecurityHeaders = (): Record<string, string> => {
-  return {
-    'X-Content-Type-Options': 'nosniff',
-    'X-Frame-Options': 'DENY',
-    'X-XSS-Protection': '1; mode=block',
-    'Strict-Transport-Security': 'max-age=31536000; includeSubDomains',
-    'Content-Security-Policy': "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; connect-src 'self' https:;",
-    'Referrer-Policy': 'strict-origin-when-cross-origin',
-    'Permissions-Policy': 'geolocation=(), microphone=(), camera=()'
-  };
+  return config.SECURITY_HEADERS;
 };
 
 // Session management

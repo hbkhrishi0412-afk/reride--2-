@@ -165,27 +165,30 @@ const getVehiclesApi = async (): Promise<Vehicle[]> => {
 };
 
 const addVehicleApi = async (vehicleData: Vehicle): Promise<Vehicle> => {
+    const authHeaders = getAuthHeader();
     const response = await fetch('/api/vehicles', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json', ...getAuthHeader() },
+        headers: authHeaders,
         body: JSON.stringify(vehicleData),
     });
     return handleResponse(response);
 };
 
 const updateVehicleApi = async (vehicleData: Vehicle): Promise<Vehicle> => {
+    const authHeaders = getAuthHeader();
     const response = await fetch('/api/vehicles', {
         method: 'PUT',
-        headers: { 'Content-Type': 'application/json', ...getAuthHeader() },
+        headers: authHeaders,
         body: JSON.stringify(vehicleData),
     });
     return handleResponse(response);
 };
 
 const deleteVehicleApi = async (vehicleId: number): Promise<{ success: boolean, id: number }> => {
+    const authHeaders = getAuthHeader();
     const response = await fetch('/api/vehicles', {
         method: 'DELETE',
-        headers: { 'Content-Type': 'application/json', ...getAuthHeader() },
+        headers: authHeaders,
         body: JSON.stringify({ id: vehicleId }),
     });
     return handleResponse(response);

@@ -9,7 +9,8 @@ interface ComparisonProps {
 }
 
 const specFields: (keyof Vehicle)[] = ['price', 'year', 'mileage', 'engine', 'transmission', 'fuelType', 'fuelEfficiency', 'color', 'sellerName', 'city', 'averageRating', 'sellerAverageRating', 'registrationYear', 'noOfOwners', 'displacement'];
-const specLabels: Record<keyof Vehicle, string> = {
+// Fixed specLabels to only include properties that exist on Vehicle
+const specLabels: Partial<Record<keyof Vehicle, string>> = {
     price: 'Price',
     year: 'Year',
     mileage: 'Mileage (kms)',
@@ -159,7 +160,7 @@ const Comparison: React.FC<ComparisonProps> = ({ vehicles, onBack: onBackToHome,
 
                     const isBest = typeof value === 'number' && isBestValue(key, value);
                     const cellClass = highlightDiffs && hasDifference ? '' : '';
-                    const cellStyle = highlightDiffs && hasDifference ? { backgroundColor: 'rgba(30, 136, 229, 0.1)' } : undefined;
+                    // Removed unused cellStyle variable
                     return (
                       <td key={`${vehicle.id}-${String(key)}`} className={`p-4 text-center dark:text-brand-gray-200 transition-colors ${cellClass} ${isBest ? 'bg-spinny-orange-light dark:bg-spinny-orange/20' : ''}`}>
                          <span className={`inline-flex items-center gap-2 ${isBest ? 'font-bold text-spinny-orange dark:text-spinny-orange' : ''}`}>

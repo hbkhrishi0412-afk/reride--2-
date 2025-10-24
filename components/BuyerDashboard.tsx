@@ -30,7 +30,7 @@ const BuyerDashboard: React.FC<BuyerDashboardProps> = ({
   onViewSellerProfile,
 }) => {
   const [activeTab, setActiveTab] = useState<'overview' | 'searches' | 'activity' | 'alerts'>('overview');
-  const [showSaveSearchModal, setShowSaveSearchModal] = useState(false);
+  // Removed unused showSaveSearchModal state
   const [savedSearches, setSavedSearches] = useState<SavedSearch[]>(
     () => buyerService.getSavedSearches(currentUser?.email || '')
   );

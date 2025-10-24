@@ -1,6 +1,6 @@
 import React, { useState, useMemo, useEffect, useRef, useCallback } from 'react';
 import type { Conversation, User, ChatMessage } from '../types';
-import ReadReceiptIcon, { OfferMessage, OfferModal } from './ReadReceiptIcon';
+import { OfferModal } from './ReadReceiptIcon';
 import InlineChat from './InlineChat';
 
 interface CustomerInboxProps {
@@ -15,39 +15,7 @@ interface CustomerInboxProps {
   onOfferResponse: (conversationId: string, messageId: number, response: 'accepted' | 'rejected' | 'countered', counterPrice?: number) => void;
 }
 
-const TypingIndicator: React.FC<{ name: string }> = ({ name }) => (
-    <div className="flex items-start">
-        <div className="rounded-xl px-4 py-3 max-w-lg bg-spinny-light-gray dark:bg-brand-gray-700 text-spinny-text-dark dark:text-brand-gray-200 flex items-center space-x-2">
-            <span className="text-sm font-medium">{name} is typing</span>
-            <div className="w-1.5 h-1.5 bg-white0 rounded-full animate-bounce [animation-delay:-0.3s]"></div>
-            <div className="w-1.5 h-1.5 bg-white0 rounded-full animate-bounce [animation-delay:-0.15s]"></div>
-            <div className="w-1.5 h-1.5 bg-white0 rounded-full animate-bounce"></div>
-        </div>
-    </div>
-);
-
-const TestDriveRequestMessage: React.FC<{ msg: ChatMessage }> = ({ msg }) => {
-    const { date, time, status } = msg.payload || {};
-    const statusInfo = {
-        pending: { text: "Pending", color: "bg-spinny-blue-light text-spinny-text-dark dark:bg-spinny-blue/50 dark:text-spinny-text-dark" },
-        confirmed: { text: "Confirmed", color: "bg-spinny-orange-light text-spinny-orange dark:bg-spinny-orange/50 dark:text-spinny-orange" },
-        rejected: { text: "Declined", color: "bg-spinny-orange-light text-spinny-orange dark:bg-spinny-orange/50 dark:text-spinny-orange" },
-        countered: { text: "Countered", color: "bg-white-dark text-spinny-text-dark dark:bg-white dark:text-spinny-text-dark" },
-        accepted: { text: "Accepted", color: "bg-spinny-orange-light text-spinny-orange dark:bg-spinny-orange/50 dark:text-spinny-orange" },
-    };
-    return (
-        <div className={`p-3 border-l-4 rounded-lg bg-spinny-off-white dark:bg-brand-gray-700/50 ${status === 'pending' ? 'border-gray-200' : status === 'confirmed' ? 'border-spinny-orange' : 'border-spinny-orange'}`}>
-            <p className="font-semibold text-spinny-text-dark dark:text-spinny-text-dark">Test Drive Request</p>
-            <p className="text-sm text-brand-gray-600 dark:text-spinny-text-dark">Date: {date}</p>
-            <p className="text-sm text-brand-gray-600 dark:text-spinny-text-dark">Time: {time}</p>
-            <div className="mt-2 flex items-center justify-between">
-                <span className={`px-2 py-0.5 text-xs font-bold rounded-full ${statusInfo[status || 'pending'].color}`}>
-                    Status: {statusInfo[status || 'pending'].text}
-                </span>
-            </div>
-        </div>
-    );
-};
+// Removed unused TypingIndicator and TestDriveRequestMessage components
 
 const CustomerInbox: React.FC<CustomerInboxProps> = ({ conversations, onSendMessage, onMarkAsRead, users, typingStatus, onUserTyping, onMarkMessagesAsRead, onFlagContent, onOfferResponse }) => {
   const [selectedConv, setSelectedConv] = useState<Conversation | null>(null);
@@ -91,33 +59,11 @@ const CustomerInbox: React.FC<CustomerInboxProps> = ({ conversations, onSendMess
       }
   }, [conversations, selectedConv]);
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setReplyText(e.target.value);
-    if (selectedConv) {
-        onUserTyping(selectedConv.id, 'customer');
-    }
-  };
+  // Removed unused handleInputChange function
 
-  const handleSendReply = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (replyText.trim() && selectedConv) {
-      onSendMessage(selectedConv.vehicleId, replyText);
-      setReplyText("");
-    }
-  };
+  // Removed unused handleSendReply function
   
-  const handleFlagClick = () => {
-    if (selectedConv && !selectedConv.isFlagged) {
-        if(window.confirm('Are you sure you want to report this conversation for review?')) {
-            const reason = window.prompt("Please provide a reason for reporting this conversation (optional):");
-            if (reason !== null) {
-                onFlagContent('conversation', selectedConv.id, reason || "No reason provided");
-                // Optimistically update UI
-                setSelectedConv(prev => prev ? {...prev, isFlagged: true, flagReason: reason || "No reason provided"} : null);
-            }
-        }
-    }
-  };
+  // Removed unused handleFlagClick function
 
   const handleSendOffer = (price: number) => {
     if (selectedConv) {
@@ -129,10 +75,7 @@ const CustomerInbox: React.FC<CustomerInboxProps> = ({ conversations, onSendMess
     }
   };
 
-  const getSellerName = (sellerId: string) => {
-    return users.find(u => u.email === sellerId)?.name || 'Seller';
-  }
-  const formInputClass = "flex-grow p-3 border border-gray-200-300 dark:border-gray-200-300 rounded-lg focus:outline-none transition bg-white dark:text-spinny-text-dark";
+  // Removed unused functions: handleInputChange, handleSendReply, handleFlagClick, formInputClass
 
   return (
     <div className="animate-fade-in">

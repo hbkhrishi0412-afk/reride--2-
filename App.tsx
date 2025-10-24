@@ -5,8 +5,7 @@ import {
   VehicleListErrorBoundary, 
   ChatErrorBoundary, 
   DashboardErrorBoundary, 
-  AdminPanelErrorBoundary,
-  AuthenticationErrorBoundary 
+  AdminPanelErrorBoundary
 } from './components/ErrorBoundaries';
 import Header from './components/Header';
 import MobileHeader from './components/MobileHeader';
@@ -20,6 +19,7 @@ import { ChatWidget } from './components/ChatWidget';
 import PWAInstallPrompt from './components/PWAInstallPrompt';
 import useIsMobileApp from './hooks/useIsMobileApp';
 import { View as ViewEnum, Vehicle } from './types';
+import { enrichVehiclesWithSellerInfo } from './utils/vehicleEnrichment';
 
 // Simple loading component
 const LoadingSpinner: React.FC = () => (
@@ -227,7 +227,7 @@ const AppContent: React.FC = () => {
         return (
           <VehicleListErrorBoundary>
             <VehicleList
-              vehicles={vehicles}
+              vehicles={enrichVehiclesWithSellerInfo(vehicles, users)}
               onSelectVehicle={selectVehicle}
               isLoading={isLoading}
               comparisonList={comparisonList}
@@ -352,7 +352,7 @@ const AppContent: React.FC = () => {
       case ViewEnum.COMPARISON:
         return (
           <Comparison 
-            vehicles={vehicles.filter(v => comparisonList.includes(v.id))}
+            vehicles={enrichVehiclesWithSellerInfo(vehicles.filter(v => comparisonList.includes(v.id)), users)}
             onBack={() => navigate(ViewEnum.USED_CARS)}
             onToggleCompare={(id: number) => {
               setComparisonList(prev => 
@@ -367,7 +367,7 @@ const AppContent: React.FC = () => {
       case ViewEnum.WISHLIST:
         return (
           <VehicleList
-            vehicles={vehicles.filter(v => wishlist.includes(v.id))}
+            vehicles={enrichVehiclesWithSellerInfo(vehicles.filter(v => wishlist.includes(v.id)), users)}
             onSelectVehicle={selectVehicle}
             isLoading={isLoading}
             comparisonList={comparisonList}
@@ -409,7 +409,7 @@ const AppContent: React.FC = () => {
           <DashboardErrorBoundary>
             <Dashboard
               seller={currentUser}
-              sellerVehicles={vehicles.filter(v => v.sellerEmail === currentUser.email)}
+              sellerVehicles={enrichVehiclesWithSellerInfo(vehicles.filter(v => v.sellerEmail === currentUser.email), users)}
               reportedVehicles={[]}
               onAddVehicle={() => {}}
               onAddMultipleVehicles={() => {}}
@@ -417,11 +417,11 @@ const AppContent: React.FC = () => {
               onDeleteVehicle={() => {}}
               onMarkAsSold={() => {}}
               conversations={conversations}
-              onSellerSendMessage={(conversationId, messageText, type, payload) => sendMessage(conversationId, messageText)}
+              onSellerSendMessage={(conversationId, messageText, _type, _payload) => sendMessage(conversationId, messageText)}
               onMarkConversationAsReadBySeller={(conversationId) => markAsRead(conversationId)}
               typingStatus={typingStatus}
-              onUserTyping={(conversationId, userRole) => toggleTyping(conversationId, true)}
-              onMarkMessagesAsRead={(conversationId, readerRole) => markAsRead(conversationId)}
+              onUserTyping={(conversationId, _userRole) => toggleTyping(conversationId, true)}
+              onMarkMessagesAsRead={(conversationId, _readerRole) => markAsRead(conversationId)}
               onUpdateSellerProfile={() => {}}
               vehicleData={vehicleData}
               onFeatureListing={() => {}}
@@ -646,7 +646,7 @@ const AppContent: React.FC = () => {
         return publicSellerProfile ? (
           <SellerProfilePage 
             seller={publicSellerProfile}
-            vehicles={vehicles.filter(v => v.sellerEmail === publicSellerProfile?.email)}
+            vehicles={enrichVehiclesWithSellerInfo(vehicles.filter(v => v.sellerEmail === publicSellerProfile?.email), users)}
             onSelectVehicle={selectVehicle}
             comparisonList={comparisonList}
             onToggleCompare={toggleCompare}
@@ -860,8 +860,6 @@ const AppContent: React.FC = () => {
         return 'Seller Login';
       case ViewEnum.ADMIN_LOGIN:
         return 'Admin Login';
-      case ViewEnum.REGISTER:
-        return 'Register';
       case ViewEnum.FORGOT_PASSWORD:
         return 'Reset Password';
       case ViewEnum.SUPPORT:
@@ -936,7 +934,7 @@ const AppContent: React.FC = () => {
         <div className="min-h-screen bg-gray-50">
           <MobileDashboard
             currentUser={currentUser}
-            userVehicles={vehicles.filter(v => v.sellerEmail === currentUser.email)}
+            userVehicles={enrichVehiclesWithSellerInfo(vehicles.filter(v => v.sellerEmail === currentUser.email), users)}
             conversations={conversations}
             onNavigate={navigate}
             onEditVehicle={(vehicle) => {
@@ -961,10 +959,10 @@ const AppContent: React.FC = () => {
               onOfferResponse(conversationId, parseInt(messageId), response as "accepted" | "rejected" | "countered", counterPrice);
             }}
             typingStatus={typingStatus}
-            onUserTyping={(conversationId, userRole) => {
+            onUserTyping={(conversationId, _userRole) => {
               toggleTyping(conversationId, true);
             }}
-            onMarkMessagesAsRead={(conversationId, readerRole) => {
+            onMarkMessagesAsRead={(conversationId, _readerRole) => {
               markAsRead(conversationId);
             }}
             onFlagContent={flagContent}
@@ -1055,17 +1053,17 @@ const AppContent: React.FC = () => {
               currentUserRole={currentUser.role as 'customer' | 'seller'}
               otherUserName={currentUser?.role === 'customer' ? activeChat.sellerId : activeChat.customerName}
               onClose={() => setActiveChat(null)}
-              onSendMessage={(messageText, type, payload) => {
+              onSendMessage={(messageText, _type, _payload) => {
                 sendMessage(activeChat.id, messageText);
               }}
               typingStatus={typingStatus}
-              onUserTyping={(conversationId, userRole) => {
+              onUserTyping={(conversationId, _userRole) => {
                 toggleTyping(conversationId, true);
               }}
-              onMarkMessagesAsRead={(conversationId, readerRole) => {
+              onMarkMessagesAsRead={(conversationId, _readerRole) => {
                 markAsRead(conversationId);
               }}
-              onFlagContent={(type, id, reason) => {
+              onFlagContent={(type, id, _reason) => {
                 flagContent(type, id);
               }}
               onOfferResponse={(conversationId, messageId, response, counterPrice) => {

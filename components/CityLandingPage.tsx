@@ -1,5 +1,5 @@
 import React, { useMemo } from 'react';
-import type { Vehicle, CityStats } from '../types';
+import type { Vehicle } from '../types';
 import { getCityStats } from '../services/locationService';
 import VehicleCard from './VehicleCard';
 
