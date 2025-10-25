@@ -133,7 +133,7 @@ export const useApp = () => {
   return context;
 };
 
-export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+export const AppProvider: React.FC<{ children: React.ReactNode }> = React.memo(({ children }) => {
   
   // All state from App.tsx moved here
   const [currentView, setCurrentView] = useState<View>(View.HOME);
@@ -320,27 +320,35 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     else setCurrentView(view);
   }, [currentView, currentUser]);
 
-  // Load initial data
+  // Load initial data with optimized loading
   useEffect(() => {
     const loadInitialData = async () => {
       try {
         setIsLoading(true);
         
-        // Load vehicles, vehicle data, users, and conversations in parallel
-        const [vehiclesData, vehicleDataData, usersData, conversationsData] = await Promise.all([
+        // Load critical data first (vehicles and users)
+        const [vehiclesData, usersData] = await Promise.all([
           dataService.getVehicles(),
-          dataService.getVehicleData(),
-          dataService.getUsers(),
-          Promise.resolve(getConversations()) // Load conversations from localStorage
+          dataService.getUsers()
         ]);
         
         setVehicles(vehiclesData);
-        setVehicleData(vehicleDataData);
         setUsers(usersData);
-        setConversations(conversationsData);
         
         // Set some recommendations (first 6 vehicles)
         setRecommendations(vehiclesData.slice(0, 6));
+        
+        // Load non-critical data in background
+        Promise.all([
+          dataService.getVehicleData(),
+          Promise.resolve(getConversations())
+        ]).then(([vehicleDataData, conversationsData]) => {
+          setVehicleData(vehicleDataData);
+          setConversations(conversationsData);
+        }).catch(error => {
+          console.warn('Background data loading failed:', error);
+        });
+        
       } catch (error) {
         console.error('AppProvider: Error loading initial data:', error);
         addToast('Failed to load vehicle data. Please refresh the page.', 'error');
@@ -909,7 +917,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
               countered: `💰 Counter-offer made: ₹${counterPrice?.toLocaleString('en-IN')}`
             };
             
-            const responseMessage: ChatMessage = {
+            const responseMessage = {
               id: Date.now(),
               sender: 'seller' as const,
               text: responseMessages[response],
@@ -984,4 +992,4 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       {children}
     </AppContext.Provider>
   );
-};
+});

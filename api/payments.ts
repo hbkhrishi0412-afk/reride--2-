@@ -1,5 +1,5 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
-import connectToDatabase from './lib-db';
+// import connectToDatabase from './lib-db';
 
 // This file consolidates payment processing functionality
 export default async function handler(
@@ -35,7 +35,7 @@ export default async function handler(
 
 // Payment requests handler - preserves exact functionality from payment-requests.ts
 async function handlePaymentRequests(req: VercelRequest, res: VercelResponse) {
-  await connectToDatabase();
+  // await connectToDatabase();
 
   const { action } = req.query;
 
@@ -184,7 +184,7 @@ async function handlePaymentRequests(req: VercelRequest, res: VercelResponse) {
   if (req.method === 'GET') {
     try {
       // Return empty array for demo (in real implementation, fetch from database)
-      const paymentRequests = [];
+      const paymentRequests: any[] = [];
       
       return res.status(200).json({
         success: true,

@@ -191,7 +191,7 @@ async function handlePayments(req: VercelRequest, res: VercelResponse) {
     if (req.method === 'GET') {
       try {
         // Return empty array for demo (in real implementation, fetch from database)
-        const paymentRequests = [];
+        const paymentRequests: any[] = [];
         
         return res.status(200).json({
           success: true,

@@ -31,7 +31,7 @@ const LoadingSpinner: React.FC = () => (
     </div>
 );
 
-// Lazy-loaded components
+// Lazy-loaded components with preloading
 const Home = React.lazy(() => import('./components/Home'));
 const VehicleList = React.lazy(() => import('./components/VehicleList'));
 const VehicleDetail = React.lazy(() => import('./components/VehicleDetail'));
@@ -54,9 +54,25 @@ const AdminLogin = React.lazy(() => import('./AdminLogin'));
 const Login = React.lazy(() => import('./Login'));
 const ForgotPassword = React.lazy(() => import('./components/ForgotPassword'));
 
-const AppContent: React.FC = () => {
+// Preload critical components
+const preloadCriticalComponents = () => {
+  // Preload components that are likely to be visited next
+  if (typeof window !== 'undefined') {
+    setTimeout(() => {
+      import('./components/VehicleList');
+      import('./components/VehicleDetail');
+    }, 1000);
+  }
+};
+
+const AppContent: React.FC = React.memo(() => {
   // Detect if running as mobile app (standalone/installed PWA)
   const { isMobileApp, isMobile } = useIsMobileApp();
+  
+  // Preload critical components after initial render
+  React.useEffect(() => {
+    preloadCriticalComponents();
+  }, []);
   
   const { 
     currentView, 
@@ -182,7 +198,7 @@ const AppContent: React.FC = () => {
   }, [currentView, selectedVehicle]);
 
 
-  const renderView = () => {
+  const renderView = React.useCallback(() => {
     switch (currentView) {
       case ViewEnum.HOME:
         return (
@@ -801,9 +817,24 @@ const AppContent: React.FC = () => {
           </div>
         );
     }
-  };
+  }, [
+    currentView, selectedVehicle, vehicles, users, currentUser, comparisonList, 
+    wishlist, conversations, recommendations, initialSearchQuery, currentCategory,
+    selectedCity, publicSellerProfile, activeChat, faqItems, platformSettings,
+    auditLog, supportTickets, vehicleData, notifications, typingStatus,
+    navigate, setInitialSearchQuery, setSelectedCategory, selectVehicle,
+    setComparisonList, setWishlist, setPublicProfile, addToast, markAsRead,
+    toggleTyping, flagContent, updateUser, deleteUser, updateVehicle,
+    deleteVehicle, toggleWishlist, toggleCompare, handleLogin, handleRegister,
+    onAdminUpdateUser, onUpdateUserPlan, onToggleUserStatus, onToggleVehicleStatus,
+    onToggleVehicleFeature, onResolveFlag, onUpdateSettings, onSendBroadcast,
+    onExportUsers, onExportVehicles, onExportSales, onUpdateVehicleData,
+    onToggleVerifiedStatus, onUpdateSupportTicket, onAddFaq, onUpdateFaq,
+    onDeleteFaq, onCertificationApproval, onOfferResponse, addSellerRating,
+    sendMessage, setActiveChat, setConversations, setForgotPasswordRole
+  ]);
 
-  const handleNotificationClick = (notification: any) => {
+  const handleNotificationClick = React.useCallback((notification: any) => {
     console.log('Notification clicked:', notification);
     
     // Navigate based on notification type
@@ -822,23 +853,23 @@ const AppContent: React.FC = () => {
         }
       }
     }
-  };
+  }, [conversations, currentUser, navigate, setActiveChat]);
 
-  const handleMarkNotificationsAsRead = (ids: number[]) => {
+  const handleMarkNotificationsAsRead = React.useCallback((ids: number[]) => {
     // Handle marking notifications as read
     console.log('Mark notifications as read:', ids);
-  };
+  }, []);
 
-  const handleMarkAllNotificationsAsRead = () => {
+  const handleMarkAllNotificationsAsRead = React.useCallback(() => {
     // Handle marking all notifications as read
     console.log('Mark all notifications as read');
-  };
+  }, []);
 
-  const handleOpenCommandPalette = () => {
+  const handleOpenCommandPalette = React.useCallback(() => {
     setIsCommandPaletteOpen(true);
-  };
+  }, [setIsCommandPaletteOpen]);
 
-  const getPageTitle = () => {
+  const getPageTitle = React.useCallback(() => {
     switch (currentView) {
       case ViewEnum.HOME:
         return 'Home';
@@ -873,7 +904,7 @@ const AppContent: React.FC = () => {
       default:
         return 'ReRide';
     }
-  };
+  }, [currentView, selectedVehicle, selectedCity, publicSellerProfile]);
 
   // Render Mobile App Layout
   if (isMobileApp) {
@@ -1125,17 +1156,17 @@ const AppContent: React.FC = () => {
           currentUserRole={currentUser.role as 'customer' | 'seller'}
           otherUserName={currentUser?.role === 'customer' ? activeChat.sellerId : activeChat.customerName}
           onClose={() => setActiveChat(null)}
-          onSendMessage={(messageText, type, payload) => {
+          onSendMessage={(messageText, _type, _payload) => {
             sendMessage(activeChat.id, messageText);
           }}
           typingStatus={typingStatus}
-          onUserTyping={(conversationId, userRole) => {
+          onUserTyping={(conversationId, _userRole) => {
             toggleTyping(conversationId, true);
           }}
-          onMarkMessagesAsRead={(conversationId, readerRole) => {
+          onMarkMessagesAsRead={(conversationId, _readerRole) => {
             markAsRead(conversationId);
           }}
-          onFlagContent={(type, id, reason) => {
+          onFlagContent={(type, id, _reason) => {
             flagContent(type, id);
           }}
           onOfferResponse={(conversationId, messageId, response, counterPrice) => {
@@ -1147,7 +1178,7 @@ const AppContent: React.FC = () => {
       )}
     </div>
   );
-};
+});
 
 const App: React.FC = () => {
   return (

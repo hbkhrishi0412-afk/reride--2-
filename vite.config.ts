@@ -109,34 +109,33 @@ export default defineConfig({
         return false;
       },
       output: {
-        // Aggressive code splitting for faster initial load
+        // More aggressive code splitting for better performance
         manualChunks: (id) => {
           if (id.includes('node_modules')) {
-            // Separate Firebase into its own chunk (heavy library)
+            // Separate heavy libraries into their own chunks
             if (id.includes('firebase')) {
               return 'firebase';
             }
-            // React core
             if (id.includes('react') || id.includes('react-dom')) {
               return 'react-vendor';
             }
-            // Chart.js - heavy library, separate it
             if (id.includes('chart.js') || id.includes('react-chartjs')) {
               return 'charts';
             }
-            // Google Gemini AI
             if (id.includes('@google/genai')) {
               return 'gemini';
             }
-            // React Window for virtual scrolling
             if (id.includes('react-window')) {
               return 'react-window';
             }
-            // Other vendors
+            // Group smaller libraries together
+            if (id.includes('bcryptjs') || id.includes('validator') || id.includes('dompurify')) {
+              return 'utils-vendor';
+            }
             return 'vendor';
           }
           
-          // Split by feature/route for better caching
+          // Split by feature/route for better caching and lazy loading
           if (id.includes('/components/Dashboard')) {
             return 'dashboard';
           }
@@ -151,6 +150,9 @@ export default defineConfig({
           }
           if (id.includes('/components/Profile') || id.includes('/components/Login')) {
             return 'auth';
+          }
+          if (id.includes('/components/ChatWidget') || id.includes('/components/CustomerInbox')) {
+            return 'chat';
           }
           
           // Split constants by type for better lazy loading
@@ -196,7 +198,10 @@ export default defineConfig({
     // Remove console logs and debugger in production for smaller bundle
     esbuild: {
       drop: ['console', 'debugger'],
-      legalComments: 'none'
+      legalComments: 'none',
+      // Optimize for better performance
+      treeShaking: true,
+      target: 'es2020'
     },
     // Optimize CSS
     cssMinify: true,
@@ -210,6 +215,10 @@ export default defineConfig({
     assetsInlineLimit: 4096,
     // Optimize for faster loading
     reportCompressedSize: false,
+        // Optimize chunk names for better caching
+        chunkFileNames: 'assets/[name]-[hash].js',
+        entryFileNames: 'assets/[name]-[hash].js',
+        assetFileNames: 'assets/[name]-[hash].[ext]'
   },
   server: {
     port: 5174,

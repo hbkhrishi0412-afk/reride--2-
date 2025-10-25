@@ -4,6 +4,8 @@ import type { Vehicle, User, VehicleData } from '../types';
 class DataService {
   private isDevelopment: boolean;
   private apiBaseUrl: string;
+  private cache: Map<string, { data: any; timestamp: number }> = new Map();
+  private readonly CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
 
   constructor() {
     this.isDevelopment = this.detectDevelopment();
@@ -26,6 +28,15 @@ class DataService {
     endpoint: string, 
     options: RequestInit = {}
   ): Promise<T> {
+    // Check cache for GET requests
+    const cacheKey = `${endpoint}_${JSON.stringify(options)}`;
+    if (options.method === 'GET' || !options.method) {
+      const cached = this.cache.get(cacheKey);
+      if (cached && Date.now() - cached.timestamp < this.CACHE_DURATION) {
+        return cached.data;
+      }
+    }
+
     const response = await fetch(`${this.apiBaseUrl}${endpoint}`, {
       headers: {
         'Content-Type': 'application/json',
@@ -50,6 +61,12 @@ class DataService {
     }
 
     const data = await response.json();
+    
+    // Cache GET requests
+    if (options.method === 'GET' || !options.method) {
+      this.cache.set(cacheKey, { data, timestamp: Date.now() });
+    }
+    
     return data;
   }
 
@@ -172,7 +189,7 @@ class DataService {
         // Try to load mock data first
         const mockVehicles = await import('../mock-vehicles.json');
         if (mockVehicles.default && mockVehicles.default.length > 0) {
-          vehicles = mockVehicles.default;
+          vehicles = mockVehicles.default as Vehicle[];
           this.setLocalStorageData('reRideVehicles', vehicles);
           console.log('✅ Loaded mock vehicles data:', vehicles.length, 'vehicles');
         } else {
@@ -315,7 +332,7 @@ class DataService {
         // Try to load mock data first
         const mockUsers = await import('../mock-users.json');
         if (mockUsers.default && mockUsers.default.length > 0) {
-          users = mockUsers.default;
+          users = mockUsers.default as User[];
           this.setLocalStorageData('reRideUsers', users);
           console.log('✅ Loaded mock users data:', users.length, 'users');
         } else {
@@ -406,7 +423,7 @@ class DataService {
     }
   }
 
-  private async registerLocal(credentials: { name: string; email: string; password: string; mobile: string; role: 'seller' | 'customer' | 'admin'; location?: string }): Promise<{ success: boolean, user?: User, reason?: string }> {
+  private async registerLocal(credentials: { name: string; email: string; password: string; mobile: string; role: string; location?: string }): Promise<{ success: boolean, user?: User, reason?: string }> {
     const users = await this.getUsersLocal();
     
     if (users.find(u => u.email === credentials.email)) {
@@ -415,6 +432,7 @@ class DataService {
     
     const newUser: User = {
       ...credentials,
+      role: credentials.role as 'seller' | 'customer' | 'admin',
       location: credentials.location || 'Mumbai', // Default location if not provided
       status: 'active',
       createdAt: new Date().toISOString(),

@@ -20,6 +20,11 @@ interface CustomerInboxProps {
 const CustomerInbox: React.FC<CustomerInboxProps> = ({ conversations, onSendMessage, onMarkAsRead, users, typingStatus, onUserTyping, onMarkMessagesAsRead, onFlagContent, onOfferResponse }) => {
   const [selectedConv, setSelectedConv] = useState<Conversation | null>(null);
   const [replyText, setReplyText] = useState("");
+
+  const getSellerName = (sellerId: string) => {
+    const seller = users.find(u => u.email === sellerId);
+    return seller?.name || seller?.dealershipName || 'Seller';
+  };
   const chatEndRef = useRef<HTMLDivElement>(null);
   const [isOfferModalOpen, setIsOfferModalOpen] = useState(false);
 

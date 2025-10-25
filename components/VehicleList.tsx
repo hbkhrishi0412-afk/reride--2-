@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useRef, useEffect } from 'react';
+import React, { useState, useMemo, useRef, useEffect, useCallback } from 'react';
 import VehicleCard from './VehicleCard';
 import type { Vehicle, VehicleCategory, SavedSearch, SearchFilters } from '../types';
 import { VehicleCategory as CategoryEnum } from '../types';
@@ -87,7 +87,24 @@ const Pagination: React.FC<{ currentPage: number; totalPages: number; onPageChan
   );
 };
 
-const VehicleList: React.FC<VehicleListProps> = ({ vehicles, onSelectVehicle, isLoading, comparisonList, onToggleCompare, onClearCompare, wishlist, onToggleWishlist, categoryTitle, initialCategory = 'ALL', initialSearchQuery = '', isWishlistMode = false, onViewSellerProfile, userLocation = '', currentUser, onSaveSearch }) => {
+const VehicleList: React.FC<VehicleListProps> = React.memo(({ 
+  vehicles, 
+  onSelectVehicle, 
+  isLoading, 
+  comparisonList, 
+  onToggleCompare, 
+  onClearCompare, 
+  wishlist, 
+  onToggleWishlist, 
+  categoryTitle, 
+  initialCategory = 'ALL', 
+  initialSearchQuery = '', 
+  isWishlistMode = false, 
+  onViewSellerProfile, 
+  userLocation = '', 
+  currentUser, 
+  onSaveSearch 
+}) => {
   const [aiSearchQuery, setAiSearchQuery] = useState(initialSearchQuery);
   const [isAiSearching, setIsAiSearching] = useState(false);
   const [suggestions, setSuggestions] = useState<string[]>([]);
@@ -101,13 +118,32 @@ const VehicleList: React.FC<VehicleListProps> = ({ vehicles, onSelectVehicle, is
   const [indianStates, setIndianStates] = useState<Array<{name: string, code: string}>>([]);
   const [fuelTypes, setFuelTypes] = useState<string[]>([]);
 
-  // Load vehicle data for filters
+  // Load vehicle data for filters with caching
   useEffect(() => {
     const loadVehicleDataForFilters = async () => {
       try {
         setIsLoadingVehicleData(true);
+        
+        // Check cache first
+        const cachedData = localStorage.getItem('reRideVehicleDataFilters');
+        if (cachedData) {
+          const { data, timestamp } = JSON.parse(cachedData);
+          if (Date.now() - timestamp < 5 * 60 * 1000) { // 5 minutes cache
+            setVehicleData(data);
+            setIsLoadingVehicleData(false);
+            return;
+          }
+        }
+        
         const data = await getVehicleData();
         setVehicleData(data);
+        
+        // Cache the data
+        localStorage.setItem('reRideVehicleDataFilters', JSON.stringify({
+          data,
+          timestamp: Date.now()
+        }));
+        
         console.log('✅ Vehicle data loaded for filters:', data);
       } catch (error) {
         console.error('❌ Failed to load vehicle data for filters:', error);
@@ -506,36 +542,26 @@ const VehicleList: React.FC<VehicleListProps> = ({ vehicles, onSelectVehicle, is
   const processedVehicles = useMemo(() => {
     const sourceVehicles = isWishlistMode ? vehicles.filter(v => wishlist.includes(v.id)) : vehicles;
 
+    // Early return if no vehicles
+    if (sourceVehicles.length === 0) return [];
+
     const filtered = sourceVehicles.filter(vehicle => {
-        const matchesCategory = categoryFilter === 'ALL' || vehicle.category === categoryFilter;
-        const matchesMake = !makeFilter || vehicle.make === makeFilter;
-        const matchesModel = !modelFilter || vehicle.model === modelFilter;
-        const matchesPrice = vehicle.price >= priceRange.min && vehicle.price <= priceRange.max;
-        const matchesMileage = vehicle.mileage >= mileageRange.min && vehicle.mileage <= mileageRange.max;
-        const matchesFuelType = !fuelTypeFilter || vehicle.fuelType === fuelTypeFilter;
-        const matchesYear = Number(yearFilter) === 0 || vehicle.year === Number(yearFilter);
-        const matchesColor = !colorFilter || vehicle.color === colorFilter;
-        const matchesState = !stateFilter || vehicle.state === stateFilter;
-        const matchesFeatures = selectedFeatures.length === 0 || selectedFeatures.every(feature => vehicle.features && vehicle.features.includes(feature));
+        // Use early returns for better performance
+        if (categoryFilter !== 'ALL' && vehicle.category !== categoryFilter) return false;
+        if (makeFilter && vehicle.make !== makeFilter) return false;
+        if (modelFilter && vehicle.model !== modelFilter) return false;
+        if (vehicle.price < priceRange.min || vehicle.price > priceRange.max) return false;
+        if (vehicle.mileage < mileageRange.min || vehicle.mileage > mileageRange.max) return false;
+        if (fuelTypeFilter && vehicle.fuelType !== fuelTypeFilter) return false;
+        if (yearFilter && vehicle.year !== Number(yearFilter)) return false;
+        if (colorFilter && vehicle.color !== colorFilter) return false;
+        if (stateFilter && vehicle.state !== stateFilter) return false;
+        if (selectedFeatures.length > 0 && (!vehicle.features || !selectedFeatures.every(feature => vehicle.features.includes(feature)))) return false;
         
-        // Debug logging for filter issues
-        if (process.env.NODE_ENV === 'development' && sourceVehicles.length > 0) {
-          const debugInfo = {
-            vehicle: vehicle.make + ' ' + vehicle.model,
-            matchesCategory, matchesMake, matchesModel, matchesPrice, matchesMileage,
-            matchesFuelType, matchesYear, matchesColor, matchesState, matchesFeatures,
-            filters: { categoryFilter, makeFilter, modelFilter, priceRange, mileageRange, fuelTypeFilter, yearFilter, colorFilter, stateFilter, selectedFeatures }
-          };
-          if (!matchesCategory || !matchesMake || !matchesModel || !matchesPrice || !matchesMileage || !matchesFuelType || !matchesYear || !matchesColor || !matchesState || !matchesFeatures) {
-            console.log('Filter debug - Vehicle filtered out:', debugInfo);
-          }
-        }
-        
-        // Apply all filters with AND logic
-        return matchesCategory && matchesMake && matchesModel && matchesPrice && matchesMileage && matchesFuelType && matchesYear && matchesColor && matchesState && matchesFeatures;
+        return true;
     });
 
-    // Debug: Log filter results
+    // Debug: Log filter results (only in development)
     if (process.env.NODE_ENV === 'development') {
       console.log('Filter Results:', {
         totalVehicles: sourceVehicles.length,
@@ -969,6 +995,8 @@ const VehicleList: React.FC<VehicleListProps> = ({ vehicles, onSelectVehicle, is
       <QuickViewModal vehicle={quickViewVehicle} onClose={() => setQuickViewVehicle(null)} onSelectVehicle={onSelectVehicle} onToggleCompare={onToggleCompare} onToggleWishlist={onToggleWishlist} comparisonList={comparisonList} wishlist={wishlist} />
     </>
   );
-};
+});
+
+VehicleList.displayName = 'VehicleList';
 
 export default VehicleList;
