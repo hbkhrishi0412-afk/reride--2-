@@ -121,29 +121,47 @@ const Login: React.FC<LoginProps> = ({ onLogin, onRegister, onNavigate, onForgot
   }
 
   return (
-    <div className="seller-dashboard-login w-full max-w-md space-y-8 bg-spinny-white dark:bg-white p-10 rounded-xl shadow-soft-xl">
-      <div>
-        <h2 className="mt-6 text-center text-3xl font-extrabold text-spinny-text-dark">
-          {isLogin ? 'Seller Dashboard Login' : 'Create a Seller Account'}
-        </h2>
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-blue-50 relative overflow-hidden flex items-center justify-center p-4">
+      {/* Background Elements */}
+      <div className="absolute inset-0 overflow-hidden">
+        <div className="absolute top-20 right-20 w-80 h-80 bg-gradient-to-br from-blue-200/20 to-purple-200/20 rounded-full blur-3xl animate-pulse"></div>
+        <div className="absolute bottom-20 left-20 w-96 h-96 bg-gradient-to-tr from-orange-200/15 to-pink-200/15 rounded-full blur-3xl animate-pulse" style={{animationDelay: '2s'}}></div>
       </div>
+      
+      <div className="relative z-10 w-full max-w-md">
+        <div className="bg-white/80 backdrop-blur-xl rounded-3xl shadow-xl border border-white/20 p-10 space-y-8">
+          <div className="text-center">
+            <div className="flex items-center justify-center gap-3 mb-6">
+              <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-purple-600 rounded-xl flex items-center justify-center">
+                <svg className="w-7 h-7 text-white" fill="currentColor" viewBox="0 0 20 20">
+                  <path fillRule="evenodd" d="M11.49 3.17c-.38-1.56-2.6-1.56-2.98 0a1.532 1.532 0 01-2.286.948c-1.372-.836-2.942.734-2.106 2.106.54.886.061 2.042-.947 2.287-1.561.379-1.561 2.6 0 2.978a1.532 1.532 0 01.947 2.287c-.836 1.372.734 2.942 2.106 2.106a1.532 1.532 0 012.287.947c.379 1.561 2.6 1.561 2.978 0a1.533 1.533 0 012.287-.947c1.372.836 2.942-.734 2.106-2.106a1.533 1.533 0 01.947-2.287c1.561-.379 1.561-2.6 0-2.978a1.532 1.532 0 01-.947-2.287c.836-1.372-.734-2.942-2.106-2.106a1.532 1.532 0 01-2.287-.947zM10 13a3 3 0 100-6 3 3 0 000 6z" clipRule="evenodd" />
+                </svg>
+              </div>
+              <h2 className="text-3xl font-black bg-gradient-to-r from-gray-900 via-blue-800 to-purple-800 bg-clip-text text-transparent">
+                {isLogin ? 'Seller Login' : 'Create Account'}
+              </h2>
+            </div>
+            <p className="text-gray-600 text-lg">
+              {isLogin ? 'Welcome back to your dashboard' : 'Join thousands of successful sellers'}
+            </p>
+          </div>
       <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
-        <div className="rounded-md shadow-sm space-y-4">
+        <div className="space-y-4">
           {!isLogin && (
                <>
                   <div>
-                    <label htmlFor="full-name" className="sr-only">Full name</label>
-                    <input id="full-name" name="name" type="text" autoComplete="name" required className={`${formInputClass} rounded-md`} placeholder="Full name" value={name} onChange={(e) => setName(e.target.value)} />
+                    <label htmlFor="full-name" className="block text-sm font-semibold text-gray-700 mb-2">Full Name</label>
+                    <input id="full-name" name="name" type="text" autoComplete="name" required className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300 bg-white/50 backdrop-blur-sm" placeholder="Enter your full name" value={name} onChange={(e) => setName(e.target.value)} />
                   </div>
                   <div>
-                    <label htmlFor="mobile-number" className="sr-only">Mobile number</label>
-                    <input id="mobile-number" name="mobile" type="tel" autoComplete="tel" required className={`${formInputClass} rounded-md`} placeholder="Mobile number" value={mobile} onChange={(e) => setMobile(e.target.value)} />
+                    <label htmlFor="mobile-number" className="block text-sm font-semibold text-gray-700 mb-2">Mobile Number</label>
+                    <input id="mobile-number" name="mobile" type="tel" autoComplete="tel" required className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300 bg-white/50 backdrop-blur-sm" placeholder="Enter your mobile number" value={mobile} onChange={(e) => setMobile(e.target.value)} />
                   </div>
                </>
           )}
           <div>
-            <label htmlFor="email-address" className="sr-only">Email address</label>
-            <input id="email-address" name="email" type="email" autoComplete="email" required className={`${formInputClass} rounded-md`} placeholder="Email address" value={email} onChange={(e) => setEmail(e.target.value)} />
+            <label htmlFor="email-address" className="block text-sm font-semibold text-gray-700 mb-2">Email Address</label>
+            <input id="email-address" name="email" type="email" autoComplete="email" required className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300 bg-white/50 backdrop-blur-sm" placeholder="Enter your email address" value={email} onChange={(e) => setEmail(e.target.value)} />
           </div>
           <PasswordInput
             id="password"
@@ -173,8 +191,15 @@ const Login: React.FC<LoginProps> = ({ onLogin, onRegister, onNavigate, onForgot
         {error && <p className="text-spinny-orange text-sm text-center">{error}</p>}
 
         <div>
-          <button type="submit" disabled={isLoading} className="btn-brand-primary group relative w-full flex justify-center py-3 px-4 border border-transparent text-sm font-medium rounded-md text-white focus:outline-none focus:ring-2 focus:ring-offset-2 transition-colors disabled:opacity-50">
-            {isLoading ? 'Processing...' : (isLogin ? 'Sign in' : 'Create Account')}
+          <button type="submit" disabled={isLoading} className="group relative w-full flex justify-center py-3 px-4 border border-transparent text-sm font-bold rounded-xl text-white bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all duration-300 transform hover:scale-105 hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed">
+            {isLoading ? (
+              <div className="flex items-center gap-2">
+                <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                <span>Processing...</span>
+              </div>
+            ) : (
+              <span>{isLogin ? 'Sign In' : 'Create Account'}</span>
+            )}
           </button>
         </div>
       </form>
@@ -195,7 +220,7 @@ const Login: React.FC<LoginProps> = ({ onLogin, onRegister, onNavigate, onForgot
             type="button"
             onClick={handleGoogleSignIn}
             disabled={isLoading}
-            className="w-full inline-flex justify-center items-center py-3 px-4 border border-gray-300 rounded-md shadow-sm bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-spinny-orange transition-colors disabled:opacity-50"
+            className="w-full inline-flex justify-center items-center py-3 px-4 border border-gray-200 rounded-xl shadow-sm bg-white/50 backdrop-blur-sm text-sm font-medium text-gray-700 hover:bg-white hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all duration-300 transform hover:scale-105 disabled:opacity-50"
           >
             <svg className="w-5 h-5 mr-2" viewBox="0 0 24 24">
               <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
@@ -210,7 +235,7 @@ const Login: React.FC<LoginProps> = ({ onLogin, onRegister, onNavigate, onForgot
             type="button"
             onClick={() => setMode('otp')}
             disabled={isLoading}
-            className="w-full inline-flex justify-center items-center py-3 px-4 border border-gray-300 rounded-md shadow-sm bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-spinny-orange transition-colors disabled:opacity-50"
+            className="w-full inline-flex justify-center items-center py-3 px-4 border border-gray-200 rounded-xl shadow-sm bg-white/50 backdrop-blur-sm text-sm font-medium text-gray-700 hover:bg-white hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all duration-300 transform hover:scale-105 disabled:opacity-50"
           >
             <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z" />
@@ -228,6 +253,8 @@ const Login: React.FC<LoginProps> = ({ onLogin, onRegister, onNavigate, onForgot
           <button onClick={() => onNavigate(View.LOGIN_PORTAL)} className="font-medium transition-colors" style={{ color: '#FF6B35' }} onMouseEnter={(e) => e.currentTarget.style.color = 'var(--spinny-blue)'} onMouseLeave={(e) => e.currentTarget.style.color = 'var(--spinny-orange)'}>
               &larr; Back to Role Selection
           </button>
+      </div>
+      </div>
       </div>
     </div>
   );

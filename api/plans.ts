@@ -1,5 +1,5 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
-import { planService } from '../services/planService';
+import { planService } from '../services/planService.js';
 
 export default async function handler(
   req: VercelRequest,

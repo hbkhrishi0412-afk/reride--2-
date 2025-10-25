@@ -122,12 +122,30 @@ const CustomerLogin: React.FC<CustomerLoginProps> = ({ onLogin, onRegister, onNa
   }
 
   return (
-    <div className="w-full max-w-md space-y-8 bg-spinny-white dark:bg-white p-10 rounded-xl shadow-soft-xl">
-      <div>
-        <h2 className="mt-6 text-center text-3xl font-extrabold text-spinny-text-dark">
-          {isLogin ? 'Welcome Back!' : 'Create an Account'}
-        </h2>
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-blue-50 relative overflow-hidden flex items-center justify-center p-4">
+      {/* Background Elements */}
+      <div className="absolute inset-0 overflow-hidden">
+        <div className="absolute top-20 right-20 w-80 h-80 bg-gradient-to-br from-blue-200/20 to-purple-200/20 rounded-full blur-3xl animate-pulse"></div>
+        <div className="absolute bottom-20 left-20 w-96 h-96 bg-gradient-to-tr from-orange-200/15 to-pink-200/15 rounded-full blur-3xl animate-pulse" style={{animationDelay: '2s'}}></div>
       </div>
+      
+      <div className="relative z-10 w-full max-w-md">
+        <div className="bg-white/80 backdrop-blur-xl rounded-3xl shadow-xl border border-white/20 p-10 space-y-8">
+          <div className="text-center">
+            <div className="flex items-center justify-center gap-3 mb-6">
+              <div className="w-12 h-12 bg-gradient-to-br from-green-500 to-teal-600 rounded-xl flex items-center justify-center">
+                <svg className="w-7 h-7 text-white" fill="currentColor" viewBox="0 0 20 20">
+                  <path fillRule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clipRule="evenodd" />
+                </svg>
+              </div>
+              <h2 className="text-3xl font-black bg-gradient-to-r from-gray-900 via-green-800 to-teal-800 bg-clip-text text-transparent">
+                {isLogin ? 'Welcome Back!' : 'Create Account'}
+              </h2>
+            </div>
+            <p className="text-gray-600 text-lg">
+              {isLogin ? 'Sign in to continue your journey' : 'Join our community of happy customers'}
+            </p>
+          </div>
       <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
         <div className="rounded-md shadow-sm space-y-4">
           {!isLogin && (
@@ -243,6 +261,8 @@ const CustomerLogin: React.FC<CustomerLoginProps> = ({ onLogin, onRegister, onNa
       </div>
       <div className="text-center">
           <button onClick={() => onNavigate(View.LOGIN_PORTAL)} className="font-medium text-spinny-orange hover:text-spinny-orange-dark">&larr; Back to Role Selection</button>
+      </div>
+      </div>
       </div>
     </div>
   );

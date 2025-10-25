@@ -125,45 +125,85 @@ const BuyerDashboard: React.FC<BuyerDashboardProps> = ({
   ];
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-brand-gray-900">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="grid grid-cols-1 lg:grid-cols-[250px_1fr] gap-8">
-          {/* Sidebar Navigation */}
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-blue-50 relative overflow-hidden">
+      {/* Background Elements */}
+      <div className="absolute inset-0 overflow-hidden">
+        <div className="absolute top-20 right-20 w-80 h-80 bg-gradient-to-br from-blue-200/20 to-purple-200/20 rounded-full blur-3xl animate-pulse"></div>
+        <div className="absolute bottom-20 left-20 w-96 h-96 bg-gradient-to-tr from-orange-200/15 to-pink-200/15 rounded-full blur-3xl animate-pulse" style={{animationDelay: '2s'}}></div>
+      </div>
+      
+      <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div className="grid grid-cols-1 lg:grid-cols-[280px_1fr] gap-8">
+          {/* Premium Sidebar */}
           <aside className="lg:col-span-1">
-            <div className="bg-white dark:bg-brand-gray-800 rounded-xl shadow-soft p-4 space-y-2 sticky top-8">
-              <h3 className="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-3">Dashboard</h3>
+            <div className="bg-white/80 backdrop-blur-xl rounded-3xl shadow-xl border border-white/20 p-6 space-y-3 sticky top-8">
+              <div className="flex items-center gap-3 mb-6">
+                <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-xl flex items-center justify-center">
+                  <svg className="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 20 20">
+                    <path d="M3 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z"/>
+                  </svg>
+                </div>
+                <h3 className="text-lg font-bold bg-gradient-to-r from-gray-900 via-blue-800 to-purple-800 bg-clip-text text-transparent">
+                  Dashboard
+                </h3>
+              </div>
+              
               <button
                 onClick={() => setActiveTab('overview')}
-                className={`w-full text-left px-4 py-3 rounded-lg transition-colors ${
-                  activeTab === 'overview' ? 'bg-brand-blue-50 text-brand-blue-700' : 'text-gray-600 hover:bg-gray-50'
+                className={`group flex items-center gap-3 w-full text-left px-4 py-3 rounded-xl transition-all duration-300 ${
+                  activeTab === 'overview' 
+                    ? 'bg-gradient-to-r from-blue-500 to-purple-600 text-white shadow-lg transform scale-105' 
+                    : 'text-gray-600 hover:bg-gradient-to-r hover:from-blue-50 hover:to-purple-50 hover:text-blue-600 hover:shadow-md hover:-translate-y-0.5'
                 }`}
               >
-                📊 Overview
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
+                </svg>
+                <span className="font-medium">Overview</span>
               </button>
+              
               <button
                 onClick={() => setActiveTab('searches')}
-                className={`w-full text-left px-4 py-3 rounded-lg transition-colors ${
-                  activeTab === 'searches' ? 'bg-brand-blue-50 text-brand-blue-700' : 'text-gray-600 hover:bg-gray-50'
+                className={`group flex items-center gap-3 w-full text-left px-4 py-3 rounded-xl transition-all duration-300 ${
+                  activeTab === 'searches' 
+                    ? 'bg-gradient-to-r from-blue-500 to-purple-600 text-white shadow-lg transform scale-105' 
+                    : 'text-gray-600 hover:bg-gradient-to-r hover:from-blue-50 hover:to-purple-50 hover:text-blue-600 hover:shadow-md hover:-translate-y-0.5'
                 }`}
               >
-                🔍 Saved Searches
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                </svg>
+                <span className="font-medium">Saved Searches</span>
               </button>
+              
               <button
                 onClick={() => setActiveTab('activity')}
-                className={`w-full text-left px-4 py-3 rounded-lg transition-colors ${
-                  activeTab === 'activity' ? 'bg-brand-blue-50 text-brand-blue-700' : 'text-gray-600 hover:bg-gray-50'
+                className={`group flex items-center gap-3 w-full text-left px-4 py-3 rounded-xl transition-all duration-300 ${
+                  activeTab === 'activity' 
+                    ? 'bg-gradient-to-r from-blue-500 to-purple-600 text-white shadow-lg transform scale-105' 
+                    : 'text-gray-600 hover:bg-gradient-to-r hover:from-blue-50 hover:to-purple-50 hover:text-blue-600 hover:shadow-md hover:-translate-y-0.5'
                 }`}
               >
-                🕒 Recent Activity
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                </svg>
+                <span className="font-medium">Recent Activity</span>
               </button>
+              
               <button
                 onClick={() => setActiveTab('alerts')}
-                className={`w-full text-left px-4 py-3 rounded-lg transition-colors ${
-                  activeTab === 'alerts' ? 'bg-brand-blue-50 text-brand-blue-700' : 'text-gray-600 hover:bg-gray-50'
+                className={`group flex items-center gap-3 w-full text-left px-4 py-3 rounded-xl transition-all duration-300 ${
+                  activeTab === 'alerts' 
+                    ? 'bg-gradient-to-r from-blue-500 to-purple-600 text-white shadow-lg transform scale-105' 
+                    : 'text-gray-600 hover:bg-gradient-to-r hover:from-blue-50 hover:to-purple-50 hover:text-blue-600 hover:shadow-md hover:-translate-y-0.5'
                 }`}
               >
-                🔔 Alerts {priceDrops.length + newMatches.length > 0 && (
-                  <span className="bg-red-100 text-red-600 text-xs font-bold px-2 py-0.5 rounded-full ml-2">
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 17h5l-5 5v-5zM4.828 7l2.586 2.586a2 2 0 002.828 0L12.828 7H4.828z"/>
+                </svg>
+                <span className="font-medium">Alerts</span>
+                {priceDrops.length + newMatches.length > 0 && (
+                  <span className="bg-gradient-to-r from-red-500 to-pink-500 text-white text-xs font-bold rounded-full px-2 py-0.5 ml-auto">
                     {priceDrops.length + newMatches.length}
                   </span>
                 )}

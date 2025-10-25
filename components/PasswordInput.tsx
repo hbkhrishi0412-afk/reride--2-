@@ -35,17 +35,17 @@ const PasswordInput: React.FC<PasswordInputProps> = ({
     setShowPassword(!showPassword);
   };
 
-  const baseInputClass = "appearance-none relative block w-full px-4 py-3 border border-gray-300 placeholder-gray-500 text-spinny-text-dark bg-white focus:outline-none focus:ring-2 focus:ring-spinny-orange focus:border-spinny-orange focus:z-10 sm:text-sm";
+  const baseInputClass = "appearance-none relative block w-full px-4 py-3 border border-gray-200 rounded-xl placeholder-gray-500 text-gray-800 bg-white/50 backdrop-blur-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent focus:bg-white transition-all duration-300 sm:text-sm";
   const inputClass = `${baseInputClass} ${className}`;
 
   return (
-    <div>
+    <div className="space-y-2">
       {showLabel && label && (
-        <label htmlFor={id || name} className="block text-sm font-medium text-spinny-text-dark dark:text-spinny-text-dark mb-1">
+        <label htmlFor={id || name} className="block text-sm font-semibold text-gray-700 mb-2">
           {label}
         </label>
       )}
-      <div className="relative">
+      <div className="relative group">
         <input
           id={id || name}
           name={name}
@@ -61,7 +61,7 @@ const PasswordInput: React.FC<PasswordInputProps> = ({
         <button
           type="button"
           onClick={togglePasswordVisibility}
-          className="absolute inset-y-0 right-0 px-3 flex items-center text-gray-500 hover:text-gray-700 focus:outline-none focus:text-gray-700"
+          className="absolute inset-y-0 right-0 px-4 flex items-center text-gray-500 hover:text-blue-600 focus:outline-none focus:text-blue-600 transition-colors duration-300 group-hover:scale-110 transform"
           aria-label={showPassword ? "Hide password" : "Show password"}
           disabled={disabled}
         >
@@ -110,7 +110,7 @@ const PasswordInput: React.FC<PasswordInputProps> = ({
           )}
         </button>
       </div>
-      {error && <p className="mt-1 text-sm text-red-600">{error}</p>}
+      {error && <p className="mt-2 text-sm text-red-500 bg-red-50 p-2 rounded-lg border border-red-200">{error}</p>}
     </div>
   );
 };

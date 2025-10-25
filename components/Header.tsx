@@ -92,10 +92,10 @@ const Header: React.FC<HeaderProps> = memo(({
 
     return (
         <>
-            <header className="spinny-header sticky top-0 z-50">
-                {/* Top Bar */}
-                <div className="spinny-header-top">
-                    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex justify-between items-center">
+            <header className="bg-white/80 backdrop-blur-xl border-b border-white/20 sticky top-0 z-50 shadow-lg">
+                {/* Premium Top Bar */}
+                <div className="bg-gradient-to-r from-blue-50/50 to-purple-50/50 border-b border-gray-100/50">
+                    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex justify-between items-center py-2">
                         <div className="flex items-center gap-6">
                             <span className="flex items-center gap-2">
                                 <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20" style={{ color: '#1E88E5' }}>
@@ -119,31 +119,46 @@ const Header: React.FC<HeaderProps> = memo(({
                     </div>
                 </div>
 
-                {/* Main Navigation */}
-                <div className="bg-white border-b border-gray-200">
+                {/* Premium Main Navigation */}
+                <div className="bg-white/90 backdrop-blur-sm">
                     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                         <div className="flex justify-between items-center h-20">
-                            {/* Logo */}
+                            {/* Premium Logo */}
                             <Logo 
                                 onClick={() => handleNavigate(ViewEnum.HOME)}
-                                className="cursor-pointer"
+                                className="cursor-pointer hover:scale-105 transition-transform duration-300"
                             />
 
-                            {/* Navigation */}
-                            <nav className="hidden md:flex items-center gap-2">
-                                <button onClick={() => handleNavigate(ViewEnum.USED_CARS)} className="spinny-nav-link">
+                            {/* Premium Navigation */}
+                            <nav className="hidden md:flex items-center gap-1">
+                                <button 
+                                    onClick={() => handleNavigate(ViewEnum.USED_CARS)} 
+                                    className="px-4 py-2 rounded-xl font-semibold text-gray-700 hover:bg-gradient-to-r hover:from-blue-50 hover:to-purple-50 hover:text-blue-600 transition-all duration-300 hover:-translate-y-0.5"
+                                >
                                     Buy Car
                                 </button>
-                                <button onClick={() => handleNavigate(ViewEnum.SELLER_LOGIN)} className="spinny-nav-link">
+                                <button 
+                                    onClick={() => handleNavigate(ViewEnum.SELLER_LOGIN)} 
+                                    className="px-4 py-2 rounded-xl font-semibold text-gray-700 hover:bg-gradient-to-r hover:from-blue-50 hover:to-purple-50 hover:text-blue-600 transition-all duration-300 hover:-translate-y-0.5"
+                                >
                                     Sell Car
                                 </button>
-                                <button onClick={() => handleNavigate(ViewEnum.NEW_CARS)} className="spinny-nav-link">
+                                <button 
+                                    onClick={() => handleNavigate(ViewEnum.NEW_CARS)} 
+                                    className="px-4 py-2 rounded-xl font-semibold text-gray-700 hover:bg-gradient-to-r hover:from-blue-50 hover:to-purple-50 hover:text-blue-600 transition-all duration-300 hover:-translate-y-0.5"
+                                >
                                     New Cars
                                 </button>
-                                <button onClick={() => handleNavigate(ViewEnum.DEALER_PROFILES)} className="spinny-nav-link">
+                                <button 
+                                    onClick={() => handleNavigate(ViewEnum.DEALER_PROFILES)} 
+                                    className="px-4 py-2 rounded-xl font-semibold text-gray-700 hover:bg-gradient-to-r hover:from-blue-50 hover:to-purple-50 hover:text-blue-600 transition-all duration-300 hover:-translate-y-0.5"
+                                >
                                     Dealers
                                 </button>
-                                <button onClick={() => handleNavigate(ViewEnum.SUPPORT)} className="spinny-nav-link">
+                                <button 
+                                    onClick={() => handleNavigate(ViewEnum.SUPPORT)} 
+                                    className="px-4 py-2 rounded-xl font-semibold text-gray-700 hover:bg-gradient-to-r hover:from-blue-50 hover:to-purple-50 hover:text-blue-600 transition-all duration-300 hover:-translate-y-0.5"
+                                >
                                     Support
                                 </button>
                             </nav>

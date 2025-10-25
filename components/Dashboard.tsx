@@ -79,13 +79,23 @@ const FormInput: React.FC<{ label: string; name: keyof Vehicle | 'summary'; type
 );
 
 
-const StatCard: React.FC<{ title: string; value: string | number; icon: React.ReactNode }> = memo(({ title, value, icon }) => (
-  <div className="bg-white p-6 rounded-lg shadow-md flex items-center">
-    <div className="p-3 rounded-full mr-4" style={{ background: 'rgba(30, 136, 229, 0.1)' }}>{icon}</div>
-    <div>
-      <h3 className="text-sm font-medium text-spinny-text-dark dark:text-spinny-text-dark">{title}</h3>
-      <p className="text-2xl font-bold text-spinny-text-dark dark:text-spinny-text-dark">{value}</p>
+const StatCard: React.FC<{ title: string; value: string | number; icon: React.ReactNode; gradient?: string }> = memo(({ title, value, icon, gradient = "from-blue-500 to-indigo-600" }) => (
+  <div className="group bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 p-6 border border-gray-100 hover:border-blue-200 hover:-translate-y-1">
+    <div className="flex items-center justify-between mb-4">
+      <div className={`w-12 h-12 bg-gradient-to-br ${gradient} rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform duration-300 shadow-lg`}>
+        <div className="text-white">
+          {icon}
+        </div>
+      </div>
+      <div className="text-right">
+        <p className="text-3xl font-black bg-gradient-to-r from-gray-900 via-blue-800 to-purple-800 bg-clip-text text-transparent">
+          {value}
+        </p>
+      </div>
     </div>
+    <h3 className="text-sm font-semibold text-gray-600 group-hover:text-blue-600 transition-colors duration-300">
+      {title}
+    </h3>
   </div>
 ));
 
@@ -1725,70 +1735,168 @@ const Dashboard: React.FC<DashboardProps> = ({ seller, sellerVehicles, reportedV
   }
 
   const NavItem: React.FC<{ view: DashboardView, children: React.ReactNode, count?: number }> = ({ view, children, count }) => (
-    <button onClick={() => handleNavigate(view)} className={`flex justify-between items-center w-full text-left px-4 py-3 rounded-lg transition-colors ${activeView === view ? 'text-white' : 'hover:bg-brand-gray-light dark:hover:bg-white'}`} style={activeView === view ? { background: 'var(--gradient-primary)' } : undefined}>
-      <span>{children}</span>
-      {count && count > 0 && <span className="bg-spinny-orange-light0 text-white text-xs font-bold rounded-full px-2 py-0.5">{count}</span>}
+    <button 
+      onClick={() => handleNavigate(view)} 
+      className={`group flex justify-between items-center w-full text-left px-4 py-3 rounded-xl transition-all duration-300 ${
+        activeView === view 
+          ? 'bg-gradient-to-r from-blue-500 to-purple-600 text-white shadow-lg transform scale-105' 
+          : 'text-gray-600 hover:bg-gradient-to-r hover:from-blue-50 hover:to-purple-50 hover:text-blue-600 hover:shadow-md hover:-translate-y-0.5'
+      }`}
+    >
+      <span className="font-medium">{children}</span>
+      {count && count > 0 && (
+        <span className={`text-xs font-bold rounded-full px-2 py-0.5 ${
+          activeView === view 
+            ? 'bg-white/20 text-white' 
+            : 'bg-gradient-to-r from-red-500 to-pink-500 text-white'
+        }`}>
+          {count}
+        </span>
+      )}
     </button>
   );
 
   // Removed unused AppNavItem component
 
   return (
-    <div className="container mx-auto py-8 animate-fade-in">
-        <div className="grid grid-cols-1 md:grid-cols-[250px_1fr] gap-8">
-            <aside>
-            <div className="bg-white p-4 rounded-lg shadow-md space-y-2">
-                <h3 className="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-3">Dashboard</h3>
-                <NavItem view="overview">Overview</NavItem>
-                <NavItem view="analytics">Analytics</NavItem>
-                <NavItem view="listings">My Listings</NavItem>
-                <NavItem view="reports" count={reportedCount}>Reports</NavItem>
-                <NavItem view="salesHistory">Sales History</NavItem>
-                <NavItem view="form">Add Vehicle</NavItem>
-                <NavItem view="inquiries" count={unreadCount}>Inquiries</NavItem>
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-blue-50 relative overflow-hidden">
+      {/* Background Elements */}
+      <div className="absolute inset-0 overflow-hidden">
+        <div className="absolute top-20 right-20 w-80 h-80 bg-gradient-to-br from-blue-200/20 to-purple-200/20 rounded-full blur-3xl animate-pulse"></div>
+        <div className="absolute bottom-20 left-20 w-96 h-96 bg-gradient-to-tr from-orange-200/15 to-pink-200/15 rounded-full blur-3xl animate-pulse" style={{animationDelay: '2s'}}></div>
+      </div>
+      
+      <div className="relative z-10 container mx-auto py-8 px-4">
+        <div className="grid grid-cols-1 lg:grid-cols-[280px_1fr] gap-8">
+          {/* Premium Sidebar */}
+          <aside className="lg:col-span-1">
+            <div className="bg-white/80 backdrop-blur-xl rounded-3xl shadow-xl border border-white/20 p-6 space-y-3 sticky top-8">
+              <div className="flex items-center gap-3 mb-6">
+                <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-xl flex items-center justify-center">
+                  <svg className="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 20 20">
+                    <path d="M3 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z"/>
+                  </svg>
+                </div>
+                <h3 className="text-lg font-bold bg-gradient-to-r from-gray-900 via-blue-800 to-purple-800 bg-clip-text text-transparent">
+                  Dashboard
+                </h3>
+              </div>
+              
+              <NavItem view="overview">
+                <div className="flex items-center gap-3">
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2H5a2 2 0 00-2-2z"/>
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 5a2 2 0 012-2h4a2 2 0 012 2v2H8V5z"/>
+                  </svg>
+                  <span>Overview</span>
+                </div>
+              </NavItem>
+              
+              <NavItem view="analytics">
+                <div className="flex items-center gap-3">
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
+                  </svg>
+                  <span>Analytics</span>
+                </div>
+              </NavItem>
+              
+              <NavItem view="listings">
+                <div className="flex items-center gap-3">
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/>
+                  </svg>
+                  <span>My Listings</span>
+                </div>
+              </NavItem>
+              
+              <NavItem view="reports" count={reportedCount}>
+                <div className="flex items-center gap-3">
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                  </svg>
+                  <span>Reports</span>
+                </div>
+              </NavItem>
+              
+              <NavItem view="salesHistory">
+                <div className="flex items-center gap-3">
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1"/>
+                  </svg>
+                  <span>Sales History</span>
+                </div>
+              </NavItem>
+              
+              <NavItem view="form">
+                <div className="flex items-center gap-3">
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
+                  </svg>
+                  <span>Add Vehicle</span>
+                </div>
+              </NavItem>
+              
+              <NavItem view="inquiries" count={unreadCount}>
+                <div className="flex items-center gap-3">
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/>
+                  </svg>
+                  <span>Inquiries</span>
+                </div>
+              </NavItem>
             </div>
-            </aside>
-            <main>
-            {renderContent()}
-            </main>
-            {selectedConv && seller && (
-                <ChatWidget
-                    conversation={selectedConv}
-                    currentUserRole="seller"
-                    otherUserName={selectedConv.customerName}
-                    onSendMessage={(messageText, type, payload) => onSellerSendMessage(selectedConv.id, messageText, type, payload)}
-                    onClose={() => setSelectedConv(null)}
-                    onUserTyping={onUserTyping}
-                    onMarkMessagesAsRead={onMarkMessagesAsRead}
-                    onFlagContent={() => {}}
-                    typingStatus={typingStatus}
-                    onOfferResponse={onOfferResponse}
-                />
-            )}
-            {isBulkUploadOpen && (
-                <BulkUploadModal
-                    onClose={() => setIsBulkUploadOpen(false)}
-                    onAddMultipleVehicles={onAddMultipleVehicles}
-                    sellerEmail={seller.email}
-                />
-            )}
-            {showBoostModal && vehicleToBoost && (
-                <BoostListingModal
-                    vehicle={vehicleToBoost}
-                    onClose={() => { setShowBoostModal(false); setVehicleToBoost(null); }}
-                    onBoost={async (vehicleId, packageId) => {
-                        await fetch('/api/vehicles?action=boost', {
-                            method: 'POST',
-                            headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({ vehicleId, packageId, sellerEmail: seller.email })
-                        });
-                        setShowBoostModal(false);
-                        setVehicleToBoost(null);
-                        window.location.reload();
-                    }}
-                />
-            )}
+          </aside>
+          
+          {/* Premium Main Content */}
+          <main className="lg:col-span-1">
+            <div className="bg-white/80 backdrop-blur-xl rounded-3xl shadow-xl border border-white/20 p-8 min-h-[600px]">
+              {renderContent()}
+            </div>
+          </main>
         </div>
+        
+        {/* Premium Modals */}
+        {selectedConv && seller && (
+          <ChatWidget
+            conversation={selectedConv}
+            currentUserRole="seller"
+            otherUserName={selectedConv.customerName}
+            onSendMessage={(messageText, type, payload) => onSellerSendMessage(selectedConv.id, messageText, type, payload)}
+            onClose={() => setSelectedConv(null)}
+            onUserTyping={onUserTyping}
+            onMarkMessagesAsRead={onMarkMessagesAsRead}
+            onFlagContent={() => {}}
+            typingStatus={typingStatus}
+            onOfferResponse={onOfferResponse}
+          />
+        )}
+        
+        {isBulkUploadOpen && (
+          <BulkUploadModal
+            onClose={() => setIsBulkUploadOpen(false)}
+            onAddMultipleVehicles={onAddMultipleVehicles}
+            sellerEmail={seller.email}
+          />
+        )}
+        
+        {showBoostModal && vehicleToBoost && (
+          <BoostListingModal
+            vehicle={vehicleToBoost}
+            onClose={() => { setShowBoostModal(false); setVehicleToBoost(null); }}
+            onBoost={async (vehicleId, packageId) => {
+              await fetch('/api/vehicles?action=boost', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ vehicleId, packageId, sellerEmail: seller.email })
+              });
+              setShowBoostModal(false);
+              setVehicleToBoost(null);
+              window.location.reload();
+            }}
+          />
+        )}
+      </div>
     </div>
   );
 };

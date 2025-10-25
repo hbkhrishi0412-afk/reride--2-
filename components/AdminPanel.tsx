@@ -1,5 +1,5 @@
 
-import React, { useMemo, useState, useEffect } from 'react';
+import React, { useMemo, useState, useEffect, useRef } from 'react';
 import type { Vehicle, User, Conversation, PlatformSettings, AuditLogEntry, VehicleData, SupportTicket, FAQItem, SubscriptionPlan, PlanDetails } from '../types';
 import { View } from '../types';
 import EditUserModal from './EditUserModal';
@@ -10,6 +10,119 @@ import { VehicleDataBulkUploadModal } from './VehicleDataBulkUploadModal';
 import VehicleDataManagement from './VehicleDataManagement';
 import SellerFormPreview from './SellerFormPreview';
 import { planService } from '../services/planService';
+
+// --- Seller Filter Dropdown Component ---
+interface SellerFilterDropdownProps {
+    sellers: User[];
+    selectedSeller: string;
+    onSellerChange: (sellerEmail: string) => void;
+}
+
+const SellerFilterDropdown: React.FC<SellerFilterDropdownProps> = ({ 
+    sellers, 
+    selectedSeller, 
+    onSellerChange 
+}) => {
+    const [isOpen, setIsOpen] = useState(false);
+    const [searchTerm, setSearchTerm] = useState('');
+    const dropdownRef = useRef<HTMLDivElement>(null);
+
+    const filteredSellers = useMemo(() => {
+        if (!searchTerm.trim()) return sellers;
+        const lowercasedFilter = searchTerm.toLowerCase();
+        return sellers.filter(seller => 
+            seller.name.toLowerCase().includes(lowercasedFilter) ||
+            seller.email.toLowerCase().includes(lowercasedFilter)
+        );
+    }, [sellers, searchTerm]);
+
+    const selectedSellerName = useMemo(() => {
+        if (selectedSeller === 'all') return 'All Sellers';
+        const seller = sellers.find(s => s.email === selectedSeller);
+        return seller ? `${seller.name} (${seller.email})` : 'All Sellers';
+    }, [selectedSeller, sellers]);
+
+    useEffect(() => {
+        const handleClickOutside = (event: MouseEvent) => {
+            if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+                setIsOpen(false);
+                setSearchTerm('');
+            }
+        };
+
+        document.addEventListener('mousedown', handleClickOutside);
+        return () => document.removeEventListener('mousedown', handleClickOutside);
+    }, []);
+
+    return (
+        <div className="relative" ref={dropdownRef}>
+            <button
+                onClick={() => setIsOpen(!isOpen)}
+                className="px-3 py-2 border border-gray-300 rounded-lg bg-white text-left min-w-[200px] flex justify-between items-center hover:bg-gray-50"
+            >
+                <span className="truncate">{selectedSellerName}</span>
+                <svg 
+                    className={`w-4 h-4 transition-transform ${isOpen ? 'rotate-180' : ''}`} 
+                    fill="none" 
+                    stroke="currentColor" 
+                    viewBox="0 0 24 24"
+                >
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                </svg>
+            </button>
+
+            {isOpen && (
+                <div className="absolute top-full left-0 mt-1 w-full bg-white border border-gray-300 rounded-lg shadow-lg z-50 max-h-60 overflow-hidden">
+                    <div className="p-2 border-b border-gray-200">
+                        <input
+                            type="text"
+                            placeholder="Search sellers..."
+                            value={searchTerm}
+                            onChange={(e) => setSearchTerm(e.target.value)}
+                            className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-orange-500"
+                            onClick={(e) => e.stopPropagation()}
+                        />
+                    </div>
+                    <div className="max-h-48 overflow-y-auto">
+                        <button
+                            onClick={() => {
+                                onSellerChange('all');
+                                setIsOpen(false);
+                                setSearchTerm('');
+                            }}
+                            className={`w-full text-left px-3 py-2 text-sm hover:bg-gray-100 ${
+                                selectedSeller === 'all' ? 'bg-orange-50 text-orange-600' : ''
+                            }`}
+                        >
+                            All Sellers
+                        </button>
+                        {filteredSellers.map(seller => (
+                            <button
+                                key={seller.email}
+                                onClick={() => {
+                                    onSellerChange(seller.email);
+                                    setIsOpen(false);
+                                    setSearchTerm('');
+                                }}
+                                className={`w-full text-left px-3 py-2 text-sm hover:bg-gray-100 ${
+                                    selectedSeller === seller.email ? 'bg-orange-50 text-orange-600' : ''
+                                }`}
+                            >
+                                <div className="font-medium">{seller.name}</div>
+                                <div className="text-xs text-gray-500">{seller.email}</div>
+                            </button>
+                        ))}
+                        {filteredSellers.length === 0 && searchTerm && (
+                            <div className="px-3 py-2 text-sm text-gray-500 text-center">
+                                No sellers found
+                            </div>
+                        )}
+                    </div>
+                </div>
+            )}
+        </div>
+    );
+};
 
 interface AdminPanelProps {
     users: User[];
@@ -810,6 +923,7 @@ const AdminPanel: React.FC<AdminPanelProps> = (props) => {
     const [editingVehicle, setEditingVehicle] = useState<Vehicle | null>(null);
     const [roleFilter, setRoleFilter] = useState<RoleFilter>('all');
     const [sortConfig, setSortConfig] = useState<SortConfig | null>(null);
+    const [selectedSeller, setSelectedSeller] = useState<string>('all');
     
     // Pagination state
     const [currentPage, setCurrentPage] = useState(1);
@@ -912,13 +1026,18 @@ const AdminPanel: React.FC<AdminPanelProps> = (props) => {
     }, [sortedUsers, roleFilter]);
 
     // Pagination logic for vehicles
+    const filteredVehicles = useMemo(() => {
+        if (selectedSeller === 'all') return vehicles;
+        return vehicles.filter(vehicle => vehicle.sellerEmail === selectedSeller);
+    }, [vehicles, selectedSeller]);
+
     const paginatedVehicles = useMemo(() => {
         const startIndex = (currentPage - 1) * itemsPerPage;
         const endIndex = startIndex + itemsPerPage;
-        return vehicles.slice(startIndex, endIndex);
-    }, [vehicles, currentPage, itemsPerPage]);
+        return filteredVehicles.slice(startIndex, endIndex);
+    }, [filteredVehicles, currentPage, itemsPerPage]);
 
-    const totalPages = Math.ceil(vehicles.length / itemsPerPage);
+    const totalPages = Math.ceil(filteredVehicles.length / itemsPerPage);
 
     const handlePageChange = (page: number) => {
         setCurrentPage(page);
@@ -1097,6 +1216,11 @@ const AdminPanel: React.FC<AdminPanelProps> = (props) => {
                     <div className="space-y-6">
                         <div className="flex justify-between items-center">
                             <div className="flex gap-4">
+                                <SellerFilterDropdown 
+                                    sellers={users.filter(u => u.role === 'seller')}
+                                    selectedSeller={selectedSeller}
+                                    onSellerChange={setSelectedSeller}
+                                />
                                 <select
                                     value={itemsPerPage}
                                     onChange={(e) => handleItemsPerPageChange(Number(e.target.value))}
@@ -1124,7 +1248,7 @@ const AdminPanel: React.FC<AdminPanelProps> = (props) => {
                                 {loadingActions.has('export-vehicles') ? 'Exporting...' : 'Export Vehicles'}
                             </button>
                         </div>
-                        <TableContainer title={`All Listings (${vehicles.length} total, showing ${paginatedVehicles.length})`}>
+                        <TableContainer title={`All Listings (${filteredVehicles.length} total, showing ${paginatedVehicles.length})`}>
                      <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
                                 <thead className="bg-white dark:bg-white">
                                     <tr>
@@ -1982,15 +2106,19 @@ const AdminPanel: React.FC<AdminPanelProps> = (props) => {
     const NavItem: React.FC<{ view: AdminView; label: string; count?: number }> = ({ view, label, count }) => (
             <button
                 onClick={() => setActiveView(view)}
-            className={`w-full flex items-center justify-between px-4 py-3 text-left rounded-lg transition-colors ${
+            className={`group w-full flex items-center justify-between px-4 py-3 text-left rounded-xl transition-all duration-300 ${
                 activeView === view
-                    ? 'bg-blue-50 text-blue-700 border-r-2 border-blue-700'
-                    : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
+                    ? 'bg-gradient-to-r from-blue-500 to-purple-600 text-white shadow-lg transform scale-105'
+                    : 'text-gray-600 hover:bg-gradient-to-r hover:from-blue-50 hover:to-purple-50 hover:text-blue-600 hover:shadow-md hover:-translate-y-0.5'
             }`}
         >
-            <span>{label}</span>
+            <span className="font-medium">{label}</span>
             {count !== undefined && count > 0 && (
-                <span className="bg-red-100 text-red-600 text-xs font-bold px-2 py-1 rounded-full">
+                <span className={`text-xs font-bold rounded-full px-2 py-0.5 ${
+                    activeView === view 
+                        ? 'bg-white/20 text-white' 
+                        : 'bg-gradient-to-r from-red-500 to-pink-500 text-white'
+                }`}>
                     {count}
                 </span>
             )}
@@ -2021,13 +2149,33 @@ const AdminPanel: React.FC<AdminPanelProps> = (props) => {
     );
 
     return (
-        <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
-            <div className="flex">
-                <aside className="w-64 bg-white dark:bg-gray-800 shadow-lg">
+        <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-blue-50 relative overflow-hidden">
+            {/* Background Elements */}
+            <div className="absolute inset-0 overflow-hidden">
+                <div className="absolute top-20 right-20 w-80 h-80 bg-gradient-to-br from-blue-200/20 to-purple-200/20 rounded-full blur-3xl animate-pulse"></div>
+                <div className="absolute bottom-20 left-20 w-96 h-96 bg-gradient-to-tr from-orange-200/15 to-pink-200/15 rounded-full blur-3xl animate-pulse" style={{animationDelay: '2s'}}></div>
+            </div>
+            
+            <div className="relative z-10 flex">
+                <aside className="w-64 bg-white/80 backdrop-blur-xl shadow-xl border-r border-white/20">
                     <div className="p-6">
-                        <h1 className="text-2xl font-bold text-gray-800 dark:text-white mb-8">Admin Panel</h1>
+                        <div className="flex items-center gap-3 mb-8">
+                            <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-xl flex items-center justify-center">
+                                <svg className="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fillRule="evenodd" d="M11.49 3.17c-.38-1.56-2.6-1.56-2.98 0a1.532 1.532 0 01-2.286.948c-1.372-.836-2.942.734-2.106 2.106.54.886.061 2.042-.947 2.287-1.561.379-1.561 2.6 0 2.978a1.532 1.532 0 01.947 2.287c-.836 1.372.734 2.942 2.106 2.106a1.532 1.532 0 012.287.947c.379 1.561 2.6 1.561 2.978 0a1.533 1.533 0 012.287-.947c1.372.836 2.942-.734 2.106-2.106a1.533 1.533 0 01.947-2.287c1.561-.379 1.561-2.6 0-2.978a1.532 1.532 0 01-.947-2.287c.836-1.372-.734-2.942-2.106-2.106a1.532 1.532 0 01-2.287-.947zM10 13a3 3 0 100-6 3 3 0 000 6z" clipRule="evenodd" />
+                                </svg>
+                            </div>
+                            <h1 className="text-2xl font-bold bg-gradient-to-r from-gray-900 via-blue-800 to-purple-800 bg-clip-text text-transparent">Admin Panel</h1>
+                        </div>
                         <nav className="space-y-2">
-                            <h3 className="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-3">Admin Panel</h3>
+                            <div className="flex items-center gap-3 mb-4">
+                                <div className="w-6 h-6 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg flex items-center justify-center">
+                                    <svg className="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
+                                        <path fillRule="evenodd" d="M3 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z"/>
+                                    </svg>
+                                </div>
+                                <h3 className="text-sm font-semibold text-gray-500 uppercase tracking-wide">Admin Panel</h3>
+                            </div>
                             <NavItem view="analytics" label="Analytics" />
                             <NavItem view="users" label="User Management" />
                             <NavItem view="listings" label="Listings" />
@@ -2071,7 +2219,9 @@ const AdminPanel: React.FC<AdminPanelProps> = (props) => {
                     </div>
                 </aside>
                 <main className="flex-1 p-8">
-                    {renderContent()}
+                    <div className="bg-white/80 backdrop-blur-xl rounded-3xl shadow-xl border border-white/20 p-8 min-h-[600px]">
+                        {renderContent()}
+                    </div>
                 </main>
             </div>
 

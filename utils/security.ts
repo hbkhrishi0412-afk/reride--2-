@@ -1,5 +1,5 @@
-import bcrypt from 'bcryptjs';
-import jwt from 'jsonwebtoken';
+import * as bcrypt from 'bcryptjs';
+import * as jwt from 'jsonwebtoken';
 import DOMPurify from 'dompurify';
 import validator from 'validator';
 import type { User } from '../types';
@@ -36,7 +36,7 @@ export const generateAccessToken = (user: User): string => {
   
   const secret = config.JWT.SECRET || 'fallback-secret-change-in-production';
   return jwt.sign(payload, secret, { 
-    expiresIn: config.JWT.ACCESS_TOKEN_EXPIRES_IN,
+    expiresIn: config.JWT.ACCESS_TOKEN_EXPIRES_IN as any,
     issuer: config.JWT.ISSUER,
     audience: config.JWT.AUDIENCE
   });
@@ -51,7 +51,7 @@ export const generateRefreshToken = (user: User): string => {
   
   const secret = config.JWT.SECRET || 'fallback-secret-change-in-production';
   return jwt.sign(payload, secret, { 
-    expiresIn: config.JWT.REFRESH_TOKEN_EXPIRES_IN,
+    expiresIn: config.JWT.REFRESH_TOKEN_EXPIRES_IN as any,
     issuer: config.JWT.ISSUER,
     audience: config.JWT.AUDIENCE
   });

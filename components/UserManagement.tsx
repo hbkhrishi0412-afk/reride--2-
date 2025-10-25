@@ -81,7 +81,7 @@ const CreateUserModal: React.FC<{
                              <PasswordInput
                                 label="Password"
                                 name="password"
-                                value={formData.password}
+                                value={formData.password || ''}
                                 onChange={handleChange}
                                 placeholder="Enter password"
                                 className="mt-1 block w-full p-2 border rounded-md"

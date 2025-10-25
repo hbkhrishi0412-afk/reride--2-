@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useRef, useEffect, useCallback } from 'react';
+import React, { useState, useMemo, useRef, useEffect } from 'react';
 import VehicleCard from './VehicleCard';
 import type { Vehicle, VehicleCategory, SavedSearch, SearchFilters } from '../types';
 import { VehicleCategory as CategoryEnum } from '../types';
@@ -515,8 +515,7 @@ const VehicleList: React.FC<VehicleListProps> = React.memo(({
       maxMileage: mileageRange.max !== MAX_MILEAGE ? mileageRange.max : undefined,
       fuelType: fuelTypeFilter || undefined,
       year: yearFilter !== '0' ? parseInt(yearFilter) : undefined,
-      color: colorFilter || undefined,
-      state: stateFilter || undefined,
+      location: stateFilter || undefined,
       features: selectedFeatures.length > 0 ? selectedFeatures : undefined,
       query: aiSearchQuery || undefined
     };
@@ -869,17 +868,39 @@ const VehicleList: React.FC<VehicleListProps> = React.memo(({
 
   return (
     <>
-      <div className="used-cars-page grid grid-cols-1 lg:grid-cols-[auto_1fr] gap-8 container mx-auto px-4 py-8">
-        <aside className={`filters hidden lg:block lg:sticky top-24 self-start space-y-6 transition-all duration-300 ${isDesktopFilterVisible ? 'w-[300px] opacity-100' : 'w-0 opacity-0 -translate-x-full'}`}>
-            <div className={`bg-white p-6 rounded-xl shadow-soft-lg ${isDesktopFilterVisible ? 'block' : 'hidden'}`}>
-              <h2 className="text-xl font-bold text-spinny-text-dark dark:text-spinny-text-dark mb-4">Filters</h2>
-              {renderFilterControls(false)}
-            </div>
-        </aside>
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-blue-50 relative overflow-hidden">
+        {/* Background Elements */}
+        <div className="absolute inset-0 overflow-hidden">
+          <div className="absolute top-20 right-20 w-80 h-80 bg-gradient-to-br from-blue-200/20 to-purple-200/20 rounded-full blur-3xl animate-pulse"></div>
+          <div className="absolute bottom-20 left-20 w-96 h-96 bg-gradient-to-tr from-orange-200/15 to-pink-200/15 rounded-full blur-3xl animate-pulse" style={{animationDelay: '2s'}}></div>
+        </div>
+        
+        <div className="relative z-10 used-cars-page grid grid-cols-1 lg:grid-cols-[auto_1fr] gap-8 container mx-auto px-4 py-8">
+          <aside className={`filters hidden lg:block lg:sticky top-24 self-start space-y-6 transition-all duration-300 ${isDesktopFilterVisible ? 'w-[300px] opacity-100' : 'w-0 opacity-0 -translate-x-full'}`}>
+              <div className={`bg-white/80 backdrop-blur-xl rounded-3xl shadow-xl border border-white/20 p-6 ${isDesktopFilterVisible ? 'block' : 'hidden'}`}>
+                <div className="flex items-center gap-3 mb-6">
+                  <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-purple-600 rounded-xl flex items-center justify-center">
+                    <svg className="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M3 3a1 1 0 011-1h12a1 1 0 011 1v3a1 1 0 01-.293.707L12 11.414V15a1 1 0 01-.293.707l-2 2A1 1 0 018 17v-5.586L3.293 6.707A1 1 0 013 6V3z" clipRule="evenodd" />
+                    </svg>
+                  </div>
+                  <h2 className="text-xl font-bold bg-gradient-to-r from-gray-900 via-blue-800 to-purple-800 bg-clip-text text-transparent">Filters</h2>
+                </div>
+                {renderFilterControls(false)}
+              </div>
+          </aside>
 
-        <main className="space-y-6">
-          <h1 className="text-4xl font-extrabold text-spinny-text-dark dark:text-spinny-text-dark">Browse Vehicles</h1>
-          <div className="intelligent-search bg-white p-4 rounded-xl shadow-soft-lg">
+          <main className="space-y-6">
+            <div className="text-center mb-8">
+              <h1 className="text-5xl font-black bg-gradient-to-r from-gray-900 via-blue-800 to-purple-800 bg-clip-text text-transparent mb-4">
+                Browse Vehicles
+              </h1>
+              <p className="text-xl text-gray-600 max-w-2xl mx-auto">
+                Discover your perfect vehicle with our AI-powered search and premium filtering options
+              </p>
+            </div>
+            
+            <div className="intelligent-search bg-white/80 backdrop-blur-xl rounded-3xl shadow-xl border border-white/20 p-8">
               <label htmlFor="ai-search" className="text-lg font-bold text-spinny-text-dark dark:text-spinny-text-dark">✨ Intelligent Search</label>
               <p className="text-sm text-spinny-text dark:text-spinny-text mb-2">Describe what you're looking for, e.g., "a white Tata Nexon under ₹15 lakhs with a sunroof"</p>
               <div className="relative" ref={aiSearchRef}>
@@ -993,6 +1014,7 @@ const VehicleList: React.FC<VehicleListProps> = React.memo(({
       )}
 
       <QuickViewModal vehicle={quickViewVehicle} onClose={() => setQuickViewVehicle(null)} onSelectVehicle={onSelectVehicle} onToggleCompare={onToggleCompare} onToggleWishlist={onToggleWishlist} comparisonList={comparisonList} wishlist={wishlist} />
+    </div>
     </>
   );
 });

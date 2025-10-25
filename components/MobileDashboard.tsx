@@ -310,7 +310,7 @@ const MobileDashboard: React.FC<MobileDashboardProps> = memo(({
                     </span>
                   </div>
                   <p className="text-sm text-gray-500 truncate mt-1">
-                    {conversation.lastMessage || 'No messages yet'}
+                    {conversation.lastMessageAt || 'No messages yet'}
                   </p>
                   {!conversation.isReadByCustomer && (
                     <div className="w-2 h-2 bg-orange-500 rounded-full mt-2"></div>

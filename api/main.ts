@@ -1,8 +1,8 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
-import connectToDatabase from '../lib/db';
-import User from '../models/User';
-import Vehicle from '../models/Vehicle';
-import VehicleDataModel from '../models/VehicleData';
+import connectToDatabase from '../lib/db.js';
+import User from '../models/User.js';
+import Vehicle from '../models/Vehicle.js';
+import VehicleDataModel from '../models/VehicleData.js';
 import { 
   hashPassword, 
   validatePassword, 
@@ -12,8 +12,8 @@ import {
   getSecurityHeaders,
   sanitizeObject,
   validateEmail
-} from '../utils/security';
-import { getSecurityConfig } from '../utils/security-config';
+} from '../utils/security.js';
+import { getSecurityConfig } from '../utils/security-config.js';
 
 // Helper: Calculate distance between coordinates
 function calculateDistance(lat1: number, lng1: number, lat2: number, lng2: number): number {
@@ -471,6 +471,9 @@ async function handleVehicles(req: VercelRequest, res: VercelResponse) {
 
     if (req.method === 'GET') {
       try {
+        await connectToDatabase();
+        console.log('📡 Connected to database for vehicles data fetch operation');
+        
         let vehicleDataDoc = await VehicleDataModel.findOne();
         if (!vehicleDataDoc) {
           // Create default vehicle data if none exists

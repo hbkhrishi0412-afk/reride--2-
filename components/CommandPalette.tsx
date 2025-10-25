@@ -109,24 +109,26 @@ const CommandPalette: React.FC<CommandPaletteProps> = ({ isOpen, onClose, onNavi
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-black/60 z-[100] flex items-start justify-center pt-20" onClick={onClose}>
-      <div className="bg-white rounded-lg shadow-2xl w-full max-w-xl animate-fade-in" onClick={e => e.stopPropagation()}>
-        <div className="p-4 border-b border-gray-200 dark:border-gray-200-200 flex items-center gap-3">
-          {ICONS.SEARCH}
+    <div className="fixed inset-0 bg-black/70 backdrop-blur-sm z-[100] flex items-start justify-center pt-20" onClick={onClose}>
+      <div className="bg-white/90 backdrop-blur-xl rounded-3xl shadow-2xl border border-white/20 w-full max-w-xl animate-fade-in" onClick={e => e.stopPropagation()}>
+        <div className="p-6 border-b border-gray-200/50 flex items-center gap-4">
+          <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-purple-600 rounded-xl flex items-center justify-center">
+            {ICONS.SEARCH}
+          </div>
           <input
             ref={inputRef}
             type="text"
             placeholder="Type a command or search..."
             value={query}
             onChange={e => setQuery(e.target.value)}
-            className="w-full bg-transparent focus:outline-none text-lg text-spinny-text-dark dark:text-spinny-text-dark"
+            className="w-full bg-transparent focus:outline-none text-lg font-semibold text-gray-800 placeholder-gray-500"
           />
         </div>
-        <div className="max-h-96 overflow-y-auto">
+        <div className="max-h-96 overflow-y-auto premium-scrollbar">
           {Object.entries(groupedCommands).map(([section, commands]) => (
-            <div key={section} className="p-2">
-              <h3 className="text-xs font-semibold text-spinny-text-dark dark:text-spinny-text-dark px-2 mb-1">{section}</h3>
-              <ul>
+            <div key={section} className="p-4">
+              <h3 className="text-sm font-bold bg-gradient-to-r from-gray-900 via-blue-800 to-purple-800 bg-clip-text text-transparent px-2 mb-3">{section}</h3>
+              <ul className="space-y-1">
                 {(commands as Command[]).map((command) => {
                   const globalIndex = filteredCommands.findIndex(c => c.id === command.id);
                   return (
@@ -134,10 +136,20 @@ const CommandPalette: React.FC<CommandPaletteProps> = ({ isOpen, onClose, onNavi
                       <button
                         onClick={command.action}
                         onMouseEnter={() => setActiveIndex(globalIndex)}
-                        className={`w-full text-left flex items-center gap-3 px-3 py-2.5 rounded-md ${activeIndex === globalIndex ? 'text-white' : 'text-spinny-text-dark dark:text-spinny-text-dark hover:bg-white dark:hover:bg-white'}`} style={activeIndex === globalIndex ? { background: 'var(--gradient-primary)' } : undefined}
+                        className={`w-full text-left flex items-center gap-4 px-4 py-3 rounded-xl transition-all duration-300 transform hover:scale-105 ${
+                          activeIndex === globalIndex 
+                            ? 'bg-gradient-to-r from-blue-500 to-purple-600 text-white shadow-lg' 
+                            : 'text-gray-700 hover:bg-gradient-to-r hover:from-blue-50 hover:to-purple-50 hover:text-blue-600'
+                        }`}
                       >
-                        <span className={activeIndex === globalIndex ? 'text-white' : 'text-spinny-text-dark dark:text-spinny-text-dark'}>{command.icon}</span>
-                        <span>{command.title}</span>
+                        <div className={`w-8 h-8 rounded-lg flex items-center justify-center transition-all duration-300 ${
+                          activeIndex === globalIndex 
+                            ? 'bg-white/20' 
+                            : 'bg-gradient-to-br from-blue-100 to-purple-100'
+                        }`}>
+                          <span className={activeIndex === globalIndex ? 'text-white' : 'text-blue-600'}>{command.icon}</span>
+                        </div>
+                        <span className="font-semibold">{command.title}</span>
                       </button>
                     </li>
                   );
@@ -146,7 +158,15 @@ const CommandPalette: React.FC<CommandPaletteProps> = ({ isOpen, onClose, onNavi
             </div>
           ))}
           {filteredCommands.length === 0 && (
-            <p className="p-4 text-center text-spinny-text-dark">No commands found.</p>
+            <div className="p-8 text-center">
+              <div className="w-16 h-16 bg-gradient-to-br from-gray-100 to-gray-200 rounded-full flex items-center justify-center mx-auto mb-4">
+                <svg className="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.172 16.172a4 4 0 015.656 0M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                </svg>
+              </div>
+              <p className="text-gray-500 font-medium">No commands found</p>
+              <p className="text-sm text-gray-400 mt-1">Try a different search term</p>
+            </div>
           )}
         </div>
       </div>

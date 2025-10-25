@@ -55,18 +55,19 @@ const VehicleCard: React.FC<VehicleCardProps> = ({ vehicle, onSelect, onToggleCo
   return (
     <div 
       onClick={handleCardClick}
-      className="vehicle-card flex flex-col cursor-pointer group"
-      style={{ ['--hover-ring-color' as any]: 'var(--spinny-orange)' }}
+      className="group cursor-pointer bg-white rounded-3xl shadow-lg hover:shadow-2xl transition-all duration-500 overflow-hidden border border-gray-100 hover:border-blue-200 hover:-translate-y-2"
       data-testid="vehicle-card"
     >
-      <div className="relative overflow-hidden">
-        <img className="w-full h-40 sm:h-56 object-cover group-hover:scale-105 transition-transform duration-500 ease-in-out" src={getFirstValidImage(vehicle.images)} alt={`${vehicle.make} ${vehicle.model}`} loading="lazy" data-testid="vehicle-image" />
-        <div className="absolute top-0 left-0 right-0 h-20 bg-gradient-to-b from-black/50 to-transparent"></div>
-        {/* Boost Indicators */}
-        <div className="absolute top-3 left-3 flex flex-col gap-1">
+      <div className="relative overflow-hidden h-56">
+        <img className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" src={getFirstValidImage(vehicle.images)} alt={`${vehicle.make} ${vehicle.model}`} loading="lazy" data-testid="vehicle-image" />
+        
+        {/* Premium Gradient Overlay */}
+        <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+        {/* Premium Boost Indicators */}
+        <div className="absolute top-4 left-4 flex flex-col gap-2">
           {/* Homepage Spotlight */}
           {vehicle.activeBoosts?.some(boost => boost.type === 'homepage_spotlight' && boost.isActive && new Date(boost.expiresAt) > new Date()) && (
-            <div className="text-white text-xs font-bold px-2 py-1 rounded-full flex items-center gap-1 bg-gradient-to-r from-yellow-500 to-orange-500 shadow-lg">
+            <div className="text-white text-xs font-bold px-3 py-1.5 rounded-full flex items-center gap-1.5 bg-gradient-to-r from-yellow-500 to-orange-500 shadow-lg backdrop-blur-sm">
               <span>⭐</span>
               <span>Spotlight</span>
             </div>
@@ -74,7 +75,7 @@ const VehicleCard: React.FC<VehicleCardProps> = ({ vehicle, onSelect, onToggleCo
           
           {/* Top Search Boost */}
           {vehicle.activeBoosts?.some(boost => boost.type === 'top_search' && boost.isActive && new Date(boost.expiresAt) > new Date()) && (
-            <div className="text-white text-xs font-bold px-2 py-1 rounded-full flex items-center gap-1 bg-gradient-to-r from-blue-500 to-purple-500 shadow-lg">
+            <div className="text-white text-xs font-bold px-3 py-1.5 rounded-full flex items-center gap-1.5 bg-gradient-to-r from-blue-500 to-purple-500 shadow-lg backdrop-blur-sm">
               <span>🔝</span>
               <span>Top Search</span>
             </div>
@@ -82,7 +83,7 @@ const VehicleCard: React.FC<VehicleCardProps> = ({ vehicle, onSelect, onToggleCo
           
           {/* Featured Badge Boost */}
           {vehicle.activeBoosts?.some(boost => boost.type === 'featured_badge' && boost.isActive && new Date(boost.expiresAt) > new Date()) && (
-            <div className="text-white text-xs font-bold px-2 py-1 rounded-full flex items-center gap-1 bg-gradient-to-r from-green-500 to-teal-500 shadow-lg">
+            <div className="text-white text-xs font-bold px-3 py-1.5 rounded-full flex items-center gap-1.5 bg-gradient-to-r from-green-500 to-teal-500 shadow-lg backdrop-blur-sm">
               <span>🏆</span>
               <span>Featured</span>
             </div>
@@ -90,7 +91,7 @@ const VehicleCard: React.FC<VehicleCardProps> = ({ vehicle, onSelect, onToggleCo
           
           {/* Multi-City Boost */}
           {vehicle.activeBoosts?.some(boost => boost.type === 'multi_city' && boost.isActive && new Date(boost.expiresAt) > new Date()) && (
-            <div className="text-white text-xs font-bold px-2 py-1 rounded-full flex items-center gap-1 bg-gradient-to-r from-indigo-500 to-blue-500 shadow-lg">
+            <div className="text-white text-xs font-bold px-3 py-1.5 rounded-full flex items-center gap-1.5 bg-gradient-to-r from-indigo-500 to-blue-500 shadow-lg backdrop-blur-sm">
               <span>🌍</span>
               <span>Multi-City</span>
             </div>

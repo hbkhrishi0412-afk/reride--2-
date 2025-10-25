@@ -131,12 +131,21 @@ export const validateVehicleData = (data: Partial<VehicleData>): void => {
       throw new ValidationError(`Vehicles for ${category} must be an array`);
     }
 
-    vehicles.forEach((vehicle, index) => {
+    vehicles.forEach((vehicleMake, index) => {
       try {
-        validateVehicle(vehicle);
+        // Validate VehicleMake structure instead of Vehicle
+        if (!vehicleMake || typeof vehicleMake !== 'object') {
+          throw new ValidationError('Vehicle make must be an object');
+        }
+        if (!vehicleMake.name || typeof vehicleMake.name !== 'string') {
+          throw new ValidationError('Vehicle make must have a valid name');
+        }
+        if (!Array.isArray(vehicleMake.models)) {
+          throw new ValidationError('Vehicle make must have models array');
+        }
       } catch (error) {
         if (error instanceof ValidationError) {
-          throw new ValidationError(`Vehicle at index ${index} in ${category}: ${error.message}`);
+          throw new ValidationError(`Vehicle make at index ${index} in ${category}: ${error.message}`);
         }
         throw error;
       }

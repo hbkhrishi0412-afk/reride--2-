@@ -48,10 +48,7 @@ const SupportPage = React.lazy(() => import('./components/SupportPage'));
 const FAQPage = React.lazy(() => import('./components/FAQPage'));
 const BuyerDashboard = React.lazy(() => import('./components/BuyerDashboard'));
 const CityLandingPage = React.lazy(() => import('./components/CityLandingPage'));
-const LoginPortal = React.lazy(() => import('./components/LoginPortal'));
-const CustomerLogin = React.lazy(() => import('./CustomerLogin'));
-const AdminLogin = React.lazy(() => import('./AdminLogin'));
-const Login = React.lazy(() => import('./Login'));
+const UnifiedLogin = React.lazy(() => import('./components/UnifiedLogin'));
 const ForgotPassword = React.lazy(() => import('./components/ForgotPassword'));
 
 // Preload critical components
@@ -87,6 +84,7 @@ const AppContent: React.FC = React.memo(() => {
     addToast,
     setIsCommandPaletteOpen,
     vehicles,
+    setVehicles,
     setSelectedVehicle,
     setSelectedCategory,
     recommendations,
@@ -820,42 +818,21 @@ const AppContent: React.FC = React.memo(() => {
         );
 
       case ViewEnum.LOGIN_PORTAL:
-        return (
-          <LoginPortal onNavigate={navigate} />
-        );
-
       case ViewEnum.CUSTOMER_LOGIN:
-        return (
-          <CustomerLogin 
-            onLogin={handleLogin}
-            onRegister={handleRegister}
-            onNavigate={navigate}
-            onForgotPassword={() => {
-              setForgotPasswordRole('customer');
-              navigate(ViewEnum.FORGOT_PASSWORD);
-            }}
-          />
-        );
-
       case ViewEnum.SELLER_LOGIN:
-        return (
-          <Login 
-            onLogin={handleLogin}
-            onRegister={handleRegister}
-            onNavigate={navigate}
-            onForgotPassword={() => {
-              setForgotPasswordRole('customer');
-              navigate(ViewEnum.FORGOT_PASSWORD);
-            }}
-          />
-        );
-
       case ViewEnum.ADMIN_LOGIN:
         return (
-          <AdminLogin 
-            onLogin={handleLogin}
-            onNavigate={navigate}
-          />
+          <Suspense fallback={<LoadingSpinner />}>
+            <UnifiedLogin 
+              onLogin={handleLogin}
+              onRegister={handleRegister}
+              onNavigate={navigate}
+              onForgotPassword={() => {
+                setForgotPasswordRole('customer');
+                navigate(ViewEnum.FORGOT_PASSWORD);
+              }}
+            />
+          </Suspense>
         );
 
       case ViewEnum.FORGOT_PASSWORD:

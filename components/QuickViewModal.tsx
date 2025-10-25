@@ -81,21 +81,32 @@ const QuickViewModal: React.FC<QuickViewModalProps> = ({ vehicle, onClose, onSel
   };
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-[100] p-4 animate-fade-in" onClick={onClose} style={{ zIndex: 9999 }}>
-      <div className="bg-white rounded-xl shadow-2xl w-full max-w-4xl max-h-[90vh] flex flex-col md:flex-row overflow-hidden relative" onClick={(e) => e.stopPropagation()}>
-        <button onClick={onClose} className="absolute top-2 right-2 text-white md:text-spinny-text bg-black/30 md:bg-transparent rounded-full w-8 h-8 flex items-center justify-center hover:text-spinny-text-dark dark:hover:text-white z-10 text-2xl">&times;</button>
+    <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-[100] p-4 animate-fade-in" onClick={onClose} style={{ zIndex: 9999 }}>
+      <div className="bg-white/90 backdrop-blur-xl rounded-3xl shadow-2xl border border-white/20 w-full max-w-4xl max-h-[90vh] flex flex-col md:flex-row overflow-hidden relative" onClick={(e) => e.stopPropagation()}>
+        <button onClick={onClose} className="absolute top-4 right-4 text-gray-600 hover:text-gray-800 bg-white/80 backdrop-blur-sm rounded-full w-10 h-10 flex items-center justify-center hover:bg-white hover:shadow-lg z-10 text-xl transition-all duration-300 transform hover:scale-110">
+          <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
         
-        {/* Image Section */}
-        <div className="w-full md:w-1/2 p-4 flex flex-col">
-          <img src={getSafeImageSrc(mainImage)} alt={`${vehicle.make || 'Vehicle'} ${vehicle.model || ''}`} className="w-full h-64 md:h-auto object-cover rounded-lg flex-grow" />
+        {/* Premium Image Section */}
+        <div className="w-full md:w-1/2 p-6 flex flex-col">
+          <div className="relative overflow-hidden rounded-2xl mb-4">
+            <img src={getSafeImageSrc(mainImage)} alt={`${vehicle.make || 'Vehicle'} ${vehicle.model || ''}`} className="w-full h-64 md:h-80 object-cover rounded-2xl group-hover:scale-105 transition-transform duration-500" />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent rounded-2xl"></div>
+          </div>
           {vehicle.images && vehicle.images.length > 1 && (
-            <div className="grid grid-cols-5 gap-2 mt-2">
+            <div className="grid grid-cols-5 gap-3">
               {getValidImages(vehicle.images).slice(0, 5).map((img, index) => (
                 <img
                   key={index}
                   src={img}
                   alt={`Thumbnail ${index + 1}`}
-                  className={`cursor-pointer rounded-md border-2 h-16 w-full object-cover ${mainImage === img ? '' : 'border-transparent'} transition`} style={mainImage === img ? { borderColor: '#FF6B35' } : undefined} onMouseEnter={(e) => mainImage !== img && (e.currentTarget.style.borderColor = 'var(--spinny-blue)')} onMouseLeave={(e) => mainImage !== img && (e.currentTarget.style.borderColor = '')}
+                  className={`cursor-pointer rounded-xl border-2 h-16 w-full object-cover transition-all duration-300 hover:scale-105 ${
+                    mainImage === img 
+                      ? 'border-blue-500 shadow-lg' 
+                      : 'border-gray-200 hover:border-blue-300'
+                  }`}
                   onClick={() => setMainImage(img)}
                 />
               ))}
@@ -103,12 +114,19 @@ const QuickViewModal: React.FC<QuickViewModalProps> = ({ vehicle, onClose, onSel
           )}
         </div>
         
-        {/* Details Section */}
+        {/* Premium Details Section */}
         <div className="w-full md:w-1/2 p-6 flex flex-col overflow-y-auto">
-          <div>
-            <h2 className="text-3xl font-bold text-spinny-text-dark dark:text-spinny-text-dark">{vehicle.year || 'N/A'} {vehicle.make || 'Vehicle'} {vehicle.model || ''}</h2>
-            <p className="text-spinny-text dark:text-spinny-text">{vehicle.variant || ''}</p>
-            <p className="text-3xl font-extrabold my-4" style={{ color: '#FF6B35' }}>₹{vehicle.price ? vehicle.price.toLocaleString('en-IN') : 'N/A'}</p>
+          <div className="mb-6">
+            <h2 className="text-3xl font-black bg-gradient-to-r from-gray-900 via-blue-800 to-purple-800 bg-clip-text text-transparent mb-2">
+              {vehicle.year || 'N/A'} {vehicle.make || 'Vehicle'} {vehicle.model || ''}
+            </h2>
+            <p className="text-lg text-gray-600 font-medium">{vehicle.variant || 'Standard'}</p>
+            <div className="mt-4">
+              <span className="text-4xl font-black bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+                ₹{(vehicle.price / 100000).toFixed(2)} Lakh
+              </span>
+              <p className="text-sm text-gray-500 mt-1">EMI from ₹{(vehicle.price / 60 / 1000).toFixed(1)}k/month</p>
+            </div>
           </div>
 
           <div className="space-y-2 my-4">
@@ -120,23 +138,36 @@ const QuickViewModal: React.FC<QuickViewModalProps> = ({ vehicle, onClose, onSel
           </div>
 
           <div className="mt-auto pt-6 space-y-3">
-             <button onClick={handleFullDetailsClick} className="w-full btn-brand-primary text-white font-bold py-3 px-6 rounded-lg text-lg transition-all transform hover:scale-105">
+             <button onClick={handleFullDetailsClick} className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-bold py-3 px-6 rounded-xl text-lg transition-all duration-300 transform hover:scale-105 hover:shadow-lg">
                 View Full Details
             </button>
             <div className="flex gap-3">
                 <button
                     onClick={() => onToggleWishlist(vehicle.id)}
-                    className={`w-full font-bold py-3 px-6 rounded-lg text-lg transition-all flex items-center justify-center gap-2 ${isInWishlist ? 'bg-spinny-blue text-spinny-orange' : 'bg-spinny-light-gray dark:bg-brand-gray-700'}`}
+                    className={`w-full font-bold py-3 px-6 rounded-xl text-lg transition-all duration-300 transform hover:scale-105 flex items-center justify-center gap-2 ${
+                      isInWishlist 
+                        ? 'bg-gradient-to-r from-pink-500 to-red-500 text-white hover:shadow-lg' 
+                        : 'bg-gray-100 hover:bg-gray-200 text-gray-700'
+                    }`}
                 >
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" viewBox="0 0 20 20" fill="currentColor"><path fillRule="evenodd" d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z" clipRule="evenodd" /></svg>
-                    Wishlist
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" viewBox="0 0 20 20" fill="currentColor">
+                      <path fillRule="evenodd" d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z" clipRule="evenodd" />
+                    </svg>
+                    {isInWishlist ? 'In Wishlist' : 'Add to Wishlist'}
                 </button>
                  <button
                     onClick={() => onToggleCompare(vehicle.id)}
                     disabled={isCompareDisabled}
-                    className={`w-full font-bold py-3 px-6 rounded-lg text-lg transition-all ${isComparing ? 'bg-spinny-orange text-spinny-orange' : 'bg-spinny-light-gray dark:bg-brand-gray-700'} ${isCompareDisabled ? 'opacity-50 cursor-not-allowed' : ''}`}
+                    className={`w-full font-bold py-3 px-6 rounded-xl text-lg transition-all duration-300 transform hover:scale-105 flex items-center justify-center gap-2 ${
+                      isComparing 
+                        ? 'bg-gradient-to-r from-orange-500 to-red-500 text-white hover:shadow-lg' 
+                        : 'bg-gray-100 hover:bg-gray-200 text-gray-700'
+                    } ${isCompareDisabled ? 'opacity-50 cursor-not-allowed' : ''}`}
                 >
-                    Compare
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" viewBox="0 0 20 20" fill="currentColor">
+                      <path fillRule="evenodd" d="M3 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z" clipRule="evenodd" />
+                    </svg>
+                    {isComparing ? 'Comparing' : 'Compare'}
                 </button>
             </div>
           </div>
