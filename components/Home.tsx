@@ -277,18 +277,18 @@ const Home: React.FC<HomeProps> = ({ onSearch, onSelectCategory, featuredVehicle
                     {/* Premium Badge */}
                     <div className="inline-flex items-center gap-2 bg-white/10 backdrop-blur-md border border-white/20 rounded-full px-6 py-2 mb-8 animate-fade-in">
                         <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
-                        <span className="text-white/90 font-medium text-sm">Trusted by 1M+ Customers</span>
+                        <span className="text-white/90 font-medium text-xs">Trusted by 1M+ Customers</span>
                     </div>
                     
                     {/* Main Heading with Premium Typography */}
-                    <h1 className="text-5xl md:text-7xl font-black mb-6 text-white leading-tight">
+                    <h1 className="text-3xl md:text-4xl font-black mb-6 text-white leading-tight">
                         <span className="bg-gradient-to-r from-white via-blue-100 to-orange-100 bg-clip-text text-transparent">
                             Premium Used Cars
                         </span>
                     </h1>
                     
                     {/* Subtitle */}
-                    <p className="text-xl md:text-2xl mb-12 text-white/90 font-light max-w-3xl mx-auto leading-relaxed">
+                    <p className="text-base md:text-lg mb-12 text-white/90 font-light max-w-3xl mx-auto leading-relaxed">
                         Discover exceptional vehicles with our comprehensive quality assurance and premium service
                     </p>
                     
@@ -308,12 +308,12 @@ const Home: React.FC<HomeProps> = ({ onSearch, onSelectCategory, featuredVehicle
                                             value={aiSearchQuery}
                                             onChange={(e) => setAiSearchQuery(e.target.value)}
                                             onKeyDown={(e) => { if (e.key === 'Enter') handleAiSearch(); }}
-                                            className="w-full pl-12 pr-4 py-4 text-gray-900 border-0 focus:outline-none rounded-2xl bg-transparent placeholder-gray-500 text-lg font-medium"
+                                            className="w-full pl-12 pr-4 py-4 text-gray-900 border-0 focus:outline-none rounded-2xl bg-transparent placeholder-gray-500 text-base font-medium"
                                         />
                                     </div>
                                     <button 
                                         onClick={handleAiSearch}
-                                        className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-8 py-4 rounded-2xl font-semibold text-lg transition-all duration-300 transform hover:scale-105 hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
+                                        className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-8 py-4 rounded-2xl font-semibold text-base transition-all duration-300 transform hover:scale-105 hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
                                         disabled={isAiSearching}
                                     >
                                         {isAiSearching ? (
@@ -336,63 +336,63 @@ const Home: React.FC<HomeProps> = ({ onSearch, onSelectCategory, featuredVehicle
                     </div>
                     
                     {/* Premium Trust Badges */}
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 max-w-6xl mx-auto">
-                        <div className="group bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl p-6 hover:bg-white/20 transition-all duration-300 hover:scale-105 hover:shadow-xl">
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 max-w-5xl mx-auto">
+                        <div className="group bg-white/10 backdrop-blur-md border border-white/20 rounded-xl p-4 hover:bg-white/20 transition-all duration-300 hover:scale-105 hover:shadow-xl">
                             <div className="flex flex-col items-center text-center">
-                                <div className="w-16 h-16 bg-gradient-to-br from-green-400 to-emerald-500 rounded-2xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-300">
-                                    <svg className="w-8 h-8 text-white" fill="currentColor" viewBox="0 0 20 20">
+                                <div className="w-12 h-12 bg-gradient-to-br from-green-400 to-emerald-500 rounded-xl flex items-center justify-center mb-3 group-hover:scale-110 transition-transform duration-300">
+                                    <svg className="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 20 20">
                                         <path fillRule="evenodd" d="M2.166 4.999A11.954 11.954 0 0010 1.944 11.954 11.954 0 0017.834 5c.11.65.166 1.32.166 2.001 0 5.225-3.34 9.67-8 11.317C5.34 16.67 2 12.225 2 7c0-.682.057-1.35.166-2.001zm11.541 3.708a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" />
                                     </svg>
                                 </div>
-                                <h3 className="text-white font-bold text-lg mb-2">200+ Quality Checks</h3>
-                                <p className="text-white/80 text-sm">Comprehensive inspection</p>
+                                <h3 className="text-white font-bold text-sm mb-1">200+ Quality Checks</h3>
+                                <p className="text-white/80 text-xs">Comprehensive inspection</p>
                             </div>
                         </div>
                         
-                        <div className="group bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl p-6 hover:bg-white/20 transition-all duration-300 hover:scale-105 hover:shadow-xl">
+                        <div className="group bg-white/10 backdrop-blur-md border border-white/20 rounded-xl p-4 hover:bg-white/20 transition-all duration-300 hover:scale-105 hover:shadow-xl">
                             <div className="flex flex-col items-center text-center">
-                                <div className="w-16 h-16 bg-gradient-to-br from-blue-400 to-indigo-500 rounded-2xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-300">
-                                    <svg className="w-8 h-8 text-white" fill="currentColor" viewBox="0 0 20 20">
+                                <div className="w-12 h-12 bg-gradient-to-br from-blue-400 to-indigo-500 rounded-xl flex items-center justify-center mb-3 group-hover:scale-110 transition-transform duration-300">
+                                    <svg className="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 20 20">
                                         <path d="M8.433 7.418c.155-.103.346-.196.567-.267v1.698a2.305 2.305 0 01-.567-.267C8.07 8.34 8 8.114 8 8c0-.114.07-.34.433-.582zM11 12.849v-1.698c.22.071.412.164.567.267.364.243.433.468.433.582 0 .114-.07.34-.433.582a2.305 2.305 0 01-.567.267z" />
                                         <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-13a1 1 0 10-2 0v.092a4.535 4.535 0 00-1.676.662C6.602 6.234 6 7.009 6 8c0 .99.602 1.765 1.324 2.246.48.32 1.054.545 1.676.662v1.941c-.391-.127-.68-.317-.843-.504a1 1 0 10-1.51 1.31c.562.649 1.413 1.076 2.353 1.253V15a1 1 0 102 0v-.092a4.535 4.535 0 001.676-.662C13.398 13.766 14 12.991 14 12c0-.99-.602-1.765-1.324-2.246A4.535 4.535 0 0011 9.092V7.151c.391.127.68.317.843.504a1 1 0 101.511-1.31c-.563-.649-1.413-1.076-2.354-1.253V5z" />
                                     </svg>
                                 </div>
-                                <h3 className="text-white font-bold text-lg mb-2">Fixed Price</h3>
-                                <p className="text-white/80 text-sm">No hidden costs</p>
+                                <h3 className="text-white font-bold text-sm mb-1">Fixed Price</h3>
+                                <p className="text-white/80 text-xs">No hidden costs</p>
                             </div>
                         </div>
                         
-                        <div className="group bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl p-6 hover:bg-white/20 transition-all duration-300 hover:scale-105 hover:shadow-xl">
+                        <div className="group bg-white/10 backdrop-blur-md border border-white/20 rounded-xl p-4 hover:bg-white/20 transition-all duration-300 hover:scale-105 hover:shadow-xl">
                             <div className="flex flex-col items-center text-center">
-                                <div className="w-16 h-16 bg-gradient-to-br from-orange-400 to-red-500 rounded-2xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-300">
-                                    <svg className="w-8 h-8 text-white" fill="currentColor" viewBox="0 0 20 20">
+                                <div className="w-12 h-12 bg-gradient-to-br from-orange-400 to-red-500 rounded-xl flex items-center justify-center mb-3 group-hover:scale-110 transition-transform duration-300">
+                                    <svg className="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 20 20">
                                         <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" />
                                     </svg>
                                 </div>
-                                <h3 className="text-white font-bold text-lg mb-2">5-Day Money Back</h3>
-                                <p className="text-white/80 text-sm">Risk-free purchase</p>
+                                <h3 className="text-white font-bold text-sm mb-1">5-Day Money Back</h3>
+                                <p className="text-white/80 text-xs">Risk-free purchase</p>
                             </div>
                         </div>
                         
-                        <div className="group bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl p-6 hover:bg-white/20 transition-all duration-300 hover:scale-105 hover:shadow-xl">
+                        <div className="group bg-white/10 backdrop-blur-md border border-white/20 rounded-xl p-4 hover:bg-white/20 transition-all duration-300 hover:scale-105 hover:shadow-xl">
                             <div className="flex flex-col items-center text-center">
-                                <div className="w-16 h-16 bg-gradient-to-br from-purple-400 to-pink-500 rounded-2xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-300">
-                                    <svg className="w-8 h-8 text-white" fill="currentColor" viewBox="0 0 20 20">
+                                <div className="w-12 h-12 bg-gradient-to-br from-purple-400 to-pink-500 rounded-xl flex items-center justify-center mb-3 group-hover:scale-110 transition-transform duration-300">
+                                    <svg className="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 20 20">
                                         <path d="M9 2a1 1 0 000 2h2a1 1 0 100-2H9z" />
                                         <path fillRule="evenodd" d="M4 5a2 2 0 012-2 3 3 0 003 3h2a3 3 0 003-3 2 2 0 012 2v11a2 2 0 01-2 2H6a2 2 0 01-2-2V5zm3 4a1 1 0 000 2h.01a1 1 0 100-2H7zm3 0a1 1 0 000 2h3a1 1 0 100-2h-3zm-3 4a1 1 0 100 2h.01a1 1 0 100-2H7zm3 0a1 1 0 100 2h3a1 1 0 100-2h-3z" />
                                     </svg>
                                 </div>
-                                <h3 className="text-white font-bold text-lg mb-2">Free RC Transfer</h3>
-                                <p className="text-white/80 text-sm">Complete documentation</p>
+                                <h3 className="text-white font-bold text-sm mb-1">Free RC Transfer</h3>
+                                <p className="text-white/80 text-xs">Complete documentation</p>
                             </div>
                         </div>
                     </div>
                 </div>
                 
                 {/* Scroll Indicator */}
-                <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 animate-bounce">
-                    <div className="w-6 h-10 border-2 border-white/50 rounded-full flex justify-center">
-                        <div className="w-1 h-3 bg-white/70 rounded-full mt-2 animate-pulse"></div>
+                <div className="absolute bottom-2 left-1/2 transform -translate-x-1/2 animate-bounce z-10">
+                    <div className="w-8 h-12 border-2 border-white/80 rounded-full flex justify-center bg-white/10 backdrop-blur-sm">
+                        <div className="w-2 h-4 bg-white rounded-full mt-3 animate-pulse"></div>
                     </div>
                 </div>
             </section>
