@@ -314,6 +314,9 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = React.memo((
     if (view === View.CITY_LANDING && params?.city) {
       setSelectedCity(params.city);
     }
+    if (view === View.USED_CARS && params?.city) {
+      setSelectedCity(params.city);
+    }
     if (view === View.SELLER_DASHBOARD && currentUser?.role !== 'seller') setCurrentView(View.LOGIN_PORTAL);
     else if (view === View.ADMIN_PANEL && currentUser?.role !== 'admin') setCurrentView(View.ADMIN_LOGIN);
     else if ((view === View.PROFILE || view === View.INBOX) && !currentUser) setCurrentView(View.LOGIN_PORTAL);

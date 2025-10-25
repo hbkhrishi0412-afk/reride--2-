@@ -1,6 +1,5 @@
 import React, { memo } from 'react';
 import { View } from '../types';
-import Logo from './Logo';
 
 interface FooterProps {
     onNavigate: (view: View) => void;
@@ -20,14 +19,11 @@ const Footer: React.FC<FooterProps> = ({ onNavigate }) => {
         <div className="absolute bottom-10 left-10 w-80 h-80 bg-gradient-to-tr from-orange-500/5 to-pink-500/5 rounded-full blur-3xl"></div>
       </div>
       
-      <div className="relative z-10 container mx-auto px-4 py-12">
+      <div className="relative z-10 container mx-auto px-4 py-12 mt-16">
         {/* Premium Footer Content */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
           {/* Brand Section */}
           <div className="md:col-span-2">
-            <div className="flex items-center gap-3 mb-4">
-              <Logo className="text-white" />
-            </div>
             <p className="text-gray-300 text-lg mb-4 max-w-md">
               The premier AI-driven marketplace for your next vehicle. Trusted by over 1 million customers nationwide.
             </p>

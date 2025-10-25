@@ -173,7 +173,7 @@ const UnifiedLogin: React.FC<UnifiedLoginProps> = ({
           {/* Left Side - Role Selection */}
           <div className="lg:w-1/3 bg-gradient-to-br from-orange-500 to-blue-600 p-8 text-white">
             <div className="flex justify-center mb-6">
-              <Logo className="scale-125 filter brightness-0 invert" />
+              <Logo className="scale-125 filter brightness-0 invert" showText={false} />
             </div>
             <h2 className="text-2xl font-bold text-center mb-2">Welcome to ReRide</h2>
             <p className="text-center text-orange-100 mb-8">Choose your role to continue</p>

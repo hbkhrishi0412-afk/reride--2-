@@ -159,7 +159,7 @@ interface AdminPanelProps {
     onCertificationApproval: (vehicleId: number, decision: 'approved' | 'rejected') => void;
 }
 
-type AdminView = 'analytics' | 'users' | 'listings' | 'moderation' | 'certificationRequests' | 'vehicleData' | 'auditLog' | 'settings' | 'support' | 'faq' | 'payments' | 'planManagement';
+type AdminView = 'analytics' | 'users' | 'listings' | 'moderation' | 'certificationRequests' | 'vehicleData' | 'sellCarAdmin' | 'auditLog' | 'settings' | 'support' | 'faq' | 'payments' | 'planManagement';
 type RoleFilter = 'all' | 'customer' | 'seller' | 'admin';
 // FIX: Restrict sortable keys to prevent comparison errors on incompatible types.
 type SortableUserKey = 'name' | 'status';
@@ -1362,6 +1362,25 @@ const AdminPanel: React.FC<AdminPanelProps> = (props) => {
                         onBulkUpload={() => setIsBulkUploadOpen(true)}
                     />
                 );
+            case 'sellCarAdmin':
+                return (
+                    <div className="p-6">
+                        <div className="text-center">
+                            <h2 className="text-2xl font-bold text-gray-900 mb-4">Sell Car Submissions</h2>
+                            <p className="text-gray-600 mb-6">Manage customer car selling requests</p>
+                            <button
+                                onClick={() => {
+                                    if (props.onNavigate) {
+                                        props.onNavigate(View.SELL_CAR_ADMIN);
+                                    }
+                                }}
+                                className="px-6 py-3 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors"
+                            >
+                                Open Sell Car Admin Panel
+                            </button>
+                        </div>
+                    </div>
+                );
             case 'auditLog':
                 return <AuditLogView auditLog={auditLog} />;
             case 'settings':
@@ -2186,6 +2205,7 @@ const AdminPanel: React.FC<AdminPanelProps> = (props) => {
                             <NavItem view="planManagement" label="Plan Management" />
                             <NavItem view="faq" label="FAQ Management" />
                             <NavItem view="vehicleData" label="Vehicle Data" />
+                            <NavItem view="sellCarAdmin" label="Sell Car Submissions" />
                             <NavItem view="auditLog" label="Audit Log" />
                             <NavItem view="settings" label="Settings" />
                         </nav>

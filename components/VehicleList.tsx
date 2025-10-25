@@ -77,7 +77,7 @@ const Pagination: React.FC<{ currentPage: number; totalPages: number; onPageChan
   }
 
   return (
-    <nav className="flex justify-center items-center space-x-2 mt-8">
+    <nav className="flex justify-center items-center space-x-2 mt-8 mb-8">
       <button onClick={() => onPageChange(currentPage - 1)} disabled={currentPage === 1} className="px-4 py-2 rounded-md bg-white dark:bg-brand-gray-700 disabled:opacity-50">Prev</button>
       {pageNumbers.map(number => (
         <button key={number} onClick={() => onPageChange(number)} className={`px-4 py-2 rounded-md ${currentPage === number ? 'text-white' : 'bg-white dark:bg-brand-gray-700'}`} style={currentPage === number ? { background: '#FF6B35' } : undefined}>{number}</button>
@@ -895,9 +895,6 @@ const VehicleList: React.FC<VehicleListProps> = React.memo(({
               <h1 className="text-5xl font-black bg-gradient-to-r from-gray-900 via-blue-800 to-purple-800 bg-clip-text text-transparent mb-4">
                 Browse Vehicles
               </h1>
-              <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-                Discover your perfect vehicle with our AI-powered search and premium filtering options
-              </p>
             </div>
             
             <div className="intelligent-search bg-white/80 backdrop-blur-xl rounded-3xl shadow-xl border border-white/20 p-8">

@@ -290,6 +290,8 @@ export enum View {
   FAQ = 'FAQ',
   BUYER_DASHBOARD = 'BUYER_DASHBOARD',
   CITY_LANDING = 'CITY_LANDING',
+  SELL_CAR = 'SELL_CAR',
+  SELL_CAR_ADMIN = 'SELL_CAR_ADMIN',
 }
 
 export interface ProsAndCons {

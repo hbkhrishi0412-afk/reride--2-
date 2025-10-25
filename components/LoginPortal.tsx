@@ -10,7 +10,7 @@ const LoginPortal: React.FC<LoginPortalProps> = ({ onNavigate }) => {
   return (
     <div className="w-full max-w-md space-y-8 bg-white p-10 rounded-xl shadow-soft-xl text-center">
       <div className="flex justify-center mb-4">
-        <Logo className="scale-125" />
+        <Logo className="scale-125" showText={false} />
       </div>
       <h2 className="text-2xl font-extrabold text-spinny-text-dark dark:text-spinny-text-dark">Welcome to ReRide</h2>
       <p className="mt-2 text-brand-gray-600 dark:text-spinny-text">Please select your role to continue.</p>

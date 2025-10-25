@@ -50,6 +50,8 @@ const BuyerDashboard = React.lazy(() => import('./components/BuyerDashboard'));
 const CityLandingPage = React.lazy(() => import('./components/CityLandingPage'));
 const UnifiedLogin = React.lazy(() => import('./components/UnifiedLogin'));
 const ForgotPassword = React.lazy(() => import('./components/ForgotPassword'));
+const SellCarPage = React.lazy(() => import('./components/SellCarPage'));
+const SellCarAdmin = React.lazy(() => import('./components/SellCarAdmin'));
 
 // Preload critical components
 const preloadCriticalComponents = () => {
@@ -238,10 +240,15 @@ const AppContent: React.FC = React.memo(() => {
         );
 
       case ViewEnum.USED_CARS:
+        // Filter vehicles by selectedCity if one is selected
+        const filteredVehicles = selectedCity 
+          ? vehicles.filter(v => v.city === selectedCity && v.status === 'published')
+          : vehicles.filter(v => v.status === 'published');
+        
         return (
           <VehicleListErrorBoundary>
             <VehicleList
-              vehicles={enrichVehiclesWithSellerInfo(vehicles, users)}
+              vehicles={enrichVehiclesWithSellerInfo(filteredVehicles, users)}
               onSelectVehicle={selectVehicle}
               isLoading={isLoading}
               comparisonList={comparisonList}
@@ -261,7 +268,7 @@ const AppContent: React.FC = React.memo(() => {
                     : [...prev, id]
                 );
               }}
-              categoryTitle="Used Cars"
+              categoryTitle={selectedCity ? `Used Cars in ${selectedCity}` : "Used Cars"}
               initialCategory={currentCategory}
               initialSearchQuery={initialSearchQuery}
               onViewSellerProfile={(sellerEmail) => {
@@ -846,6 +853,20 @@ const AppContent: React.FC = React.memo(() => {
           />
         );
 
+      case ViewEnum.SELL_CAR:
+        return (
+          <SellCarPage 
+            onNavigate={navigate}
+          />
+        );
+
+      case ViewEnum.SELL_CAR_ADMIN:
+        return (
+          <SellCarAdmin 
+            onNavigate={navigate}
+          />
+        );
+
       default:
         return (
           <div className="min-h-[calc(100vh-140px)] flex items-center justify-center">
@@ -1172,6 +1193,7 @@ const AppContent: React.FC = React.memo(() => {
         userLocation={userLocation}
         onLocationChange={setUserLocation}
         addToast={addToast}
+        allVehicles={vehicles}
       />
       <main className="min-h-[calc(100vh-140px)]">
         <ErrorBoundary>

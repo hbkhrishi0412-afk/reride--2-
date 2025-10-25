@@ -1,9 +1,11 @@
 import React, { useState, useEffect, memo, useRef, useMemo } from 'react';
-import type { User, Notification, Toast as ToastType } from '../types';
+import type { User, Notification, Toast as ToastType, Vehicle } from '../types';
 import { View as ViewEnum } from '../types';
 import NotificationCenter from './NotificationCenter';
 import LocationModal from './LocationModal';
 import Logo from './Logo';
+import CityDropdown from './CityDropdown';
+import SellerDropdown from './SellerDropdown';
 
 interface HeaderProps {
     onNavigate: (view: ViewEnum) => void;
@@ -21,6 +23,7 @@ interface HeaderProps {
     userLocation: string;
     onLocationChange: (location: string) => void;
     addToast: (message: string, type: ToastType['type']) => void;
+    allVehicles: Vehicle[];
 }
 
 const Header: React.FC<HeaderProps> = memo(({
@@ -37,7 +40,8 @@ const Header: React.FC<HeaderProps> = memo(({
     onOpenCommandPalette,
     userLocation,
     onLocationChange,
-    addToast
+    addToast,
+    allVehicles
 }) => {
     const [isLocationModalOpen, setIsLocationModalOpen] = useState(false);
     const [isNotificationsOpen, setIsNotificationsOpen] = useState(false);
@@ -127,22 +131,33 @@ const Header: React.FC<HeaderProps> = memo(({
                             <Logo 
                                 onClick={() => handleNavigate(ViewEnum.HOME)}
                                 className="cursor-pointer hover:scale-105 transition-transform duration-300"
+                                showText={false}
                             />
 
                             {/* Premium Navigation */}
                             <nav className="hidden md:flex items-center gap-1">
-                                <button 
-                                    onClick={() => handleNavigate(ViewEnum.USED_CARS)} 
-                                    className="px-4 py-2 rounded-xl font-semibold text-gray-700 hover:bg-gradient-to-r hover:from-blue-50 hover:to-purple-50 hover:text-blue-600 transition-all duration-300 hover:-translate-y-0.5"
-                                >
-                                    Buy Car
-                                </button>
-                                <button 
-                                    onClick={() => handleNavigate(ViewEnum.SELLER_LOGIN)} 
-                                    className="px-4 py-2 rounded-xl font-semibold text-gray-700 hover:bg-gradient-to-r hover:from-blue-50 hover:to-purple-50 hover:text-blue-600 transition-all duration-300 hover:-translate-y-0.5"
-                                >
-                                    Sell Car
-                                </button>
+                                <CityDropdown 
+                                    allVehicles={allVehicles}
+                                    onCitySelect={(city) => {
+                                        // Navigate to used cars with city filter
+                                        onNavigate(ViewEnum.USED_CARS, { city });
+                                    }}
+                                    onViewAllCars={() => onNavigate(ViewEnum.USED_CARS)}
+                                />
+                                <SellerDropdown 
+                                    allVehicles={allVehicles}
+                                    onCitySelect={(city) => {
+                                        // Navigate to sell car page with city context
+                                        onNavigate(ViewEnum.SELL_CAR);
+                                        // You can add city-specific seller logic here
+                                    }}
+                                    onSellOnline={() => onNavigate(ViewEnum.SELL_CAR)}
+                                    onSellScrapCar={() => {
+                                        // Navigate to sell car page
+                                        onNavigate(ViewEnum.SELL_CAR);
+                                        // You can add scrap car specific logic here
+                                    }}
+                                />
                                 <button 
                                     onClick={() => handleNavigate(ViewEnum.NEW_CARS)} 
                                     className="px-4 py-2 rounded-xl font-semibold text-gray-700 hover:bg-gradient-to-r hover:from-blue-50 hover:to-purple-50 hover:text-blue-600 transition-all duration-300 hover:-translate-y-0.5"

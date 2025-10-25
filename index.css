@@ -4,6 +4,47 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Sell Car Page Animations */
+@keyframes fade-in {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes slide-up {
+  from { opacity: 0; transform: translateY(30px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.animate-fade-in {
+  animation: fade-in 0.6s ease-out forwards;
+}
+
+.animate-slide-up {
+  animation: slide-up 0.8s ease-out forwards;
+}
+
+/* Fix input field issues */
+input[type="text"] {
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  background-color: transparent;
+}
+
+input[type="text"]:focus {
+  outline: none;
+  box-shadow: none;
+}
+
+/* Ensure input fields are interactive */
+.sell-car-input {
+  pointer-events: auto;
+  user-select: text;
+  -webkit-user-select: text;
+  -moz-user-select: text;
+  -ms-user-select: text;
+}
+
 /* Mobile App Specific Styles */
 .mobile-app-content {
   padding-bottom: 80px; /* Space for bottom navigation */
