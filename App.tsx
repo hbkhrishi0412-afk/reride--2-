@@ -474,9 +474,9 @@ const AppContent: React.FC = React.memo(() => {
               typingStatus={typingStatus}
               onUserTyping={(conversationId, _userRole) => toggleTyping(conversationId, true)}
               onMarkMessagesAsRead={(conversationId, _readerRole) => markAsRead(conversationId)}
-              onUpdateSellerProfile={(details) => {
+              onUpdateSellerProfile={async (details) => {
                 if (currentUser) {
-                  updateUser(currentUser.email, details);
+                  await updateUser(currentUser.email, details);
                 }
               }}
               vehicleData={vehicleData}
@@ -619,9 +619,9 @@ const AppContent: React.FC = React.memo(() => {
         return currentUser ? (
           <Profile 
             currentUser={currentUser}
-            onUpdateProfile={(details) => {
+            onUpdateProfile={async (details) => {
               if (currentUser) {
-                updateUser(currentUser.email, details);
+                await updateUser(currentUser.email, details);
               }
             }}
             onUpdatePassword={async (passwords) => {
@@ -632,10 +632,20 @@ const AppContent: React.FC = React.memo(() => {
                   return false;
                 }
                 
-                // Update password
-                updateUser(currentUser.email, { password: passwords.new });
-                addToast('Password updated successfully', 'success');
-                return true;
+                // Hash the new password before updating
+                try {
+                  const { hashPassword } = await import('./utils/passwordUtils');
+                  const hashedNewPassword = await hashPassword(passwords.new);
+                  
+                  // Update password with hashed version
+                  await updateUser(currentUser.email, { password: hashedNewPassword });
+                  addToast('Password updated successfully', 'success');
+                  return true;
+                } catch (error) {
+                  console.error('Failed to hash password:', error);
+                  addToast('Failed to update password', 'error');
+                  return false;
+                }
               }
               return false;
             }}

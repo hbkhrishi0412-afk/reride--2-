@@ -113,7 +113,7 @@ interface AppContextType {
   markAsRead: (conversationId: string) => void;
   toggleTyping: (conversationId: string, isTyping: boolean) => void;
   flagContent: (type: 'vehicle' | 'conversation', id: number | string) => void;
-  updateUser: (email: string, updates: Partial<User>) => void;
+  updateUser: (email: string, updates: Partial<User>) => Promise<void>;
   deleteUser: (email: string) => void;
   updateVehicle: (id: number, updates: Partial<Vehicle>) => void;
   deleteVehicle: (id: number) => void;
@@ -812,26 +812,89 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = React.memo((
       }
       addToast(`Content flagged for review`, 'warning');
     },
-    updateUser: (email: string, updates: Partial<User>) => {
-      setUsers(prev => prev.map(user => 
-        user.email === email ? { ...user, ...updates } : user
-      ));
-      
-      // Also update currentUser if it's the same user
-      if (currentUser && currentUser.email === email) {
-        setCurrentUser(prev => prev ? { ...prev, ...updates } : null);
+    updateUser: async (email: string, updates: Partial<User>) => {
+      try {
+        // First update local state for immediate UI response
+        setUsers(prev => prev.map(user => 
+          user.email === email ? { ...user, ...updates } : user
+        ));
         
-        // Update localStorage as well
-        try {
-          const updatedUser = { ...currentUser, ...updates };
-          localStorage.setItem('reRideCurrentUser', JSON.stringify(updatedUser));
-          sessionStorage.setItem('currentUser', JSON.stringify(updatedUser));
-        } catch (error) {
-          console.error('Failed to update user in localStorage:', error);
+        // Also update currentUser if it's the same user
+        if (currentUser && currentUser.email === email) {
+          setCurrentUser(prev => prev ? { ...prev, ...updates } : null);
+          
+          // Update localStorage as well
+          try {
+            const updatedUser = { ...currentUser, ...updates };
+            localStorage.setItem('reRideCurrentUser', JSON.stringify(updatedUser));
+            sessionStorage.setItem('currentUser', JSON.stringify(updatedUser));
+          } catch (error) {
+            console.error('Failed to update user in localStorage:', error);
+          }
         }
+        
+        // Now update MongoDB via API call
+        try {
+          const response = await fetch('/api/main', {
+            method: 'PUT',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              email: email,
+              ...updates
+            })
+          });
+          
+          if (!response.ok) {
+            const errorText = await response.text();
+            let errorMessage = `API call failed: ${response.status}`;
+            
+            try {
+              const errorData = JSON.parse(errorText);
+              if (errorData.reason) {
+                errorMessage = errorData.reason;
+              }
+            } catch {
+              // If we can't parse the error, use the status text
+              errorMessage = response.statusText || errorMessage;
+            }
+            
+            throw new Error(errorMessage);
+          }
+          
+          const result = await response.json();
+          console.log('✅ User updated in MongoDB:', result);
+          addToast('User updated successfully', 'success');
+          
+        } catch (apiError) {
+          console.error('❌ Failed to update user in MongoDB:', apiError);
+          
+          // Determine the type of error and show appropriate message
+          if (apiError instanceof Error) {
+            if (apiError.message.includes('fetch') || 
+                apiError.message.includes('network') ||
+                apiError.message.includes('503') ||
+                apiError.message.includes('Failed to fetch')) {
+              addToast('Profile updated locally. Will sync when connection is restored.', 'warning');
+            } else if (apiError.message.includes('404')) {
+              addToast('User not found in database. Profile updated locally.', 'warning');
+            } else if (apiError.message.includes('400')) {
+              addToast('Invalid profile data. Please check your input.', 'error');
+            } else if (apiError.message.includes('500')) {
+              addToast('Server error. Profile updated locally, will retry later.', 'warning');
+            } else {
+              addToast('Profile updated locally, but failed to sync with server', 'warning');
+            }
+          } else {
+            addToast('Profile updated locally, but failed to sync with server', 'warning');
+          }
+        }
+        
+      } catch (error) {
+        console.error('Failed to update user:', error);
+        addToast('Failed to update profile', 'error');
       }
-      
-      addToast('User updated successfully', 'success');
     },
     deleteUser: (email: string) => {
       setUsers(prev => prev.filter(user => user.email !== email));
