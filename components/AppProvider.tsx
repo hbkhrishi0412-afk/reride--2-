@@ -816,6 +816,21 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = React.memo((
       setUsers(prev => prev.map(user => 
         user.email === email ? { ...user, ...updates } : user
       ));
+      
+      // Also update currentUser if it's the same user
+      if (currentUser && currentUser.email === email) {
+        setCurrentUser(prev => prev ? { ...prev, ...updates } : null);
+        
+        // Update localStorage as well
+        try {
+          const updatedUser = { ...currentUser, ...updates };
+          localStorage.setItem('reRideCurrentUser', JSON.stringify(updatedUser));
+          sessionStorage.setItem('currentUser', JSON.stringify(updatedUser));
+        } catch (error) {
+          console.error('Failed to update user in localStorage:', error);
+        }
+      }
+      
       addToast('User updated successfully', 'success');
     },
     deleteUser: (email: string) => {
@@ -985,6 +1000,8 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = React.memo((
     setIsCommandPaletteOpen, setUserLocation, setSelectedCity, setUsers,
     setPlatformSettings, setAuditLog, setVehicleData, setFaqItems, setSupportTickets,
     setNotifications, addToast, removeToast, navigate, handleLogin, handleLogout,
+    // Add missing dependencies
+    setCurrentUser, setUsers
   ]);
 
   return (

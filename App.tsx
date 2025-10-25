@@ -427,21 +427,71 @@ const AppContent: React.FC = React.memo(() => {
               seller={currentUser}
               sellerVehicles={enrichVehiclesWithSellerInfo(vehicles.filter(v => v.sellerEmail === currentUser.email), users)}
               reportedVehicles={[]}
-              onAddVehicle={() => {}}
-              onAddMultipleVehicles={() => {}}
-              onUpdateVehicle={() => {}}
-              onDeleteVehicle={() => {}}
-              onMarkAsSold={() => {}}
+              onAddVehicle={async (vehicleData, isFeaturing = false) => {
+                const newVehicle = {
+                  ...vehicleData,
+                  id: Date.now(),
+                  sellerEmail: currentUser.email,
+                  averageRating: 0,
+                  ratingCount: 0,
+                  isFeatured: isFeaturing,
+                  createdAt: new Date().toISOString(),
+                };
+                setVehicles(prev => [...prev, newVehicle]);
+                addToast('Vehicle added successfully', 'success');
+              }}
+              onAddMultipleVehicles={async (vehiclesData) => {
+                const newVehicles = vehiclesData.map(vehicle => ({
+                  ...vehicle,
+                  id: Date.now() + Math.random(),
+                  sellerEmail: currentUser.email,
+                  averageRating: 0,
+                  ratingCount: 0,
+                  createdAt: new Date().toISOString(),
+                }));
+                setVehicles(prev => [...prev, ...newVehicles]);
+                addToast(`${newVehicles.length} vehicles added successfully`, 'success');
+              }}
+              onUpdateVehicle={async (vehicleData) => {
+                setVehicles(prev => prev.map(v => 
+                  v.id === vehicleData.id ? { ...v, ...vehicleData } : v
+                ));
+                addToast('Vehicle updated successfully', 'success');
+              }}
+              onDeleteVehicle={async (vehicleId) => {
+                setVehicles(prev => prev.filter(v => v.id !== vehicleId));
+                addToast('Vehicle deleted successfully', 'success');
+              }}
+              onMarkAsSold={async (vehicleId) => {
+                setVehicles(prev => prev.map(v => 
+                  v.id === vehicleId ? { ...v, isSold: true } : v
+                ));
+                addToast('Vehicle marked as sold', 'success');
+              }}
               conversations={conversations}
               onSellerSendMessage={(conversationId, messageText, _type, _payload) => sendMessage(conversationId, messageText)}
               onMarkConversationAsReadBySeller={(conversationId) => markAsRead(conversationId)}
               typingStatus={typingStatus}
               onUserTyping={(conversationId, _userRole) => toggleTyping(conversationId, true)}
               onMarkMessagesAsRead={(conversationId, _readerRole) => markAsRead(conversationId)}
-              onUpdateSellerProfile={() => {}}
+              onUpdateSellerProfile={(details) => {
+                if (currentUser) {
+                  updateUser(currentUser.email, details);
+                }
+              }}
               vehicleData={vehicleData}
-              onFeatureListing={() => {}}
-              onRequestCertification={() => {}}
+              onFeatureListing={async (vehicleId) => {
+                setVehicles(prev => prev.map(v => 
+                  v.id === vehicleId ? { ...v, isFeatured: true } : v
+                ));
+                addToast('Vehicle featured successfully', 'success');
+              }}
+              onRequestCertification={async (vehicleId) => {
+                setVehicles(prev => prev.map(v => 
+                  v.id === vehicleId ? { ...v, certificationRequested: true } : v
+                ));
+                addToast('Certification request submitted', 'success');
+              }}
               onNavigate={navigate}
               onTestDriveResponse={() => {}}
               allVehicles={vehicles}
@@ -576,7 +626,15 @@ const AppContent: React.FC = React.memo(() => {
             }}
             onUpdatePassword={async (passwords) => {
               if (currentUser) {
+                // Validate current password
+                if (currentUser.password !== passwords.current) {
+                  addToast('Current password is incorrect', 'error');
+                  return false;
+                }
+                
+                // Update password
                 updateUser(currentUser.email, { password: passwords.new });
+                addToast('Password updated successfully', 'success');
                 return true;
               }
               return false;
