@@ -464,7 +464,7 @@ const AppContent: React.FC = React.memo(() => {
               }}
               onMarkAsSold={async (vehicleId) => {
                 setVehicles(prev => prev.map(v => 
-                  v.id === vehicleId ? { ...v, isSold: true } : v
+                  v.id === vehicleId ? { ...v, status: 'sold', soldAt: new Date().toISOString() } : v
                 ));
                 addToast('Vehicle marked as sold', 'success');
               }}
@@ -482,13 +482,13 @@ const AppContent: React.FC = React.memo(() => {
               vehicleData={vehicleData}
               onFeatureListing={async (vehicleId) => {
                 setVehicles(prev => prev.map(v => 
-                  v.id === vehicleId ? { ...v, isFeatured: true } : v
+                  v.id === vehicleId ? { ...v, isFeatured: true, featuredAt: new Date().toISOString() } : v
                 ));
                 addToast('Vehicle featured successfully', 'success');
               }}
               onRequestCertification={async (vehicleId) => {
                 setVehicles(prev => prev.map(v => 
-                  v.id === vehicleId ? { ...v, certificationRequested: true } : v
+                  v.id === vehicleId ? { ...v, certificationStatus: 'requested', certificationRequestedAt: new Date().toISOString() } : v
                 ));
                 addToast('Certification request submitted', 'success');
               }}

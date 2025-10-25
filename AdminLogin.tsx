@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { View, User } from './types';
 import { login } from './services/userService';
+import PasswordInput from './components/PasswordInput';
 
 interface AdminLoginProps {
   onLogin: (user: User) => void;
@@ -63,10 +64,17 @@ const AdminLogin: React.FC<AdminLoginProps> = ({ onLogin, onNavigate }) => {
             <label htmlFor="email-address" className="sr-only">Email address</label>
             <input id="email-address" name="email" type="email" autoComplete="email" required className={`${formInputClass} rounded-md`} placeholder="Email address" value={email} onChange={(e) => setEmail(e.target.value)} />
           </div>
-          <div>
-            <label htmlFor="password" className="sr-only">Password</label>
-            <input id="password" name="password" type="password" autoComplete="current-password" required className={`${formInputClass} rounded-md`} placeholder="Password" value={password} onChange={(e) => setPassword(e.target.value)} />
-          </div>
+          <PasswordInput
+            id="password"
+            name="password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            placeholder="Password"
+            className={`${formInputClass} rounded-md`}
+            autoComplete="current-password"
+            required
+            showLabel={false}
+          />
         </div>
 
         {error && <p className="text-spinny-orange text-sm text-center">{error}</p>}

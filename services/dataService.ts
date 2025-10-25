@@ -14,11 +14,13 @@ class DataService {
 
   private detectDevelopment(): boolean {
     try {
-      return import.meta.env.DEV || 
-             window.location.hostname === 'localhost' || 
-             window.location.hostname === '127.0.0.1' ||
-             window.location.hostname.includes('localhost') ||
-             window.location.protocol === 'file:';
+      // Force API usage instead of localStorage for now
+      return false;
+      // return import.meta.env.DEV || 
+      //        window.location.hostname === 'localhost' || 
+      //        window.location.hostname === '127.0.0.1' ||
+      //        window.location.hostname.includes('localhost') ||
+      //        window.location.protocol === 'file:';
     } catch {
       return false;
     }

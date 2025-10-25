@@ -49,7 +49,7 @@ interface DashboardProps {
   onOfferResponse: (conversationId: string, messageId: number, response: 'accepted' | 'rejected' | 'countered', counterPrice?: number) => void;
 }
 
-type DashboardView = 'overview' | 'listings' | 'form' | 'inquiries' | 'analytics' | 'salesHistory' | 'profile' | 'reports';
+type DashboardView = 'overview' | 'listings' | 'form' | 'inquiries' | 'analytics' | 'salesHistory' | 'reports';
 
 const HelpTooltip: React.FC<{ text: string }> = memo(({ text }) => (
     <span className="group relative ml-1">
@@ -1003,103 +1003,6 @@ const ProfileTextarea: React.FC<{ label: string; name: string; value: string; on
 );
 
 
-const SellerProfileForm: React.FC<{ seller: User; onUpdateProfile: (details: any) => void; }> = memo(({ seller, onUpdateProfile }) => {
-    const [formData, setFormData] = useState({
-        dealershipName: seller.dealershipName || '',
-        bio: seller.bio || '',
-        logoUrl: seller.logoUrl || '',
-    });
-    const [copySuccess, setCopySuccess] = useState('');
-    
-    const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-        setFormData(prev => ({ ...prev, [e.target.name]: e.target.value }));
-    };
-
-    const handleLogoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-        if (e.target.files && e.target.files[0]) {
-            const reader = new FileReader();
-            reader.onload = (event) => {
-                if(event.target && typeof event.target.result === 'string') {
-                    setFormData(prev => ({ ...prev, logoUrl: event.target.result as string }));
-                }
-            };
-            reader.readAsDataURL(e.target.files[0]);
-        }
-    };
-    
-    const handleSubmit = (e: React.FormEvent) => {
-        e.preventDefault();
-        onUpdateProfile(formData);
-    };
-
-    const profileUrl = `${window.location.origin}${window.location.pathname}?seller=${seller.email}`;
-    const qrCodeUrl = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(profileUrl)}`;
-    
-    const handleCopy = () => {
-        navigator.clipboard.writeText(profileUrl).then(() => {
-            setCopySuccess('Copied!');
-            setTimeout(() => setCopySuccess(''), 2000);
-        }, () => {
-            setCopySuccess('Failed to copy');
-            setTimeout(() => setCopySuccess(''), 2000);
-        });
-    };
-
-    return (
-        <div className="bg-white p-6 sm:p-8 rounded-lg shadow-md">
-            <h2 className="text-2xl font-bold text-spinny-text-dark dark:text-spinny-text-dark mb-6">Seller Profile</h2>
-            <form onSubmit={handleSubmit} className="space-y-6">
-                <div className="flex items-center gap-6">
-                    <img src={getSafeImageSrc(formData.logoUrl, 'https://via.placeholder.com/100')} alt="Logo" className="w-24 h-24 rounded-full object-cover bg-white-dark" />
-                    <div>
-                        <label htmlFor="logo-upload" className="cursor-pointer font-medium transition-colors" style={{ color: '#FF6B35' }} onMouseEnter={(e) => e.currentTarget.style.color = 'var(--spinny-blue)'} onMouseLeave={(e) => e.currentTarget.style.color = 'var(--spinny-orange)'}>
-                            <span>Upload New Logo</span>
-                            <input id="logo-upload" name="logo-upload" type="file" className="sr-only" accept="image/*" onChange={handleLogoUpload} />
-                        </label>
-                        <p className="text-xs text-spinny-text-dark mt-1">PNG, JPG, GIF up to 2MB.</p>
-                    </div>
-                </div>
-                <ProfileInput 
-                    label="Dealership Name"
-                    name="dealershipName"
-                    value={formData.dealershipName}
-                    onChange={handleChange}
-                />
-                <ProfileTextarea
-                    label="Public Bio / About"
-                    name="bio"
-                    value={formData.bio}
-                    onChange={handleChange}
-                    placeholder="Tell customers about your dealership..."
-                />
-                <div>
-                    <button type="submit" className="btn-brand-primary text-white font-bold py-3 px-6 rounded-lg">Save Profile</button>
-                </div>
-            </form>
-
-             <div className="mt-8 pt-6 border-t border-gray-200 dark:border-gray-200-200">
-                <h3 className="text-xl font-bold text-spinny-text-dark dark:text-spinny-text-dark mb-4">Your Public Profile</h3>
-                <div className="flex flex-col sm:flex-row items-center gap-6 p-4 bg-white rounded-lg">
-                    <div className="text-center">
-                        <img src={getSafeImageSrc(qrCodeUrl)} alt="Seller Profile QR Code" className="w-36 h-36 rounded-lg border dark:border-gray-200-300" />
-                         <a href={qrCodeUrl} download={`qr-code-${seller.email}.png`} className="mt-2 inline-block text-sm hover:underline transition-colors" style={{ color: '#FF6B35' }} onMouseEnter={(e) => e.currentTarget.style.color = 'var(--spinny-blue)'} onMouseLeave={(e) => e.currentTarget.style.color = 'var(--spinny-orange)'}>
-                            Download QR Code
-                        </a>
-                    </div>
-                    <div>
-                        <p className="text-sm text-spinny-text-dark dark:text-spinny-text-dark mb-3">Share this QR code or link with customers. When they scan or click it, they'll be taken directly to your profile page with all your listings.</p>
-                        <div className="mt-2 p-2 bg-white-dark dark:bg-white rounded-md flex items-center justify-between gap-2">
-                           <a href={profileUrl} target="_blank" rel="noopener noreferrer" className="text-sm font-mono truncate hover:underline transition-colors" style={{ color: '#FF6B35' }} onMouseEnter={(e) => e.currentTarget.style.color = 'var(--spinny-blue)'} onMouseLeave={(e) => e.currentTarget.style.color = 'var(--spinny-orange)'}>{profileUrl}</a>
-                           <button onClick={handleCopy} className="text-sm font-semibold px-3 py-1 text-white rounded-md transition-colors whitespace-nowrap btn-brand-primary">
-                               {copySuccess || 'Copy Link'}
-                           </button>
-                        </div>
-                    </div>
-                </div>
-              </div>
-        </div>
-    );
-});
 
 const ReportsView: React.FC<{
     reportedVehicles: Vehicle[];
@@ -1168,6 +1071,140 @@ const Dashboard: React.FC<DashboardProps> = ({ seller, sellerVehicles, reportedV
     setActiveView(view);
   };
 
+  const handleRefreshVehicle = async (vehicleId: number) => {
+    try {
+      const response = await fetch('/api/vehicles?action=refresh', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ 
+          action: 'refresh',
+          vehicleId, 
+          refreshAction: 'refresh', 
+          sellerEmail: seller.email 
+        })
+      });
+      
+      if (response.ok) {
+        const result = await response.json();
+        if (result.success) {
+          // Update local state instead of reloading page
+          onUpdateVehicle(result.vehicle);
+          console.log('✅ Vehicle refreshed successfully');
+        }
+      } else {
+        console.error('❌ Failed to refresh vehicle');
+      }
+    } catch (error) {
+      console.error('❌ Error refreshing vehicle:', error);
+    }
+  };
+
+  const handleRenewVehicle = async (vehicleId: number) => {
+    try {
+      const response = await fetch('/api/vehicles?action=refresh', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ 
+          action: 'refresh',
+          vehicleId, 
+          refreshAction: 'renew', 
+          sellerEmail: seller.email 
+        })
+      });
+      
+      if (response.ok) {
+        const result = await response.json();
+        if (result.success) {
+          // Update local state instead of reloading page
+          onUpdateVehicle(result.vehicle);
+          console.log('✅ Vehicle renewed successfully');
+        }
+      } else {
+        console.error('❌ Failed to renew vehicle');
+      }
+    } catch (error) {
+      console.error('❌ Error renewing vehicle:', error);
+    }
+  };
+
+  const handleCertifyVehicle = async (vehicleId: number) => {
+    try {
+      const response = await fetch('/api/vehicles', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ 
+          action: 'certify',
+          vehicleId
+        })
+      });
+      
+      if (response.ok) {
+        const result = await response.json();
+        if (result.success) {
+          // Update local state
+          onUpdateVehicle(result.vehicle);
+          console.log('✅ Certification request submitted');
+        }
+      } else {
+        console.error('❌ Failed to submit certification request');
+      }
+    } catch (error) {
+      console.error('❌ Error submitting certification request:', error);
+    }
+  };
+
+  const handleMarkAsSold = async (vehicleId: number) => {
+    try {
+      const response = await fetch('/api/vehicles', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ 
+          action: 'sold',
+          vehicleId
+        })
+      });
+      
+      if (response.ok) {
+        const result = await response.json();
+        if (result.success) {
+          // Update local state
+          onUpdateVehicle(result.vehicle);
+          console.log('✅ Vehicle marked as sold');
+        }
+      } else {
+        console.error('❌ Failed to mark vehicle as sold');
+      }
+    } catch (error) {
+      console.error('❌ Error marking vehicle as sold:', error);
+    }
+  };
+
+  const handleFeatureVehicle = async (vehicleId: number) => {
+    try {
+      const response = await fetch('/api/vehicles', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ 
+          action: 'feature',
+          vehicleId
+        })
+      });
+      
+      if (response.ok) {
+        const result = await response.json();
+        if (result.success) {
+          // Update local state
+          onUpdateVehicle(result.vehicle);
+          console.log('✅ Vehicle featured successfully');
+        }
+      } else {
+        console.error('❌ Failed to feature vehicle');
+      }
+    } catch (error) {
+      console.error('❌ Error featuring vehicle:', error);
+    }
+  };
+  
   const handleEditClick = (vehicle: Vehicle) => {
     setEditingVehicle(vehicle);
     handleNavigate('form');
@@ -1240,10 +1277,10 @@ const Dashboard: React.FC<DashboardProps> = ({ seller, sellerVehicles, reportedV
           case 'approved':
               return <span className="px-1.5 py-0.5 text-spinny-green text-xs border border-spinny-green rounded bg-spinny-green-light" title="Vehicle is certified">✅ Certified</span>;
           case 'rejected':
-              return <button onClick={() => onRequestCertification(vehicle.id)} className="px-1.5 py-0.5 text-spinny-orange hover:text-spinny-orange text-xs border border-spinny-orange rounded hover:bg-spinny-orange-light" title="Certification was rejected, you can request again.">🔄 Retry</button>;
+              return <button onClick={() => handleCertifyVehicle(vehicle.id)} className="px-1.5 py-0.5 text-spinny-orange hover:text-spinny-orange text-xs border border-spinny-orange rounded hover:bg-spinny-orange-light" title="Certification was rejected, you can request again.">🔄 Retry</button>;
           case 'none':
           default:
-              return <button onClick={() => onRequestCertification(vehicle.id)} className="px-1.5 py-0.5 text-teal-600 hover:text-teal-800 text-xs border border-teal-600 rounded hover:bg-teal-50" title="Request a certified inspection report">🛡️ Certify</button>;
+              return <button onClick={() => handleCertifyVehicle(vehicle.id)} className="px-1.5 py-0.5 text-teal-600 hover:text-teal-800 text-xs border border-teal-600 rounded hover:bg-teal-50" title="Request a certified inspection report">🛡️ Certify</button>;
       }
   };
 
@@ -1379,8 +1416,6 @@ const Dashboard: React.FC<DashboardProps> = ({ seller, sellerVehicles, reportedV
                 </div>
             </div>
         );
-      case 'profile':
-          return <SellerProfileForm seller={seller} onUpdateProfile={onUpdateSellerProfile} />;
       case 'listings':
         return (
           <div className="bg-white p-6 sm:p-8 rounded-lg shadow-md">
@@ -1459,7 +1494,7 @@ const Dashboard: React.FC<DashboardProps> = ({ seller, sellerVehicles, reportedV
                               </button>
                               {!v.isFeatured && (seller.featuredCredits ?? 0) > 0 ? (
                                 <button 
-                                  onClick={() => onFeatureListing(v.id)} 
+                                  onClick={() => handleFeatureVehicle(v.id)} 
                                   className="px-1.5 py-0.5 text-spinny-orange hover:text-spinny-orange text-xs border border-spinny-orange rounded hover:bg-spinny-orange-light" 
                                   title="Use a credit to feature this listing"
                                 >
@@ -1471,28 +1506,14 @@ const Dashboard: React.FC<DashboardProps> = ({ seller, sellerVehicles, reportedV
                                 </div>
                               )}
                               <button 
-                                onClick={async () => { 
-                                  await fetch('/api/vehicles?action=refresh', { 
-                                    method: 'POST', 
-                                    headers: { 'Content-Type': 'application/json' }, 
-                                    body: JSON.stringify({ vehicleId: v.id, refreshAction: 'refresh', sellerEmail: seller.email }) 
-                                  }); 
-                                  window.location.reload(); 
-                                }} 
+                                onClick={() => handleRefreshVehicle(v.id)} 
                                 className="px-1.5 py-0.5 text-spinny-blue hover:text-spinny-blue text-xs border border-spinny-blue rounded hover:bg-spinny-blue-light" 
                                 title="Refresh listing"
                               >
                                 🔄 Refresh
                               </button>
                               <button 
-                                onClick={async () => { 
-                                  await fetch('/api/vehicles?action=refresh', { 
-                                    method: 'POST', 
-                                    headers: { 'Content-Type': 'application/json' }, 
-                                    body: JSON.stringify({ vehicleId: v.id, refreshAction: 'renew', sellerEmail: seller.email }) 
-                                  }); 
-                                  window.location.reload(); 
-                                }} 
+                                onClick={() => handleRenewVehicle(v.id)} 
                                 className="px-1.5 py-0.5 text-spinny-green hover:text-spinny-green text-xs border border-spinny-green rounded hover:bg-spinny-green-light" 
                                 title="Renew listing"
                               >
@@ -1508,7 +1529,7 @@ const Dashboard: React.FC<DashboardProps> = ({ seller, sellerVehicles, reportedV
                                     e.preventDefault();
                                     e.stopPropagation();
                                     console.log('🔄 Mark as sold button clicked for vehicle:', v.id);
-                                    onMarkAsSold(v.id);
+                                    handleMarkAsSold(v.id);
                                 }} 
                                 className="px-1.5 py-0.5 text-spinny-orange hover:text-spinny-orange text-xs border border-spinny-orange rounded hover:bg-spinny-orange-light cursor-pointer"
                               >
@@ -1552,35 +1573,21 @@ const Dashboard: React.FC<DashboardProps> = ({ seller, sellerVehicles, reportedV
                                   🚀
                                 </button>
                                 <button 
-                                  onClick={() => onFeatureListing(v.id)} 
+                                  onClick={() => handleFeatureVehicle(v.id)} 
                                   className="px-1.5 py-0.5 text-spinny-orange text-xs border border-spinny-orange rounded"
                                   title="Feature"
                                 >
                                   ⭐
                                 </button>
                                 <button 
-                                  onClick={async () => { 
-                                    await fetch('/api/vehicles?action=refresh', { 
-                                      method: 'POST', 
-                                      headers: { 'Content-Type': 'application/json' }, 
-                                      body: JSON.stringify({ vehicleId: v.id, refreshAction: 'refresh', sellerEmail: seller.email }) 
-                                    }); 
-                                    window.location.reload(); 
-                                  }} 
+                                  onClick={() => handleRefreshVehicle(v.id)} 
                                   className="px-1.5 py-0.5 text-spinny-blue text-xs border border-spinny-blue rounded"
                                   title="Refresh"
                                 >
                                   🔄
                                 </button>
                                 <button 
-                                  onClick={async () => { 
-                                    await fetch('/api/vehicles?action=refresh', { 
-                                      method: 'POST', 
-                                      headers: { 'Content-Type': 'application/json' }, 
-                                      body: JSON.stringify({ vehicleId: v.id, refreshAction: 'renew', sellerEmail: seller.email }) 
-                                    }); 
-                                    window.location.reload(); 
-                                  }} 
+                                  onClick={() => handleRenewVehicle(v.id)} 
                                   className="px-1.5 py-0.5 text-spinny-green text-xs border border-spinny-green rounded"
                                   title="Renew"
                                 >
@@ -1596,7 +1603,7 @@ const Dashboard: React.FC<DashboardProps> = ({ seller, sellerVehicles, reportedV
                                       e.preventDefault();
                                       e.stopPropagation();
                                       console.log('🔄 Mark as sold button clicked for vehicle:', v.id);
-                                      onMarkAsSold(v.id);
+                                      handleMarkAsSold(v.id);
                                   }} 
                                   className="px-1.5 py-0.5 text-spinny-orange text-xs border border-spinny-orange rounded cursor-pointer"
                                   title="Sold"
@@ -1739,7 +1746,6 @@ const Dashboard: React.FC<DashboardProps> = ({ seller, sellerVehicles, reportedV
                 <NavItem view="salesHistory">Sales History</NavItem>
                 <NavItem view="form">Add Vehicle</NavItem>
                 <NavItem view="inquiries" count={unreadCount}>Inquiries</NavItem>
-                <NavItem view="profile">My Profile</NavItem>
             </div>
             </aside>
             <main>

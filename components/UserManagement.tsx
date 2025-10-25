@@ -1,6 +1,7 @@
 import React, { useMemo, useState } from 'react';
 import type { User, View } from '../types';
 import { View as ViewEnum } from '../types';
+import PasswordInput from './PasswordInput';
 
 interface UserManagementProps {
     users: User[];
@@ -77,10 +78,15 @@ const CreateUserModal: React.FC<{
                                 <label className="block text-sm font-medium text-spinny-text-dark dark:text-spinny-text-dark">Mobile Number</label>
                                 <input type="tel" name="mobile" value={formData.mobile} onChange={handleChange} required className="mt-1 block w-full p-2 border rounded-md" />
                             </div>
-                             <div>
-                                <label className="block text-sm font-medium text-spinny-text-dark dark:text-spinny-text-dark">Password</label>
-                                <input type="password" name="password" value={formData.password} onChange={handleChange} required className="mt-1 block w-full p-2 border rounded-md" />
-                            </div>
+                             <PasswordInput
+                                label="Password"
+                                name="password"
+                                value={formData.password}
+                                onChange={handleChange}
+                                placeholder="Enter password"
+                                className="mt-1 block w-full p-2 border rounded-md"
+                                required
+                            />
                             <div>
                                 <label className="block text-sm font-medium text-spinny-text-dark dark:text-spinny-text-dark">Role</label>
                                 <select name="role" value={formData.role} onChange={handleChange} className="mt-1 block w-full p-2 border rounded-md">
