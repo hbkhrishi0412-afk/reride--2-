@@ -553,7 +553,7 @@ const VehicleList: React.FC<VehicleListProps> = React.memo(({
         if (vehicle.price < priceRange.min || vehicle.price > priceRange.max) return false;
         if (vehicle.mileage < mileageRange.min || vehicle.mileage > mileageRange.max) return false;
         if (fuelTypeFilter && vehicle.fuelType !== fuelTypeFilter) return false;
-        if (yearFilter && vehicle.year !== Number(yearFilter)) return false;
+        if (yearFilter && yearFilter !== '0' && vehicle.year !== Number(yearFilter)) return false;
         if (colorFilter && vehicle.color !== colorFilter) return false;
         if (stateFilter && vehicle.state !== stateFilter) return false;
         if (selectedFeatures.length > 0 && (!vehicle.features || !selectedFeatures.every(feature => vehicle.features.includes(feature)))) return false;
