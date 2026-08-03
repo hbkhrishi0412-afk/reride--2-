@@ -320,7 +320,7 @@ const EditVehicleModal: React.FC<EditVehicleModalProps> = ({ vehicle, onClose, o
 
     const FormInput = ({ label, name, type = 'text', value, required = false, placeholder }: { label: string, name: keyof Vehicle | string, type?: string, value: any, required?: boolean, placeholder?: string }) => (
         <div>
-            <label className="block text-sm font-medium text-reride-text-dark dark:text-reride-text-dark mb-1">
+            <label className="block text-sm font-medium text-reride-text-dark dark:text-gray-200 mb-1">
                 {label}
                 {required && <span className="text-red-500 ml-1">*</span>}
             </label>
@@ -352,7 +352,7 @@ const EditVehicleModal: React.FC<EditVehicleModalProps> = ({ vehicle, onClose, o
             className={`flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-all duration-200 ${
                 activeTab === tab
                     ? 'bg-reride-orange text-white shadow-md'
-                    : 'text-reride-text-dark dark:text-reride-text-dark hover:bg-gray-100 dark:hover:bg-gray-700'
+                    : 'text-reride-text-dark dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700'
             }`}
         >
             <span>{icon}</span>

@@ -21,6 +21,8 @@ import {
     AdminPageIntro,
     AdminToolbar,
     adminTableHeadClass,
+    adminTableCellClass,
+    adminTableRowClass,
     AdminMobileCardList,
     AdminMobileCard,
     AdminCardField,
@@ -3622,14 +3624,72 @@ const AdminPanel: React.FC<AdminPanelProps> = (props) => {
             }
         };
 
-        // User Row Component
+        const formatPlanDate = (iso?: string) => {
+            if (!iso) return null;
+            const d = new Date(iso);
+            if (Number.isNaN(d.getTime())) return null;
+            return d.toLocaleDateString('en-IN', { year: 'numeric', month: 'short', day: 'numeric' });
+        };
+
+        const UsageMeter: React.FC<{
+            used: number;
+            limit: number | 'unlimited';
+            caption?: string;
+            emptyLabel?: string;
+        }> = ({ used, limit, caption, emptyLabel }) => {
+            if (emptyLabel) {
+                return (
+                    <div className="flex h-[3.25rem] w-[7.5rem] items-center">
+                        <span className="text-xs font-medium text-slate-400">{emptyLabel}</span>
+                    </div>
+                );
+            }
+            const isUnlimited = limit === 'unlimited';
+            const numericLimit = isUnlimited ? 0 : Number(limit) || 0;
+            const pct = isUnlimited || numericLimit <= 0 ? 0 : Math.min(100, Math.round((used / numericLimit) * 100));
+            const nearCap = !isUnlimited && numericLimit > 0 && pct >= 90;
+            return (
+                <div className="flex h-[3.25rem] w-[7.5rem] flex-col justify-center">
+                    <span className="text-sm font-semibold leading-none tabular-nums text-slate-900">
+                        {used}
+                        <span className="font-medium text-slate-400"> / {isUnlimited ? '∞' : numericLimit}</span>
+                    </span>
+                    <div className="mt-2 h-1.5 w-full overflow-hidden rounded-full bg-slate-100">
+                        <div
+                            className={`h-full rounded-full transition-all ${
+                                nearCap ? 'bg-amber-500' : 'bg-gradient-to-r from-violet-500 to-indigo-500'
+                            }`}
+                            style={{ width: isUnlimited ? '12%' : `${Math.max(pct, used > 0 ? 8 : 0)}%` }}
+                        />
+                    </div>
+                    <p className="mt-1.5 h-3 text-[11px] leading-none text-slate-500">
+                        {caption || '\u00A0'}
+                    </p>
+                </div>
+            );
+        };
+
+        const resolvePlanDetails = (planId: string): PlanDetails => {
+            const fromLoaded = (plans || []).find((p) => p.id === planId);
+            if (fromLoaded) return fromLoaded;
+            // Sync fallback so a row never gets stuck on "Loading…"
+            const label = planId ? planId.charAt(0).toUpperCase() + planId.slice(1) : 'Free';
+            return {
+                id: (planId || 'free') as SubscriptionPlan,
+                name: `${label} Plan`,
+                price: 0,
+                features: [],
+                listingLimit: planId === 'premium' ? 'unlimited' : planId === 'pro' ? 10 : 1,
+                featuredCredits: planId === 'premium' ? 5 : planId === 'pro' ? 2 : 0,
+                freeCertifications: 0,
+                isMostPopular: false,
+            };
+        };
+
+        // User Row Component — uses already-loaded `plans` (no per-row fetch / loading flash)
         const UserRow: React.FC<{ user: User; currentPlan: SubscriptionPlan }> = ({ user, currentPlan }) => {
-            const [planDetails, setPlanDetails] = useState<PlanDetails | null>(null);
-            
-            useEffect(() => {
-                planService.getPlanDetails(currentPlan).then(setPlanDetails);
-            }, [currentPlan]);
-            
+            const planDetails = resolvePlanDetails(currentPlan);
+
             // Normalize emails for comparison (critical for production)
             const normalizedUserEmail = user?.email ? user.email.toLowerCase().trim() : '';
             const userVehicles = vehicles.filter((v: Vehicle) => {
@@ -3639,7 +3699,7 @@ const AdminPanel: React.FC<AdminPanelProps> = (props) => {
             const activeListings = userVehicles.filter((v: Vehicle) => v.status === 'published').length;
             const featuredListings = userVehicles.filter((v: Vehicle) => v.isFeatured).length;
 
-            const planFeaturedCredits = planDetails?.featuredCredits ?? 0;
+            const planFeaturedCredits = planDetails.featuredCredits ?? 0;
             const storedRemainingCredits = typeof user.featuredCredits === 'number'
                 ? user.featuredCredits
                 : planFeaturedCredits;
@@ -3649,148 +3709,151 @@ const AdminPanel: React.FC<AdminPanelProps> = (props) => {
                 Math.max(planFeaturedCredits - featuredListings, 0)
             );
             const usedCredits = Math.max(planFeaturedCredits - calculatedRemaining, featuredListings);
-            
-            if (!planDetails) {
-                return (
-                    <tr key={user.email}>
-                        <td colSpan={7} className="px-6 py-4 text-center text-gray-500">
-                            Loading plan details...
-                        </td>
-                    </tr>
-                );
+            const remainingCredits = Math.max(planFeaturedCredits - usedCredits, 0);
+
+            const activatedLabel = formatPlanDate(user.planActivatedDate);
+            const expiryLabel = formatPlanDate(user.planExpiryDate);
+            let expiryStatus: 'none' | 'active' | 'soon' | 'expired' = 'none';
+            let daysRemaining = 0;
+            if (user.planExpiryDate) {
+                const expiryDate = new Date(user.planExpiryDate);
+                daysRemaining = Math.ceil((expiryDate.getTime() - Date.now()) / (1000 * 60 * 60 * 24));
+                if (expiryDate < new Date()) expiryStatus = 'expired';
+                else if (daysRemaining <= 7) expiryStatus = 'soon';
+                else expiryStatus = 'active';
+            } else if (currentPlan === 'free') {
+                expiryStatus = 'none';
             }
-            
+
+            const planBadgeClass =
+                currentPlan === 'free'
+                    ? 'bg-slate-100 text-slate-700 ring-slate-200/80'
+                    : currentPlan === 'pro'
+                      ? 'bg-sky-50 text-sky-800 ring-sky-200/80'
+                      : 'bg-violet-50 text-violet-800 ring-violet-200/80';
+
+            const otherPlans = (['free', 'pro', 'premium'] as SubscriptionPlan[]).filter((p) => p !== currentPlan);
+            const cellClass = `${adminTableCellClass} align-middle whitespace-nowrap`;
+
             return (
-                <tr key={user.email}>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="flex items-center">
-                            <div className="flex-shrink-0 h-10 w-10">
-                                <div className="h-10 w-10 rounded-full bg-reride-orange flex items-center justify-center text-white font-bold">
-                                    {user.name.charAt(0).toUpperCase()}
-                                </div>
+                <tr className={adminTableRowClass}>
+                    <td className={cellClass}>
+                        <div className="flex h-[3.25rem] items-center gap-3">
+                            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-orange-500 to-amber-500 text-sm font-bold text-white shadow-sm ring-1 ring-orange-400/30">
+                                {(user.name || '?').charAt(0).toUpperCase()}
                             </div>
-                            <div className="ml-4">
-                                <div className="text-sm font-medium text-gray-900">{user.name}</div>
-                                <div className="text-sm text-gray-500">{user.email}</div>
+                            <div className="min-w-0 leading-tight">
+                                <div className="truncate text-sm font-semibold text-slate-900">{user.name}</div>
+                                <div className="mt-0.5 truncate text-xs text-slate-500">{user.email}</div>
                             </div>
                         </div>
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                        <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                            currentPlan === 'free' ? 'bg-gray-100 text-gray-800' :
-                            currentPlan === 'pro' ? 'bg-blue-100 text-blue-800' :
-                            'bg-purple-100 text-purple-800'
-                        }`}>
-                            {planDetails.name}
-                        </span>
+                    <td className={cellClass}>
+                        <div className="flex h-[3.25rem] items-center">
+                            <span className={`inline-flex items-center rounded-lg px-2.5 py-1 text-xs font-semibold ring-1 ring-inset ${planBadgeClass}`}>
+                                {planDetails.name}
+                            </span>
+                        </div>
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                        {activeListings} / {planDetails.listingLimit === 'unlimited' ? '∞' : planDetails.listingLimit}
+                    <td className={cellClass}>
+                        <UsageMeter used={activeListings} limit={planDetails.listingLimit} />
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="flex items-center">
-                            <div className="flex-1">
-                                <div className="text-sm text-gray-900">
-                                                    {user.usedCertifications || 0} / {planDetails.freeCertifications}
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                    <td className={cellClass}>
                         {planFeaturedCredits > 0 ? (
-                            <div>
-                                <div className="font-medium">
-                                    {usedCredits} used / {planFeaturedCredits}
-                                </div>
-                                <div className="text-xs text-gray-500">
-                                    Remaining: {Math.max(planFeaturedCredits - usedCredits, 0)}
-                                </div>
-                            </div>
+                            <UsageMeter
+                                used={usedCredits}
+                                limit={planFeaturedCredits}
+                                caption={`${remainingCredits} remaining`}
+                            />
                         ) : (
-                            <span className="text-gray-400">Not included</span>
+                            <UsageMeter used={0} limit={0} emptyLabel="Not included" />
                         )}
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                                        <div className="flex flex-col gap-2">
-                                            {currentPlan !== 'free' && (
-                                                <button 
-                                                    onClick={() => handleAssignPlan(user, 'free')}
-                                                    className="text-gray-600 hover:text-gray-800 transition-colors"
-                                                >
-                                                    Assign Free
-                                                </button>
-                                            )}
-                                            {currentPlan !== 'pro' && (
-                                                <button 
-                                                    onClick={() => handleAssignPlan(user, 'pro')}
-                                                    className="text-blue-600 hover:text-blue-800 transition-colors"
-                                                >
-                                                    Assign Pro
-                                                </button>
-                                            )}
-                                            {currentPlan !== 'premium' && (
-                                                <button 
-                                                    onClick={() => handleAssignPlan(user, 'premium')}
-                                                    className="text-purple-600 hover:text-purple-800 transition-colors"
-                                                >
-                                                    Assign Premium
-                                                </button>
-                                            )}
-                                        </div>
-                                    </td>
-                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                                        {user.planActivatedDate 
-                                            ? new Date(user.planActivatedDate).toLocaleDateString('en-IN', { 
-                                                year: 'numeric', 
-                                                month: 'short', 
-                                                day: 'numeric' 
-                                            })
-                                            : <span className="text-gray-400">Not set</span>
-                                        }
-                                    </td>
-                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                                        <div className="flex items-center gap-2">
-                                            <div className="flex-1">
-                                                {user.planExpiryDate 
-                                                    ? (() => {
-                                                        const expiryDate = new Date(user.planExpiryDate);
-                                                        const isExpired = expiryDate < new Date();
-                                                        const daysRemaining = Math.ceil((expiryDate.getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24));
-                                                        return (
-                                                            <div>
-                                                                <div className={isExpired ? 'text-red-600 font-semibold' : daysRemaining <= 7 ? 'text-orange-600 font-semibold' : ''}>
-                                                                    {expiryDate.toLocaleDateString('en-IN', { 
-                                                                        year: 'numeric', 
-                                                                        month: 'short', 
-                                                                        day: 'numeric' 
-                                                                    })}
-                                                                </div>
-                                                                {!isExpired && daysRemaining <= 30 && (
-                                                                    <div className="text-xs text-gray-500 mt-1">
-                                                                        {daysRemaining} {daysRemaining === 1 ? 'day' : 'days'} left
-                                                                    </div>
-                                                                )}
-                                                            </div>
-                                                        );
-                                                    })()
-                                                    : currentPlan === 'free' 
-                                                        ? <span className="text-gray-400">No expiry</span>
-                                                        : <span className="text-gray-400">Not set</span>
-                                                }
-                                            </div>
-                                            <button
-                                                onClick={() => {
-                                                    setEditingExpiryUser(user);
-                                                    setShowExpiryEditModal(true);
-                                                }}
-                                                className="text-blue-600 hover:text-blue-800 text-xs underline"
-                                                title="Edit expiry date"
-                                            >
-                                                Edit
-                                            </button>
-                                        </div>
-                                    </td>
-                                </tr>
+                    <td className={cellClass}>
+                        <div className="flex h-[3.25rem] flex-col justify-center gap-1">
+                            <div className="grid grid-cols-[2.75rem_minmax(0,1fr)] items-center gap-x-2 text-xs leading-none">
+                                <span className="font-medium uppercase tracking-wide text-slate-400">Start</span>
+                                <span className="font-medium tabular-nums text-slate-800">
+                                    {activatedLabel || <span className="font-normal text-slate-400">Not set</span>}
+                                </span>
+                            </div>
+                            <div className="grid grid-cols-[2.75rem_minmax(0,1fr)] items-center gap-x-2 text-xs leading-none">
+                                <span className="font-medium uppercase tracking-wide text-slate-400">Ends</span>
+                                {expiryLabel ? (
+                                    <span
+                                        className={`inline-flex items-center gap-1.5 font-semibold tabular-nums ${
+                                            expiryStatus === 'expired'
+                                                ? 'text-red-600'
+                                                : expiryStatus === 'soon'
+                                                  ? 'text-amber-600'
+                                                  : 'text-slate-800'
+                                        }`}
+                                    >
+                                        {expiryLabel}
+                                        {expiryStatus === 'soon' && (
+                                            <span className="rounded bg-amber-50 px-1 py-0.5 text-[10px] font-semibold text-amber-700 ring-1 ring-inset ring-amber-200/80">
+                                                {daysRemaining}d
+                                            </span>
+                                        )}
+                                        {expiryStatus === 'expired' && (
+                                            <span className="rounded bg-red-50 px-1 py-0.5 text-[10px] font-semibold text-red-700 ring-1 ring-inset ring-red-200/80">
+                                                Expired
+                                            </span>
+                                        )}
+                                    </span>
+                                ) : (
+                                    <span className="font-normal text-slate-400">
+                                        {currentPlan === 'free' ? 'No expiry' : 'Not set'}
+                                    </span>
+                                )}
+                            </div>
+                        </div>
+                    </td>
+                    <td className={`${cellClass} w-[15.5rem]`}>
+                        <div className="ml-auto flex h-[3.25rem] w-[14.5rem] items-center justify-end gap-2">
+                            <button
+                                type="button"
+                                onClick={() => {
+                                    setEditingExpiryUser(user);
+                                    setShowExpiryEditModal(true);
+                                }}
+                                className="inline-flex h-8 w-[5.25rem] shrink-0 items-center justify-center gap-1.5 rounded-lg border border-slate-200 bg-white text-xs font-semibold text-slate-700 shadow-sm transition hover:border-slate-300 hover:bg-slate-50"
+                                title="Edit subscription dates"
+                            >
+                                <svg className="h-3.5 w-3.5 text-slate-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                                    <path strokeLinecap="round" strokeLinejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                </svg>
+                                Dates
+                            </button>
+                            <label className="sr-only" htmlFor={`change-plan-${user.email}`}>
+                                Change plan for {user.name}
+                            </label>
+                            <select
+                                id={`change-plan-${user.email}`}
+                                defaultValue=""
+                                onChange={(e) => {
+                                    const next = e.target.value as SubscriptionPlan | '';
+                                    e.target.value = '';
+                                    if (next) handleAssignPlan(user, next);
+                                }}
+                                className="h-8 w-[8.75rem] shrink-0 appearance-none rounded-lg border-0 bg-slate-900 bg-[length:12px] bg-[right_0.6rem_center] bg-no-repeat py-0 pl-2.5 pr-7 text-xs font-semibold text-white shadow-sm focus:outline-none focus:ring-2 focus:ring-violet-400 cursor-pointer"
+                                style={{
+                                    backgroundImage:
+                                        "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%23ffffff'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'/%3E%3C/svg%3E\")",
+                                }}
+                            >
+                                <option value="" disabled>
+                                    Change plan
+                                </option>
+                                {otherPlans.map((plan) => (
+                                    <option key={plan} value={plan} className="bg-white text-slate-900">
+                                        {plan === 'free' ? 'Free' : plan === 'pro' ? 'Pro' : 'Premium'}
+                                    </option>
+                                ))}
+                            </select>
+                        </div>
+                    </td>
+                </tr>
             );
         };
 
@@ -4086,30 +4149,46 @@ const AdminPanel: React.FC<AdminPanelProps> = (props) => {
 
                 <AdminDataTableFrame
                     title="Seller directory"
-                    subtitle={planFilter !== 'all' ? `Filtered: ${planFilter}` : 'All subscription tiers'}
+                    subtitle={
+                        planFilter !== 'all'
+                            ? `${filteredUsers.length} seller${filteredUsers.length === 1 ? '' : 's'} · ${planFilter} plan`
+                            : `${filteredUsers.length} seller${filteredUsers.length === 1 ? '' : 's'} across all tiers`
+                    }
                     actions={
-                        <select
+                        <AdminSegmentedTabs<'all' | SubscriptionPlan>
+                            aria-label="Filter sellers by plan"
                             value={planFilter}
-                            onChange={(e) => setPlanFilter(e.target.value as SubscriptionPlan)}
-                            className="rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm font-medium text-slate-800 shadow-sm focus:border-violet-400 focus:outline-none focus:ring-2 focus:ring-violet-200"
-                        >
-                            <option value="all">All plans</option>
-                            <option value="free">Free</option>
-                            <option value="pro">Pro</option>
-                            <option value="premium">Premium</option>
-                        </select>
+                            onChange={setPlanFilter}
+                            items={[
+                                { id: 'all', label: 'All', count: users.filter((u) => u.role === 'seller').length },
+                                { id: 'free', label: 'Free', count: planStats.free },
+                                { id: 'pro', label: 'Pro', count: planStats.pro },
+                                { id: 'premium', label: 'Premium', count: planStats.premium },
+                            ]}
+                        />
                     }
                 >
+                    {filteredUsers.length === 0 ? (
+                        <div className="p-4">
+                            <AdminEmptyState
+                                title="No sellers in this view"
+                                description={
+                                    planFilter === 'all'
+                                        ? 'Seller accounts will appear here once they register.'
+                                        : `No sellers are currently on the ${planFilter} plan.`
+                                }
+                            />
+                        </div>
+                    ) : (
                     <table className="min-w-full divide-y divide-slate-100">
                         <thead>
                             <tr>
-                                <th className={`${adminTableHeadClass} px-4 py-3`}>User</th>
-                                <th className={`${adminTableHeadClass} px-4 py-3`}>Current plan</th>
-                                <th className={`${adminTableHeadClass} px-4 py-3`}>Usage</th>
-                                <th className={`${adminTableHeadClass} px-4 py-3`}>Featured credits</th>
-                                <th className={`${adminTableHeadClass} px-4 py-3`}>Actions</th>
-                                <th className={`${adminTableHeadClass} px-4 py-3`}>Activated</th>
-                                <th className={`${adminTableHeadClass} px-4 py-3`}>Expiry</th>
+                                <th className={`${adminTableHeadClass} px-4 py-3`}>Seller</th>
+                                <th className={`${adminTableHeadClass} px-4 py-3`}>Plan</th>
+                                <th className={`${adminTableHeadClass} px-4 py-3`}>Listings</th>
+                                <th className={`${adminTableHeadClass} px-4 py-3`}>Featured</th>
+                                <th className={`${adminTableHeadClass} px-4 py-3`}>Subscription</th>
+                                <th className={`${adminTableHeadClass} w-[15.5rem] px-4 py-3 text-right`}>Actions</th>
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-slate-100 bg-white">
@@ -4119,6 +4198,7 @@ const AdminPanel: React.FC<AdminPanelProps> = (props) => {
                                 })}
                             </tbody>
                        </table>
+                    )}
                    </AdminDataTableFrame>
 
                 {/* Plan Edit Modal */}
