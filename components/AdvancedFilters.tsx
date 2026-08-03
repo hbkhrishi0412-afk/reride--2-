@@ -1,6 +1,7 @@
 import React, { useState, memo, useMemo } from 'react';
 import useIsMobileApp from '../hooks/useIsMobileApp';
 import type { Vehicle } from '../types';
+import { isEffectivelyFeatured } from '../utils/listingPromotion';
 
 interface AdvancedFiltersProps {
   vehicles: Vehicle[];
@@ -138,8 +139,8 @@ const AdvancedFilters: React.FC<AdvancedFiltersProps> = memo(({
         }
       }
 
-      // Featured filter
-      if (filters.featuredOnly && !vehicle.isFeatured) {
+      // Featured filter (active featured/spotlight boosts only)
+      if (filters.featuredOnly && !isEffectivelyFeatured(vehicle)) {
         return false;
       }
 

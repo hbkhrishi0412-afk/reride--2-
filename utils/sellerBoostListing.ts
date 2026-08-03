@@ -2,43 +2,60 @@ import { BOOST_PACKAGES } from '../constants/boost.js';
 import type { User, Vehicle } from '../types.js';
 import { buildVehicleMutationBody } from './vehicleIdentity.js';
 
-/** Razorpay checkout + verified boost API call for seller listings. */
+export type SellerBoostListingResult = {
+  vehicle: Vehicle;
+  remainingCredits?: number;
+};
+
+/** Razorpay checkout or plan-credit boost API call for seller listings. */
 export async function executeSellerBoostListing(deps: {
   vehicleId: number;
   packageId: string;
   seller: Pick<User, 'email' | 'name'>;
   sellerVehicles: Vehicle[];
-}): Promise<Vehicle> {
+}): Promise<SellerBoostListingResult> {
   const { vehicleId, packageId, seller, sellerVehicles } = deps;
   const pkg = BOOST_PACKAGES.find((p) => p.id === packageId);
   if (!pkg) {
     throw new Error('Unknown boost package. Please refresh and try again.');
   }
 
-  const { openRazorpayBoostCheckout, isRazorpayConfiguredInClient } = await import(
-    '../services/razorpayPlanPayment.js'
-  );
-  if (!isRazorpayConfiguredInClient()) {
-    throw new Error('Online payments are not configured. Please contact support to boost listings.');
-  }
+  const useCredit = pkg.paymentMethod === 'credit' || pkg.price === 0;
+  let razorpayProof:
+    | {
+        razorpay_order_id: string;
+        razorpay_payment_id: string;
+        razorpay_signature: string;
+        amountInr: number;
+      }
+    | undefined;
 
-  const razorpayProof = await new Promise<{
-    razorpay_order_id: string;
-    razorpay_payment_id: string;
-    razorpay_signature: string;
-    amountInr: number;
-  }>((resolve, reject) => {
-    openRazorpayBoostCheckout({
-      vehicleId,
-      packageId,
-      packageName: pkg.name,
-      amountInr: Number(pkg.price) || 0,
-      sellerEmail: seller.email,
-      sellerName: seller.name,
-      onSuccess: (proof) => resolve(proof),
-      onFailure: (message) => reject(new Error(message)),
+  if (!useCredit) {
+    const { openRazorpayBoostCheckout, isRazorpayConfiguredInClient } = await import(
+      '../services/razorpayPlanPayment.js'
+    );
+    if (!isRazorpayConfiguredInClient()) {
+      throw new Error('Online payments are not configured. Please contact support to boost listings.');
+    }
+
+    razorpayProof = await new Promise<{
+      razorpay_order_id: string;
+      razorpay_payment_id: string;
+      razorpay_signature: string;
+      amountInr: number;
+    }>((resolve, reject) => {
+      openRazorpayBoostCheckout({
+        vehicleId,
+        packageId,
+        packageName: pkg.name,
+        amountInr: Number(pkg.price) || 0,
+        sellerEmail: seller.email,
+        sellerName: seller.name,
+        onSuccess: (proof) => resolve(proof),
+        onFailure: (message) => reject(new Error(message)),
+      });
     });
-  });
+  }
 
   const { authenticatedFetch } = await import('../utils/authenticatedFetch.js');
   const response = await authenticatedFetch('/api/vehicles?action=boost', {
@@ -47,10 +64,14 @@ export async function executeSellerBoostListing(deps: {
       buildVehicleMutationBody(vehicleId, sellerVehicles, {
         packageId,
         sellerEmail: seller.email,
-        razorpay_order_id: razorpayProof.razorpay_order_id,
-        razorpay_payment_id: razorpayProof.razorpay_payment_id,
-        razorpay_signature: razorpayProof.razorpay_signature,
-        amount: razorpayProof.amountInr,
+        ...(useCredit
+          ? { useCredit: true }
+          : {
+              razorpay_order_id: razorpayProof!.razorpay_order_id,
+              razorpay_payment_id: razorpayProof!.razorpay_payment_id,
+              razorpay_signature: razorpayProof!.razorpay_signature,
+              amount: razorpayProof!.amountInr,
+            }),
       }),
     ),
   });
@@ -75,7 +96,11 @@ export async function executeSellerBoostListing(deps: {
 
   const result = await response.json();
   if (result?.success && result?.vehicle) {
-    return result.vehicle as Vehicle;
+    return {
+      vehicle: result.vehicle as Vehicle,
+      remainingCredits:
+        typeof result.remainingCredits === 'number' ? result.remainingCredits : undefined,
+    };
   }
   throw new Error(result?.reason || result?.error || 'Failed to boost listing.');
 }

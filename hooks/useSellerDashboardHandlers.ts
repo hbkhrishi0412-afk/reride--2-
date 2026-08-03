@@ -235,21 +235,46 @@ export function useSellerDashboardHandlers({ app, currentUser, locals }: UseSell
     async (vehicleId: number, packageId: string) => {
       try {
         const { executeSellerBoostListing } = await import('../utils/sellerBoostListing.js');
-        const updated = await executeSellerBoostListing({
+        const result = await executeSellerBoostListing({
           vehicleId,
           packageId,
           seller: currentUser,
           sellerVehicles: sellerVehiclesFiltered || [],
         });
-        await updateVehicle(vehicleId, updated, { skipToast: true });
-        addToast('Your listing has been boosted! It will get more visibility.', 'success');
+        await updateVehicle(vehicleId, result.vehicle, { skipToast: true });
+
+        if (typeof result.remainingCredits === 'number') {
+          const remainingCredits = result.remainingCredits;
+          const sellerEmail = result.vehicle?.sellerEmail || currentUser?.email;
+          if (
+            currentUser?.email &&
+            sellerEmail &&
+            currentUser.email.toLowerCase().trim() === sellerEmail.toLowerCase().trim()
+          ) {
+            setCurrentUser({
+              ...currentUser,
+              featuredCredits: remainingCredits,
+            });
+          }
+          if (sellerEmail) {
+            await runBackgroundSync('Boost credits sync', () =>
+              updateUser(sellerEmail, { featuredCredits: remainingCredits }, { skipToast: true }),
+            );
+          }
+          addToast(
+            `Listing boosted for 7 days! You have ${remainingCredits} boost credit${remainingCredits === 1 ? '' : 's'} left.`,
+            'success',
+          );
+        } else {
+          addToast('Your listing has been boosted! It will get more visibility.', 'success');
+        }
       } catch (err) {
         const message = err instanceof Error ? err.message : 'Failed to boost listing.';
         addToast(message, 'error');
         throw err;
       }
     },
-    [currentUser, sellerVehiclesFiltered, updateVehicle, addToast],
+    [currentUser, sellerVehiclesFiltered, updateVehicle, setCurrentUser, updateUser, addToast],
   );
 
   const onUpdateVehicle = useCallback(
@@ -332,7 +357,7 @@ export function useSellerDashboardHandlers({ app, currentUser, locals }: UseSell
               );
             }
 
-            addToast(`Listing featured! You have ${remainingCredits} feature credits left.`, 'success');
+          addToast(`Listing featured! You have ${remainingCredits} boost credit${remainingCredits === 1 ? '' : 's'} left.`, 'success');
           } else {
             addToast('Listing featured successfully!', 'success');
           }

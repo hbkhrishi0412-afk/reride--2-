@@ -105,7 +105,7 @@ export default {
         'chat-open': '100',
         overlay: '105',
         modal: '110',
-        toast: '120',
+        toast: '200',
         command: '130',
       },
     },

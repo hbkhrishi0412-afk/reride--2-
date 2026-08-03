@@ -88,6 +88,7 @@ export function useSellerCommandCenter(seller: User | null) {
   const [commandCenterError, setCommandCenterError] = useState<string | null>(null);
   const [pendingDealCount, setPendingDealCount] = useState(0);
   const [pendingAcceptCount, setPendingAcceptCount] = useState(0);
+  const [pendingTaskCount, setPendingTaskCount] = useState(0);
   const [sellerActiveDeals, setSellerActiveDeals] = useState<DealLead[]>([]);
 
   const refreshDealCommandStats = useCallback(
@@ -96,6 +97,7 @@ export function useSellerCommandCenter(seller: User | null) {
         setCommandCenter(null);
         setPendingDealCount(0);
         setPendingAcceptCount(0);
+        setPendingTaskCount(0);
         setSellerActiveDeals([]);
         setCommandCenterLoading(false);
         setCommandCenterError(null);
@@ -108,6 +110,9 @@ export function useSellerCommandCenter(seller: User | null) {
           setCommandCenter(center);
           setPendingDealCount(center.stats.activeDealCount ?? 0);
           setPendingAcceptCount(center.stats.pendingInterestCount ?? 0);
+          setPendingTaskCount(
+            center.stats.tasksToday ?? center.tasks?.length ?? 0,
+          );
           setSellerActiveDeals(center.activeDeals ?? []);
           setCommandCenterError(null);
         })
@@ -151,6 +156,7 @@ export function useSellerCommandCenter(seller: User | null) {
     commandCenterError,
     pendingDealCount,
     pendingAcceptCount,
+    pendingTaskCount,
     sellerActiveDeals,
     dealsByVehicleId,
     refreshDealCommandStats,

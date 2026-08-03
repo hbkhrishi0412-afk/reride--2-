@@ -379,22 +379,29 @@ const AppProviderCore: React.FC<{ children: React.ReactNode }> = ({ children }) 
     [askConfirm],
   );
 
-  // CRITICAL: Emergency fail-safe to prevent infinite loading
-  // Only show notification if we have no vehicles loaded at all
+  // CRITICAL: Emergency fail-safe to prevent infinite loading / endless skeletons
+  // Catalog gate uses vehiclesCatalogReady — clearing only isLoading left skeletons up forever.
   useEffect(() => {
     const emergencyTimeout = setTimeout(() => {
-      setIsLoading(current => {
+      setIsLoading((current) => {
         if (current && vehicles.length === 0) {
-          // Only log warning if we truly have no data - don't show toast to users
-          logWarn('⚠️ EMERGENCY: No vehicles loaded after 3s');
+          logWarn('⚠️ EMERGENCY: No vehicles loaded after 3s — releasing loading gate');
           return false;
         }
         return current;
       });
-    }, 3000); // Reduced from 5000 to 3000 for faster response
-    
+      // Always release the catalog-ready gate so Home can show empty/retry UI instead of skeletons
+      setVehiclesCatalogReady((ready) => {
+        if (!ready && vehicles.length === 0) {
+          logWarn('⚠️ EMERGENCY: Releasing vehiclesCatalogReady after 3s');
+          return true;
+        }
+        return ready;
+      });
+    }, 3000);
+
     return () => clearTimeout(emergencyTimeout);
-  }, [addToast, vehicles.length, t]); // Add vehicles.length dependency
+  }, [vehicles.length]);
 
   const syncUserCachesByEmail = useCallback((email: string, updates: Partial<User>) => {
     if (typeof window === 'undefined' || typeof localStorage === 'undefined') return;
@@ -1550,10 +1557,11 @@ const AppProviderCore: React.FC<{ children: React.ReactNode }> = ({ children }) 
     return () => {
       isMounted = false;
     };
-    // PERFORMANCE: Only depend on user role, not entire currentUser object
-    // Use optional chaining in dependency to handle null/undefined
+    // Mount-once bootstrap. Role is read from localStorage above; admin/login refresh
+    // is handled by the syncLatestData effect — do NOT re-run this when currentUser?.role
+    // hydrates or the catalog gate resets and skeletons flash again.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [addToast, currentUser?.role, t]);
+  }, []);
 
   // Supabase Realtime: other party's messages (customer_id/seller_id are users.id, not raw emails — must match email + emailToKey + user.id)
   const applyConversationRealtimeRow = useCallback(
@@ -1771,15 +1779,9 @@ const AppProviderCore: React.FC<{ children: React.ReactNode }> = ({ children }) 
       hasRunOnce = true;
 
       try {
-        // Don't set loading to true if we already have cached data - show it immediately
-        // Only show loading if we have no cached data
-        const hasCachedVehicles = localStorage.getItem('reRideVehicles_prod');
-        const hasCachedUsers = localStorage.getItem('reRideUsers_prod');
-        
-        if (!hasCachedVehicles && !hasCachedUsers) {
-          setIsLoading(true);
-        }
-        
+        // Never flip loading back on if the catalog already painted — that re-shows skeletons.
+        // Catalog bootstrap is handled by loadInitialData; this path only refreshes after auth.
+
         // For admin users, load all vehicles (including unpublished/sold)
         const isAdmin = currentUser?.role === 'admin';
         
@@ -1816,6 +1818,8 @@ const AppProviderCore: React.FC<{ children: React.ReactNode }> = ({ children }) 
         // Update vehicles if fetch succeeded
         if (vehiclesResult.status === 'fulfilled' && Array.isArray(vehiclesResult.value)) {
           setVehicles((prev) => mergeVehicleCatalog(prev, vehiclesResult.value, !!isAdmin));
+          setVehiclesCatalogReady(true);
+          setIsLoading(false);
           // PERFORMANCE: Recommendations are now computed via useMemo from vehicles
           // Do not toast on empty listings: zero published vehicles is valid (new seller, empty marketplace).
           // Misconfiguration is surfaced when the request fails (see rejected branch / 503 handling).

@@ -8,6 +8,7 @@ import PricingGuidance from './PricingGuidance';
 import BoostListingModal from './BoostListingModal';
 import ListingLifecycleIndicator from './ListingLifecycleIndicator';
 import PaymentStatusCard from './PaymentStatusCard';
+import { isEffectivelyFeatured } from '../utils/listingPromotion';
 import { PaymentErrorBoundary } from './ErrorBoundaries';
 import { saveQrCodePngFromUrl } from '../utils/saveQrCodeImage';
 import { getFirstValidImage, swapToPlaceholderOnError } from '../utils/imageUtils';
@@ -31,17 +32,22 @@ import {
 import SellerDisclosureForm from './SellerDisclosureForm';
 import SellerCommandHome from './command-center/SellerCommandHome';
 import DealDetailPage from './command-center/DealDetailPage';
+import { useSellerDashboardController } from '../hooks/useSellerDashboardController';
+import { countActionableSellerTasks } from '../utils/sellerViewedTasks';
 import { formatIndianNumberInput, parseIndianNumberDigits } from '../utils/indianNumberInput.js';
 import {
   clearChecklistPhotoByUrl,
   extractChecklistGalleryUrls,
   getExtraGalleryImages,
   mergeListingImages,
+  syncDocumentsFromChecklist,
 } from '../lib/universalChecklist/mediaSync';
 import { verifyVahanRegistration, applyVahanVerifyToVehicleFields } from '../services/vehicleTrustService';
 import MarkSoldDealModal from './MarkSoldDealModal';
-import { isListingLimitReached } from '../utils/listingPlanRules';
-import { useSellerDashboardController } from '../hooks/useSellerDashboardController';
+import { isListingLimitReached, validateListingRenewal } from '../utils/listingPlanRules';
+import { isListingExpired } from '../services/listingLifecycleService';
+import { authenticatedFetch } from '../utils/authenticatedFetch';
+import { buildVehicleMutationBody } from '../utils/vehicleIdentity';
 import InlineChat from './InlineChat';
 
 // ---------- Premium inline SVG icon set (kept local to avoid new deps) ----------
@@ -486,6 +492,7 @@ const MobileDashboard: React.FC<MobileDashboardProps> = memo(({
   onSetConversationReadState,
   onMarkAllAsReadBySeller,
 }) => {
+  void _onFeatureListing;
   const { t } = useTranslation();
   const identityT = useCallback(
     (key: string, defaultValue?: string) => String(t(key, defaultValue ?? key)),
@@ -513,6 +520,7 @@ const MobileDashboard: React.FC<MobileDashboardProps> = memo(({
     commandCenterError,
     refreshDealCommandStats,
   } = useSellerDashboardController(currentUser);
+  const [viewedTasksVersion, setViewedTasksVersion] = useState(0);
   const [messagesHubFilter, setMessagesHubFilter] = useState<'all' | 'unread' | 'read'>('all');
   const [hubSelectedConversation, setHubSelectedConversation] = useState<Conversation | null>(null);
   const [editingVehicle, setEditingVehicle] = useState<Vehicle | null>(null);
@@ -635,10 +643,26 @@ const MobileDashboard: React.FC<MobileDashboardProps> = memo(({
   }, [activeTab]);
 
   const hotLeadsBadgeCount = useMemo(() => {
-    const taskCount = commandCenter?.tasks?.length ?? 0;
-    const pendingAccept = commandCenter?.stats?.pendingInterestCount ?? 0;
-    return taskCount > 0 ? taskCount : pendingAccept > 0 ? pendingAccept : 0;
-  }, [commandCenter]);
+    return countActionableSellerTasks(
+      commandCenter?.tasks,
+      commandCenter?.stats?.pendingInterestCount ?? 0,
+    );
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- viewedTasksVersion bumps after markSellerTaskViewed
+  }, [commandCenter, viewedTasksVersion]);
+
+  const openHotLeadConversation = useCallback(
+    (conv: Conversation) => {
+      onMarkConversationAsRead(conv.id);
+      onMarkMessagesAsRead(conv.id, 'seller');
+      if (onSellerOpenChat) {
+        onSellerOpenChat(conv);
+      } else {
+        setHubSelectedConversation(conv);
+        setActiveTab('messages');
+      }
+    },
+    [onMarkConversationAsRead, onMarkMessagesAsRead, onSellerOpenChat],
+  );
 
   // Keep bank checkboxes in sync with server when `partnerBanks` actually changes.
   // Do NOT depend on the whole `currentUser` object — it gets a new reference often and
@@ -721,6 +745,41 @@ const MobileDashboard: React.FC<MobileDashboardProps> = memo(({
     }
     void _onMarkAsSold(vehicleId);
   }, [safeUserVehicles, _onMarkAsSold]);
+
+  const handleRenewVehicle = useCallback(async (vehicleId: number) => {
+    const vehicle = safeUserVehicles.find((v) => v?.id === vehicleId);
+    if (!vehicle) {
+      notify('Listing not found. Please refresh and try again.', 'error');
+      return;
+    }
+    const validation = validateListingRenewal(currentUser, vehicle, safeUserVehicles, plan);
+    if (!validation.allowed) {
+      notify(validation.reason || 'Cannot renew this listing.', 'error');
+      return;
+    }
+    try {
+      const response = await authenticatedFetch('/api/vehicles?action=refresh', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(
+          buildVehicleMutationBody(vehicleId, safeUserVehicles, {
+            action: 'refresh',
+            refreshAction: 'renew',
+            sellerEmail: currentUser?.email,
+          }),
+        ),
+      });
+      const result = await response.json().catch(() => null);
+      if (response.ok && result?.success && result.vehicle) {
+        onUpdateVehicle?.(result.vehicle);
+        notify('Listing renewed successfully. It is visible to buyers again.', 'success');
+        return;
+      }
+      notify(result?.reason || 'Failed to renew listing. Please try again.', 'error');
+    } catch {
+      notify('Failed to renew listing. Please try again.', 'error');
+    }
+  }, [safeUserVehicles, currentUser, plan, notify, onUpdateVehicle]);
   
   const totalListings = safeUserVehicles.length;
   const activeListings = safeUserVehicles.filter(v => v && v.status === 'published').length;
@@ -729,7 +788,7 @@ const MobileDashboard: React.FC<MobileDashboardProps> = memo(({
   const totalViews = publishedVehicles.reduce((sum, v) => sum + (v?.views || 0), 0);
   const totalInquiries = safeConversations.length;
   const reportedCount = safeReportedVehicles.length;
-  const featuredListingsCount = safeUserVehicles.filter(v => v && v.isFeatured).length;
+  const featuredListingsCount = safeUserVehicles.filter(v => v && isEffectivelyFeatured(v)).length;
   const listingAtLimit = useMemo(
     () => isListingLimitReached(currentUser, safeUserVehicles, plan),
     [currentUser, safeUserVehicles, plan],
@@ -805,10 +864,7 @@ const MobileDashboard: React.FC<MobileDashboardProps> = memo(({
             role="seller"
             conversations={safeConversations}
             onBack={() => setSelectedDealId(null)}
-            onOpenConversation={(conv) => {
-              onSellerOpenChat?.(conv);
-              setActiveTab('messages');
-            }}
+            onOpenConversation={openHotLeadConversation}
             onNotify={(message, type) => addToast?.(message, type ?? 'info')}
           />
         </div>
@@ -826,16 +882,14 @@ const MobileDashboard: React.FC<MobileDashboardProps> = memo(({
           commandCenterError={commandCenterError}
           onRefreshCommandCenter={(force) => refreshDealCommandStats(force)}
           onOpenDeal={(leadId) => setSelectedDealId(leadId)}
-          onOpenConversation={(conv) => {
-            onSellerOpenChat?.(conv);
-            setActiveTab('messages');
-          }}
+          onOpenConversation={openHotLeadConversation}
           onNavigateToMessages={() => setActiveTab('messages')}
           onNavigateToListings={() => setActiveTab('listings')}
           onNotify={(message, type) => {
             addToast?.(message, type ?? 'info');
             void refreshDealCommandStats(true);
           }}
+          onTaskViewed={() => setViewedTasksVersion((v) => v + 1)}
         />
       </div>
     );
@@ -1284,12 +1338,15 @@ const MobileDashboard: React.FC<MobileDashboardProps> = memo(({
         <div className="space-y-3">
           {safeUserVehicles.map((vehicle) => {
             const heroImage = vehicle.images && vehicle.images.length ? getFirstValidImage(vehicle.images, vehicle.id) : '';
+            const listingExpired = isListingExpired(vehicle, currentUser);
             const statusMeta =
-              vehicle.status === 'published'
-                ? { bg: 'rgba(16,185,129,0.10)', color: '#047857', label: t('sellerListing.badgeActive') }
-                : vehicle.status === 'sold'
-                  ? { bg: 'rgba(71,85,105,0.10)', color: '#334155', label: t('sellerListing.badgeSold') }
-                  : { bg: 'rgba(245,158,11,0.12)', color: '#B45309', label: t('sellerListing.badgePending') };
+              vehicle.status === 'sold' || vehicle.listingStatus === 'sold'
+                ? { bg: 'rgba(71,85,105,0.10)', color: '#334155', label: t('sellerListing.badgeSold') }
+                : listingExpired
+                  ? { bg: 'rgba(185,28,28,0.10)', color: '#991B1B', label: 'Expired' }
+                  : vehicle.status === 'published'
+                    ? { bg: 'rgba(16,185,129,0.10)', color: '#047857', label: t('sellerListing.badgeActive') }
+                    : { bg: 'rgba(245,158,11,0.12)', color: '#B45309', label: t('sellerListing.badgePending') };
             return (
               <div
                 key={vehicle.id}
@@ -1318,12 +1375,12 @@ const MobileDashboard: React.FC<MobileDashboardProps> = memo(({
                     ) : (
                       <span className="text-slate-400"><IconCar size={32} stroke={1.6} /></span>
                     )}
-                    {vehicle.isFeatured && (
+                    {isEffectivelyFeatured(vehicle) && (
                       <span
                         className="absolute top-1.5 left-1.5 inline-flex items-center gap-0.5 rounded-full px-1.5 py-[3px] text-[9px] font-bold text-white"
                         style={{ background: 'linear-gradient(135deg, #FFD08A, #E59F4B)', color: '#1B120A' }}
                       >
-                        <IconStar size={9} stroke={2.4} /> Featured
+                        <IconStar size={9} stroke={2.4} /> Boosted
                       </span>
                     )}
                   </div>
@@ -1366,6 +1423,15 @@ const MobileDashboard: React.FC<MobileDashboardProps> = memo(({
                   >
                     {[
                       {
+                        key: 'renew',
+                        label: 'Renew',
+                        icon: <IconPlus size={14} stroke={2} />,
+                        color: '#B42318',
+                        tint: 'rgba(180,35,24,0.10)',
+                        show: listingExpired,
+                        onClick: () => { void handleRenewVehicle(vehicle.id); }
+                      },
+                      {
                         key: 'edit',
                         label: 'Edit',
                         icon: <IconEdit size={14} stroke={2} />,
@@ -1380,17 +1446,8 @@ const MobileDashboard: React.FC<MobileDashboardProps> = memo(({
                         icon: <IconCheck size={14} stroke={2} />,
                         color: '#047857',
                         tint: 'rgba(16,185,129,0.08)',
-                        show: vehicle.status === 'published',
+                        show: vehicle.status === 'published' && !listingExpired,
                         onClick: () => handleMarkAsSold(vehicle.id)
-                      },
-                      {
-                        key: 'feature',
-                        label: 'Feature',
-                        icon: <IconStar size={14} stroke={2} />,
-                        color: '#B45309',
-                        tint: 'rgba(245,158,11,0.10)',
-                        show: !vehicle.isFeatured && vehicle.status === 'published',
-                        onClick: () => _onFeatureListing(vehicle.id)
                       },
                       {
                         key: 'boost',
@@ -1398,7 +1455,7 @@ const MobileDashboard: React.FC<MobileDashboardProps> = memo(({
                         icon: <IconRocket size={14} stroke={2} />,
                         color: '#7C3AED',
                         tint: 'rgba(139,92,246,0.10)',
-                        show: vehicle.status === 'published' && !!onBoostListing,
+                        show: vehicle.status === 'published' && !listingExpired && !!onBoostListing,
                         onClick: () => setBoostVehicle(vehicle)
                       },
                       {
@@ -1407,7 +1464,7 @@ const MobileDashboard: React.FC<MobileDashboardProps> = memo(({
                         icon: <IconShield size={14} stroke={2} />,
                         color: '#0EA5E9',
                         tint: 'rgba(14,165,233,0.10)',
-                        show: vehicle.status === 'published' && !!onRequestCertification,
+                        show: vehicle.status === 'published' && !listingExpired && !!onRequestCertification,
                         onClick: () => onRequestCertification?.(vehicle.id)
                       },
                       {
@@ -4493,7 +4550,7 @@ const MobileDashboard: React.FC<MobileDashboardProps> = memo(({
                   className="rounded-2xl px-3 py-2.5"
                   style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.06)' }}
                 >
-                  <p className="text-[10px] uppercase tracking-[0.16em] text-white/45 font-semibold">Featured</p>
+                  <p className="text-[10px] uppercase tracking-[0.16em] text-white/45 font-semibold">Boost credits</p>
                   <p className="mt-1 text-[16px] font-bold text-white tracking-tight">
                     {featuredRemaining}<span className="text-white/40 text-[12px] font-medium ml-1">left</span>
                   </p>
@@ -4773,11 +4830,11 @@ const MobileDashboard: React.FC<MobileDashboardProps> = memo(({
       {boostVehicle && onBoostListing && (
         <BoostListingModal
           vehicle={boostVehicle}
+          featuredCredits={currentUser.featuredCredits ?? 0}
           onClose={() => setBoostVehicle(null)}
           onBoost={async (vehicleId, packageId) => {
             await onBoostListing(vehicleId, packageId);
             setBoostVehicle(null);
-            addToast?.('Your listing has been boosted! It will get more visibility.', 'success');
           }}
         />
       )}

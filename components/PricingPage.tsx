@@ -359,7 +359,7 @@ const PricingPage: React.FC<PricingPageProps> = ({ currentUser, onSelectPlan, ad
                   </div>
                   <div className="rounded-2xl px-3.5 py-3" style={{ background: accent.accentSoft }}>
                     <p className="text-[11px] font-bold uppercase tracking-[0.14em]" style={{ color: accent.accent }}>
-                      Featured
+                      Boost credits
                     </p>
                     <p className="mt-1 text-lg font-bold text-slate-900">{plan.featuredCredits}/mo</p>
                   </div>

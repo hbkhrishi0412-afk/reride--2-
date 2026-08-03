@@ -17,21 +17,79 @@ function nativeMirrorKey(localKey: string): string {
   return `reride_ls_mirror:${localKey}`;
 }
 
+type ReadyGate = {
+  promise: Promise<void>;
+  resolve: () => void;
+};
+
+function createReadyGate(alreadyReady: boolean): ReadyGate {
+  if (alreadyReady) {
+    return { promise: Promise.resolve(), resolve: () => {} };
+  }
+  let resolve!: () => void;
+  const promise = new Promise<void>((r) => {
+    resolve = r;
+  });
+  return { promise, resolve };
+}
+
+const readyGate = createReadyGate(!isCapacitorNative());
+let hydrateStarted = false;
+
+/**
+ * Resolves when native session keys have been mirrored into WebView localStorage
+ * (or immediately on web). Auth restore must await this so cold starts don't
+ * briefly treat a logged-in user as logged out.
+ * Caps wait at 2s so a hung Preferences/SecureStorage bridge can't stall login UI.
+ */
+export function whenNativeSessionReady(): Promise<void> {
+  if (!isCapacitorNative()) return Promise.resolve();
+  return Promise.race([
+    readyGate.promise,
+    new Promise<void>((resolve) => {
+      setTimeout(resolve, 2_000);
+    }),
+  ]);
+}
+
 /** Restore mirrored session keys from native storage into WebView localStorage before auth boot. */
 export async function hydrateNativeSessionMirror(): Promise<void> {
-  if (!isCapacitorNative() || typeof localStorage === 'undefined') return;
-  await Promise.all(
-    SESSION_MIRROR_KEYS.map(async (key) => {
-      try {
-        const value = await nativeKvGet(nativeMirrorKey(key));
-        if (value != null) {
-          localStorage.setItem(key, value);
+  if (!isCapacitorNative() || typeof localStorage === 'undefined') {
+    readyGate.resolve();
+    return;
+  }
+  if (hydrateStarted) return readyGate.promise;
+  hydrateStarted = true;
+
+  try {
+    await Promise.all(
+      SESSION_MIRROR_KEYS.map(async (key) => {
+        try {
+          const value = await nativeKvGet(nativeMirrorKey(key));
+          if (value != null) {
+            localStorage.setItem(key, value);
+          }
+        } catch {
+          /* ignore per-key failures */
         }
-      } catch {
-        /* ignore per-key failures */
-      }
-    }),
-  );
+      }),
+    );
+  } finally {
+    readyGate.resolve();
+  }
+
+  return readyGate.promise;
+}
+
+/**
+ * Kick off hydrate without blocking React mount. Safe to call multiple times.
+ */
+export function startNativeSessionHydrate(): Promise<void> {
+  if (!isCapacitorNative()) {
+    readyGate.resolve();
+    return Promise.resolve();
+  }
+  return hydrateNativeSessionMirror();
 }
 
 export async function mirrorSessionKeyToNative(

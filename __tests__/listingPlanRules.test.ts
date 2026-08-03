@@ -43,4 +43,29 @@ describe('listingPlanRules', () => {
     expect(isListingLimitReached(freeSeller, [published(1)], freePlan)).toBe(true);
     expect(isListingLimitReached(freeSeller, [], freePlan)).toBe(false);
   });
+
+  it('allows renew under free limits when paid plan has expired', () => {
+    const expiredPremium = {
+      subscriptionPlan: 'premium' as const,
+      planExpiryDate: '2020-01-01T00:00:00.000Z',
+    };
+    const vehicle = unpublished(2);
+    const vehicles = [unpublished(2)];
+    const result = validateListingRenewal(expiredPremium, vehicle, vehicles);
+    expect(result.allowed).toBe(true);
+    expect(result.planExpired).toBe(true);
+  });
+
+  it('blocks renew under free limits when expired premium already has an active listing', () => {
+    const expiredPremium = {
+      subscriptionPlan: 'premium' as const,
+      planExpiryDate: '2020-01-01T00:00:00.000Z',
+    };
+    const vehicle = unpublished(2);
+    const vehicles = [published(1), unpublished(2)];
+    const result = validateListingRenewal(expiredPremium, vehicle, vehicles);
+    expect(result.allowed).toBe(false);
+    expect(result.limitReached).toBe(true);
+    expect(result.planExpired).toBe(true);
+  });
 });

@@ -25,6 +25,7 @@ import { parseDeepLink } from '../../utils/mobileFeatures';
 import { randomIntBelow } from '../../utils/secureRandom.js';
 import { isCapacitorNativeApp } from '../../utils/isCapacitorNative';
 import { currentUserForLocalSessionJson } from '../../utils/userLocalStorageSnapshot';
+import { isEffectivelyFeatured } from '../../utils/listingPromotion';
 import {
   conversationBelongsToCustomer,
   conversationBelongsToSeller,
@@ -147,6 +148,12 @@ const MobileBuyerDashboard = React.lazy(() => import('../MobileBuyerDashboard'))
 const MobileDealerProfilesPage = React.lazy(() => import('../MobileDealerProfilesPage'));
 const MobileHomePage = React.lazy(() => import('../MobileHomePage'));
 const ServiceCart = React.lazy(() => import('../ServiceCart'));
+
+// Warm the default landing chunks while AppProvider boots so Suspense does not stall on Home.
+if (typeof window !== 'undefined') {
+  void import('../Home');
+  void import('../MobileHomePage');
+}
 
 // Lazy-loaded non-critical components (loaded on demand)
 const CommandPalette = React.lazy(() => import('../CommandPalette'));
@@ -319,7 +326,7 @@ switch (currentView) {
             navigate(ViewEnum.USED_CARS);
           }}
           featuredVehicles={enrichVehiclesWithSellerInfo(
-            vehicles.filter(v => v.isFeatured && v.status === 'published'),
+            vehicles.filter(v => isEffectivelyFeatured(v) && v.status === 'published'),
             users
           )}
           onSelectVehicle={selectVehicle}
@@ -367,7 +374,7 @@ switch (currentView) {
           navigate(ViewEnum.USED_CARS);
         }}
         featuredVehicles={enrichVehiclesWithSellerInfo(
-          vehicles.filter(v => v.isFeatured && v.status === 'published'),
+          vehicles.filter(v => isEffectivelyFeatured(v) && v.status === 'published'),
           users
         )}
         onSelectVehicle={selectVehicle}

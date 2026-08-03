@@ -8,6 +8,11 @@ import {
   fetchSellerCommandCenter,
   invalidateSellerCommandCenterCache,
 } from '../../services/dealService.js';
+import {
+  VIEW_DISMISSIBLE_TASK_TYPES,
+  getViewedSellerTaskIds,
+  markSellerTaskViewed,
+} from '../../utils/sellerViewedTasks.js';
 import SellerDealCalendar from './SellerDealCalendar.js';
 
 export interface SellerCommandHomeProps {
@@ -24,6 +29,8 @@ export interface SellerCommandHomeProps {
   onNavigateToListings?: () => void;
   onNotify?: (message: string, type?: 'success' | 'error' | 'info') => void;
   onSignInAgain?: () => void;
+  /** Fires when an informational task is viewed so parent badges can update. */
+  onTaskViewed?: (taskId: string) => void;
 }
 
 const TASKS_PAGE = 5;
@@ -239,6 +246,7 @@ export const SellerCommandHome: React.FC<SellerCommandHomeProps> = ({
   onNavigateToListings,
   onNotify,
   onSignInAgain,
+  onTaskViewed,
 }) => {
   const { t } = useTranslation();
   const [data, setData] = useState<SellerCommandCenter | null>(externalCommandCenter ?? null);
@@ -252,6 +260,7 @@ export const SellerCommandHome: React.FC<SellerCommandHomeProps> = ({
   const [dealFilter, setDealFilter] = useState<DealFilter>('all');
   const [tasksVisible, setTasksVisible] = useState(TASKS_PAGE);
   const [dealsVisible, setDealsVisible] = useState(DEALS_PAGE);
+  const [viewedTaskIds, setViewedTaskIds] = useState<Set<string>>(() => getViewedSellerTaskIds());
   const retryAvailableAtRef = useRef(0);
 
   const usesExternalData = externalCommandCenter !== undefined || onRefreshCommandCenter !== undefined;
@@ -307,6 +316,16 @@ export const SellerCommandHome: React.FC<SellerCommandHomeProps> = ({
     setDealsVisible(DEALS_PAGE);
   }, [dealQuery, dealFilter]);
 
+  const dismissViewableTask = useCallback(
+    (task: SellerTask) => {
+      if (!VIEW_DISMISSIBLE_TASK_TYPES.has(task.type)) return;
+      markSellerTaskViewed(task.id);
+      setViewedTaskIds(getViewedSellerTaskIds());
+      onTaskViewed?.(task.id);
+    },
+    [onTaskViewed],
+  );
+
   const openDealConversation = useCallback(
     (task: SellerTask) => {
       if (!task.conversationId) {
@@ -347,6 +366,9 @@ export const SellerCommandHome: React.FC<SellerCommandHomeProps> = ({
           onOpenDeal?.(task.dealId);
           return;
         }
+        if (VIEW_DISMISSIBLE_TASK_TYPES.has(task.type)) {
+          dismissViewableTask(task);
+        }
         openDealConversation(task);
       } catch (err) {
         onNotify?.(err instanceof Error ? err.message : 'Action failed', 'error');
@@ -354,7 +376,7 @@ export const SellerCommandHome: React.FC<SellerCommandHomeProps> = ({
         setActingId(null);
       }
     },
-    [load, onNotify, onOpenDeal, openDealConversation],
+    [dismissViewableTask, load, onNotify, onOpenDeal, openDealConversation],
   );
 
   const openDeal = useCallback(
@@ -380,7 +402,13 @@ export const SellerCommandHome: React.FC<SellerCommandHomeProps> = ({
   const firstName = seller.name?.split(' ')[0] || 'there';
   const stats = data?.stats;
   const trustScore = stats?.trustScore ?? seller.trustScore ?? 50;
-  const tasks = data?.tasks ?? [];
+  const tasks = useMemo(() => {
+    const all = data?.tasks ?? [];
+    return all.filter(
+      (task) =>
+        !(VIEW_DISMISSIBLE_TASK_TYPES.has(task.type) && viewedTaskIds.has(String(task.id))),
+    );
+  }, [data?.tasks, viewedTaskIds]);
   const activeDeals = data?.activeDeals ?? [];
 
   const filteredTasks = useMemo(

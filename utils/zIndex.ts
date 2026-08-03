@@ -10,7 +10,8 @@ export const Z_INDEX = {
   chatExpanded: 100,
   modalBackdrop: 105,
   modal: 110,
-  toast: 120,
+  /** Above sticky chrome (header/nav) and modal shells; keep below confirm/command escapes. */
+  toast: 200,
   commandPalette: 130,
   skipLink: 10000,
 } as const;

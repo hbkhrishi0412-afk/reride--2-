@@ -9,7 +9,6 @@ import TranslationProvider from './components/TranslationProvider';
 import PageTransition from './components/PageTransition';
 import SEO from './components/SEO';
 import CookieConsentBanner from './components/CookieConsentBanner';
-import AppLegalConsent from './components/AppLegalConsent';
 import { 
   VehicleListErrorBoundary, 
   ChatErrorBoundary, 
@@ -101,53 +100,52 @@ const MinimalLoader: React.FC = () => null;
 const CommandPalette = React.lazy(() => import('./components/CommandPalette'));
 const KeyboardShortcutsHelp = React.lazy(() => import('./components/KeyboardShortcutsHelp'));
 
-// Preload critical components - optimized for faster loading
+// Preload route chunks after first paint. On Capacitor, stay lighter so cold-start
+// bandwidth isn't stolen from Home / catalog.
 const preloadCriticalComponents = () => {
-  // Preload components that are likely to be visited next
-  if (typeof window !== 'undefined') {
-    // Use requestIdleCallback for better performance, fallback to setTimeout
-    const schedulePreload = (callback: () => void, delay: number) => {
-      if ('requestIdleCallback' in window) {
-        requestIdleCallback(callback, { timeout: delay });
-      } else {
-        setTimeout(callback, delay);
-      }
-    };
-    
-    // Preload critical components after initial render
-    schedulePreload(() => {
-      Promise.all([
-        import('./components/VehicleList'),
-        import('./components/VehicleDetail'),
-        import('./components/Home')
-      ]).catch(() => {
-        // Silently fail if preloading fails
-      });
-    }, 500);
-    
-    // Preload secondary components when idle
-    schedulePreload(() => {
-      Promise.all([
-        import('./components/Dashboard').catch((error) => {
-          // Log error but don't fail - Dashboard will be loaded on-demand if needed
-          if (process.env.NODE_ENV === 'development') {
-            logWarn('⚠️ Dashboard preload failed (non-critical):', error);
-          }
-          return null; // Return null to prevent Promise.all from failing
-        }),
-        import('./components/Profile').catch((error) => {
-          if (process.env.NODE_ENV === 'development') {
-            logWarn('⚠️ Profile preload failed (non-critical):', error);
-          }
-          return null;
-        })
-      ]).catch(() => {
-        // Silently fail if preloading fails - these are optimizations, not critical
-      });
-    }, 2000);
-  }
-};
+  if (typeof window === 'undefined') return;
 
+  const schedulePreload = (callback: () => void, delay: number) => {
+    if ('requestIdleCallback' in window) {
+      requestIdleCallback(callback, { timeout: delay });
+    } else {
+      setTimeout(callback, delay);
+    }
+  };
+
+  const native = isCapacitorNativeApp();
+
+  // Home is usually already loading via Suspense / deep-link preload in index.tsx
+  schedulePreload(() => {
+    const jobs = native
+      ? [import('./components/Home')]
+      : [
+          import('./components/VehicleList'),
+          import('./components/VehicleDetail'),
+          import('./components/Home'),
+        ];
+    Promise.all(jobs).catch(() => {});
+  }, native ? 2500 : 500);
+
+  if (native) return;
+
+  schedulePreload(() => {
+    Promise.all([
+      import('./components/Dashboard').catch((error) => {
+        if (process.env.NODE_ENV === 'development') {
+          logWarn('⚠️ Dashboard preload failed (non-critical):', error);
+        }
+        return null;
+      }),
+      import('./components/Profile').catch((error) => {
+        if (process.env.NODE_ENV === 'development') {
+          logWarn('⚠️ Profile preload failed (non-critical):', error);
+        }
+        return null;
+      }),
+    ]).catch(() => {});
+  }, 2000);
+};
 /** API/session may surface role with different casing; keep admin checks consistent. */
 function userHasAdminRole(user: User | null | undefined): boolean {
   return (user?.role || '').toLowerCase().trim() === 'admin';
@@ -2317,7 +2315,6 @@ const App: React.FC = () => {
         <TranslationProvider>
           <AppContent />
           <CookieConsentBanner />
-          <AppLegalConsent />
         </TranslationProvider>
       </AppProvider>
     </ErrorBoundary>

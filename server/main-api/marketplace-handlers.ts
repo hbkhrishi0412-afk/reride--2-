@@ -2,6 +2,8 @@ import type { VercelRequest, VercelResponse } from '@vercel/node';
 import * as core from './shared.js';
 import { trackViewBodySchema, loginBodySchema, registerBodySchema } from '../../utils/api-schemas.js';
 import { verifyViewTrackToken } from '../../utils/view-track-token.js';
+import { BOOST_PACKAGES, CREDIT_FEATURED_PACKAGE_ID } from '../../constants/boost.js';
+import { isEffectivelyFeatured } from '../../utils/listingPromotion.js';
 
 async function handleUsers(req: VercelRequest, res: VercelResponse, _options: core.HandlerOptions) {
   try {
@@ -3814,7 +3816,9 @@ async function handleVehicles(req: VercelRequest, res: VercelResponse, _options:
 
     if (action === 'refresh') {
       const { refreshAction, sellerEmail } = req.body;
-      const mutation = await core.resolveVehicleForMutation((req.body || {}) as Record<string, unknown>);
+      const mutation = await core.resolveVehicleForMutation((req.body || {}) as Record<string, unknown>, {
+        sellerEmailHint: typeof req.body?.sellerEmail === 'string' ? req.body.sellerEmail : authenticatedEmail,
+      });
       if (!mutation.ok) {
         return res.status(mutation.status).json({ success: false, reason: mutation.reason });
       }
@@ -3857,11 +3861,14 @@ async function handleVehicles(req: VercelRequest, res: VercelResponse, _options:
     if (action === 'boost') {
       const {
         packageId,
+        useCredit,
         razorpay_order_id: boostOrderId,
         razorpay_payment_id: boostPaymentId,
         razorpay_signature: boostSignature,
       } = req.body;
-      const mutation = await core.resolveVehicleForMutation((req.body || {}) as Record<string, unknown>);
+      const mutation = await core.resolveVehicleForMutation((req.body || {}) as Record<string, unknown>, {
+        sellerEmailHint: authenticatedEmail || undefined,
+      });
       if (!mutation.ok) {
         return res.status(mutation.status).json({ success: false, reason: mutation.reason });
       }
@@ -3875,9 +3882,78 @@ async function handleVehicles(req: VercelRequest, res: VercelResponse, _options:
         return res.status(403).json({ success: false, reason: 'You can only boost your own listings.' });
       }
 
-      // REVENUE GATE: Require a verified Razorpay payment for this boost.
-      // Admins may bypass for manual promotions, otherwise we require signed payment proof.
-      if (auth.user?.role !== 'admin') {
+      const pkg = BOOST_PACKAGES.find((p) => p.id === packageId);
+      if (!pkg) {
+        return res.status(400).json({ success: false, reason: 'Unknown boost package. Please refresh and try again.' });
+      }
+
+      const wantsCredit =
+        useCredit === true ||
+        pkg.paymentMethod === 'credit' ||
+        pkg.id === CREDIT_FEATURED_PACKAGE_ID;
+
+      let remainingCredits: number | undefined;
+
+      if (wantsCredit) {
+        if (pkg.paymentMethod !== 'credit' && pkg.id !== CREDIT_FEATURED_PACKAGE_ID) {
+          return res.status(400).json({
+            success: false,
+            reason: 'This boost package cannot be purchased with plan credits.',
+          });
+        }
+
+        if (!sellerEmailLower) {
+          return res.status(400).json({ success: false, reason: 'Vehicle does not have an associated seller.' });
+        }
+
+        const seller = await core.userService.findByEmail(sellerEmailLower);
+        if (!seller) {
+          return res.status(404).json({ success: false, reason: 'Seller not found for this vehicle.' });
+        }
+
+        const FEATURE_CREDIT_LIMITS: Record<string, number> = {
+          free: 0,
+          pro: 2,
+          premium: 5,
+        };
+        const sellerPlan = (seller.subscriptionPlan || 'free') as string;
+        const planLimit = FEATURE_CREDIT_LIMITS[sellerPlan] ?? 0;
+        let credits = typeof seller.featuredCredits === 'number' ? seller.featuredCredits : planLimit;
+        if (!Number.isFinite(credits)) credits = 0;
+
+        if (auth.user?.role !== 'admin') {
+          if (planLimit === 0) {
+            return res.status(403).json({
+              success: false,
+              reason: 'Your current plan does not include boost credits. Upgrade to unlock promotion credits.',
+              remainingCredits: credits,
+            });
+          }
+          if (credits <= 0) {
+            return res.status(403).json({
+              success: false,
+              reason: 'You have no boost credits remaining. Upgrade your plan or choose a paid boost pack.',
+              remainingCredits: credits,
+            });
+          }
+          remainingCredits = Math.max(0, credits - 1);
+          await core.userService.update(seller.email, {
+            featuredCredits: remainingCredits,
+          });
+          const updatedSeller = await core.userService.findByEmail(seller.email);
+          remainingCredits = updatedSeller?.featuredCredits ?? remainingCredits;
+        } else if (credits > 0) {
+          remainingCredits = Math.max(0, credits - 1);
+          await core.userService.update(seller.email, {
+            featuredCredits: remainingCredits,
+          });
+          const updatedSeller = await core.userService.findByEmail(seller.email);
+          remainingCredits = updatedSeller?.featuredCredits ?? remainingCredits;
+        } else {
+          remainingCredits = credits;
+        }
+      } else if (auth.user?.role !== 'admin') {
+        // REVENUE GATE: Require a verified Razorpay payment for paid boosts.
         const keySecret = process.env.RAZORPAY_KEY_SECRET;
         if (!keySecret) {
           return res.status(503).json({ success: false, reason: 'Boost payments are not configured. Please contact support.' });
@@ -3897,60 +3973,43 @@ async function handleVehicles(req: VercelRequest, res: VercelResponse, _options:
         }
       }
 
-      // Add boost information if packageId is provided
-      // packageId format is like "top_search_3", "homepage_spot", etc.
-      // Extract type and duration from packageId
-      let boostType: 'top_search' | 'homepage_spotlight' | 'featured_badge' | 'multi_city' = 'top_search';
-      let boostDuration = 7; // Default 7 days
-      
-      if (packageId) {
-        const parts = packageId.split('_');
-        if (parts.length >= 2) {
-          // Extract type (first parts except last if it's a number)
-          const lastPart = parts[parts.length - 1];
-          const isLastPartNumber = !isNaN(Number(lastPart));
-          
-          if (isLastPartNumber) {
-            const extractedType = parts.slice(0, -1).join('_');
-            // Validate and set boostType
-            if (extractedType === 'top_search' || extractedType === 'homepage_spotlight' || 
-                extractedType === 'featured_badge' || extractedType === 'multi_city') {
-              boostType = extractedType;
-            }
-            boostDuration = Number(lastPart);
-          } else {
-            const extractedType = parts.join('_');
-            // Validate and set boostType
-            if (extractedType === 'top_search' || extractedType === 'homepage_spotlight' || 
-                extractedType === 'featured_badge' || extractedType === 'multi_city') {
-              boostType = extractedType;
-            }
-            // Use default duration based on package
-            boostDuration = 7; // Default
-          }
-        }
-      }
-      
+      const boostType = pkg.type;
+      const boostDuration = pkg.durationDays;
+      const now = new Date();
       const boostInfo = {
         id: `boost_${Date.now()}`,
         vehicleId: vehicleIdNum,
-        packageId: packageId || 'standard',
+        packageId: pkg.id,
         type: boostType,
-        startDate: new Date().toISOString(),
-        expiresAt: new Date(Date.now() + boostDuration * 24 * 60 * 60 * 1000).toISOString(),
-        isActive: true
+        startDate: now.toISOString(),
+        expiresAt: new Date(now.getTime() + boostDuration * 24 * 60 * 60 * 1000).toISOString(),
+        isActive: true,
       };
-      
-      const activeBoosts = vehicle.activeBoosts || [];
-      activeBoosts.push(boostInfo);
-      
-      const updatedVehicle = await core.vehicleService.update(mutation.primaryKey, {
-        activeBoosts,
+
+      const previousBoosts = Array.isArray(vehicle.activeBoosts) ? vehicle.activeBoosts : [];
+      // Drop expired boosts and sticky featured when no featured-eligible boost remains after this apply.
+      const prunedBoosts = previousBoosts.filter((boost) => {
+        if (!boost?.isActive) return false;
+        const expiresAt = new Date(boost.expiresAt);
+        return !Number.isNaN(expiresAt.getTime()) && expiresAt > now;
+      });
+      prunedBoosts.push(boostInfo);
+
+      const vehicleAfterBoost = {
+        ...vehicle,
+        activeBoosts: prunedBoosts,
         isFeatured: true,
+      };
+      const shouldFeature = isEffectivelyFeatured(vehicleAfterBoost, now);
+
+      const updatedVehicle = await core.vehicleService.update(mutation.primaryKey, {
+        activeBoosts: prunedBoosts,
+        isFeatured: shouldFeature,
+        ...(shouldFeature ? { featuredAt: now.toISOString() } : {}),
       });
 
       // Record the boost payment (if any) so admins have a full audit trail.
-      if (boostPaymentId && boostOrderId) {
+      if (!wantsCredit && boostPaymentId && boostOrderId) {
         try {
           const nowIso = new Date().toISOString();
           const prId = `payment_boost_${Date.now()}`;
@@ -3978,7 +4037,11 @@ async function handleVehicles(req: VercelRequest, res: VercelResponse, _options:
         }
       }
 
-      return res.status(200).json({ success: true, vehicle: updatedVehicle });
+      return res.status(200).json({
+        success: true,
+        vehicle: updatedVehicle,
+        ...(typeof remainingCredits === 'number' ? { remainingCredits } : {}),
+      });
     }
 
       if (action === 'certify') {
@@ -4114,7 +4177,7 @@ async function handleVehicles(req: VercelRequest, res: VercelResponse, _options:
           if (planLimit === 0) {
             return res.status(403).json({
               success: false,
-              reason: 'Your current plan does not include featured listings. Upgrade to unlock featured credits.',
+              reason: 'Your current plan does not include boost credits. Upgrade to unlock promotion credits.',
               remainingCredits
             });
           }
@@ -4122,7 +4185,7 @@ async function handleVehicles(req: VercelRequest, res: VercelResponse, _options:
           if (remainingCredits <= 0) {
             return res.status(403).json({
               success: false,
-              reason: 'You have no featured credits remaining. Upgrade your plan or wait until your credits refresh.',
+              reason: 'You have no boost credits remaining. Upgrade your plan or wait until your credits refresh.',
               remainingCredits
             });
           }

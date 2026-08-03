@@ -969,7 +969,7 @@ class DataService {
   private async executeGetVehicles(
     includeAllStatuses: boolean,
     forceRefresh: boolean,
-    useApiInDev: boolean,
+    _useApiInDev: boolean,
     isNativeWebView: boolean
   ): Promise<Vehicle[]> {
     this.ensureVehicleCacheMigrated();
@@ -990,7 +990,7 @@ class DataService {
     }
     const cachedVehicles = this.getLocalStorageData<Vehicle[]>(cacheKey, []);
 
-    if (cachedVehicles.length > 0 && !forceRefresh && !useApiInDev && !isNativeWebView) {
+    if (cachedVehicles.length > 0 && !forceRefresh && !isNativeWebView) {
       const endpoint = this.buildPublishedVehiclesFirstPageEndpoint(
         includeAllStatuses,
         isNativeWebView,

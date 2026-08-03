@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next';
 import type { Vehicle, User, Conversation, VehicleData, ChatMessage, PlanDetails, SubscriptionPlan, Notification } from '../types';
 import { View, VehicleCategory } from '../types';
 import { enhanceVehicleListing } from '../services/listingEnhancementService';
-import { getSafeImageSrc } from '../utils/imageUtils';
+import { getSafeImageSrc, getFirstValidImage } from '../utils/imageUtils';
 import { currentUserForLocalSessionJson } from '../utils/userLocalStorageSnapshot';
 import { formatSalesValue } from '../utils/numberUtils';
 import { formatIndianNumberInput, parseIndianNumberDigits } from '../utils/indianNumberInput.js';
@@ -22,6 +22,7 @@ import MarkSoldDealModal from './MarkSoldDealModal';
 import SellerCommandHome from './command-center/SellerCommandHome';
 import DealDetailPage from './command-center/DealDetailPage';
 import { useSellerDashboardController } from '../hooks/useSellerDashboardController';
+import { countActionableSellerTasks } from '../utils/sellerViewedTasks';
 import { CLIENT_POLL_INTERVALS_MS } from '../utils/clientPolling.js';
 import {
   clearChecklistPhotoByUrl,
@@ -31,7 +32,7 @@ import {
   syncDocumentsFromChecklist,
 } from '../lib/universalChecklist/mediaSync';
 import { verifyVahanRegistration, applyVahanVerifyToVehicleFields } from '../services/vehicleTrustService';
-import { findVehicleByIdentity, getCanonicalPrimaryKey } from '../utils/vehicleIdentity';
+import { findVehicleByIdentity, getCanonicalPrimaryKey, buildVehicleMutationBody } from '../utils/vehicleIdentity';
 
 export type DashboardNotifyFn = (
   message: string,
@@ -57,6 +58,13 @@ import PricingGuidance from './PricingGuidance';
 import BoostListingModal from './BoostListingModal';
 import ListingLifecycleIndicator from './ListingLifecycleIndicator';
 import { isListingExpired } from '../services/listingLifecycleService';
+import { isEffectivelyFeatured } from '../utils/listingPromotion';
+import SellerListingsActions from './seller-dashboard/SellerListingsActions';
+import SellerPremiumPanel, {
+  sellerPremiumGhostBtnStyle,
+  sellerPremiumPrimaryBtnStyle,
+  sellerPremiumTableWrapStyle,
+} from './seller-dashboard/SellerPremiumShell';
 import {
   validateListingRenewal,
   isListingLimitReached,
@@ -106,6 +114,7 @@ interface DashboardProps {
   onUpdateSellerProfile: (details: { dealershipName: string; bio: string; logoUrl: string; partnerBanks?: string[] }) => void;
   vehicleData: VehicleData;
   onFeatureListing: (vehicleId: number) => Promise<void>;
+  onBoostListing?: (vehicleId: number, packageId: string) => Promise<void>;
   onRequestCertification: (vehicleId: number) => void;
   onNavigate: (view: View) => void;
   onTestDriveResponse?: (conversationId: string, messageId: number, newStatus: 'confirmed' | 'rejected') => void;
@@ -250,7 +259,7 @@ const ComboboxInput: React.FC<{
 
   return (
     <div className="relative">
-      <label htmlFor={name} className="flex items-center text-sm font-medium text-reride-text-dark dark:text-gray-100 mb-1">
+      <label htmlFor={name} className="flex items-center text-sm font-medium text-reride-text-dark mb-1">
         {label}{required && <span className="text-reride-orange ml-0.5">*</span>}
         {tooltip && <HelpTooltip text={tooltip} />}
       </label>
@@ -267,7 +276,7 @@ const ComboboxInput: React.FC<{
           disabled={disabled}
           placeholder={placeholder}
           required={required}
-          className={`block w-full p-3 pr-10 border rounded-lg focus:outline-none transition bg-white dark:text-gray-100 disabled:bg-white dark:disabled:bg-white ${error ? 'border-reride-orange' : 'border-gray-200 dark:border-gray-300'}`}
+          className={`block w-full p-3 pr-10 border rounded-lg focus:outline-none transition bg-white text-reride-text-dark disabled:bg-white dark:disabled:bg-white ${error ? 'border-reride-orange' : 'border-gray-200 dark:border-gray-300'}`}
           style={!error ? { boxShadow: 'none' } : {}}
         />
         <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
@@ -310,7 +319,7 @@ const ComboboxInput: React.FC<{
 
 const FormInput: React.FC<{ label: string; name: keyof Vehicle | 'summary'; type?: string; value: string | number; onChange: (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => void; onBlur?: (e: React.FocusEvent<HTMLInputElement>) => void; error?: string; tooltip?: string; required?: boolean; children?: React.ReactNode; disabled?: boolean; placeholder?: string; rows?: number; prefix?: React.ReactNode; suffix?: React.ReactNode; indianNumberFormat?: boolean }> =
   ({ label, name, type = 'text', value, onChange, onBlur, error, tooltip, required = false, children, disabled = false, placeholder, rows, prefix, suffix, indianNumberFormat = false }) => {
-  const baseInputClasses = `block w-full p-3 border rounded-lg focus:outline-none transition bg-white dark:text-gray-100 disabled:bg-gray-50 disabled:text-gray-500 disabled:cursor-not-allowed ${error ? 'border-reride-orange' : 'border-gray-200 dark:border-gray-300 hover:border-gray-300'}`;
+  const baseInputClasses = `block w-full p-3 border rounded-lg focus:outline-none transition bg-white text-reride-text-dark disabled:bg-gray-50 disabled:text-gray-500 disabled:cursor-not-allowed ${error ? 'border-reride-orange' : 'border-gray-200 dark:border-gray-300 hover:border-gray-300'}`;
   const focusOn = (e: React.FocusEvent<HTMLElement>) => !error && (e.currentTarget.style.boxShadow = '0 0 0 3px rgba(255, 107, 53, 0.15)');
   const focusOff = (e: React.FocusEvent<HTMLElement>) => (e.currentTarget.style.boxShadow = '');
   const inputType = indianNumberFormat ? 'text' : type;
@@ -324,7 +333,7 @@ const FormInput: React.FC<{ label: string; name: keyof Vehicle | 'summary'; type
   };
   return (
   <div>
-    <label htmlFor={String(name)} className="flex items-center text-sm font-medium text-reride-text-dark dark:text-gray-100 mb-1">
+    <label htmlFor={String(name)} className="flex items-center text-sm font-medium text-reride-text-dark mb-1">
         {label}{required && <span className="text-reride-orange ml-0.5">*</span>}
         {tooltip && <HelpTooltip text={tooltip} />}
     </label>
@@ -373,21 +382,32 @@ const FormInput: React.FC<{ label: string; name: keyof Vehicle | 'summary'; type
 };
 
 
-const StatCard: React.FC<{ title: string; value: string | number; icon: React.ReactNode; gradient?: string }> = memo(({ title, value, icon, gradient = "from-blue-500 to-indigo-600" }) => (
-  <div className="group bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 p-6 border border-gray-100 hover:border-blue-200 hover:-translate-y-1 overflow-hidden">
-    <div className="flex items-center justify-between mb-4 gap-3 overflow-hidden">
-      <div className={`w-12 h-12 flex-shrink-0 bg-gradient-to-br ${gradient} rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform duration-300 shadow-lg`}>
-        <div className="text-white">
-          {icon}
-        </div>
+const StatCard: React.FC<{ title: string; value: string | number; icon: React.ReactNode; gradient?: string }> = memo(({ title, value, icon }) => (
+  <div
+    className="group rounded-2xl p-5 transition-all duration-300 hover:-translate-y-0.5"
+    style={{
+      background: 'linear-gradient(180deg, #FFFFFF 0%, #FBF8F5 100%)',
+      border: '1px solid rgba(28,25,23,0.08)',
+      boxShadow: '0 18px 36px -28px rgba(28,25,23,0.35)',
+    }}
+  >
+    <div className="mb-4 flex items-center justify-between gap-3 overflow-hidden">
+      <div
+        className="flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-xl text-white transition-transform duration-300 group-hover:scale-105"
+        style={{ background: 'linear-gradient(135deg, #FF8456 0%, #E85A2A 100%)' }}
+      >
+        {icon}
       </div>
-      <div className="text-right min-w-0 flex-1 overflow-hidden">
-        <p className="text-xs sm:text-sm md:text-base lg:text-lg font-bold bg-gradient-to-r from-gray-900 via-blue-800 to-purple-800 bg-clip-text text-transparent break-words break-all">
+      <div className="min-w-0 flex-1 overflow-hidden text-right">
+        <p
+          className="break-words text-lg font-bold tabular-nums text-stone-900 sm:text-xl"
+          style={{ fontFamily: "'Nunito Sans', Poppins, sans-serif", letterSpacing: '-0.02em' }}
+        >
           {value}
         </p>
       </div>
     </div>
-    <h3 className="text-sm font-semibold text-gray-600 group-hover:text-blue-600 transition-colors duration-300">
+    <h3 className="text-[11px] font-semibold uppercase tracking-[0.14em] text-stone-500 transition-colors duration-300 group-hover:text-orange-700">
       {title}
     </h3>
   </div>
@@ -1023,7 +1043,7 @@ const SettingsView: React.FC<{
       </div>
 
       <div className="bg-white p-6 sm:p-8 rounded-lg shadow-md">
-      <h2 className="text-2xl font-bold text-reride-text-dark dark:text-gray-100 mb-6">
+      <h2 className="text-2xl font-bold text-reride-text-dark mb-6">
         {t('sellerDashboard.settingsTitle')}
       </h2>
       
@@ -1127,7 +1147,8 @@ const SettingsView: React.FC<{
   );
 };
 
-const VehicleForm: React.FC<VehicleFormProps> = memo(({ editingVehicle, onAddVehicle, onUpdateVehicle, onCancel, vehicleData, seller, onFeatureListing, allVehicles, onNotify }) => {
+const VehicleForm: React.FC<VehicleFormProps> = memo(({ editingVehicle, onAddVehicle, onUpdateVehicle, onCancel, vehicleData, seller, onFeatureListing: _onFeatureListing, allVehicles, onNotify }) => {
+    void _onFeatureListing;
     const { t } = useTranslation();
     const notify = useCallback(
       (message: string, type: 'success' | 'error' | 'info' | 'warning' = 'info') =>
@@ -1183,7 +1204,6 @@ const VehicleForm: React.FC<VehicleFormProps> = memo(({ editingVehicle, onAddVeh
         return () => clearInterval(interval);
     }, []);
     const [isUploading, setIsUploading] = useState(false);
-    const [isFeaturing, setIsFeaturing] = useState(false);
     
     // Ensure seller email is always set in form data
     useEffect(() => {
@@ -1492,7 +1512,6 @@ const VehicleForm: React.FC<VehicleFormProps> = memo(({ editingVehicle, onAddVeh
         }
         logInfo('📝 Dashboard form submitted');
         logInfo('📋 Form data:', formData);
-        logInfo('⭐ Is featuring:', isFeaturing);
         logInfo('✉️ Seller email in form:', formData.sellerEmail);
         
         // CRITICAL FIX: Validate required numeric fields BEFORE sanitization
@@ -1547,9 +1566,6 @@ const VehicleForm: React.FC<VehicleFormProps> = memo(({ editingVehicle, onAddVeh
                 const enhanced = await runEnhancement(sanitizedFormData);
                 if (!enhanced) return;
                 await Promise.resolve(onUpdateVehicle(enhanced));
-                if (isFeaturing && !editingVehicle.isFeatured) {
-                    await onFeatureListing(editingVehicle.id);
-                }
                 onCancel();
             } catch (err) {
                 console.error('Failed to update listing:', err);
@@ -1563,7 +1579,7 @@ const VehicleForm: React.FC<VehicleFormProps> = memo(({ editingVehicle, onAddVeh
         try {
             const enhanced = await runEnhancement(sanitizedFormData);
             if (!enhanced) return;
-            await Promise.resolve(onAddVehicle(enhanced, isFeaturing));
+            await Promise.resolve(onAddVehicle(enhanced, false));
             onCancel();
         } catch (err) {
             console.error('Failed to add vehicle:', err);
@@ -1992,13 +2008,13 @@ const VehicleForm: React.FC<VehicleFormProps> = memo(({ editingVehicle, onAddVeh
                         onChange={(e) => setFormData((prev) => ({ ...prev, offerEnabled: e.target.checked }))}
                         className="h-5 w-5 rounded border-gray-300"
                     />
-                    <label htmlFor="offer-enabled" className="text-sm font-medium text-reride-text-dark dark:text-gray-100 cursor-pointer">
+                    <label htmlFor="offer-enabled" className="text-sm font-medium text-reride-text-dark cursor-pointer">
                         {t('sellerListing.offer.enable')}
                     </label>
                 </div>
                 <div className={`space-y-4 ${formData.offerEnabled ? '' : 'opacity-50 pointer-events-none'}`}>
                     <div>
-                        <label htmlFor="offer-title" className="block text-sm font-medium text-reride-text-dark dark:text-gray-100 mb-1">
+                        <label htmlFor="offer-title" className="block text-sm font-medium text-reride-text-dark mb-1">
                             {t('sellerListing.label.offerTitle')}
                         </label>
                         <input
@@ -2013,7 +2029,7 @@ const VehicleForm: React.FC<VehicleFormProps> = memo(({ editingVehicle, onAddVeh
                     </div>
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <div>
-                            <label htmlFor="offer-start" className="block text-sm font-medium text-reride-text-dark dark:text-gray-100 mb-1">
+                            <label htmlFor="offer-start" className="block text-sm font-medium text-reride-text-dark mb-1">
                                 {t('sellerListing.label.offerStartDate')}
                             </label>
                             <input
@@ -2026,7 +2042,7 @@ const VehicleForm: React.FC<VehicleFormProps> = memo(({ editingVehicle, onAddVeh
                             />
                         </div>
                         <div>
-                            <label htmlFor="offer-end" className="block text-sm font-medium text-reride-text-dark dark:text-gray-100 mb-1">
+                            <label htmlFor="offer-end" className="block text-sm font-medium text-reride-text-dark mb-1">
                                 {t('sellerListing.label.offerEndDate')}
                             </label>
                             <input
@@ -2040,7 +2056,7 @@ const VehicleForm: React.FC<VehicleFormProps> = memo(({ editingVehicle, onAddVeh
                         </div>
                     </div>
                     <div>
-                        <label htmlFor="offer-date-label" className="block text-sm font-medium text-reride-text-dark dark:text-gray-100 mb-1">
+                        <label htmlFor="offer-date-label" className="block text-sm font-medium text-reride-text-dark mb-1">
                             {t('sellerListing.label.offerDateLabel')}
                         </label>
                         <input
@@ -2054,7 +2070,7 @@ const VehicleForm: React.FC<VehicleFormProps> = memo(({ editingVehicle, onAddVeh
                         />
                     </div>
                     <div>
-                        <label htmlFor="offer-description" className="block text-sm font-medium text-reride-text-dark dark:text-gray-100 mb-1">
+                        <label htmlFor="offer-description" className="block text-sm font-medium text-reride-text-dark mb-1">
                             {t('sellerListing.label.offerDescription')}
                         </label>
                         <input
@@ -2068,7 +2084,7 @@ const VehicleForm: React.FC<VehicleFormProps> = memo(({ editingVehicle, onAddVeh
                         />
                     </div>
                     <div>
-                        <label htmlFor="offer-highlight" className="block text-sm font-medium text-reride-text-dark dark:text-gray-100 mb-1">
+                        <label htmlFor="offer-highlight" className="block text-sm font-medium text-reride-text-dark mb-1">
                             {t('sellerListing.label.offerHighlight')}
                         </label>
                         <input
@@ -2082,7 +2098,7 @@ const VehicleForm: React.FC<VehicleFormProps> = memo(({ editingVehicle, onAddVeh
                         />
                     </div>
                     <div>
-                        <label htmlFor="offer-disclaimer" className="block text-sm font-medium text-reride-text-dark dark:text-gray-100 mb-1">
+                        <label htmlFor="offer-disclaimer" className="block text-sm font-medium text-reride-text-dark mb-1">
                             {t('sellerListing.label.offerDisclaimer')}
                         </label>
                         <input
@@ -2119,31 +2135,19 @@ const VehicleForm: React.FC<VehicleFormProps> = memo(({ editingVehicle, onAddVeh
               </FormFieldset>
             )}
 
-            <FormFieldset title="Promotion" step={6} description="Boost visibility with featured placement" defaultOpen={false}>
-                {(!editingVehicle || !editingVehicle.isFeatured) && (
-                    <div className="p-4 bg-reride-orange dark:bg-reride-orange/20 border border-reride-orange dark:border-reride-orange rounded-lg">
-                        <div className="flex items-center justify-between">
-                            <div>
-                                <label htmlFor="feature-listing" className="font-bold text-white dark:text-white flex items-center gap-2">
-                                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" /></svg>
-                                    Feature this Listing
-                                </label>
-                                <p className="text-xs text-white dark:text-white mt-1">
-                                    Use 1 of your {seller.featuredCredits || 0} available credits.
-                                </p>
-                            </div>
-                            <input
-                                id="feature-listing"
-                                type="checkbox"
-                                checked={isFeaturing}
-                                onChange={(e) => setIsFeaturing(e.target.checked)}
-                                disabled={(seller.featuredCredits || 0) <= 0}
-                                className="h-6 w-6 text-reride-orange bg-white border-gray-200 rounded focus:ring-purple-500 disabled:opacity-50 disabled:cursor-not-allowed"
-                            />
-                        </div>
-                        {(seller.featuredCredits || 0) <= 0 && <p className="text-xs text-reride-orange mt-2">You have no featured credits. Upgrade your plan to get more.</p>}
-                    </div>
-                )}
+            <FormFieldset title="Promotion" step={6} description="Use Boost after publishing to promote this listing" defaultOpen={false}>
+                <div className="p-4 bg-reride-orange dark:bg-reride-orange/20 border border-reride-orange dark:border-reride-orange rounded-lg">
+                    <p className="font-bold text-white flex items-center gap-2">
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" /></svg>
+                        Boost after you publish
+                    </p>
+                    <p className="text-xs text-white mt-2">
+                        After publishing, open Boost on your listing. Plan credits unlock a 7-day Featured boost; paid packs add stronger placements.
+                    </p>
+                    <p className="text-xs text-white/90 mt-2">
+                        Boost credits available: {seller.featuredCredits || 0}
+                    </p>
+                </div>
             </FormFieldset>
 
             {/* Sticky action bar – always visible on scroll */}
@@ -2334,7 +2338,7 @@ const InquiriesView: React.FC<{
 
     return (
        <div className="bg-white p-6 sm:p-8 rounded-lg shadow-md">
-         <h2 className="text-2xl font-bold text-reride-text-dark dark:text-gray-100 mb-6">{t('sellerDashboard.nav.messages')}</h2>
+         <h2 className="text-2xl font-bold text-reride-text-dark mb-6">{t('sellerDashboard.nav.messages')}</h2>
          <div className="mb-3 flex flex-wrap gap-2">
             <button type="button" onClick={() => setFilterMode('all')} className={`px-3 py-1 rounded-full text-sm ${filterMode === 'all' ? 'bg-reride-orange text-white' : 'bg-gray-200 text-gray-700'}`}>All</button>
             <button type="button" onClick={() => setFilterMode('unread')} className={`px-3 py-1 rounded-full text-sm ${filterMode === 'unread' ? 'bg-reride-orange text-white' : 'bg-gray-200 text-gray-700'}`}>Unread</button>
@@ -2364,10 +2368,10 @@ const InquiriesView: React.FC<{
                 <div className="flex items-center gap-3">
                     {!conv.isReadBySeller && <div className="w-3 h-3 rounded-full flex-shrink-0" style={{ backgroundColor: '#FF6B35' }}></div>}
                     <div>
-                      <p className="font-bold text-reride-text-dark dark:text-gray-100">
-                        {conv.customerName || 'Unknown'} - <span className="font-normal text-reride-text-dark dark:text-gray-100">{conv.vehicleName || 'Unknown Vehicle'}</span>
+                      <p className="font-bold text-reride-text-dark">
+                        {conv.customerName || 'Unknown'} - <span className="font-normal text-reride-text-dark">{conv.vehicleName || 'Unknown Vehicle'}</span>
                       </p>
-                      <p className="text-sm text-reride-text-dark dark:text-gray-100 truncate max-w-md">
+                      <p className="text-sm text-reride-text-dark truncate max-w-md">
                         {lastVisible ? lastLine : snippet.text}
                       </p>
                     </div>
@@ -2386,7 +2390,7 @@ const InquiriesView: React.FC<{
                       {conv.isReadBySeller ? 'Mark unread' : 'Mark read'}
                     </button>
                   )}
-                  <span className="text-xs text-reride-text-dark dark:text-gray-100">{lastMessageTime}</span>
+                  <span className="text-xs text-reride-text-dark">{lastMessageTime}</span>
                 </div>
               </Pressable>
             );
@@ -2395,8 +2399,8 @@ const InquiriesView: React.FC<{
                     <svg xmlns="http://www.w3.org/2000/svg" className="mx-auto h-12 w-12 text-reride-text-dark" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
                     </svg>
-                    <h3 className="mt-2 text-xl font-semibold text-reride-text-dark dark:text-gray-100">{t('sellerDashboard.messages.emptyTitle')}</h3>
-                    <p className="mt-1 text-sm text-reride-text-dark dark:text-gray-100">{t('sellerDashboard.messages.emptyBody')}</p>
+                    <h3 className="mt-2 text-xl font-semibold text-reride-text-dark">{t('sellerDashboard.messages.emptyTitle')}</h3>
+                    <p className="mt-1 text-sm text-reride-text-dark">{t('sellerDashboard.messages.emptyBody')}</p>
                 </div>
             )}
          </div>
@@ -2417,15 +2421,15 @@ const ReportsView: React.FC<{
     
     return (
     <div className="bg-white p-6 sm:p-8 rounded-lg shadow-md">
-        <h2 className="text-2xl font-bold text-reride-text-dark dark:text-gray-100 mb-6">Reported Listings</h2>
+        <h2 className="text-2xl font-bold text-reride-text-dark mb-6">Reported Listings</h2>
         {safeReportedVehicles.length > 0 ? (
             <div className="space-y-4">
                 {safeReportedVehicles.map(v => (
                     <div key={v.id} className="border border-gray-200 dark:border-gray-200 bg-reride-blue-light dark:bg-reride-blue/20 p-4 rounded-lg">
-                        <h3 className="font-bold text-reride-text-dark dark:text-gray-100">{v.year} {v.make} {v.model}</h3>
-                        <p className="text-sm text-reride-text-dark dark:text-gray-100 mt-1">Reported on: {v.flaggedAt ? new Date(v.flaggedAt).toLocaleString() : 'N/A'}</p>
-                        <p className="mt-2 text-sm italic text-reride-text-dark dark:text-gray-100">Reason: "{v.flagReason || 'No reason provided.'}"</p>
-                        <p className="text-xs text-reride-text-dark dark:text-gray-100 mt-2">An administrator will review this report. You can edit the listing to correct any issues or delete it if it's no longer valid.</p>
+                        <h3 className="font-bold text-reride-text-dark">{v.year} {v.make} {v.model}</h3>
+                        <p className="text-sm text-reride-text-dark mt-1">Reported on: {v.flaggedAt ? new Date(v.flaggedAt).toLocaleString() : 'N/A'}</p>
+                        <p className="mt-2 text-sm italic text-reride-text-dark">Reason: "{v.flagReason || 'No reason provided.'}"</p>
+                        <p className="text-xs text-reride-text-dark mt-2">An administrator will review this report. You can edit the listing to correct any issues or delete it if it's no longer valid.</p>
                         <div className="mt-3 space-x-4">
                             <button 
                                 type="button"
@@ -2459,8 +2463,8 @@ const ReportsView: React.FC<{
         ) : (
              <div className="text-center py-16 px-6">
                 <svg xmlns="http://www.w3.org/2000/svg" className="mx-auto h-12 w-12 text-reride-text-dark" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-                <h3 className="mt-2 text-xl font-semibold text-reride-text-dark dark:text-gray-100">All Clear!</h3>
-                <p className="mt-1 text-sm text-reride-text-dark dark:text-gray-100">You have no reported listings at this time.</p>
+                <h3 className="mt-2 text-xl font-semibold text-reride-text-dark">All Clear!</h3>
+                <p className="mt-1 text-sm text-reride-text-dark">You have no reported listings at this time.</p>
             </div>
         )}
     </div>
@@ -2469,7 +2473,7 @@ const ReportsView: React.FC<{
 
 
 // Main Dashboard Component
-const Dashboard: React.FC<DashboardProps> = ({ seller, sellerVehicles, reportedVehicles, onAddVehicle, onAddMultipleVehicles, onUpdateVehicle, onDeleteVehicle, onMarkAsSold, onMarkAsUnsold, conversations, onSellerSendMessage, onMarkConversationAsReadBySeller, onSetConversationReadState, onMarkAllAsReadBySeller, typingStatus, onUserTyping, onUserStoppedTyping, onMarkMessagesAsRead, onClearChat, onDeleteConversation, onArchiveConversation, onUpdateSellerProfile, vehicleData, onFeatureListing, onRequestCertification, onNavigate, onTestDriveResponse, allVehicles, onOfferResponse, onViewVehicle, chatPeerOnlineByConversationId, onSellerOpenChat, onNotify, notifications = [], onNotificationClick, onMarkNotificationsAsRead }) => {
+const Dashboard: React.FC<DashboardProps> = ({ seller, sellerVehicles, reportedVehicles, onAddVehicle, onAddMultipleVehicles, onUpdateVehicle, onDeleteVehicle, onMarkAsSold, onMarkAsUnsold, conversations, onSellerSendMessage, onMarkConversationAsReadBySeller, onSetConversationReadState, onMarkAllAsReadBySeller, typingStatus, onUserTyping, onUserStoppedTyping, onMarkMessagesAsRead, onClearChat, onDeleteConversation, onArchiveConversation, onUpdateSellerProfile, vehicleData, onFeatureListing, onBoostListing, onRequestCertification, onNavigate, onTestDriveResponse, allVehicles, onOfferResponse, onViewVehicle, chatPeerOnlineByConversationId, onSellerOpenChat, onNotify, notifications = [], onNotificationClick, onMarkNotificationsAsRead }) => {
   const notify = useCallback(
     (message: string, type: 'success' | 'error' | 'info' | 'warning' = 'info') =>
       dashboardNotify(onNotify, message, type),
@@ -2477,6 +2481,7 @@ const Dashboard: React.FC<DashboardProps> = ({ seller, sellerVehicles, reportedV
   );
   void onRequestCertification;
   void onSellerOpenChat;
+  void onFeatureListing;
 
   const { t } = useTranslation();
   
@@ -2488,12 +2493,22 @@ const Dashboard: React.FC<DashboardProps> = ({ seller, sellerVehicles, reportedV
     commandCenter,
     commandCenterLoading,
     commandCenterError: dealStatsError,
-    pendingDealCount,
     pendingAcceptCount,
     sellerActiveDeals,
     dealsByVehicleId,
     refreshDealCommandStats,
   } = useSellerDashboardController(seller);
+  const [viewedTasksVersion, setViewedTasksVersion] = useState(0);
+  const hotLeadsBadgeCount = useMemo(
+    () =>
+      countActionableSellerTasks(
+        commandCenter?.tasks,
+        commandCenter?.stats?.pendingInterestCount ?? pendingAcceptCount,
+      ),
+    // Recompute when seller dismisses a view-only task in-session.
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- viewedTasksVersion bumps after markSellerTaskViewed
+    [commandCenter?.tasks, commandCenter?.stats?.pendingInterestCount, pendingAcceptCount, viewedTasksVersion],
+  );
 
   useEffect(() => {
     try {
@@ -2542,13 +2557,17 @@ const Dashboard: React.FC<DashboardProps> = ({ seller, sellerVehicles, reportedV
   /** Include canonical Supabase `databaseId` so API mutations work for UUID primary keys. */
   const buildVehicleActionBody = useCallback(
     (vehicleId: number, extra: Record<string, unknown> = {}) => {
-      const vehicle = findVehicleByIdentity(safeSellerVehicles, vehicleId);
-      const databaseId = vehicle ? getCanonicalPrimaryKey(vehicle) : undefined;
-      return {
-        vehicleId,
-        ...(databaseId ? { databaseId } : {}),
-        ...extra,
-      };
+      try {
+        return buildVehicleMutationBody(vehicleId, safeSellerVehicles, extra);
+      } catch {
+        const vehicle = findVehicleByIdentity(safeSellerVehicles, vehicleId);
+        const databaseId = vehicle ? getCanonicalPrimaryKey(vehicle) : undefined;
+        return {
+          vehicleId,
+          ...(databaseId ? { databaseId } : {}),
+          ...extra,
+        };
+      }
     },
     [safeSellerVehicles],
   );
@@ -3001,6 +3020,16 @@ const Dashboard: React.FC<DashboardProps> = ({ seller, sellerVehicles, reportedV
     setActiveView(view);
   };
 
+  const openHotLeadConversation = useCallback(
+    (conv: Conversation) => {
+      setSelectedConv(conv);
+      onMarkConversationAsReadBySeller(conv.id);
+      onMarkMessagesAsRead(conv.id, 'seller');
+      handleNavigate('messages');
+    },
+    [onMarkConversationAsReadBySeller, onMarkMessagesAsRead],
+  );
+
   const sellerPlan = useMemo(
     () => ({
       subscriptionPlan: seller?.subscriptionPlan,
@@ -3272,15 +3301,6 @@ const Dashboard: React.FC<DashboardProps> = ({ seller, sellerVehicles, reportedV
     }
   };
 
-  const handleFeatureVehicle = async (vehicleId: number) => {
-    logInfo('🚀 handleFeatureVehicle called for vehicle:', vehicleId);
-    try {
-      await onFeatureListing(vehicleId);
-    } catch (error) {
-      console.error('❌ Error featuring vehicle via callback:', error);
-    }
-  };
-  
   const handleEditClick = (vehicle: Vehicle) => {
     // FIXED: Added safety check to prevent crashes
     if (!vehicle || !vehicle.id) {
@@ -3364,8 +3384,7 @@ const Dashboard: React.FC<DashboardProps> = ({ seller, sellerVehicles, reportedV
     try {
       const conv = safeConversations.find(c => c && c.id === conversationId);
       if (conv) {
-        setSelectedConv(conv);
-        handleNavigate('messages');
+        openHotLeadConversation(conv);
       }
     } catch (error) {
       if (process.env.NODE_ENV === 'development') {
@@ -3418,39 +3437,6 @@ const Dashboard: React.FC<DashboardProps> = ({ seller, sellerVehicles, reportedV
     );
   }
 
-  const getCertificationButton = (vehicle: Vehicle) => {
-        const status = vehicle.certificationStatus || 'none';
-        switch (status) {
-            case 'requested':
-                return <button type="button" disabled className="px-1.5 py-0.5 text-reride-text-dark text-xs border border-gray-300 rounded opacity-50" title="Certification pending approval">🕐 Pending</button>;
-            case 'approved':
-                return <span className="px-1.5 py-0.5 text-reride-green text-xs border border-reride-green rounded bg-reride-green-light" title="Vehicle is certified">✅ Certified</span>;
-            case 'rejected':
-                return <button 
-                  type="button"
-                  onClick={(e) => {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    handleCertifyVehicle(vehicle.id);
-                  }} 
-                  className="px-1.5 py-0.5 text-reride-orange hover:text-reride-orange text-xs border border-reride-orange rounded hover:bg-reride-orange-light cursor-pointer" 
-                  title="Certification was rejected, you can request again."
-                >🔄 Retry</button>;
-            case 'none':
-            default:
-                return <button 
-                  type="button"
-                  onClick={(e) => {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    handleCertifyVehicle(vehicle.id);
-                  }} 
-                  className="px-1.5 py-0.5 text-teal-600 hover:text-teal-800 text-xs border border-teal-600 rounded hover:bg-teal-50 cursor-pointer" 
-                  title="Request a certified inspection report"
-                >🛡️ Certify</button>;
-        }
-    };
-
   const renderPendingDealsBanner = () => {
     if (dealStatsError && activeView !== 'overview') {
       return (
@@ -3498,85 +3484,103 @@ const Dashboard: React.FC<DashboardProps> = ({ seller, sellerVehicles, reportedV
       case 'overview':
         if (selectedDealId) {
           return (
-            <DealDetailPage
-              leadId={selectedDealId}
-              currentUser={seller}
-              role="seller"
-              conversations={safeConversations.filter((c) =>
-                c && seller?.email ? conversationBelongsToSeller(c, seller.email, seller.id) : false,
-              )}
-              onBack={() => setSelectedDealId(null)}
-              onOpenConversation={(conv) => {
-                setSelectedConv(conv);
-                handleNavigate('messages');
-              }}
-              onNotify={(message, type) => onNotify?.(message, type ?? 'info')}
-            />
+            <SellerPremiumPanel
+              eyebrow="Deal"
+              title="Lead detail"
+              description="Review the buyer conversation and next steps."
+              actions={
+                <button
+                  type="button"
+                  onClick={() => setSelectedDealId(null)}
+                  className="rounded-xl px-3.5 py-2 text-sm font-semibold text-stone-700"
+                  style={sellerPremiumGhostBtnStyle}
+                >
+                  Back to leads
+                </button>
+              }
+            >
+              <DealDetailPage
+                leadId={selectedDealId}
+                currentUser={seller}
+                role="seller"
+                conversations={safeConversations.filter((c) =>
+                  c && seller?.email ? conversationBelongsToSeller(c, seller.email, seller.id) : false,
+                )}
+                onBack={() => setSelectedDealId(null)}
+                onOpenConversation={openHotLeadConversation}
+                onNotify={(message, type) => onNotify?.(message, type ?? 'info')}
+              />
+            </SellerPremiumPanel>
           );
         }
         return (
           <div className="space-y-6">
-            <SellerCommandHome
-              seller={seller}
-              commandCenter={commandCenter}
-              commandCenterLoading={commandCenterLoading}
-              commandCenterError={dealStatsError}
-              onRefreshCommandCenter={(force) => refreshDealCommandStats(force)}
-              conversations={safeConversations.filter((c) =>
-                c && seller?.email ? conversationBelongsToSeller(c, seller.email, seller.id) : false,
-              )}
-              onOpenDeal={(leadId) => setSelectedDealId(leadId)}
-              onOpenConversation={(conv) => {
-                setSelectedConv(conv);
-                handleNavigate('messages');
-              }}
-              onNavigateToMessages={() => handleNavigate('messages')}
-              onNavigateToListings={() => handleNavigate('listings')}
-              onNotify={(message, type) => {
-                onNotify?.(message, type ?? 'info');
-                refreshDealCommandStats();
-              }}
-              onSignInAgain={() => {
-                void (async () => {
-                  const { clearPersistedUserSession } = await import('../utils/validatePersistedSession.js');
-                  const { logout } = await import('../services/userService.js');
-                  clearPersistedUserSession();
-                  logout();
-                  onNavigate(View.SELLER_LOGIN);
-                  window.location.reload();
-                })();
-              }}
-            />
+            <SellerPremiumPanel
+              eyebrow="Command"
+              title="Hot leads"
+              description="Accept chats, move deals forward, and keep buyers warm."
+            >
+              <SellerCommandHome
+                seller={seller}
+                commandCenter={commandCenter}
+                commandCenterLoading={commandCenterLoading}
+                commandCenterError={dealStatsError}
+                onRefreshCommandCenter={(force) => refreshDealCommandStats(force)}
+                conversations={safeConversations.filter((c) =>
+                  c && seller?.email ? conversationBelongsToSeller(c, seller.email, seller.id) : false,
+                )}
+                onOpenDeal={(leadId) => setSelectedDealId(leadId)}
+                onOpenConversation={openHotLeadConversation}
+                onNavigateToMessages={() => handleNavigate('messages')}
+                onNavigateToListings={() => handleNavigate('listings')}
+                onNotify={(message, type) => {
+                  onNotify?.(message, type ?? 'info');
+                  void refreshDealCommandStats(true);
+                }}
+                onTaskViewed={() => setViewedTasksVersion((v) => v + 1)}
+                onSignInAgain={() => {
+                  void (async () => {
+                    const { clearPersistedUserSession } = await import('../utils/validatePersistedSession.js');
+                    const { logout } = await import('../services/userService.js');
+                    clearPersistedUserSession();
+                    logout();
+                    onNavigate(View.SELLER_LOGIN);
+                    window.location.reload();
+                  })();
+                }}
+              />
+            </SellerPremiumPanel>
           </div>
         );
       case 'analytics':
         return (
             <div className="space-y-6">
-                {/* Month Selector */}
-                <div className="bg-white p-4 rounded-lg shadow-md flex items-center justify-between">
-                    <h2 className="text-xl font-bold text-reride-text-dark dark:text-gray-100">Analytics Overview</h2>
-                    <div className="flex items-center gap-3">
-                        <label htmlFor="month-selector" className="text-sm font-medium text-gray-700">
-                            Filter by Month:
-                        </label>
-                        <select
+                <SellerPremiumPanel
+                  eyebrow="Insights"
+                  title="Analytics"
+                  description="Performance across listings, views, and inquiries."
+                  actions={
+                    <label className="inline-flex items-center gap-2 text-sm text-stone-600">
+                      <span className="text-[11px] font-semibold uppercase tracking-[0.12em] text-stone-400">Month</span>
+                      <select
                             id="month-selector"
                             value={selectedMonth}
                             onChange={(e) => setSelectedMonth(e.target.value)}
-                            className="px-4 py-2 border border-gray-300 rounded-lg bg-white dark:bg-white text-reride-text-dark focus:outline-none focus:ring-2 focus:ring-reride-orange focus:border-transparent"
+                            className="rounded-xl bg-white px-3 py-2 text-sm font-medium text-stone-800 focus:outline-none focus:ring-2 focus:ring-orange-400"
+                            style={{ border: '1px solid rgba(28,25,23,0.12)' }}
                         >
                             {monthOptions.map(month => (
                                 <option key={month.value} value={month.value}>{month.label}</option>
                             ))}
                         </select>
-                    </div>
-                </div>
-                
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-                    <StatCard title="Active Listings" value={filteredPublishedListings.length} icon={<svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 17v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 17v-2a4 4 0 00-4-4h-1.5m1.5 4H13m-2 0a2 2 0 104 0 2 2 0 00-4 0z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 11V7a4 4 0 00-4-4H7a4 4 0 00-4 4v4" /></svg>} />
-                    <StatCard title="Total Sales Value" value={formatSalesValue(analyticsData.totalSalesValue)} icon={<svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v.01" /></svg>} />
-                    <StatCard title="Total Views" value={analyticsData.totalViews.toLocaleString('en-IN')} icon={<svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057 5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" /></svg>} />
-                    <StatCard title="Total Inquiries" value={analyticsData.totalInquiries.toLocaleString('en-IN')} icon={<svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" /></svg>} />
+                    </label>
+                  }
+                >
+                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+                    <StatCard title="Active Listings" value={filteredPublishedListings.length} icon={<svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 17v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 17v-2a4 4 0 00-4-4h-1.5m1.5 4H13m-2 0a2 2 0 104 0 2 2 0 00-4 0z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 11V7a4 4 0 00-4-4H7a4 4 0 00-4 4v4" /></svg>} />
+                    <StatCard title="Total Sales Value" value={formatSalesValue(analyticsData.totalSalesValue)} icon={<svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v.01" /></svg>} />
+                    <StatCard title="Total Views" value={analyticsData.totalViews.toLocaleString('en-IN')} icon={<svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057 5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" /></svg>} />
+                    <StatCard title="Total Inquiries" value={analyticsData.totalInquiries.toLocaleString('en-IN')} icon={<svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" /></svg>} />
                 </div>
                 
                 {/* Boost Analytics */}
@@ -3587,43 +3591,49 @@ const Dashboard: React.FC<DashboardProps> = ({ seller, sellerVehicles, reportedV
                   
                   if (activeBoosts.length > 0) {
                     return (
-                      <div className="bg-gradient-to-r from-purple-50 to-blue-50 rounded-xl p-6 mb-8">
-                        <div className="flex items-center justify-between mb-4">
-                          <h3 className="text-xl font-bold text-gray-900 flex items-center gap-2">
-                            <span>🚀</span>
-                            Active Boost Campaigns
+                      <div
+                        className="mt-6 rounded-2xl p-5"
+                        style={{ background: 'rgba(255,107,53,0.06)', border: '1px solid rgba(255,107,53,0.14)' }}
+                      >
+                        <div className="mb-4 flex items-center justify-between gap-3">
+                          <h3 className="text-base font-semibold text-stone-900" style={{ letterSpacing: '-0.02em' }}>
+                            Active boost campaigns
                           </h3>
-                          <span className="bg-gradient-to-r from-purple-500 to-blue-500 text-white px-3 py-1 rounded-full text-sm font-semibold">
-                            {activeBoosts.length} Active
+                          <span
+                            className="rounded-full px-2.5 py-1 text-[11px] font-bold text-white"
+                            style={{ background: 'linear-gradient(135deg, #FF8456 0%, #E85A2A 100%)' }}
+                          >
+                            {activeBoosts.length} active
                           </span>
                         </div>
                         
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                        <div className="grid grid-cols-1 gap-3 md:grid-cols-2 lg:grid-cols-4">
                           {activeBoosts.map(boost => {
                             const vehicle = safeSellerVehicles.find(v => v && v.activeBoosts?.some(b => b.id === boost.id));
                             const daysLeft = Math.ceil((new Date(boost.expiresAt).getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24));
                             
                             return (
-                              <div key={boost.id} className="bg-white rounded-lg p-4 shadow-sm border border-gray-200">
-                                <div className="flex items-center gap-2 mb-2">
-                                  <span className="text-lg">
-                                    {boost.type === 'homepage_spotlight' ? '⭐' : 
-                                     boost.type === 'top_search' ? '🔝' : 
-                                     boost.type === 'featured_badge' ? '🏆' : 
-                                     boost.type === 'multi_city' ? '🌍' : '🚀'}
-                                  </span>
-                                  <span className="font-semibold text-sm capitalize">{boost.type.replace('_', ' ')}</span>
-                                </div>
-                                <p className="text-xs text-gray-600 mb-1">
+                              <div
+                                key={boost.id}
+                                className="rounded-xl bg-white p-4"
+                                style={{ border: '1px solid rgba(28,25,23,0.08)' }}
+                              >
+                                <p className="text-[12px] font-semibold capitalize text-stone-800">
+                                  {boost.type.replace(/_/g, ' ')}
+                                </p>
+                                <p className="mt-1 text-[11px] text-stone-500">
                                   {vehicle?.year} {vehicle?.make} {vehicle?.model}
                                 </p>
-                                <div className="flex items-center justify-between">
-                                  <span className="text-xs text-gray-500">{daysLeft} days left</span>
-                                  <div className="w-16 h-1 bg-gray-200 rounded-full overflow-hidden">
+                                <div className="mt-3 flex items-center justify-between gap-2">
+                                  <span className="text-[11px] font-medium text-stone-500">{daysLeft}d left</span>
+                                  <div className="h-1 w-16 overflow-hidden rounded-full bg-stone-100">
                                     <div 
-                                      className="h-full bg-gradient-to-r from-purple-500 to-blue-500 transition-all duration-300"
-                                      style={{ width: `${Math.max(0, Math.min(100, (daysLeft / 30) * 100))}%` }}
-                                    ></div>
+                                      className="h-full transition-all duration-300"
+                                      style={{
+                                        width: `${Math.max(0, Math.min(100, (daysLeft / 30) * 100))}%`,
+                                        background: 'linear-gradient(90deg, #FF8456, #E85A2A)',
+                                      }}
+                                    />
                                   </div>
                                 </div>
                               </div>
@@ -3636,17 +3646,19 @@ const Dashboard: React.FC<DashboardProps> = ({ seller, sellerVehicles, reportedV
                   return null;
                 })()}
                 
-                <div className="bg-white p-6 sm:p-8 rounded-lg shadow-md">
-                    <h2 className="text-2xl font-bold text-reride-text-dark dark:text-gray-100 mb-6">Listing Performance</h2>
+                <div className="mt-6 rounded-2xl p-5 sm:p-6" style={{ border: '1px solid rgba(28,25,23,0.08)', background: 'rgba(255,255,255,0.7)' }}>
+                    <h3 className="mb-5 text-base font-semibold text-stone-900" style={{ letterSpacing: '-0.02em' }}>
+                      Listing performance
+                    </h3>
                     {filteredPublishedListings.length > 0 ? (
                         (() => {
                           try {
                             // Safety check: ensure chartData is valid before rendering
                             if (!analyticsData?.chartData || !analyticsData.chartData.labels || !analyticsData.chartData.datasets) {
                               return (
-                                <div className="text-center py-16 px-6">
-                                  <h3 className="mt-2 text-xl font-semibold text-reride-text-dark dark:text-gray-100">Chart Data Unavailable</h3>
-                                  <p className="mt-1 text-sm text-reride-text-dark dark:text-gray-100">
+                                <div className="px-6 py-16 text-center">
+                                  <h3 className="mt-2 text-lg font-semibold text-stone-900">Chart data unavailable</h3>
+                                  <p className="mt-1 text-sm text-stone-500">
                                     Unable to load chart data. Please refresh the page.
                                   </p>
                                 </div>
@@ -3656,7 +3668,7 @@ const Dashboard: React.FC<DashboardProps> = ({ seller, sellerVehicles, reportedV
                             return (
                               <React.Suspense
                                 fallback={
-                                  <div className="h-80 sm:h-96 flex items-center justify-center">
+                                  <div className="flex h-80 items-center justify-center sm:h-96">
                                     <div className="h-8 w-8 animate-spin rounded-full border-2 border-reride-orange border-t-transparent" />
                                   </div>
                                 }
@@ -3670,9 +3682,9 @@ const Dashboard: React.FC<DashboardProps> = ({ seller, sellerVehicles, reportedV
                               console.error('❌ Error rendering chart:', chartError);
                             }
                             return (
-                              <div className="text-center py-16 px-6">
-                                <h3 className="mt-2 text-xl font-semibold text-reride-text-dark dark:text-gray-100">Chart Error</h3>
-                                <p className="mt-1 text-sm text-reride-text-dark dark:text-gray-100">
+                              <div className="px-6 py-16 text-center">
+                                <h3 className="mt-2 text-lg font-semibold text-stone-900">Chart error</h3>
+                                <p className="mt-1 text-sm text-stone-500">
                                   Unable to display chart. Please refresh the page.
                                 </p>
                               </div>
@@ -3680,9 +3692,9 @@ const Dashboard: React.FC<DashboardProps> = ({ seller, sellerVehicles, reportedV
                           }
                         })()
                     ) : (
-                        <div className="text-center py-16 px-6">
-                            <h3 className="mt-2 text-xl font-semibold text-reride-text-dark dark:text-gray-100">No Data to Display</h3>
-                            <p className="mt-1 text-sm text-reride-text-dark dark:text-gray-100">
+                        <div className="px-6 py-16 text-center">
+                            <h3 className="mt-2 text-lg font-semibold text-stone-900">No data to display</h3>
+                            <p className="mt-1 text-sm text-stone-500">
                                 {selectedMonth === 'all' 
                                     ? 'Add a vehicle to see performance data.' 
                                     : 'No data available for the selected month.'}
@@ -3690,445 +3702,335 @@ const Dashboard: React.FC<DashboardProps> = ({ seller, sellerVehicles, reportedV
                         </div>
                     )}
                 </div>
+                </SellerPremiumPanel>
             </div>
         );
       case 'listings':
         return (
-          <div className="bg-white p-6 sm:p-8 rounded-lg shadow-md">
-            {renderPendingDealsBanner()}
-            <div className="flex flex-col sm:flex-row justify-between items-center mb-6 gap-4">
-              <h2 className="text-2xl font-bold text-reride-text-dark dark:text-gray-100">Active Listings</h2>
-              <div className="flex gap-2">
-                <button onClick={() => setIsBulkUploadOpen(true)} className="bg-reride-orange text-white font-bold py-2 px-4 rounded-lg hover:bg-reride-orange">Bulk Upload</button>
-                <button onClick={handleAddNewClick} className="btn-brand-primary text-white font-bold py-2 px-4 rounded-lg">List New Vehicle</button>
+          <div
+            className="relative overflow-hidden rounded-2xl"
+            style={{
+              background: 'linear-gradient(180deg, #FFFFFF 0%, #FBF8F5 100%)',
+              border: '1px solid rgba(28, 25, 23, 0.08)',
+              boxShadow: '0 24px 48px -32px rgba(28, 25, 23, 0.28)',
+            }}
+          >
+            <div
+              aria-hidden
+              className="pointer-events-none absolute inset-x-0 top-0 h-28"
+              style={{
+                background:
+                  'radial-gradient(80% 120% at 0% 0%, rgba(255,107,53,0.14), transparent 55%), radial-gradient(60% 100% at 100% 0%, rgba(28,25,23,0.05), transparent 50%)',
+              }}
+            />
+            <div className="relative p-5 sm:p-7">
+              {renderPendingDealsBanner()}
+              <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+                <div>
+                  <p className="text-[10.5px] font-semibold uppercase tracking-[0.2em] text-stone-400">Inventory</p>
+                  <h2
+                    className="mt-1 text-[1.65rem] font-semibold tracking-tight text-stone-900"
+                    style={{ fontFamily: "'Nunito Sans', Poppins, sans-serif", letterSpacing: '-0.03em' }}
+                  >
+                    My listings
+                  </h2>
+                  <p className="mt-1.5 text-sm text-stone-500">
+                    {activeListings.length} active · boost to climb search and homepage placement
+                  </p>
+                </div>
+                <div className="flex flex-wrap gap-2">
+                  <button
+                    type="button"
+                    onClick={() => setIsBulkUploadOpen(true)}
+                    className="inline-flex items-center rounded-xl px-3.5 py-2.5 text-sm font-semibold text-stone-700 transition hover:bg-white"
+                    style={{ border: '1px solid rgba(28,25,23,0.12)', background: 'rgba(255,255,255,0.7)' }}
+                  >
+                    Bulk upload
+                  </button>
+                  <button
+                    type="button"
+                    onClick={handleAddNewClick}
+                    className="inline-flex items-center rounded-xl px-3.5 py-2.5 text-sm font-semibold text-white transition hover:brightness-110"
+                    style={{
+                      background: 'linear-gradient(135deg, #FF8456 0%, #E85A2A 100%)',
+                      boxShadow: '0 12px 24px -14px rgba(232,90,42,0.85)',
+                    }}
+                  >
+                    List new vehicle
+                  </button>
+                </div>
               </div>
-            </div>
-            {activeListings.length > 0 ? (
-              <>
-                <div className="overflow-x-auto">
-                  <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
-                    <thead className="bg-white dark:bg-white">
-                      <tr>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Vehicle</th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Price</th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Views</th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
-                      </tr>
-                    </thead>
-                    <tbody className="bg-white divide-y divide-gray-200 dark:divide-gray-700">
-                      {paginatedListings.map((v) => {
-                      const renewalValidation = getListingRenewalValidation(v);
-                      const vehicleDeals =
-                        dealsByVehicleId.get(String(v.id)) ||
-                        (v.databaseId ? dealsByVehicleId.get(String(v.databaseId)) : undefined) ||
-                        [];
-                      return (
-                      <tr 
-                        key={v.id}
-                        onClick={() => {
-                          if (onViewVehicle) {
-                            onViewVehicle(v);
-                          }
-                        }}
-                        className="cursor-pointer hover:bg-gray-50 transition-colors"
-                      >
-                        <td className="px-6 py-4 font-medium">{v.year} {v.make} {v.model} {v.variant || ''}</td>
-                        <td className="px-6 py-4">₹{v.price.toLocaleString('en-IN')}</td>
-                        <td className="px-6 py-4 text-gray-700 tabular-nums">
-                          {(typeof v.views === 'number' ? v.views : 0).toLocaleString('en-IN')}
-                        </td>
-                        <td className="px-6 py-4">
-                          <div className="flex flex-col gap-1">
-                            <ListingLifecycleIndicator vehicle={v} seller={seller} compact={true} onRefresh={() => handleRefreshVehicle(v.id)} onRenew={() => handleRenewVehicle(v.id)} />
-                            {vehicleDeals.length > 0 ? (
-                              <button
-                                type="button"
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  const lead = vehicleDeals[0];
-                                  if (lead) setSelectedDealId(lead.id);
-                                  handleNavigate('overview');
-                                }}
-                                className="inline-flex w-fit items-center gap-1 text-xs font-semibold px-2 py-1 rounded-full bg-amber-100 text-amber-900 hover:bg-amber-200"
-                              >
-                                {vehicleDeals.length} buyer lead{vehicleDeals.length === 1 ? '' : 's'}
-                                {vehicleDeals.some((d) => d.chatStatus === 'pending') ? ' · Accept chat' : ''}
-                              </button>
-                            ) : null}
-                            
-                            {/* Boost Status Indicators */}
-                            {v.activeBoosts?.filter(boost => boost.isActive && new Date(boost.expiresAt) > new Date()).map(boost => {
-                              const getBoostIcon = (type: string) => {
-                                switch (type) {
-                                  case 'homepage_spotlight': return '⭐';
-                                  case 'top_search': return '🔝';
-                                  case 'featured_badge': return '🏆';
-                                  case 'multi_city': return '🌍';
-                                  default: return '🚀';
-                                }
-                              };
-                              
-                              const getBoostColor = (type: string) => {
-                                switch (type) {
-                                  case 'homepage_spotlight': return 'from-yellow-500 to-orange-500';
-                                  case 'top_search': return 'from-blue-500 to-purple-500';
-                                  case 'featured_badge': return 'from-green-500 to-teal-500';
-                                  case 'multi_city': return 'from-indigo-500 to-blue-500';
-                                  default: return 'from-gray-500 to-gray-600';
-                                }
-                              };
-                              
-                              const daysLeft = Math.ceil((new Date(boost.expiresAt).getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24));
-                              
-                              return (
-                                <div key={boost.id} className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium text-white bg-gradient-to-r ${getBoostColor(boost.type)}`}>
-                                  <span>{getBoostIcon(boost.type)}</span>
-                                  <span className="capitalize">{boost.type.replace('_', ' ')}</span>
-                                  <span>({daysLeft}d)</span>
+
+              {activeListings.length > 0 ? (
+                <>
+                  <div className="overflow-x-auto rounded-xl" style={{ border: '1px solid rgba(28,25,23,0.08)' }}>
+                    <table className="min-w-full">
+                      <thead>
+                        <tr style={{ background: 'rgba(28,25,23,0.03)' }}>
+                          {['Vehicle', 'Price', 'Views', 'Status', 'Actions'].map((label) => (
+                            <th
+                              key={label}
+                              className={`px-4 py-3 text-[10.5px] font-semibold uppercase tracking-[0.14em] text-stone-400 ${
+                                label === 'Actions' ? 'text-right' : 'text-left'
+                              }`}
+                            >
+                              {label}
+                            </th>
+                          ))}
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {paginatedListings.map((v) => {
+                          const renewalValidation = getListingRenewalValidation(v);
+                          const vehicleDeals =
+                            dealsByVehicleId.get(String(v.id)) ||
+                            (v.databaseId ? dealsByVehicleId.get(String(v.databaseId)) : undefined) ||
+                            [];
+                          const thumb = getFirstValidImage(v.images || [], v.id);
+                          const activeBoosts = (v.activeBoosts || []).filter(
+                            (boost) => boost.isActive && new Date(boost.expiresAt) > new Date(),
+                          );
+                          return (
+                            <tr
+                              key={v.id}
+                              onClick={() => {
+                                if (onViewVehicle) onViewVehicle(v);
+                              }}
+                              className="group cursor-pointer border-t transition-colors"
+                              style={{ borderColor: 'rgba(28,25,23,0.06)' }}
+                              onMouseEnter={(e) => {
+                                e.currentTarget.style.background = 'rgba(255,107,53,0.035)';
+                              }}
+                              onMouseLeave={(e) => {
+                                e.currentTarget.style.background = 'transparent';
+                              }}
+                            >
+                              <td className="px-4 py-3.5">
+                                <div className="flex min-w-[14rem] items-center gap-3">
+                                  <div
+                                    className="h-12 w-16 shrink-0 overflow-hidden rounded-lg bg-stone-100"
+                                    style={{ border: '1px solid rgba(28,25,23,0.06)' }}
+                                  >
+                                    {thumb ? (
+                                      <img
+                                        src={thumb}
+                                        alt=""
+                                        loading="lazy"
+                                        className="h-full w-full object-cover transition duration-300 group-hover:scale-[1.03]"
+                                      />
+                                    ) : (
+                                      <div className="flex h-full w-full items-center justify-center text-stone-300">
+                                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" aria-hidden>
+                                          <path d="M3 13l2-5a2 2 0 012-1h8a2 2 0 012 1l2 5" />
+                                          <path d="M5 13h14v5a1 1 0 01-1 1H6a1 1 0 01-1-1v-5z" />
+                                          <circle cx="7.5" cy="16.5" r="1.2" />
+                                          <circle cx="16.5" cy="16.5" r="1.2" />
+                                        </svg>
+                                      </div>
+                                    )}
+                                  </div>
+                                  <div className="min-w-0">
+                                    <p
+                                      className="truncate text-[14px] font-semibold text-stone-900"
+                                      style={{ letterSpacing: '-0.015em' }}
+                                    >
+                                      {v.year} {v.make} {v.model}
+                                    </p>
+                                    {v.variant ? (
+                                      <p className="truncate text-[12px] text-stone-500">{v.variant}</p>
+                                    ) : null}
+                                  </div>
                                 </div>
-                              );
-                            })}
-                          </div>
-                        </td>
-                        <td 
-                          className="px-6 py-4"
-                          onClick={(e) => e.stopPropagation()}
-                        >
-                          {/* Desktop Layout - 4+4 Grid */}
-                          <div className="hidden lg:flex flex-col space-y-1">
-                            {/* First Row - 4 buttons */}
-                            <div className="flex items-center space-x-1">
-                              {isVehicleListingExpired(v) && (
-                                <button
-                                  type="button"
-                                  onClick={(e) => {
-                                    e.preventDefault();
-                                    e.stopPropagation();
-                                    handleRenewVehicle(v.id);
-                                  }}
-                                  disabled={!renewalValidation.allowed}
-                                  className="px-2 py-0.5 bg-red-600 text-white rounded hover:bg-red-700 text-xs font-medium cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
-                                  title={renewalValidation.allowed ? 'Renew expired listing' : renewalValidation.reason}
-                                >
-                                  ♻️ Renew
-                                </button>
-                              )}
-                              <button 
-                                type="button"
-                                onClick={(e) => {
-                                    e.preventDefault();
-                                    e.stopPropagation();
+                              </td>
+                              <td className="px-4 py-3.5 whitespace-nowrap text-[14px] font-semibold tabular-nums text-stone-800">
+                                ₹{v.price.toLocaleString('en-IN')}
+                              </td>
+                              <td className="px-4 py-3.5 text-[13px] tabular-nums text-stone-500">
+                                {(typeof v.views === 'number' ? v.views : 0).toLocaleString('en-IN')}
+                              </td>
+                              <td className="px-4 py-3.5">
+                                <div className="flex flex-col items-start gap-1.5">
+                                  <ListingLifecycleIndicator
+                                    vehicle={v}
+                                    seller={seller}
+                                    compact={true}
+                                    onRefresh={() => handleRefreshVehicle(v.id)}
+                                    onRenew={() => handleRenewVehicle(v.id)}
+                                  />
+                                  {vehicleDeals.length > 0 ? (
+                                    <button
+                                      type="button"
+                                      onClick={(e) => {
+                                        e.stopPropagation();
+                                        const lead = vehicleDeals[0];
+                                        if (lead) setSelectedDealId(lead.id);
+                                        handleNavigate('overview');
+                                      }}
+                                      className="inline-flex w-fit items-center gap-1 rounded-full px-2 py-0.5 text-[11px] font-semibold text-amber-900 transition hover:brightness-95"
+                                      style={{ background: 'rgba(251, 191, 36, 0.22)' }}
+                                    >
+                                      {vehicleDeals.length} buyer lead{vehicleDeals.length === 1 ? '' : 's'}
+                                      {vehicleDeals.some((d) => d.chatStatus === 'pending') ? ' · Accept chat' : ''}
+                                    </button>
+                                  ) : null}
+                                  {activeBoosts.map((boost) => {
+                                    const daysLeft = Math.max(
+                                      1,
+                                      Math.ceil(
+                                        (new Date(boost.expiresAt).getTime() - Date.now()) / (1000 * 60 * 60 * 24),
+                                      ),
+                                    );
+                                    return (
+                                      <span
+                                        key={boost.id}
+                                        className="inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10.5px] font-semibold uppercase tracking-wide text-orange-900"
+                                        style={{ background: 'rgba(255,107,53,0.14)' }}
+                                      >
+                                        Boost · {boost.type.replace(/_/g, ' ')} · {daysLeft}d
+                                      </span>
+                                    );
+                                  })}
+                                  {isEffectivelyFeatured(v) && activeBoosts.length === 0 ? (
+                                    <span
+                                      className="inline-flex items-center rounded-full px-2 py-0.5 text-[10.5px] font-semibold uppercase tracking-wide text-orange-900"
+                                      style={{ background: 'rgba(255,107,53,0.14)' }}
+                                    >
+                                      Featured
+                                    </span>
+                                  ) : null}
+                                </div>
+                              </td>
+                              <td className="px-4 py-3.5">
+                                <SellerListingsActions
+                                  vehicle={v}
+                                  isExpired={isVehicleListingExpired(v)}
+                                  renewAllowed={renewalValidation.allowed}
+                                  renewReason={renewalValidation.reason}
+                                  onBoost={() => {
                                     setVehicleToBoost(v);
                                     setShowBoostModal(true);
-                                  }} 
-                                className="px-2 py-0.5 bg-reride-orange text-white rounded hover:bg-orange-600 text-xs font-medium cursor-pointer" 
-                                title="Boost for more visibility"
-                              >
-                                🚀 Boost
-                              </button>
-                              {!v.isFeatured && (seller.featuredCredits ?? 0) > 0 ? (
-                                <button 
-                                  type="button"
-                                  onClick={(e) => {
-                                      e.preventDefault();
-                                      e.stopPropagation();
-                                      handleFeatureVehicle(v.id);
-                                    }} 
-                                  className="px-1.5 py-0.5 text-reride-orange hover:text-reride-orange text-xs border border-reride-orange rounded hover:bg-reride-orange-light cursor-pointer" 
-                                  title="Use a credit to feature this listing"
-                                >
-                                  ⭐ Feature
-                                </button>
-                              ) : (
-                                <div className="px-1.5 py-0.5 text-xs text-gray-400 border border-gray-300 rounded opacity-50">
-                                  ⭐ Feature
-                                </div>
-                              )}
-                            </div>
-                            
-                            {/* Second Row - 4 buttons */}
-                            <div className="flex items-center space-x-1">
-                              {getCertificationButton(v)}
-                              <button 
-                                type="button"
-                                onClick={(e) => {
-                                    e.preventDefault();
-                                    e.stopPropagation();
-                                    logInfo('🔄 Mark as sold button clicked for vehicle:', v.id);
-                                    handleMarkAsSold(v.id);
-                                }} 
-                                className="px-1.5 py-0.5 text-reride-orange hover:text-reride-orange text-xs border border-reride-orange rounded hover:bg-reride-orange-light cursor-pointer"
-                              >
-                                ✅ Sold
-                              </button>
-                              <button 
-                                type="button"
-                                onClick={(e) => {
-                                    e.preventDefault();
-                                    e.stopPropagation();
-                                    logInfo('🔄 Edit vehicle button clicked for vehicle:', v.id);
-                                    handleEditClick(v);
-                                }} 
-                                className="px-1.5 py-0.5 text-reride-blue hover:text-reride-blue text-xs border border-reride-blue rounded hover:bg-reride-blue-light cursor-pointer"
-                              >
-                                ✏️ Edit
-                              </button>
-                              <button 
-                                type="button"
-                                onClick={(e) => {
-                                    e.preventDefault();
-                                    e.stopPropagation();
-                                    logInfo('🔄 Delete vehicle button clicked for vehicle:', v.id);
-                                    onDeleteVehicle(v.id);
-                                }} 
-                                className="px-1.5 py-0.5 text-red-600 hover:text-red-700 text-xs border border-red-600 rounded hover:bg-red-50 cursor-pointer"
-                              >
-                                🗑️ Delete
-                              </button>
-                            </div>
-                          </div>
-                          
-                          {/* Mobile/Tablet Layout - 4+4 Grid */}
-                          <div className="lg:hidden">
-                            <div className="flex flex-col space-y-1">
-                              {/* First Row - 4 buttons */}
-                              <div className="flex items-center space-x-1">
-                                {isVehicleListingExpired(v) && (
-                                  <button
-                                    type="button"
-                                    onClick={(e) => {
-                                      e.preventDefault();
-                                      e.stopPropagation();
-                                      handleRenewVehicle(v.id);
-                                    }}
-                                    disabled={!renewalValidation.allowed}
-                                    className="px-1.5 py-0.5 bg-red-600 text-white rounded text-xs cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
-                                    title={renewalValidation.allowed ? 'Renew expired listing' : renewalValidation.reason}
-                                  >
-                                    ♻️
-                                  </button>
-                                )}
-                                <button 
-                                  type="button"
-                                  onClick={(e) => {
-                                      e.preventDefault();
-                                      e.stopPropagation();
-                                      setVehicleToBoost(v);
-                                      setShowBoostModal(true);
-                                    }} 
-                                  className="px-1.5 py-0.5 bg-reride-orange text-white rounded text-xs cursor-pointer"
-                                  title="Boost"
-                                >
-                                  🚀
-                                </button>
-                                <button 
-                                  type="button"
-                                  onClick={(e) => {
-                                      e.preventDefault();
-                                      e.stopPropagation();
-                                      handleFeatureVehicle(v.id);
-                                    }} 
-                                  className="px-1.5 py-0.5 text-reride-orange text-xs border border-reride-orange rounded cursor-pointer"
-                                  title="Feature"
-                                >
-                                  ⭐
-                                </button>
-                              </div>
-                              
-                              {/* Second Row - 4 buttons */}
-                              <div className="flex items-center space-x-1">
-                                {getCertificationButton(v)}
-                                <button 
-                                  type="button"
-                                  onClick={(e) => {
-                                      e.preventDefault();
-                                      e.stopPropagation();
-                                      logInfo('🔄 Mark as sold button clicked for vehicle:', v.id);
-                                      handleMarkAsSold(v.id);
-                                  }} 
-                                  className="px-1.5 py-0.5 text-reride-orange text-xs border border-reride-orange rounded cursor-pointer"
-                                  title="Sold"
-                                >
-                                  ✅
-                                </button>
-                                <button 
-                                  type="button"
-                                  onClick={(e) => {
-                                      e.preventDefault();
-                                      e.stopPropagation();
-                                      logInfo('🔄 Edit vehicle button clicked for vehicle:', v.id);
-                                      handleEditClick(v);
-                                  }} 
-                                  className="px-1.5 py-0.5 text-reride-blue text-xs border border-reride-blue rounded cursor-pointer"
-                                  title="Edit"
-                                >
-                                  ✏️
-                                </button>
-                                <button 
-                                  type="button"
-                                  onClick={(e) => {
-                                      e.preventDefault();
-                                      e.stopPropagation();
-                                      logInfo('🔄 Delete vehicle button clicked for vehicle:', v.id);
-                                      onDeleteVehicle(v.id);
-                                  }} 
-                                  className="px-1.5 py-0.5 text-red-600 text-xs border border-red-600 rounded cursor-pointer"
-                                  title="Delete"
-                                >
-                                  🗑️
-                                </button>
-                              </div>
-                            </div>
-                          </div>
-                        </td>
-                      </tr>
-                      );
-                      })}
-                  </tbody>
-                </table>
-              </div>
-              {/* Pagination Controls */}
-              {activeListings.length > itemsPerPage && (
-                <div className="mt-6 flex items-center justify-between border-t border-gray-200 dark:border-gray-700 pt-4">
-                  <div className="flex-1 flex justify-between sm:hidden">
-                    <button
-                      onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
-                      disabled={currentPage === 1}
-                      className="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
-                    >
-                      Previous
-                    </button>
-                    <button
-                      onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
-                      disabled={currentPage === totalPages}
-                      className="ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
-                    >
-                      Next
-                    </button>
+                                  }}
+                                  onRenew={() => handleRenewVehicle(v.id)}
+                                  onRenewBlocked={(reason) =>
+                                    dashboardNotify(onNotify, reason, 'error')
+                                  }
+                                  onEdit={() => handleEditClick(v)}
+                                  onSold={() => handleMarkAsSold(v.id)}
+                                  onDelete={() => onDeleteVehicle(v.id)}
+                                  onCertify={() => handleCertifyVehicle(v.id)}
+                                />
+                              </td>
+                            </tr>
+                          );
+                        })}
+                      </tbody>
+                    </table>
                   </div>
-                  <div className="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
-                    <div>
-                      <p className="text-sm text-gray-700 dark:text-gray-300">
-                        Showing <span className="font-medium">{(currentPage - 1) * itemsPerPage + 1}</span> to{' '}
-                        <span className="font-medium">{Math.min(currentPage * itemsPerPage, activeListings.length)}</span> of{' '}
-                        <span className="font-medium">{activeListings.length}</span> results
+
+                  {activeListings.length > itemsPerPage && (
+                    <div className="mt-5 flex items-center justify-between gap-3 border-t pt-4" style={{ borderColor: 'rgba(28,25,23,0.08)' }}>
+                      <p className="text-[12.5px] text-stone-500">
+                        Showing{' '}
+                        <span className="font-semibold text-stone-800">
+                          {(currentPage - 1) * itemsPerPage + 1}–{Math.min(currentPage * itemsPerPage, activeListings.length)}
+                        </span>{' '}
+                        of <span className="font-semibold text-stone-800">{activeListings.length}</span>
                       </p>
-                    </div>
-                    <div>
-                      <nav className="relative z-0 inline-flex rounded-md shadow-sm -space-x-px" aria-label="Pagination">
+                      <div className="flex items-center gap-1.5">
                         <button
-                          onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
+                          type="button"
+                          onClick={() => setCurrentPage((prev) => Math.max(1, prev - 1))}
                           disabled={currentPage === 1}
-                          className="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                          className="rounded-lg px-3 py-1.5 text-[12px] font-semibold text-stone-700 disabled:opacity-40"
+                          style={{ border: '1px solid rgba(28,25,23,0.12)' }}
                         >
-                          <span className="sr-only">Previous</span>
-                          <svg className="h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-                            <path fillRule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clipRule="evenodd" />
-                          </svg>
+                          Prev
                         </button>
-                        {(() => {
-                          const pages: (number | string)[] = [];
-                          
-                          // Always show first page
-                          pages.push(1);
-                          
-                          // Add ellipsis after first page if needed
-                          if (currentPage > 3) {
-                            pages.push('ellipsis-start');
-                          }
-                          
-                          // Show pages around current page
-                          for (let i = Math.max(2, currentPage - 1); i <= Math.min(totalPages - 1, currentPage + 1); i++) {
-                            if (i !== 1 && i !== totalPages) {
-                              pages.push(i);
-                            }
-                          }
-                          
-                          // Add ellipsis before last page if needed
-                          if (currentPage < totalPages - 2) {
-                            pages.push('ellipsis-end');
-                          }
-                          
-                          // Always show last page (if more than 1 page)
-                          if (totalPages > 1) {
-                            pages.push(totalPages);
-                          }
-                          
-                          return pages.map((page) => {
-                            if (typeof page === 'string') {
-                              return (
-                                <span key={page} className="relative inline-flex items-center px-4 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-700">
-                                  ...
-                                </span>
-                              );
-                            }
-                            
-                            return (
-                              <button
-                                key={page}
-                                onClick={() => setCurrentPage(page)}
-                                className={`relative inline-flex items-center px-4 py-2 border text-sm font-medium ${
-                                  currentPage === page
-                                    ? 'z-10 bg-reride-orange border-reride-orange text-white'
-                                    : 'bg-white border-gray-300 text-gray-700 hover:bg-gray-50'
-                                }`}
-                              >
-                                {page}
-                              </button>
-                            );
-                          });
-                        })()}
+                        <span className="px-2 text-[12px] font-medium text-stone-500">
+                          {currentPage} / {totalPages}
+                        </span>
                         <button
-                          onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
+                          type="button"
+                          onClick={() => setCurrentPage((prev) => Math.min(totalPages, prev + 1))}
                           disabled={currentPage === totalPages}
-                          className="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                          className="rounded-lg px-3 py-1.5 text-[12px] font-semibold text-stone-700 disabled:opacity-40"
+                          style={{ border: '1px solid rgba(28,25,23,0.12)' }}
                         >
-                          <span className="sr-only">Next</span>
-                          <svg className="h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-                            <path fillRule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clipRule="evenodd" />
-                          </svg>
+                          Next
                         </button>
-                      </nav>
+                      </div>
                     </div>
+                  )}
+                </>
+              ) : (
+                <div
+                  className="rounded-2xl px-6 py-14 text-center"
+                  style={{
+                    background: 'linear-gradient(180deg, rgba(255,255,255,0.9), rgba(255,247,237,0.65))',
+                    border: '1px dashed rgba(28,25,23,0.14)',
+                  }}
+                >
+                  <div
+                    className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl text-orange-600"
+                    style={{ background: 'rgba(255,107,53,0.12)' }}
+                  >
+                    <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" aria-hidden>
+                      <path d="M3 13l2-5a2 2 0 012-1h8a2 2 0 012 1l2 5" />
+                      <path d="M5 13h14v5a1 1 0 01-1 1H6a1 1 0 01-1-1v-5z" />
+                    </svg>
                   </div>
+                  <h3
+                    className="text-xl font-semibold text-stone-900"
+                    style={{ fontFamily: "'Nunito Sans', Poppins, sans-serif", letterSpacing: '-0.02em' }}
+                  >
+                    No vehicles listed yet
+                  </h3>
+                  <p className="mx-auto mt-2 max-w-sm text-sm text-stone-500">
+                    Ready to sell? Add your first vehicle, then use Boost to put it in front of buyers.
+                  </p>
+                  <button
+                    type="button"
+                    onClick={handleAddNewClick}
+                    className="mt-6 inline-flex items-center rounded-xl px-4 py-2.5 text-sm font-semibold text-white transition hover:brightness-110"
+                    style={{
+                      background: 'linear-gradient(135deg, #FF8456 0%, #E85A2A 100%)',
+                      boxShadow: '0 12px 24px -14px rgba(232,90,42,0.85)',
+                    }}
+                  >
+                    List your first vehicle
+                  </button>
                 </div>
               )}
-              </>
-            ) : (
-                <div className="text-center py-12 bg-white rounded-lg border border-dashed border-gray-200 dark:border-gray-300">
-                    <svg xmlns="http://www.w3.org/2000/svg" className="mx-auto h-12 w-12 text-reride-text-dark" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 13h6m-3-3v6m-9 1V7a2 2 0 012-2h6l2 2h6a2 2 0 012 2v8a2 2 0 01-2-2H5a2 2 0 01-2-2z" />
-                    </svg>
-                    <h3 className="mt-2 text-xl font-semibold text-reride-text-dark dark:text-gray-100">No vehicles listed yet</h3>
-                    <p className="mt-1 text-sm text-reride-text-dark dark:text-gray-100">Ready to sell? Add your first vehicle to get started.</p>
-                    <div className="mt-6">
-                        <button
-                            onClick={handleAddNewClick}
-                            className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white btn-brand-primary focus:outline-none focus:ring-2 focus:ring-offset-2" style={{ boxShadow: 'var(--shadow-red)' }}
-                        >
-                            List Your First Vehicle
-                        </button>
-                    </div>
-                </div>
-            )}
+            </div>
           </div>
         );
       case 'salesHistory':
         return (
-          <div className="bg-white p-6 sm:p-8 rounded-lg shadow-md">
-            <h2 className="text-2xl font-bold text-gray-900 mb-6">{t('sellerDashboard.nav.salesHistory')}</h2>
+          <SellerPremiumPanel
+            eyebrow="Closed deals"
+            title={t('sellerDashboard.nav.salesHistory')}
+            description={
+              soldListings.length > 0
+                ? `${soldListings.length} sold listing${soldListings.length === 1 ? '' : 's'}`
+                : 'Vehicles you have marked as sold.'
+            }
+          >
             {soldListings.length > 0 ? (
-                <div className="overflow-x-auto">
-                <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
-                  <thead className="bg-white dark:bg-white">
-                    <tr>
-                      <th className="px-6 py-3 text-left text-xs font-medium uppercase text-gray-700">Vehicle</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium uppercase text-gray-700">Sold Price</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium uppercase text-gray-700">Action</th>
+                <div className="overflow-x-auto rounded-xl" style={sellerPremiumTableWrapStyle}>
+                <table className="min-w-full">
+                  <thead>
+                    <tr style={{ background: 'rgba(28,25,23,0.03)' }}>
+                      {['Vehicle', 'Sold price', 'Action'].map((label) => (
+                        <th
+                          key={label}
+                          className="px-4 py-3 text-left text-[10.5px] font-semibold uppercase tracking-[0.14em] text-stone-400"
+                        >
+                          {label}
+                        </th>
+                      ))}
                     </tr>
                   </thead>
-                  <tbody className="bg-white divide-y divide-gray-200 dark:divide-gray-700">
+                  <tbody>
                     {paginatedSoldListings.map((v) => (
                       <tr 
                         key={v.id}
@@ -4137,51 +4039,61 @@ const Dashboard: React.FC<DashboardProps> = ({ seller, sellerVehicles, reportedV
                             onViewVehicle(v);
                           }
                         }}
-                        className="cursor-pointer hover:bg-gray-50 transition-colors"
+                        className="cursor-pointer border-t transition-colors hover:bg-orange-50/40"
+                        style={{ borderColor: 'rgba(28,25,23,0.06)' }}
                       >
-                        <td className="px-6 py-4 font-medium">{v.year} {v.make} {v.model} {v.variant || ''}</td>
-                        <td className="px-6 py-4">₹{v.price.toLocaleString('en-IN')}</td>
+                        <td className="px-4 py-3.5 text-[14px] font-semibold text-stone-900">
+                          {v.year} {v.make} {v.model} {v.variant || ''}
+                        </td>
+                        <td className="px-4 py-3.5 text-[14px] font-semibold tabular-nums text-stone-800">
+                          ₹{v.price.toLocaleString('en-IN')}
+                        </td>
                         <td 
-                          className="px-6 py-4"
+                          className="px-4 py-3.5"
                           onClick={(e) => e.stopPropagation()}
                         >
                           <button
+                            type="button"
                             onClick={(e) => {
                               e.stopPropagation();
                               handleMarkAsUnsold(v.id);
                             }}
-                            className="px-3 py-1.5 text-xs font-medium text-green-700 bg-green-50 border border-green-300 rounded-lg hover:bg-green-100 hover:text-green-800 transition-colors"
+                            className="rounded-lg px-3 py-1.5 text-[11px] font-semibold text-emerald-800 transition hover:brightness-95"
+                            style={{ background: 'rgba(16,185,129,0.12)', border: '1px solid rgba(16,185,129,0.25)' }}
                           >
-                            Mark as Unsold
+                            Mark as unsold
                           </button>
                         </td>
                       </tr>
                     ))}
                   </tbody>
                 </table>
-                {/* Pagination Controls */}
                 {totalSoldPages > 1 && (
-                  <div className="flex items-center justify-between mt-4 px-2">
-                    <div className="text-xs text-gray-600">
+                  <div className="flex items-center justify-between gap-3 border-t px-4 py-3" style={{ borderColor: 'rgba(28,25,23,0.08)' }}>
+                    <div className="text-[12px] text-stone-500">
                       Showing {(soldPage - 1) * SOLD_PAGE_SIZE + 1}
-                      {' - '}
+                      {' – '}
                       {Math.min(soldPage * SOLD_PAGE_SIZE, soldListings.length)} of {soldListings.length}
                     </div>
-                    <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-1.5">
                       <button
+                        type="button"
                         onClick={() => setSoldPage(p => Math.max(1, p - 1))}
                         disabled={soldPage === 1}
-                        className={`px-3 py-1.5 text-xs rounded-lg border ${soldPage === 1 ? 'text-gray-400 bg-gray-100 border-gray-200 cursor-not-allowed' : 'text-gray-700 bg-white hover:bg-gray-50 border-gray-300'}`}
+                        className="rounded-lg px-3 py-1.5 text-[12px] font-semibold text-stone-700 disabled:opacity-40"
+                        style={sellerPremiumGhostBtnStyle}
                       >
-                        Previous
+                        Prev
                       </button>
-                      <span className="text-xs text-gray-600">
-                        Page {soldPage} of {totalSoldPages}
+                      <span className="px-2 text-[12px] text-stone-500">
+                        {soldPage} / {totalSoldPages}
                       </span>
                       <button
+                        type="button"
                         onClick={() => setSoldPage(p => Math.min(totalSoldPages, p + 1))}
                         disabled={soldPage === totalSoldPages}
-                        className={`px-3 py-1.5 text-xs rounded-lg border ${soldPage === totalSoldPages ? 'text-gray-400 bg-gray-100 border-gray-200 cursor-not-allowed' : 'text-gray-700 bg-white hover:bg-gray-50 border-gray-300'}`}
+                        className="rounded-lg px-3 py-1.5 text-[12px] font-semibold text-stone-700 disabled:opacity-40"
+                        style={sellerPremiumGhostBtnStyle}
                       >
                         Next
                       </button>
@@ -4190,25 +4102,43 @@ const Dashboard: React.FC<DashboardProps> = ({ seller, sellerVehicles, reportedV
                 )}
               </div>
             ) : (
-                <p className="text-center text-gray-600 py-8">You have not sold any vehicles yet.</p>
+                <p className="rounded-xl px-4 py-10 text-center text-sm text-stone-500" style={{ border: '1px dashed rgba(28,25,23,0.14)' }}>
+                  You have not sold any vehicles yet.
+                </p>
             )}
-          </div>
+          </SellerPremiumPanel>
         );
       case 'form':
-        return <VehicleForm 
-            seller={seller}
-            editingVehicle={editingVehicle} 
-            onAddVehicle={onAddVehicle} 
-            onUpdateVehicle={onUpdateVehicle} 
-            onCancel={handleFormCancel} 
-            vehicleData={safeVehicleData} 
-            onFeatureListing={onFeatureListing}
-            allVehicles={allVehicles}
-            onNotify={onNotify}
-        />;
+        return (
+          <SellerPremiumPanel
+            eyebrow="Listing"
+            title={editingVehicle ? 'Edit vehicle' : 'Add vehicle'}
+            description={
+              editingVehicle
+                ? 'Update details, photos, and listing status.'
+                : 'Create a listing, then boost it from My listings.'
+            }
+          >
+            <VehicleForm 
+              seller={seller}
+              editingVehicle={editingVehicle} 
+              onAddVehicle={onAddVehicle} 
+              onUpdateVehicle={onUpdateVehicle} 
+              onCancel={handleFormCancel} 
+              vehicleData={safeVehicleData} 
+              onFeatureListing={onFeatureListing}
+              allVehicles={allVehicles}
+              onNotify={onNotify}
+            />
+          </SellerPremiumPanel>
+        );
       case 'messages':
         return (
-          <div className="space-y-6">
+          <SellerPremiumPanel
+            eyebrow="Inbox"
+            title={t('sellerDashboard.nav.messages')}
+            description="Buyer chats and listing inquiries."
+          >
             <InquiriesView 
               conversations={safeConversations} 
               sellerEmail={seller.email}
@@ -4219,67 +4149,83 @@ const Dashboard: React.FC<DashboardProps> = ({ seller, sellerVehicles, reportedV
               onSetConversationReadState={onSetConversationReadState}
               onMarkAllAsReadBySeller={onMarkAllAsReadBySeller}
             />
-          </div>
+          </SellerPremiumPanel>
         );
       case 'settings':
         if (!seller) {
           return (
-            <div className="bg-white p-6 sm:p-8 rounded-lg shadow-md">
-              <p className="text-gray-600">{t('sellerDashboard.loadingSellerInfo')}</p>
-            </div>
+            <SellerPremiumPanel eyebrow="Account" title="Settings" description="Loading seller profile…">
+              <p className="text-sm text-stone-500">{t('sellerDashboard.loadingSellerInfo')}</p>
+            </SellerPremiumPanel>
           );
         }
         return (
-          <SettingsView
-            seller={seller}
-            onUpdateSeller={onUpdateSellerProfile}
-            onNotify={onNotify}
-            activeListingsCount={publishedListings.length}
-            featuredListingsCount={safeSellerVehicles.filter(v => v && v.isFeatured).length}
-            onNavigate={onNavigate}
-          />
+          <SellerPremiumPanel
+            eyebrow="Account"
+            title={t('sellerDashboard.nav.settings')}
+            description="Plan, profile, and dealership preferences."
+          >
+            <SettingsView
+              seller={seller}
+              onUpdateSeller={onUpdateSellerProfile}
+              onNotify={onNotify}
+              activeListingsCount={publishedListings.length}
+              featuredListingsCount={safeSellerVehicles.filter(v => v && isEffectivelyFeatured(v)).length}
+              onNavigate={onNavigate}
+            />
+          </SellerPremiumPanel>
         );
       case 'reports':
-        return <ReportsView
-                    reportedVehicles={safeReportedVehicles}
-                    onEditVehicle={handleEditClick}
-                    onDeleteVehicle={onDeleteVehicle}
-                />;
+        return (
+          <SellerPremiumPanel
+            eyebrow="Trust & safety"
+            title={t('sellerDashboard.nav.reports')}
+            description="Listings flagged by buyers or moderation."
+          >
+            <ReportsView
+              reportedVehicles={safeReportedVehicles}
+              onEditVehicle={handleEditClick}
+              onDeleteVehicle={onDeleteVehicle}
+            />
+          </SellerPremiumPanel>
+        );
       case 'notifications':
         return (
-          <div className="bg-white p-6 sm:p-8 rounded-lg shadow-md">
-            <div className="flex items-end justify-between gap-4 mb-6">
-              <div>
-                <h2 className="text-2xl font-bold text-reride-text-dark dark:text-gray-100">Notifications</h2>
-                <p className="text-sm text-gray-500 mt-1">
-                  {sellerNotifications.length} total · {unreadNotificationCount} unread
-                </p>
-              </div>
-              <div className="flex flex-col items-end gap-2">
+          <SellerPremiumPanel
+            eyebrow="Alerts"
+            title="Notifications"
+            description={`${sellerNotifications.length} total · ${unreadNotificationCount} unread`}
+            actions={
+              <>
                 <button
                   type="button"
                   onClick={() => onNavigate(View.NOTIFICATIONS_CENTER)}
-                  className="text-sm font-semibold text-reride-orange hover:underline"
+                  className="rounded-xl px-3.5 py-2 text-sm font-semibold text-stone-700 transition hover:bg-white"
+                  style={sellerPremiumGhostBtnStyle}
                 >
                   Grouped view
                 </button>
-                {unreadNotificationCount > 0 && onMarkNotificationsAsRead && (
+                {unreadNotificationCount > 0 && onMarkNotificationsAsRead ? (
                   <button
                     type="button"
                     onClick={() => onMarkNotificationsAsRead(sellerNotifications.filter((n) => !n.isRead).map((n) => n.id))}
-                    className="text-sm font-semibold text-blue-700 hover:underline"
+                    className="rounded-xl px-3.5 py-2 text-sm font-semibold text-white transition hover:brightness-110"
+                    style={sellerPremiumPrimaryBtnStyle}
                   >
                     Mark all read
                   </button>
-                )}
-              </div>
-            </div>
+                ) : null}
+              </>
+            }
+          >
             {sellerNotifications.length === 0 ? (
-              <p className="text-gray-500 text-center py-12">You&apos;re all caught up. New alerts will appear here.</p>
+              <p className="rounded-xl px-4 py-12 text-center text-sm text-stone-500" style={{ border: '1px dashed rgba(28,25,23,0.14)' }}>
+                You&apos;re all caught up. New alerts will appear here.
+              </p>
             ) : (
-              <ul className="divide-y divide-gray-100">
-                {sellerNotifications.map((notification) => (
-                  <li key={notification.id}>
+              <ul className="overflow-hidden rounded-xl" style={sellerPremiumTableWrapStyle}>
+                {sellerNotifications.map((notification, index) => (
+                  <li key={notification.id} style={{ borderTop: index === 0 ? undefined : '1px solid rgba(28,25,23,0.06)' }}>
                     <button
                       type="button"
                       onClick={() => {
@@ -4288,26 +4234,26 @@ const Dashboard: React.FC<DashboardProps> = ({ seller, sellerVehicles, reportedV
                           onMarkNotificationsAsRead([notification.id]);
                         }
                       }}
-                      className={`w-full text-left px-4 py-4 hover:bg-gray-50 transition-colors ${
-                        !notification.isRead ? 'bg-orange-50/40' : ''
+                      className={`w-full px-4 py-4 text-left transition-colors hover:bg-orange-50/50 ${
+                        !notification.isRead ? 'bg-orange-50/35' : 'bg-white'
                       }`}
                     >
                       <div className="flex items-start justify-between gap-3">
                         <div className="min-w-0">
-                          <p className={`text-sm ${!notification.isRead ? 'font-bold text-gray-900' : 'font-medium text-gray-700'}`}>
+                          <p className={`text-sm ${!notification.isRead ? 'font-bold text-stone-900' : 'font-medium text-stone-700'}`}>
                             {notification.targetType === 'conversation'
                               ? 'New message'
                               : notification.targetType === 'vehicle'
                                 ? 'Vehicle update'
                                 : 'Notification'}
                           </p>
-                          <p className="text-sm text-gray-600 mt-1">{notification.message}</p>
-                          <p className="text-xs text-gray-400 mt-1">
+                          <p className="mt-1 text-sm text-stone-600">{notification.message}</p>
+                          <p className="mt-1 text-xs text-stone-400">
                             {new Date(notification.timestamp).toLocaleString()}
                           </p>
                         </div>
                         {!notification.isRead && (
-                          <span className="w-2 h-2 rounded-full bg-reride-orange shrink-0 mt-2" />
+                          <span className="mt-2 h-2 w-2 shrink-0 rounded-full bg-reride-orange" />
                         )}
                       </div>
                     </button>
@@ -4315,12 +4261,12 @@ const Dashboard: React.FC<DashboardProps> = ({ seller, sellerVehicles, reportedV
                 ))}
               </ul>
             )}
-          </div>
+          </SellerPremiumPanel>
         );
       default:
         return (
           <div className="text-center py-8">
-            <h2 className="text-xl font-semibold text-reride-text-dark dark:text-gray-100 mb-4">
+            <h2 className="text-xl font-semibold text-reride-text-dark mb-4">
               {t('sellerDashboard.pageNotFound')}
             </h2>
             <p className="text-gray-600">{t('sellerDashboard.sectionNotFound')}</p>
@@ -4345,25 +4291,25 @@ const Dashboard: React.FC<DashboardProps> = ({ seller, sellerVehicles, reportedV
         disabled={disabled}
         aria-disabled={disabled}
         aria-current={isActive ? 'page' : undefined}
-        className={`group flex justify-between items-center w-full text-left px-4 py-3 rounded-xl transition-all duration-300 focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-blue-500 ${
+        className={`group flex w-full items-center justify-between rounded-xl px-3.5 py-2.5 text-left transition-all duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-orange-500 focus-visible:ring-offset-2 ${
           disabled
-            ? 'text-gray-400 cursor-not-allowed opacity-60'
+            ? 'cursor-not-allowed text-stone-400 opacity-55'
             : isActive
-            ? 'bg-gradient-to-r from-blue-500 to-purple-600 text-white shadow-lg'
-            : 'text-gray-600 hover:bg-gradient-to-r hover:from-blue-50 hover:to-purple-50 hover:text-blue-600 hover:shadow-sm'
+            ? 'bg-stone-900 text-white shadow-lg shadow-stone-900/20'
+            : 'text-stone-600 hover:bg-orange-50 hover:text-orange-800'
         }`}
       >
-        <span className="font-medium">{children}</span>
-        {count && count > 0 && (
+        <span className="font-medium tracking-tight">{children}</span>
+        {typeof count === 'number' && count > 0 ? (
           <span
             aria-label={`${count} items`}
-            className={`text-xs font-bold rounded-full px-2 py-0.5 ${
-              isActive ? 'bg-white/20 text-white' : 'bg-gradient-to-r from-red-500 to-pink-500 text-white'
+            className={`rounded-full px-2 py-0.5 text-[10px] font-bold tabular-nums ${
+              isActive ? 'bg-white/20 text-white' : 'bg-orange-500 text-white'
             }`}
           >
-            {count}
+            {count > 99 ? '99+' : count}
           </span>
-        )}
+        ) : null}
       </button>
     );
   };
@@ -4371,11 +4317,11 @@ const Dashboard: React.FC<DashboardProps> = ({ seller, sellerVehicles, reportedV
   // Removed unused AppNavItem component
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-blue-50 relative overflow-hidden">
+    <div className="min-h-screen relative overflow-hidden" style={{ background: 'linear-gradient(165deg, #F7F4F0 0%, #FBF8F5 42%, #FFF7F2 100%)' }}>
       {/* Background Elements */}
-      <div className="absolute inset-0 overflow-hidden">
-        <div className="absolute top-20 right-20 w-80 h-80 bg-gradient-to-br from-blue-200/20 to-purple-200/20 rounded-full blur-3xl animate-pulse"></div>
-        <div className="absolute bottom-20 left-20 w-96 h-96 bg-gradient-to-tr from-orange-200/15 to-pink-200/15 rounded-full blur-3xl animate-pulse" style={{animationDelay: '2s'}}></div>
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        <div className="absolute -top-24 right-0 w-[28rem] h-[28rem] rounded-full blur-3xl" style={{ background: 'radial-gradient(closest-side, rgba(255,107,53,0.16), transparent)' }} />
+        <div className="absolute bottom-0 left-0 w-[32rem] h-[32rem] rounded-full blur-3xl" style={{ background: 'radial-gradient(closest-side, rgba(28,25,23,0.06), transparent)' }} />
       </div>
       
       {/* Firebase Connection Status Banner */}
@@ -4419,20 +4365,36 @@ const Dashboard: React.FC<DashboardProps> = ({ seller, sellerVehicles, reportedV
           <aside className="lg:col-span-1">
             <nav
               aria-label={t('nav.dashboard') || 'Seller dashboard'}
-              className="bg-white/80 backdrop-blur-xl rounded-3xl shadow-xl border border-white/20 p-4 sm:p-5 space-y-2 lg:sticky lg:top-6"
+              className="rounded-3xl p-4 sm:p-5 space-y-2 lg:sticky lg:top-6"
+              style={{
+                background: 'rgba(255,255,255,0.78)',
+                border: '1px solid rgba(28,25,23,0.08)',
+                boxShadow: '0 20px 40px -28px rgba(28,25,23,0.35)',
+                backdropFilter: 'blur(16px)',
+              }}
             >
-              <div className="flex items-center gap-3 mb-4">
-                <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-xl flex items-center justify-center">
-                  <svg className="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
+              <div className="mb-4 flex items-center gap-3">
+                <div
+                  className="flex h-10 w-10 items-center justify-center rounded-xl text-white"
+                  style={{ background: 'linear-gradient(135deg, #FF8456 0%, #E85A2A 100%)' }}
+                >
+                  <svg className="h-5 w-5" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
                     <path d="M3 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z"/>
                   </svg>
                 </div>
-                <h3 className="text-lg font-bold bg-gradient-to-r from-gray-900 via-blue-800 to-purple-800 bg-clip-text text-transparent">
-                  {t('nav.dashboard')}
-                </h3>
+                <div>
+                  <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-stone-400">Seller</p>
+                  <h3
+                    className="text-lg font-bold text-stone-900"
+                    style={{ fontFamily: "'Nunito Sans', Poppins, sans-serif", letterSpacing: '-0.02em' }}
+                  >
+                    {t('nav.dashboard')}
+                  </h3>
+                </div>
               </div>
-              
-              <NavItem view="overview" count={pendingAcceptCount > 0 ? pendingAcceptCount : pendingDealCount > 0 ? pendingDealCount : undefined}>
+
+              <p className="mb-2 px-1 text-[10px] font-semibold uppercase tracking-[0.16em] text-stone-400">Workspace</p>
+              <NavItem view="overview" count={hotLeadsBadgeCount > 0 ? hotLeadsBadgeCount : undefined}>
                 <div className="flex items-center gap-3">
                   <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2H5a2 2 0 00-2-2z"/>
@@ -4487,6 +4449,7 @@ const Dashboard: React.FC<DashboardProps> = ({ seller, sellerVehicles, reportedV
                 </div>
               </NavItem>
               
+              <p className="mb-2 mt-5 px-1 text-[10px] font-semibold uppercase tracking-[0.16em] text-stone-400">Communication</p>
               <NavItem view="messages" count={unreadCount}>
                 <div className="flex items-center gap-3">
                   <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -4519,7 +4482,15 @@ const Dashboard: React.FC<DashboardProps> = ({ seller, sellerVehicles, reportedV
           
           {/* Premium Main Content */}
           <main className="lg:col-span-1 min-w-0">
-            <div className="bg-white/80 backdrop-blur-xl rounded-3xl shadow-xl border border-white/20 p-4 sm:p-6 lg:p-8 min-h-[500px]">
+            <div
+              className="rounded-3xl p-4 sm:p-6 lg:p-7 min-h-[500px]"
+              style={{
+                background: 'rgba(255,255,255,0.55)',
+                border: '1px solid rgba(28,25,23,0.06)',
+                boxShadow: '0 20px 40px -28px rgba(28,25,23,0.25)',
+                backdropFilter: 'blur(12px)',
+              }}
+            >
               {(() => {
                 try {
                   return renderContent();
@@ -4634,113 +4605,36 @@ const Dashboard: React.FC<DashboardProps> = ({ seller, sellerVehicles, reportedV
         {showBoostModal && vehicleToBoost && (
           <BoostListingModal
             vehicle={vehicleToBoost}
+            featuredCredits={seller.featuredCredits ?? 0}
             onClose={() => { setShowBoostModal(false); setVehicleToBoost(null); }}
             onBoost={async (vehicleId, packageId) => {
-              // Find the package price so we can charge the seller via Razorpay before boosting.
-              let razorpayProof: {
-                razorpay_order_id: string;
-                razorpay_payment_id: string;
-                razorpay_signature: string;
-                amountInr: number;
-              } | null = null;
               try {
-                const { BOOST_PACKAGES } = await import('../constants/boost');
-                const pkg = BOOST_PACKAGES.find((p) => p.id === packageId);
-                if (!pkg) {
-                  notify('Unknown boost package. Please refresh and try again.');
-                  return;
-                }
-                const { openRazorpayBoostCheckout, isRazorpayConfiguredInClient } = await import('../services/razorpayPlanPayment');
-                if (!isRazorpayConfiguredInClient()) {
-                  notify('Online payments are not configured. Please contact support to boost listings.');
-                  return;
-                }
-                razorpayProof = await new Promise((resolve, reject) => {
-                  openRazorpayBoostCheckout({
+                if (onBoostListing) {
+                  await onBoostListing(vehicleId, packageId);
+                } else {
+                  const { executeSellerBoostListing } = await import('../utils/sellerBoostListing');
+                  const result = await executeSellerBoostListing({
                     vehicleId,
                     packageId,
-                    packageName: pkg.name,
-                    amountInr: Number(pkg.price) || 0,
-                    sellerEmail: seller.email,
-                    sellerName: seller.name,
-                    onSuccess: (proof) => resolve(proof),
-                    onFailure: (message) => reject(new Error(message)),
+                    seller,
+                    sellerVehicles: safeSellerVehicles,
                   });
-                });
-              } catch (paymentError) {
-                const msg = paymentError instanceof Error ? paymentError.message : 'Payment failed. Please try again.';
-                notify(msg);
-                return;
-              }
-
-              if (!razorpayProof) {
-                notify('Payment was not completed. Please try again.');
-                return;
-              }
-
-              try {
-                const response = await authenticatedFetch('/api/vehicles?action=boost', {
-                  method: 'POST',
-                  headers: { 'Content-Type': 'application/json' },
-                  body: JSON.stringify(buildVehicleActionBody(vehicleId, {
-                    packageId,
-                    sellerEmail: seller.email,
-                    razorpay_order_id: razorpayProof.razorpay_order_id,
-                    razorpay_payment_id: razorpayProof.razorpay_payment_id,
-                    razorpay_signature: razorpayProof.razorpay_signature,
-                    amount: razorpayProof.amountInr,
-                  }))
-                });
-                
-                if (response.ok) {
-                  const contentType = response.headers.get('content-type');
-                  if (contentType && contentType.includes('application/json')) {
-                    try {
-                      const result = await response.json();
-                      if (result && result.success && result.vehicle) {
-                        // Update local state instead of reloading page
-                        onUpdateVehicle(result.vehicle);
-                        // Only close modal on successful boost
-                        setShowBoostModal(false);
-                        setVehicleToBoost(null);
-                      } else {
-                        // API returned success but result indicates failure
-                        const errorMsg = result?.message || result?.error || 'Failed to boost listing. Please try again.';
-                        notify(errorMsg);
-                        // Keep modal open so user can retry
-                      }
-                    } catch (jsonError) {
-                      if (process.env.NODE_ENV === 'development') {
-                        console.warn('⚠️ Failed to parse boost response:', jsonError);
-                      }
-                      notify('Failed to process boost response. Please try again.');
-                      // Keep modal open so user can retry
-                    }
-                  } else {
-                    // Response OK but not JSON - unexpected format
-                    notify('Unexpected response format. Please try again.');
-                    // Keep modal open so user can retry
-                  }
-                } else {
-                  // Response not OK - API error
-                  let errorMsg = 'Failed to boost listing. ';
-                  try {
-                    const errorData = await response.json();
-                    errorMsg += errorData.message || errorData.error || `Server returned status ${response.status}`;
-                  } catch {
-                    errorMsg += `Server returned status ${response.status}`;
-                  }
-                  notify(errorMsg);
-                  // Keep modal open so user can retry
+                  await onUpdateVehicle(result.vehicle);
+                  notify(
+                    typeof result.remainingCredits === 'number'
+                      ? `Listing boosted for 7 days! You have ${result.remainingCredits} boost credit${result.remainingCredits === 1 ? '' : 's'} left.`
+                      : 'Your listing has been boosted! It will get more visibility.',
+                    'success',
+                  );
                 }
+                setShowBoostModal(false);
+                setVehicleToBoost(null);
               } catch (error) {
-                // Network or other errors
                 const errorMsg = error instanceof Error ? error.message : 'An unexpected error occurred. Please try again.';
-                notify(`Error boosting vehicle: ${errorMsg}`);
-                if (process.env.NODE_ENV === 'development') {
-                  console.error('❌ Error boosting vehicle:', error);
+                if (!onBoostListing) {
+                  notify(`Error boosting vehicle: ${errorMsg}`, 'error');
                 }
-                // Keep modal open so user can retry
+                // Keep modal open so user can retry (handler already toasts when onBoostListing is set)
               }
             }}
           />

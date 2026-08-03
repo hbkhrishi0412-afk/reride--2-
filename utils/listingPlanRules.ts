@@ -23,20 +23,36 @@ export function isSellerPlanExpired(seller: SellerPlanContext, now: Date = new D
 }
 
 /**
+ * When a paid plan has lapsed, continue under free-tier listing rules
+ * instead of hard-locking the seller out of renewals/publishes.
+ */
+export function effectiveSellerPlanForListings(
+  seller: SellerPlanContext,
+  now: Date = new Date(),
+): SellerPlanContext {
+  if (!isSellerPlanExpired(seller, now)) return seller;
+  return { subscriptionPlan: 'free', planExpiryDate: undefined };
+}
+
+/**
  * Listing expiry aligned with plan rules.
  * Every listing MUST have an expiry date — no infinite listings.
  * Premium listings expire when the plan expires.
  * Free/Pro listings expire after LISTING_EXPIRY_DAYS (30 days).
  */
 export function computeListingExpiresAtForSeller(seller: SellerPlanContext): string {
-  const plan = seller.subscriptionPlan || 'free';
+  const effective = effectiveSellerPlanForListings(seller);
+  const plan = effective.subscriptionPlan || 'free';
 
-  // Premium: listing expires when the plan expires
-  if (plan === 'premium' && seller.planExpiryDate) {
-    return seller.planExpiryDate;
+  // Active Premium: listing expires when the plan expires
+  if (plan === 'premium' && effective.planExpiryDate) {
+    const planExpiry = new Date(effective.planExpiryDate);
+    if (!Number.isNaN(planExpiry.getTime()) && planExpiry > new Date()) {
+      return effective.planExpiryDate;
+    }
   }
 
-  // All plans (including premium without a set expiry): default 30-day window
+  // All plans (including lapsed premium): default 30-day window
   const expiryDate = new Date();
   expiryDate.setDate(expiryDate.getDate() + LISTING_EXPIRY_DAYS);
   return expiryDate.toISOString();
@@ -47,7 +63,8 @@ export function planDetailsForSeller(
   override?: PlanDetails | null,
 ): PlanDetails {
   if (override) return override;
-  const planKey = (seller.subscriptionPlan || 'free') as SubscriptionPlan;
+  const effective = effectiveSellerPlanForListings(seller);
+  const planKey = (effective.subscriptionPlan || 'free') as SubscriptionPlan;
   return PLAN_DETAILS[planKey] || PLAN_DETAILS.free;
 }
 
@@ -77,15 +94,9 @@ function validatePublishSlot(
   planDetails: PlanDetails,
   excludeVehicleId?: number,
 ): ListingRenewalValidation {
-  if (isSellerPlanExpired(seller)) {
-    return {
-      allowed: false,
-      reason: 'Your subscription plan has expired. Please renew your plan before reactivating listings.',
-      planExpired: true,
-      expiredOn: seller.planExpiryDate,
-    };
-  }
-
+  // Lapsed paid plans fall back to free-tier limits (handled via planDetailsForSeller).
+  // Keep planExpired in the payload so the UI can nudge upgrade, but do not hard-block.
+  const planExpired = isSellerPlanExpired(seller);
   const listingLimit = planDetails.listingLimit;
   if (listingLimit !== 'unlimited') {
     const numericLimit = Number(listingLimit) || 0;
@@ -97,15 +108,24 @@ function validatePublishSlot(
     if (activeAfterPublish > numericLimit) {
       return {
         allowed: false,
-        reason: `Listing limit reached for your ${planDetails.name} plan. You can have up to ${listingLimit} active listing(s). Unpublish or sell another listing first.`,
+        reason: planExpired
+          ? `Your subscription has expired and the free plan allows only ${listingLimit} active listing(s). Unpublish or sell another listing, or renew your plan.`
+          : `Listing limit reached for your ${planDetails.name} plan. You can have up to ${listingLimit} active listing(s). Unpublish or sell another listing first.`,
+        planExpired,
         limitReached: true,
         activeListings: countPublishedListings(sellerVehicles),
         limit: numericLimit,
+        expiredOn: planExpired ? seller.planExpiryDate : undefined,
       };
     }
   }
 
-  return { allowed: true };
+  return {
+    allowed: true,
+    ...(planExpired
+      ? { planExpired: true, expiredOn: seller.planExpiryDate }
+      : {}),
+  };
 }
 
 export function validateNewListingCreation(

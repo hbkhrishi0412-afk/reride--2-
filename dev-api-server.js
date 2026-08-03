@@ -1023,7 +1023,25 @@ app.post('/api/vehicles', async (req, res) => {
     return;
   }
 
-  // Handle special actions
+  // Seller inventory is loaded from Supabase (seller-mine), but these mutation
+  // actions historically looked up mockVehicles only — renew/boost/certify/etc.
+  // always 404'd for real listings. Delegate to the production marketplace handler.
+  if (
+    isSupabaseDevConfigured() &&
+    (
+      action === 'refresh' ||
+      action === 'boost' ||
+      action === 'certify' ||
+      action === 'feature' ||
+      action === 'sold' ||
+      action === 'unsold' ||
+      !action
+    )
+  ) {
+    return delegateToMainHandler(req, res);
+  }
+
+  // Handle special actions (mock-only fallback when Supabase is not configured)
   if (action === 'refresh') {
     const { vehicleId, refreshAction, sellerEmail } = req.body;
     const vehicle = mockVehicles.find(v => v.id === vehicleId);
@@ -1058,55 +1076,82 @@ app.post('/api/vehicles', async (req, res) => {
   }
 
   if (action === 'boost') {
-    const { vehicleId, packageId } = req.body;
+    const { vehicleId, packageId, useCredit } = req.body;
     const vehicle = mockVehicles.find(v => v.id === vehicleId);
     
     if (!vehicle) {
       return res.status(404).json({ success: false, reason: 'Vehicle not found' });
     }
-    
-    // Extract type and duration from packageId
-    let boostType = 'top_search';
-    let boostDuration = 7;
-    
-    if (packageId) {
-      const parts = packageId.split('_');
-      if (parts.length >= 2) {
-        const lastPart = parts[parts.length - 1];
-        const isLastPartNumber = !isNaN(Number(lastPart));
-        
-        if (isLastPartNumber) {
-          boostType = parts.slice(0, -1).join('_');
-          boostDuration = Number(lastPart);
-        } else {
-          boostType = parts.join('_');
-          boostDuration = 7;
-        }
+
+    let boostPackages = [];
+    try {
+      const boostMod = await import('./constants/boost.js');
+      boostPackages = boostMod.BOOST_PACKAGES || [];
+    } catch {
+      try {
+        const boostMod = await import('./constants/boost.ts');
+        boostPackages = boostMod.BOOST_PACKAGES || [];
+      } catch {
+        boostPackages = [];
       }
     }
+
+    const pkg = boostPackages.find((p) => p.id === packageId);
+    const wantsCredit = useCredit === true || pkg?.paymentMethod === 'credit' || packageId === 'credit_featured_7';
+
+    let remainingCredits;
+    if (wantsCredit) {
+      const seller = mockUsers.find((u) => u.email && vehicle.sellerEmail && u.email.toLowerCase() === String(vehicle.sellerEmail).toLowerCase());
+      if (seller) {
+        const credits = typeof seller.featuredCredits === 'number' ? seller.featuredCredits : 0;
+        if (credits <= 0) {
+          return res.status(403).json({
+            success: false,
+            reason: 'You have no boost credits remaining. Upgrade your plan or choose a paid boost pack.',
+            remainingCredits: 0,
+          });
+        }
+        seller.featuredCredits = Math.max(0, credits - 1);
+        remainingCredits = seller.featuredCredits;
+      }
+    }
+
+    const boostType = pkg?.type || 'featured_badge';
+    const boostDuration = pkg?.durationDays || 7;
     
+    const now = new Date();
     const boostInfo = {
       id: `boost_${Date.now()}`,
       vehicleId: vehicleId,
       packageId: packageId || 'standard',
       type: boostType,
-      startDate: new Date().toISOString(),
-      expiresAt: new Date(Date.now() + boostDuration * 24 * 60 * 60 * 1000).toISOString(),
+      startDate: now.toISOString(),
+      expiresAt: new Date(now.getTime() + boostDuration * 24 * 60 * 60 * 1000).toISOString(),
       isActive: true
     };
     
     if (!vehicle.activeBoosts) {
       vehicle.activeBoosts = [];
     }
+    vehicle.activeBoosts = vehicle.activeBoosts.filter((boost) => {
+      if (!boost?.isActive) return false;
+      const expiresAt = new Date(boost.expiresAt);
+      return !Number.isNaN(expiresAt.getTime()) && expiresAt > now;
+    });
     vehicle.activeBoosts.push(boostInfo);
     vehicle.isFeatured = true;
+    vehicle.featuredAt = now.toISOString();
     
     // Emit real-time update
     if (io) {
       io.emit('vehicles:boosted', { vehicle });
     }
     
-    return res.status(200).json({ success: true, vehicle });
+    return res.status(200).json({
+      success: true,
+      vehicle,
+      ...(typeof remainingCredits === 'number' ? { remainingCredits } : {}),
+    });
   }
 
   if (action === 'certify') {

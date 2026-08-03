@@ -193,31 +193,27 @@
 
   // Start vehicle catalog fetch immediately (before React bundle) so first-time visitors
   // see listings faster. dataService consumes window.__RERIDE_EARLY_VEHICLES__ on init.
+  // Also enabled on localhost so Vite proxy (/api → :3001) warms the catalog before React mounts.
   try {
-    var h3 = window.location.hostname || '';
-    var hl = h3.toLowerCase();
-    var isLocalhost = h3 === 'localhost' || h3 === '127.0.0.1' || h3.indexOf('localhost') !== -1;
-    if (!isLocalhost) {
-      var firstPageUrl = '/api/vehicles?limit=30&page=1&skipExpiryCheck=true';
-      var earlyAbort =
-        typeof AbortSignal !== 'undefined' && typeof AbortSignal.timeout === 'function'
-          ? AbortSignal.timeout(5000)
-          : undefined;
-      window.__RERIDE_EARLY_VEHICLES__ = fetch(firstPageUrl, {
-        method: 'GET',
-        headers: { Accept: 'application/json' },
-        credentials: 'include',
-        cache: 'default',
-        signal: earlyAbort,
+    var firstPageUrl = '/api/vehicles?limit=30&page=1&skipExpiryCheck=true';
+    var earlyAbort =
+      typeof AbortSignal !== 'undefined' && typeof AbortSignal.timeout === 'function'
+        ? AbortSignal.timeout(5000)
+        : undefined;
+    window.__RERIDE_EARLY_VEHICLES__ = fetch(firstPageUrl, {
+      method: 'GET',
+      headers: { Accept: 'application/json' },
+      credentials: 'include',
+      cache: 'default',
+      signal: earlyAbort,
+    })
+      .then(function (response) {
+        if (!response.ok) return null;
+        return response.json();
       })
-        .then(function (response) {
-          if (!response.ok) return null;
-          return response.json();
-        })
-        .catch(function () {
-          return null;
-        });
-    }
+      .catch(function () {
+        return null;
+      });
   } catch (e9) {}
 
   // Viewport normalization and zoom reset.

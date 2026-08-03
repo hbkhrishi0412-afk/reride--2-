@@ -198,7 +198,7 @@ const Header: React.FC<HeaderProps> = memo(({
 
     return (
         <>
-            <header className="bg-white/80 backdrop-blur-xl border-b border-white/20 sticky top-0 z-[1200] shadow-lg">
+            <header className="bg-white/80 backdrop-blur-xl border-b border-white/20 sticky top-0 z-chrome shadow-lg">
                 {showHomeLocationActions ? (
                     <div className="lg:hidden border-b border-gray-100 bg-white" data-testid="header-mobile-home-location">
                         <div className="max-w-7xl mx-auto px-4 py-2 flex items-center justify-end gap-2">

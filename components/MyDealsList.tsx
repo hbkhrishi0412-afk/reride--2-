@@ -1,9 +1,11 @@
-import React from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import type { DealLead, Vehicle } from '../types';
 import { dealStageLabel, pipelineStageProgressPercent } from '../types';
 import { useMyDealLeads } from '../hooks/useMyDealLeads';
 import { EmptyState } from './dashboard/shared';
+
+const DEALS_PER_PAGE = 10;
 
 interface MyDealsListProps {
   vehicles: Vehicle[];
@@ -21,6 +23,25 @@ function vehicleForLead(vehicles: Vehicle[], lead: DealLead): Vehicle | undefine
 export const MyDealsList: React.FC<MyDealsListProps> = ({ vehicles, onSelectVehicle, onOpenDeal, onBrowseVehicles }) => {
   const { t } = useTranslation();
   const { activeLeads, loading, error, reload } = useMyDealLeads();
+  const [currentPage, setCurrentPage] = useState(1);
+
+  const totalPages = useMemo(
+    () => Math.max(1, Math.ceil(activeLeads.length / DEALS_PER_PAGE)),
+    [activeLeads.length],
+  );
+
+  useEffect(() => {
+    setCurrentPage((page) => Math.min(page, totalPages));
+  }, [totalPages]);
+
+  const paginatedLeads = useMemo(() => {
+    const start = (currentPage - 1) * DEALS_PER_PAGE;
+    return activeLeads.slice(start, start + DEALS_PER_PAGE);
+  }, [activeLeads, currentPage]);
+
+  const needsPagination = activeLeads.length > DEALS_PER_PAGE;
+  const rangeStart = activeLeads.length === 0 ? 0 : (currentPage - 1) * DEALS_PER_PAGE + 1;
+  const rangeEnd = Math.min(currentPage * DEALS_PER_PAGE, activeLeads.length);
 
   if (loading) {
     return (
@@ -65,7 +86,7 @@ export const MyDealsList: React.FC<MyDealsListProps> = ({ vehicles, onSelectVehi
 
   return (
     <div className="space-y-4">
-      {activeLeads.map((lead) => {
+      {paginatedLeads.map((lead) => {
         const vehicle = vehicleForLead(vehicles, lead);
         const title =
           lead.vehicleName ||
@@ -113,6 +134,46 @@ export const MyDealsList: React.FC<MyDealsListProps> = ({ vehicles, onSelectVehi
           </button>
         );
       })}
+
+      {needsPagination ? (
+        <div className="flex flex-col gap-3 border-t border-gray-100 pt-4 sm:flex-row sm:items-center sm:justify-between">
+          <p className="text-sm text-gray-600">
+            {t('buyerDashboard.deals.showingRange', {
+              defaultValue: 'Showing {{from}} to {{to}} of {{total}} deals',
+              from: rangeStart,
+              to: rangeEnd,
+              total: activeLeads.length,
+            })}
+          </p>
+          <div className="flex items-center justify-between gap-2 sm:justify-end">
+            <span className="text-xs text-gray-500 tabular-nums sm:text-sm">
+              {t('buyerDashboard.deals.pageOf', {
+                defaultValue: 'Page {{page}} of {{pages}}',
+                page: currentPage,
+                pages: totalPages,
+              })}
+            </span>
+            <div className="inline-flex rounded-lg border border-gray-200 bg-white p-0.5 shadow-sm">
+              <button
+                type="button"
+                onClick={() => setCurrentPage((page) => Math.max(1, page - 1))}
+                disabled={currentPage <= 1}
+                className="rounded-md px-2.5 py-1 text-xs font-semibold text-gray-700 hover:bg-gray-50 disabled:pointer-events-none disabled:opacity-40"
+              >
+                {t('common.previous', { defaultValue: 'Previous' })}
+              </button>
+              <button
+                type="button"
+                onClick={() => setCurrentPage((page) => Math.min(totalPages, page + 1))}
+                disabled={currentPage >= totalPages}
+                className="rounded-md px-2.5 py-1 text-xs font-semibold text-gray-700 hover:bg-gray-50 disabled:pointer-events-none disabled:opacity-40"
+              >
+                {t('common.next', { defaultValue: 'Next' })}
+              </button>
+            </div>
+          </div>
+        </div>
+      ) : null}
     </div>
   );
 };

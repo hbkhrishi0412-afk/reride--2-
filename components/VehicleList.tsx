@@ -28,6 +28,7 @@ import type { VehicleData } from '../types.js';
 import type { VehicleMake, VehicleModel } from '../vehicleDataTypes.js';
 import ListingTrustFilterBar from './ListingTrustFilterBar.js';
 import { useApp } from './AppProvider';
+import { hasActiveBoost, isEffectivelyFeatured } from '../utils/listingPromotion.js';
 import type { TrustFilterValue } from '../utils/listingTrust.js';
 import { vehicleMatchesTrustFilter, getListingDisclosureScore } from '../utils/listingTrust.js';
 // Lazy load location data when needed
@@ -1416,20 +1417,20 @@ const VehicleList: React.FC<VehicleListProps> = React.memo(({
 
     return [...filtered].sort((a, b) => {
         // Priority 1: Homepage Spotlight (highest priority)
-        const aHasSpotlight = a.activeBoosts?.some(boost => boost.type === 'homepage_spotlight' && boost.isActive && new Date(boost.expiresAt) > new Date()) || false;
-        const bHasSpotlight = b.activeBoosts?.some(boost => boost.type === 'homepage_spotlight' && boost.isActive && new Date(boost.expiresAt) > new Date()) || false;
+        const aHasSpotlight = hasActiveBoost(a, ['homepage_spotlight']);
+        const bHasSpotlight = hasActiveBoost(b, ['homepage_spotlight']);
         if (aHasSpotlight && !bHasSpotlight) return -1;
         if (!aHasSpotlight && bHasSpotlight) return 1;
         
         // Priority 2: Top Search Boost
-        const aHasTopSearch = a.activeBoosts?.some(boost => boost.type === 'top_search' && boost.isActive && new Date(boost.expiresAt) > new Date()) || false;
-        const bHasTopSearch = b.activeBoosts?.some(boost => boost.type === 'top_search' && boost.isActive && new Date(boost.expiresAt) > new Date()) || false;
+        const aHasTopSearch = hasActiveBoost(a, ['top_search']);
+        const bHasTopSearch = hasActiveBoost(b, ['top_search']);
         if (aHasTopSearch && !bHasTopSearch) return -1;
         if (!aHasTopSearch && bHasTopSearch) return 1;
         
-        // Priority 3: Featured Badge Boost
-        const aHasFeaturedBadge = a.activeBoosts?.some(boost => boost.type === 'featured_badge' && boost.isActive && new Date(boost.expiresAt) > new Date()) || a.isFeatured;
-        const bHasFeaturedBadge = b.activeBoosts?.some(boost => boost.type === 'featured_badge' && boost.isActive && new Date(boost.expiresAt) > new Date()) || b.isFeatured;
+        // Priority 3: Featured / Standout Badge Boost (active only — no sticky isFeatured)
+        const aHasFeaturedBadge = isEffectivelyFeatured(a);
+        const bHasFeaturedBadge = isEffectivelyFeatured(b);
         if (aHasFeaturedBadge && !bHasFeaturedBadge) return -1;
         if (!aHasFeaturedBadge && bHasFeaturedBadge) return 1;
         
@@ -1438,8 +1439,8 @@ const VehicleList: React.FC<VehicleListProps> = React.memo(({
         if (!a.isPremiumListing && b.isPremiumListing) return 1;
         
         // Priority 5: Any active boost
-        const aHasAnyBoost = a.activeBoosts?.some(boost => boost.isActive && new Date(boost.expiresAt) > new Date()) || false;
-        const bHasAnyBoost = b.activeBoosts?.some(boost => boost.isActive && new Date(boost.expiresAt) > new Date()) || false;
+        const aHasAnyBoost = hasActiveBoost(a);
+        const bHasAnyBoost = hasActiveBoost(b);
         if (aHasAnyBoost && !bHasAnyBoost) return -1;
         if (!aHasAnyBoost && bHasAnyBoost) return 1;
         

@@ -389,7 +389,7 @@ export const MobilePricingPage: React.FC<MobilePricingPageProps> = ({
                   style={{ background: accent.accentSoft }}
                 >
                   <p className="text-[10px] font-bold uppercase tracking-[0.14em]" style={{ color: accent.accent }}>
-                    Featured
+                    Boost credits
                   </p>
                   <p className="mt-0.5 text-[15px] font-bold text-slate-900">
                     {plan.featuredCredits}/mo

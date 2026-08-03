@@ -32,6 +32,23 @@ const StatsCardSkeleton: React.FC = () => (
   </div>
 );
 
+/** Lightweight content-area skeleton while lazy Home / listings chunks load. */
+export const HomeContentSkeleton: React.FC = () => (
+  <div className="min-h-[calc(100vh-140px)] bg-gray-50" aria-busy="true" aria-label="Loading">
+    <div className="container mx-auto px-4 py-8 space-y-8">
+      <div className="flex items-center justify-between">
+        <div className="h-7 w-48 bg-gray-200 rounded-lg animate-pulse" />
+        <div className="h-9 w-28 bg-gray-100 rounded-lg animate-pulse" />
+      </div>
+      <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6">
+        {[...Array(3)].map((_, i) => (
+          <VehicleCardSkeleton key={i} />
+        ))}
+      </div>
+    </div>
+  </div>
+);
+
 /** Content-area skeleton for listing pages — no fake header (real Header is already rendered). */
 export const ListingsPageSkeleton: React.FC = () => (
   <div className="min-h-[calc(100vh-140px)] bg-gray-50" aria-busy="true" aria-label="Loading listings">
@@ -149,4 +166,4 @@ export const MobileDashboardSkeleton: React.FC = () => (
   </div>
 );
 
-export const LoadingSpinner: React.FC = () => <ListingsPageSkeleton />;
+export const LoadingSpinner: React.FC = () => <HomeContentSkeleton />;

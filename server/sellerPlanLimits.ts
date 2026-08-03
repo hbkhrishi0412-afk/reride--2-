@@ -2,6 +2,7 @@ import { PLAN_DETAILS } from '../constants/plans.js';
 import { adminReadAll } from './supabase-admin-db.js';
 import type { PlanDetails, SubscriptionPlan, Vehicle } from '../types.js';
 import {
+  effectiveSellerPlanForListings,
   validateListingRenewal,
   validateNewListingCreation,
   type ListingRenewalValidation,
@@ -78,7 +79,8 @@ export async function resolveSellerPlanDetails(
   seller: SellerPlanContext,
   useSupabase: boolean,
 ): Promise<PlanDetails> {
-  const planId = (seller.subscriptionPlan || 'free') as SubscriptionPlan;
+  const effective = effectiveSellerPlanForListings(seller);
+  const planId = (effective.subscriptionPlan || 'free') as SubscriptionPlan;
   const plans = await loadPlansById(useSupabase);
   return plans.get(planId) || PLAN_DETAILS[planId] || PLAN_DETAILS.free;
 }

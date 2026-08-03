@@ -1,12 +1,13 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import type { Vehicle, BoostPackage } from '../types';
-import { useApp } from './AppProvider';
 import { useFocusTrap } from '../utils/focusTrap';
 import { Z_INDEX } from '../utils/zIndex';
+import { CREDIT_FEATURED_PACKAGE_ID } from '../constants/boost';
 
 interface BoostListingModalProps {
   vehicle: Vehicle | null;
+  featuredCredits?: number;
   onClose: () => void;
   onBoost: (vehicleId: number, packageId: string) => Promise<void>;
 }
@@ -41,12 +42,15 @@ const IconGlobe = (p: IconProps) => (<Icon {...p}><circle cx="12" cy="12" r="10"
 const IconTrophy = (p: IconProps) => (<Icon {...p}><path d="M8 21h8M12 17v4M7 4h10v5a5 5 0 0 1-10 0V4z" /><path d="M17 4h3v3a3 3 0 0 1-3 3M7 4H4v3a3 3 0 0 0 3 3" /></Icon>);
 const IconArrowUp = (p: IconProps) => (<Icon {...p}><path d="M12 19V5M5 12l7-7 7 7" /></Icon>);
 
+const isCreditPackage = (pkg: BoostPackage) =>
+  pkg.paymentMethod === 'credit' || pkg.id === CREDIT_FEATURED_PACKAGE_ID || pkg.price === 0;
+
 const BoostListingModal: React.FC<BoostListingModalProps> = ({
   vehicle,
+  featuredCredits = 0,
   onClose,
   onBoost,
 }) => {
-  const { addToast } = useApp();
   const [selectedPackage, setSelectedPackage] = useState<string | null>(null);
   const [isProcessing, setIsProcessing] = useState(false);
   const [boostPackages, setBoostPackages] = useState<BoostPackage[]>([]);
@@ -66,7 +70,7 @@ const BoostListingModal: React.FC<BoostListingModalProps> = ({
   useEffect(() => {
     const loadBoostPackages = async () => {
       try {
-        const { BOOST_PACKAGES } = await import('../constants');
+        const { BOOST_PACKAGES } = await import('../constants/boost');
         setBoostPackages(BOOST_PACKAGES);
       } catch (error) {
         console.error('Failed to load boost packages:', error);
@@ -75,23 +79,40 @@ const BoostListingModal: React.FC<BoostListingModalProps> = ({
     loadBoostPackages();
   }, []);
 
+  const creditsAvailable = Math.max(0, Number(featuredCredits) || 0);
+
+  const visiblePackages = useMemo(() => {
+    return boostPackages.filter((pkg) => {
+      if (!isCreditPackage(pkg)) return true;
+      // Always show the credit pack so sellers know the plan benefit exists.
+      return true;
+    });
+  }, [boostPackages]);
+
+  const selectedPkg = visiblePackages.find((p) => p.id === selectedPackage) || null;
+  const selectedIsCredit = selectedPkg ? isCreditPackage(selectedPkg) : false;
+  const creditPackDisabled = creditsAvailable <= 0;
+
   if (!vehicle) return null;
 
   const handleBoost = async () => {
-    if (!selectedPackage) return;
+    if (!selectedPackage || !selectedPkg) return;
+    if (isCreditPackage(selectedPkg) && creditPackDisabled) return;
     setIsProcessing(true);
     try {
       await onBoost(vehicle.id, selectedPackage);
-      onClose();
     } catch (error) {
       console.error('Boost error:', error);
-      addToast('Failed to boost listing. Please try again.', 'error');
+      // Parent handlers toast errors; keep modal open for retry.
     } finally {
       setIsProcessing(false);
     }
   };
 
-  const getPackageMeta = (type: string): { icon: React.ReactNode; tint: string; color: string } => {
+  const getPackageMeta = (type: string, credit?: boolean): { icon: React.ReactNode; tint: string; color: string } => {
+    if (credit) {
+      return { icon: <IconStar size={18} stroke={2} />, tint: 'rgba(255,107,53,0.12)', color: '#EA580C' };
+    }
     switch (type) {
       case 'top_search':
         return { icon: <IconArrowUp size={18} stroke={2} />, tint: 'rgba(37,99,235,0.10)', color: '#1D4ED8' };
@@ -107,6 +128,8 @@ const BoostListingModal: React.FC<BoostListingModalProps> = ({
   };
 
   const formatPrice = (n: number) => (n >= 10000000 ? `${(n / 10000000).toFixed(2)} Cr` : n >= 100000 ? `${(n / 100000).toFixed(2)} L` : n.toLocaleString('en-IN'));
+
+  const ctaLabel = selectedIsCredit ? 'Boost with credit' : 'Pay & Boost';
 
   const modalContent = (
     <div
@@ -134,7 +157,6 @@ const BoostListingModal: React.FC<BoostListingModalProps> = ({
         className="relative w-full sm:max-w-3xl min-h-0 max-h-[92vh] sm:max-h-[min(92vh,100dvh)] overflow-hidden flex flex-col rounded-t-3xl sm:rounded-3xl animate-slide-in-up outline-none"
         style={{ background: '#FFFFFF', border: '1px solid rgba(15,23,42,0.06)', boxShadow: '0 30px 60px -20px rgba(0,0,0,0.40)' }}
       >
-        {/* Premium obsidian header */}
         <div
           className="relative shrink-0 overflow-hidden px-5 pt-5 pb-5 sm:px-6 sm:pt-6 text-white"
           style={{ background: 'linear-gradient(180deg, #0B0B0F 0%, #16161D 70%, #1C1C24 100%)' }}
@@ -145,7 +167,6 @@ const BoostListingModal: React.FC<BoostListingModalProps> = ({
             <div className="absolute inset-x-0 bottom-0 h-px" style={{ background: 'linear-gradient(90deg, transparent, rgba(255,255,255,0.10), transparent)' }} />
           </div>
 
-          {/* Drag handle (mobile) */}
           <div className="relative flex justify-center sm:hidden mb-3">
             <span className="w-10 h-1 rounded-full" style={{ background: 'rgba(255,255,255,0.18)' }} />
           </div>
@@ -166,6 +187,9 @@ const BoostListingModal: React.FC<BoostListingModalProps> = ({
                 <p className="mt-1.5 text-[12px] text-white/55 font-medium truncate">
                   {vehicle.year} {vehicle.make} {vehicle.model} · ₹{formatPrice(vehicle.price)}
                 </p>
+                <p className="mt-1 text-[11px] text-white/50 font-medium">
+                  Boost credits available: {creditsAvailable}
+                </p>
               </div>
             </div>
             <button
@@ -180,9 +204,7 @@ const BoostListingModal: React.FC<BoostListingModalProps> = ({
           </div>
         </div>
 
-        {/* Scrollable body — min-h-0 is required so flex-1 can shrink and the footer stays inside max-h */}
         <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain px-5 pt-5 pb-4 sm:px-6 sm:pt-6 space-y-5">
-          {/* Why boost */}
           <div className="grid grid-cols-3 gap-2.5">
             {[
               { icon: <IconEye size={15} stroke={2} />, label: '3× more views', sub: 'Get noticed faster', tint: 'rgba(37,99,235,0.10)', color: '#1D4ED8' },
@@ -203,7 +225,6 @@ const BoostListingModal: React.FC<BoostListingModalProps> = ({
             ))}
           </div>
 
-          {/* Packages */}
           <div>
             <div className="flex items-end justify-between mb-3">
               <div>
@@ -221,23 +242,35 @@ const BoostListingModal: React.FC<BoostListingModalProps> = ({
             </div>
 
             <div className="space-y-2.5">
-              {boostPackages.length === 0 ? (
+              {visiblePackages.length === 0 ? (
                 <div className="text-center py-8 rounded-2xl" style={{ background: 'rgba(15,23,42,0.025)', border: '1px solid rgba(15,23,42,0.06)' }}>
                   <p className="text-[12.5px] text-slate-500 font-medium">Loading packages…</p>
                 </div>
               ) : (
-                boostPackages.map((pkg) => {
-                  const m = getPackageMeta(pkg.type);
+                visiblePackages.map((pkg) => {
+                  const credit = isCreditPackage(pkg);
+                  const disabled = credit && creditPackDisabled;
+                  const m = getPackageMeta(pkg.type, credit);
                   const isSelected = selectedPackage === pkg.id;
-                  const isBest = pkg.id.includes('_7');
+                  const isBest = !credit && pkg.id.includes('_7');
                   return (
                     <div
                       key={pkg.id}
                       role="button"
-                      tabIndex={0}
-                      onClick={() => setSelectedPackage(pkg.id)}
-                      onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setSelectedPackage(pkg.id); } }}
-                      className="relative rounded-2xl p-4 cursor-pointer transition-all active:scale-[0.99]"
+                      tabIndex={disabled ? -1 : 0}
+                      aria-disabled={disabled}
+                      onClick={() => {
+                        if (disabled) return;
+                        setSelectedPackage(pkg.id);
+                      }}
+                      onKeyDown={(e) => {
+                        if (disabled) return;
+                        if (e.key === 'Enter' || e.key === ' ') {
+                          e.preventDefault();
+                          setSelectedPackage(pkg.id);
+                        }
+                      }}
+                      className={`relative rounded-2xl p-4 transition-all ${disabled ? 'opacity-55 cursor-not-allowed' : 'cursor-pointer active:scale-[0.99]'}`}
                       style={{
                         background: isSelected ? 'linear-gradient(180deg, #FFF7F2, #FFFFFF)' : '#FFFFFF',
                         border: `1.5px solid ${isSelected ? '#FF6B35' : 'rgba(15,23,42,0.08)'}`,
@@ -255,6 +288,14 @@ const BoostListingModal: React.FC<BoostListingModalProps> = ({
                             <h4 className="text-[14.5px] font-semibold text-slate-900 tracking-tight" style={{ letterSpacing: '-0.01em' }}>
                               {pkg.name}
                             </h4>
+                            {credit && (
+                              <span
+                                className="inline-flex items-center gap-1 rounded-full px-2 py-[3px] text-[9.5px] font-bold uppercase tracking-wider"
+                                style={{ background: 'rgba(255,107,53,0.12)', color: '#C2410C' }}
+                              >
+                                Plan credit
+                              </span>
+                            )}
                             {isBest && (
                               <span
                                 className="inline-flex items-center gap-1 rounded-full px-2 py-[3px] text-[9.5px] font-bold uppercase tracking-wider"
@@ -275,16 +316,34 @@ const BoostListingModal: React.FC<BoostListingModalProps> = ({
                           <p className="mt-2 text-[10.5px] text-slate-400 font-medium uppercase tracking-[0.14em]">
                             Duration · {pkg.durationDays} days
                           </p>
+                          {credit && disabled && (
+                            <p className="mt-1.5 text-[11px] text-amber-700 font-medium">
+                              No boost credits left. Upgrade your plan or pick a paid pack.
+                            </p>
+                          )}
                         </div>
                         <div className="text-right shrink-0">
-                          <div className="text-[22px] font-bold tracking-tight" style={{ color: '#FF6B35', letterSpacing: '-0.02em' }}>
-                            ₹{pkg.price}
-                          </div>
-                          <p className="text-[10px] text-slate-400 font-semibold uppercase tracking-[0.14em]">One-time</p>
+                          {credit ? (
+                            <>
+                              <div className="text-[18px] font-bold tracking-tight" style={{ color: '#FF6B35', letterSpacing: '-0.02em' }}>
+                                1 credit
+                              </div>
+                              <p className="text-[10px] text-slate-400 font-semibold uppercase tracking-[0.14em]">
+                                {creditsAvailable} left
+                              </p>
+                            </>
+                          ) : (
+                            <>
+                              <div className="text-[22px] font-bold tracking-tight" style={{ color: '#FF6B35', letterSpacing: '-0.02em' }}>
+                                ₹{pkg.price}
+                              </div>
+                              <p className="text-[10px] text-slate-400 font-semibold uppercase tracking-[0.14em]">One-time</p>
+                            </>
+                          )}
                         </div>
                       </div>
 
-                      {isSelected && (
+                      {isSelected && !disabled && (
                         <div
                           className="absolute -top-2 -right-2 w-7 h-7 rounded-full grid place-items-center text-white"
                           style={{ background: 'linear-gradient(135deg, #FF8456, #FF6B35)', boxShadow: '0 6px 14px -6px rgba(255,107,53,0.55)' }}
@@ -299,10 +358,9 @@ const BoostListingModal: React.FC<BoostListingModalProps> = ({
             </div>
           </div>
 
-          {/* Trust badges */}
           <div className="flex flex-wrap gap-2 pt-1">
             {[
-              { icon: <IconShield size={12} stroke={2.2} />, label: 'Secure payment' },
+              { icon: <IconShield size={12} stroke={2.2} />, label: selectedIsCredit ? 'Uses plan credit' : 'Secure payment' },
               { icon: <IconBolt size={12} stroke={2.2} />, label: 'Instant activation' },
             ].map((b, i) => (
               <span
@@ -317,7 +375,6 @@ const BoostListingModal: React.FC<BoostListingModalProps> = ({
           </div>
         </div>
 
-        {/* Footer */}
         <div
           className="shrink-0 px-5 sm:px-6 py-3.5 flex gap-2.5 pb-[max(0.875rem,env(safe-area-inset-bottom))]"
           style={{ background: 'rgba(248,250,252,0.85)', borderTop: '1px solid rgba(15,23,42,0.06)', backdropFilter: 'blur(10px)', WebkitBackdropFilter: 'blur(10px)' }}
@@ -334,7 +391,11 @@ const BoostListingModal: React.FC<BoostListingModalProps> = ({
           <button
             type="button"
             onClick={handleBoost}
-            disabled={!selectedPackage || isProcessing}
+            disabled={
+              !selectedPackage ||
+              isProcessing ||
+              (selectedIsCredit && creditPackDisabled)
+            }
             className="flex-[1.4] inline-flex items-center justify-center gap-2 rounded-2xl py-3 text-[13px] font-semibold text-white active:scale-[0.98] transition-transform disabled:opacity-60 disabled:cursor-not-allowed"
             style={{
               background: selectedPackage
@@ -357,7 +418,7 @@ const BoostListingModal: React.FC<BoostListingModalProps> = ({
             ) : (
               <>
                 <IconRocket size={15} stroke={2} />
-                Boost now
+                {selectedPackage ? ctaLabel : 'Boost now'}
               </>
             )}
           </button>

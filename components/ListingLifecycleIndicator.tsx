@@ -1,6 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import type { Vehicle, User } from '../types';
-import { getDaysUntilExpiry, getExpiryNotificationMessage } from '../services/listingLifecycleService';
+import {
+  getDaysUntilExpiry,
+  isListingExpired,
+} from '../services/listingLifecycleService';
 
 interface ListingLifecycleIndicatorProps {
   vehicle: Vehicle;
@@ -37,12 +40,17 @@ const ListingLifecycleIndicator: React.FC<ListingLifecycleIndicatorProps> = ({
   
   // Recalculate expiry based on current time (for real-time updates)
   const daysUntilExpiry = getDaysUntilExpiry(vehicle, sellerPlan, currentTime);
-  const isExpired = daysUntilExpiry <= 0;
-  const isExpiringSoon = daysUntilExpiry > 0 && daysUntilExpiry <= 7;
+  const isExpired = isListingExpired(vehicle, sellerPlan, currentTime);
+  const isUnpublished = vehicle.status === 'unpublished' || vehicle.status === 'archived';
+  const isSold = vehicle.status === 'sold' || vehicle.listingStatus === 'sold';
+  const isExpiringSoon = !isExpired && !isSold && daysUntilExpiry > 0 && daysUntilExpiry <= 7;
+  const hasNoExpiry = !isExpired && !isSold && !isUnpublished && daysUntilExpiry === -1;
 
   const getStatusColor = () => {
-    if (daysUntilExpiry === -1) return { bg: '#E0F2FE', text: '#0277BD', border: '#81D4FA' };
+    if (isSold) return { bg: '#F1F5F9', text: '#334155', border: '#CBD5E1' };
     if (isExpired) return { bg: '#FEE2E2', text: '#991B1B', border: '#FCA5A5' };
+    if (isUnpublished) return { bg: '#FEF3C7', text: '#92400E', border: '#FCD34D' };
+    if (hasNoExpiry) return { bg: '#E0F2FE', text: '#0277BD', border: '#81D4FA' };
     if (isExpiringSoon) return { bg: '#FEF3C7', text: '#92400E', border: '#FCD34D' };
     return { bg: '#D1FAE5', text: '#065F46', border: '#6EE7B7' };
   };
@@ -50,19 +58,22 @@ const ListingLifecycleIndicator: React.FC<ListingLifecycleIndicatorProps> = ({
   const colors = getStatusColor();
 
   const getStatusIcon = () => {
-    if (daysUntilExpiry === -1) return '🔵';
-    if (isExpired) return '🔴';
-    if (isExpiringSoon) return '⚠️';
-    return '✅';
+    if (isSold) return '●';
+    if (isExpired) return '●';
+    if (isUnpublished) return '●';
+    if (hasNoExpiry) return '●';
+    if (isExpiringSoon) return '●';
+    return '●';
   };
 
   const getStatusText = () => {
-    if (daysUntilExpiry === -1) return 'Active (No expiry)';
+    if (isSold) return 'Sold';
     if (isExpired) return 'Expired';
+    if (isUnpublished) return 'Unpublished';
+    if (hasNoExpiry) return 'Active (No expiry)';
     
     // For Premium plans, show plan expiry info
     if (seller?.subscriptionPlan === 'premium' && seller?.planExpiryDate && new Date(seller.planExpiryDate) > new Date()) {
-      if (isExpiringSoon) return `Active (Plan expires in ${daysUntilExpiry} days)`;
       return `Active (Plan expires in ${daysUntilExpiry} days)`;
     }
     

@@ -989,6 +989,8 @@ export interface BoostPackage {
   durationDays: number;
   price: number;
   features: string[];
+  /** How this pack is paid for. Defaults to Razorpay when omitted. */
+  paymentMethod?: 'razorpay' | 'credit';
 }
 
 export interface ActiveBoost {

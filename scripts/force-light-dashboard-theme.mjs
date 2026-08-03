@@ -8,6 +8,7 @@ const root = process.cwd();
 
 const files = [
   'components/AdminPanel.tsx',
+  'components/Dashboard.tsx',
   'components/DashboardOptimized.tsx',
   'components/CarServiceDashboard.tsx',
   'components/dashboard/shared.tsx',

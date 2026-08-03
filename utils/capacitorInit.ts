@@ -9,12 +9,15 @@ import { initUniversalLinksHandler } from './universalLinks.js';
 import { initCapacitorAndroidBack } from './capacitorAndroidBack.js';
 import { hydrateNativeTokensFromPreferences } from './nativeTokenStorage.js';
 import { hydrateSupabaseAuthTokenCache } from './supabaseNativeAuthStorage.js';
+import { startNativeSessionHydrate } from './nativeSessionMirror.js';
 
 ensureRerideWebCanonicalHost();
 restoreOAuthRoleFromUrl();
 patchFetchForCapacitor();
 void hydrateNativeTokensFromPreferences();
 void hydrateSupabaseAuthTokenCache();
+// Session mirror runs in parallel with React mount (auth awaits whenNativeSessionReady).
+void startNativeSessionHydrate();
 initNativeGoogleOAuthReturnHandler();
 initUniversalLinksHandler();
 warmUpNativeGoogleSignIn();

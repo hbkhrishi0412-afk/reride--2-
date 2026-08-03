@@ -151,6 +151,7 @@ const SellerDashboardContent: React.FC<SellerDashboardContentProps> = ({
           onUpdateSellerProfile={handlers.onUpdateSellerProfile}
           vehicleData={handlers.vehicleData}
           onFeatureListing={handlers.onFeatureListing}
+          onBoostListing={handlers.onBoostListing}
           onRequestCertification={handlers.onRequestCertification}
           onNavigate={handlers.navigate}
           onTestDriveResponse={handlers.handleTestDriveResponse}

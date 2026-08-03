@@ -437,20 +437,27 @@ export const supabaseVehicleService = {
       if (vehicle) {
         return { vehicle, primaryKey: vehicle.databaseId || String(numId) };
       }
+    }
 
-      const sellerEmail = params.sellerEmail?.trim().toLowerCase();
-      if (sellerEmail) {
-        const sellerVehicles = await this.findBySellerEmail(sellerEmail);
-        const idStr = dbId || String(numId);
-        const match = sellerVehicles.find((v) => {
-          if (vehicleIdsEqual(v.id, numId)) return true;
-          const pk = v.databaseId?.trim();
-          return Boolean(pk && pk === idStr);
-        });
-        if (match) {
-          const primaryKey = match.databaseId || String(match.id);
-          return { vehicle: match, primaryKey };
+    // Seller-scoped fallback: recovers unsafe/corrupted numeric ids and cases
+    // where databaseId was rounded in JSON but the row is still in the seller's list.
+    const sellerEmail = params.sellerEmail?.trim().toLowerCase();
+    if (sellerEmail) {
+      const sellerVehicles = await this.findBySellerEmail(sellerEmail);
+      const idStr = dbId || (numId != null ? String(numId) : '');
+      const match = sellerVehicles.find((v) => {
+        if (numId != null && vehicleIdsEqual(v.id, numId)) return true;
+        const pk = v.databaseId?.trim();
+        if (pk && idStr && pk === idStr) return true;
+        // Last resort for unsafe integer PKs: compare digit strings ignoring JS rounding.
+        if (pk && idStr && /^\d+$/.test(pk) && /^\d+$/.test(idStr)) {
+          return Number(pk) === Number(idStr);
         }
+        return false;
+      });
+      if (match) {
+        const primaryKey = match.databaseId || String(match.id);
+        return { vehicle: match, primaryKey };
       }
     }
     throw new Error('Vehicle not found.');

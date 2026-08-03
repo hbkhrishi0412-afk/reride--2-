@@ -14,7 +14,7 @@ import { logDebug, logError, logInfo, logWarn } from '../../utils/logger';
 import { clearUserContext, setUserContext } from '../../utils/monitoring';
 import { persistReRideNotifications } from '../../utils/notificationLocalStorage';
 import { clearRememberMeState } from '../../utils/rememberMe';
-import { persistCurrentUserMirrorSync } from '../../utils/nativeSessionMirror';
+import { persistCurrentUserMirrorSync, whenNativeSessionReady } from '../../utils/nativeSessionMirror';
 import { currentUserForLocalSessionJson } from '../../utils/userLocalStorageSnapshot';
 import {
   clearPersistedUserSession,
@@ -80,12 +80,20 @@ export function useAppAuthRuntime({
   currentUserRef.current = currentUser;
 
   // Restore or reject persisted sessions (no optimistic auth UI before token validation).
+  // On Capacitor, wait for native session mirror so cold-start localStorage isn't empty.
   useEffect(() => {
     if (typeof window === 'undefined') return;
-    if (!localStorage.getItem('reRideCurrentUser')) return;
 
     let cancelled = false;
     void (async () => {
+      try {
+        await whenNativeSessionReady();
+      } catch {
+        /* non-fatal — proceed with whatever localStorage has */
+      }
+      if (cancelled) return;
+      if (!localStorage.getItem('reRideCurrentUser')) return;
+
       const authenticated = await isPersistedSessionAuthenticated();
       if (cancelled) return;
 
@@ -119,7 +127,6 @@ export function useAppAuthRuntime({
       cancelled = true;
     };
   }, []);
-
   const handleLogout = useCallback(async () => {
     logoutInProgressRef.current = true;
     sessionRestoreBlockedRef.current = true;

@@ -12,6 +12,7 @@ import { useTranslatedFields } from '../hooks/useTranslatedText.js';
 
 import { PriceFairnessBadge } from './PriceInsights.js';
 import type { BuyerVisibleDealLabel } from '../utils/vehiclePricing.js';
+import { isEffectivelyFeatured } from '../utils/listingPromotion.js';
 
 interface VehicleCardProps {
   vehicle: Vehicle;
@@ -103,11 +104,7 @@ const VehicleCard: React.FC<VehicleCardProps> = ({
     }
   };
 
-  const isFeatured = vehicle.isFeatured || vehicle.activeBoosts?.some(boost => 
-    (boost.type === 'featured_badge' || boost.type === 'homepage_spotlight') && 
-    boost.isActive && 
-    new Date(boost.expiresAt) > new Date()
-  );
+  const isFeatured = isEffectivelyFeatured(vehicle);
 
   return (
     <div 
