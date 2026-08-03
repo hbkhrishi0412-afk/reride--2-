@@ -19,6 +19,7 @@ import {
 
 export type NavigateParams = {
   city?: string;
+  category?: VehicleCategory | 'ALL';
   sellerEmail?: string;
   detailVehicle?: Vehicle;
   unblockPopstateSync?: boolean;
@@ -241,11 +242,17 @@ export function useAppNavigation(args: UseAppNavigationArgs) {
         }
       }
 
-      if (view === View.USED_CARS && currentView !== View.HOME) setSelectedCategory('ALL');
       if (view === View.CITY_LANDING && params?.city) {
         updateSelectedCity(params.city);
       }
       if (view === View.USED_CARS) {
+        // Always resolve category on Used Cars entry. Buy Car / browse-all
+        // must load every published category; Home tiles pass { category }.
+        if (params?.category) {
+          setSelectedCategory(params.category);
+        } else {
+          setSelectedCategory('ALL');
+        }
         if (params && params.city !== undefined && params.city !== '') {
           if (process.env.NODE_ENV === 'development') {
             logInfo('🔵 AppProvider: Setting city filter to:', params.city);

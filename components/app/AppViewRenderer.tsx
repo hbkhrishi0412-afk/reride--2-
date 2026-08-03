@@ -20,6 +20,7 @@ import { authenticatedFetch } from '../../utils/authenticatedFetch';
 import { planService } from '../../services/planService';
 import { logInfo, logWarn, logError } from '../../utils/logger';
 import { isPublicBuyListing } from '../../services/listingLifecycleService';
+import { getPublishedCatalogTotal } from '../../services/dataService';
 import { runBackgroundSync } from '../../utils/toastPolicy.js';
 import { parseDeepLink } from '../../utils/mobileFeatures';
 import { randomIntBelow } from '../../utils/secureRandom.js';
@@ -165,6 +166,7 @@ export const AppViewRenderer: React.FC<AppViewRendererLocals> = (locals) => {
   const isLgUp = useIsLgUp();
   const preferCompactDashboard = isMobileApp || !isLgUp;
   const { t } = useTranslation();
+  const [publishedCatalogTotal, setPublishedCatalogTotal] = React.useState(0);
   const {
     currentView,
     navigate,
@@ -299,6 +301,50 @@ export const AppViewRenderer: React.FC<AppViewRendererLocals> = (locals) => {
     }
   }, [currentView, selectedVehicle, setSelectedVehicle]);
 
+  // When Used Cars opens on "All Categories", reset the published catalog cursor
+  // so listings from every published category are fetched (not a leftover
+  // four-wheeler-only page from a prior Home category click).
+  React.useEffect(() => {
+    if (currentView !== ViewEnum.USED_CARS) return;
+    let cancelled = false;
+    (async () => {
+      const { fetchPublishedVehiclesWithFilters } = await import('../../services/dataService');
+      const serverFilters: Record<string, string | number | undefined> = {};
+      if (selectedCity?.trim()) serverFilters.city = selectedCity.trim();
+      if (filtersFromUrl?.make) serverFilters.make = String(filtersFromUrl.make);
+      if (filtersFromUrl?.model) serverFilters.model = String(filtersFromUrl.model);
+      if (filtersFromUrl?.fuelType) serverFilters.fuelType = String(filtersFromUrl.fuelType);
+      if (filtersFromUrl?.minPrice != null) serverFilters.minPrice = Number(filtersFromUrl.minPrice);
+      if (filtersFromUrl?.maxPrice != null) serverFilters.maxPrice = Number(filtersFromUrl.maxPrice);
+      if (currentCategory && currentCategory !== 'ALL') {
+        serverFilters.category = String(currentCategory);
+      }
+      try {
+        const { vehicles: pageVehicles, total } = await fetchPublishedVehiclesWithFilters(serverFilters);
+        if (cancelled) return;
+        setVehicles(pageVehicles);
+        setPublishedCatalogTotal(total || getPublishedCatalogTotal() || pageVehicles.length);
+      } catch (error) {
+        if (process.env.NODE_ENV === 'development') {
+          logWarn('Failed to load published catalog for Used Cars:', error);
+        }
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [
+    currentView,
+    currentCategory,
+    selectedCity,
+    filtersFromUrl?.make,
+    filtersFromUrl?.model,
+    filtersFromUrl?.fuelType,
+    filtersFromUrl?.minPrice,
+    filtersFromUrl?.maxPrice,
+    setVehicles,
+  ]);
+
   const productScope =
     (MARKETPLACE_VIEWS as readonly string[]).includes(currentView)
       ? 'marketplace'
@@ -322,8 +368,7 @@ switch (currentView) {
           }}
           onApplyFilters={applyFilters}
           onSelectCategory={(category) => {
-            setSelectedCategory(category);
-            navigate(ViewEnum.USED_CARS);
+            navigate(ViewEnum.USED_CARS, { category });
           }}
           featuredVehicles={enrichVehiclesWithSellerInfo(
             vehicles.filter(v => isEffectivelyFeatured(v) && v.status === 'published'),
@@ -370,8 +415,7 @@ switch (currentView) {
         }}
         onApplyFilters={applyFilters}
         onSelectCategory={(category) => {
-          setSelectedCategory(category);
-          navigate(ViewEnum.USED_CARS);
+          navigate(ViewEnum.USED_CARS, { category });
         }}
         featuredVehicles={enrichVehiclesWithSellerInfo(
           vehicles.filter(v => isEffectivelyFeatured(v) && v.status === 'published'),
@@ -393,7 +437,7 @@ switch (currentView) {
         allVehicles={vehicles.filter(v => v.status === 'published')}
         onNavigate={navigate}
         onSelectCity={(city) => {
-          // Pass city in navigate params â€” navigate(USED_CARS) without params clears the filter in AppProvider.
+          // Pass city in navigate params — navigate(USED_CARS) without params clears the filter in AppProvider.
           navigate(ViewEnum.USED_CARS, { city });
         }}
         selectedCity={selectedCity}
@@ -476,6 +520,10 @@ switch (currentView) {
           }}
           sourceVehicleCount={vehicles.length}
           onRetryLoadVehicles={() => void refreshVehicles({ userInitiated: true })}
+          onCategoryChange={(category) => {
+            setSelectedCategory(category);
+          }}
+          catalogTotal={publishedCatalogTotal || getPublishedCatalogTotal() || undefined}
           onRequestMoreVehicles={async () => {
             const { fetchNextPublishedVehiclePage, getPublishedCatalogHasMore } = await import(
               '../../services/dataService'
@@ -489,13 +537,16 @@ switch (currentView) {
             if (filtersFromUrl?.maxPrice != null) serverFilters.maxPrice = Number(filtersFromUrl.maxPrice);
             if (currentCategory && currentCategory !== 'ALL') serverFilters.category = String(currentCategory);
 
-            const { vehicles: pageVehicles, hasMore, reset } = await fetchNextPublishedVehiclePage(
+            const { vehicles: pageVehicles, hasMore, reset, total } = await fetchNextPublishedVehiclePage(
               Object.keys(serverFilters).length > 0 ? serverFilters : {},
             );
             if (pageVehicles.length > 0) {
               setVehicles((prev) =>
                 reset ? pageVehicles : mergeVehicleCatalog(prev, pageVehicles, false),
               );
+            }
+            if (typeof total === 'number' && total > 0) {
+              setPublishedCatalogTotal(total);
             }
             return hasMore || getPublishedCatalogHasMore();
           }}

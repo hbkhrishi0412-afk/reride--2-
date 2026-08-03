@@ -110,7 +110,13 @@ export interface AppContextType {
   handleRegister: (user: User) => void;
   navigate: (
     view: View,
-    params?: { city?: string; sellerEmail?: string; detailVehicle?: Vehicle; unblockPopstateSync?: boolean },
+    params?: {
+      city?: string;
+      category?: VehicleCategory | 'ALL';
+      sellerEmail?: string;
+      detailVehicle?: Vehicle;
+      unblockPopstateSync?: boolean;
+    },
   ) => void;
   goBack: (fallbackView?: View) => void;
   refreshVehicles: (options?: { userInitiated?: boolean }) => Promise<void>;

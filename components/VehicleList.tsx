@@ -73,6 +73,13 @@ interface VehicleListProps {
    * Returns true if more pages may remain.
    */
   onRequestMoreVehicles?: () => Promise<boolean>;
+  /**
+   * Called when the buyer changes the Category filter so the parent can sync
+   * app state and refetch published listings for that category (or all).
+   */
+  onCategoryChange?: (category: VehicleCategory | 'ALL') => void | Promise<void>;
+  /** Server-reported published catalog total (for "Showing X of Y" when available). */
+  catalogTotal?: number;
 }
 
 // Base items per page - optimized for performance (10-12 vehicles per load)
@@ -352,6 +359,8 @@ const VehicleList: React.FC<VehicleListProps> = React.memo(({
   onRetryLoadVehicles,
   onBrowseAll,
   onRequestMoreVehicles,
+  onCategoryChange,
+  catalogTotal,
 }) => {
   const [searchQuery, setSearchQuery] = useState(initialSearchQuery);
   
@@ -527,27 +536,37 @@ const VehicleList: React.FC<VehicleListProps> = React.memo(({
     };
   }, []);
 
-  // Get categories from admin database vehicle data
+  // Prefer categories that actually appear on published listings; fall back to
+  // admin vehicleData / enum so the filter stays usable while catalog loads.
   const uniqueCategories = useMemo(() => {
-    if (vehicleData && !isLoadingVehicleData) {
-      // Get categories from admin database
-      const categoriesFromDb = Object.keys(vehicleData).sort();
-      // Ensure categories match VehicleCategory enum format
-      return categoriesFromDb.map(cat => {
-        // If already in enum format, return as is
-        if (Object.values(CategoryEnum).includes(cat as VehicleCategory)) {
-          return cat;
-        }
-        // Try to match enum values by normalizing
-        const normalized = cat.toLowerCase().replace(/_/g, '-').replace(/\s+/g, '-');
-        const enumValues = Object.values(CategoryEnum);
-        const matched = enumValues.find(enumVal => enumVal.toLowerCase() === normalized);
-        return matched || cat; // Return matched enum value or original
-      });
+    const normalizeCat = (cat: string) =>
+      String(cat).toLowerCase().replace(/_/g, '-').replace(/\s+/g, '-').trim();
+    const enumValues = Object.values(CategoryEnum) as string[];
+    const resolveEnum = (cat: string): string => {
+      const normalized = normalizeCat(cat);
+      if (enumValues.includes(cat)) return cat;
+      return enumValues.find((enumVal) => normalizeCat(enumVal) === normalized) || cat;
+    };
+
+    const fromPublished = new Set<string>();
+    for (const v of vehicles || []) {
+      if (!v?.category) continue;
+      if (v.status && v.status !== 'published') continue;
+      fromPublished.add(resolveEnum(String(v.category)));
     }
-    // Fallback to enum values
-    return Object.values(CategoryEnum);
-  }, [vehicleData, isLoadingVehicleData]);
+
+    if (fromPublished.size > 0) {
+      return Array.from(fromPublished).sort();
+    }
+
+    if (vehicleData && !isLoadingVehicleData) {
+      return Object.keys(vehicleData)
+        .map(resolveEnum)
+        .sort();
+    }
+
+    return enumValues;
+  }, [vehicles, vehicleData, isLoadingVehicleData]);
 
   // Get makes from admin database vehicle data, filtered by selected category
   const uniqueMakes = useMemo(() => {
@@ -1192,6 +1211,7 @@ const VehicleList: React.FC<VehicleListProps> = React.memo(({
       
       // Batch all state updates together - use functional updates to ensure consistency
       setCategoryFilter(categoryForValidation);
+      void onCategoryChange?.(categoryForValidation);
       setMakeFilter(makeForValidation);
       setModelFilter(modelForValidation);
       // Create new objects/arrays to ensure React detects the change
@@ -2178,6 +2198,7 @@ const VehicleList: React.FC<VehicleListProps> = React.memo(({
                     setOwnershipFilter('');
                     setYearFilter('0');
                     setYearBounds({ min: null, max: null });
+                    void onCategoryChange?.(value as VehicleCategory | 'ALL');
                     break;
                 case 'makeFilter': 
                     setMakeFilter(value); 
@@ -2440,7 +2461,8 @@ const VehicleList: React.FC<VehicleListProps> = React.memo(({
             <div>
               <p className="text-[11px] text-gray-500 font-medium uppercase tracking-wide">{t('listings.showing')}</p>
               <p className="text-sm font-bold text-gray-900">
-                {paginatedVehicles.length} {t('listings.of')} {processedVehicles.length}
+                {paginatedVehicles.length} {t('listings.of')}{' '}
+                {Math.max(processedVehicles.length, catalogTotal ?? 0)}
               </p>
             </div>
             <button
@@ -2707,9 +2729,11 @@ const VehicleList: React.FC<VehicleListProps> = React.memo(({
                 </button>
                 <p className="text-xs text-gray-600 dark:text-gray-400 flex-shrink-0 ml-1">
                   <span className="text-gray-500 dark:text-gray-400">{t('listings.showing')}</span>{' '}
-                  <span className="font-bold text-gray-900 dark:text-white">{paginatedVehicles.length}</span>{' '}
+                  <span className="font-bold text-gray-900">{paginatedVehicles.length}</span>{' '}
                   <span className="text-gray-500 dark:text-gray-400">{t('listings.of')}</span>{' '}
-                  <span className="font-bold text-gray-900 dark:text-white">{processedVehicles.length}</span>
+                  <span className="font-bold text-gray-900">
+                    {Math.max(processedVehicles.length, catalogTotal ?? 0)}
+                  </span>
                 </p>
                 {isBackgroundHydratingVehicles && (
                   <p className="text-xs text-orange-600 dark:text-orange-400 flex items-center gap-1 ml-2">

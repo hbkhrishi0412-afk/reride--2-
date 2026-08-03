@@ -15,7 +15,6 @@ import { useNavigate as useRouterNavigate, useLocation } from 'react-router-dom'
 import type { Vehicle, User, Conversation, Toast as ToastType, PlatformSettings, AuditLogEntry, VehicleData, Notification, VehicleCategory, SupportTicket, FAQItem, SubscriptionPlan, ChatMessage } from '../types';
 import { View } from '../types';
 import { normalizeNotificationRow } from '../utils/normalizeNotification.js';
-import { VehicleCategory as CategoryEnum } from '../vehicle-category.js';
 import {
   computeCompareToggle,
   getCategoryDisplayName,
@@ -274,7 +273,9 @@ const AppProviderCore: React.FC<{ children: React.ReactNode }> = ({ children }) 
     ensureSyncQueueOnlineListener();
   }, []);
   const [forgotPasswordRole, setForgotPasswordRole] = useState<'customer' | 'seller' | null>(null);
-  const [selectedCategory, setSelectedCategory] = useState<VehicleCategory | 'ALL'>(CategoryEnum.FOUR_WHEELER);
+  // Used Cars should start on all published categories; Home tiles pass an
+  // explicit category via navigate({ category }) when the user picks one.
+  const [selectedCategory, setSelectedCategory] = useState<VehicleCategory | 'ALL'>('ALL');
   const [publicSellerProfile, setPublicSellerProfile] = useState<User | null>(null);
   const [isAnnouncementVisible, setIsAnnouncementVisible] = useState(true);
   const [initialSearchQuery, setInitialSearchQuery] = useState<string>('');
