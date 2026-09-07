@@ -41,6 +41,10 @@ export default defineConfig(({ mode }) => {
   define: {
     __RERIDE_CAPACITOR__: JSON.stringify(!!capacitor),
     __RERIDE_BUILD_TIME__: JSON.stringify(new Date().toISOString()),
+    // Force-inline so Capacitor Android push gate cannot miss .env.local (static replace can miss some transforms).
+    'import.meta.env.VITE_ANDROID_PUSH_ENABLED': JSON.stringify(
+      env.VITE_ANDROID_PUSH_ENABLED || process.env.VITE_ANDROID_PUSH_ENABLED || '',
+    ),
   },
   plugins: [
     {

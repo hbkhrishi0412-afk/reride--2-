@@ -519,6 +519,7 @@ switch (currentView) {
             setSelectedCity(city);
           }}
           sourceVehicleCount={vehicles.length}
+          catalogReady={vehiclesCatalogReady}
           onRetryLoadVehicles={() => void refreshVehicles({ userInitiated: true })}
           onCategoryChange={(category) => {
             setSelectedCategory(category);

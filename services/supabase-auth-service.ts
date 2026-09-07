@@ -126,9 +126,11 @@ function mapGoogleProviderError(message: string): string | undefined {
   }
   if (m.includes('redirect_uri') && m.includes('mismatch')) {
     return (
-      'Google rejected the return URL. In Google Cloud Console → OAuth 2.0 → Authorized redirect URIs, ' +
-      'add the Supabase callback URL (see Supabase → Authentication → Providers → Google). ' +
-      'In Supabase → Authentication → URL Configuration, add your site under Redirect URLs (e.g. https://www.reride.co.in/** and https://reride.co.in/**).'
+      'Google rejected the return URL (redirect_uri_mismatch). In Google Cloud Console → ' +
+      'APIs & Services → Credentials → your OAuth 2.0 Web client → Authorized redirect URIs, add exactly: ' +
+      'https://pqtrsoytudolnvuydvfo.supabase.co/auth/v1/callback ' +
+      '(copy the same URL from Supabase → Authentication → Providers → Google). ' +
+      'Do not put www.reride.co.in there — that belongs in Supabase Redirect URLs only.'
     );
   }
   if (m.includes('access_denied') || m.includes('user denied')) {

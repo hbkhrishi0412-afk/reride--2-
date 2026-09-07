@@ -23,7 +23,8 @@ function isNativePushSafe(): boolean {
   const platform = Capacitor.getPlatform();
   if (platform === 'ios') return true;
   if (platform === 'android') {
-    return (import.meta as any)?.env?.VITE_ANDROID_PUSH_ENABLED === 'true';
+    // Vite `define` + import.meta.env both must resolve at build time (see vite.config.ts).
+    return import.meta.env.VITE_ANDROID_PUSH_ENABLED === 'true';
   }
   return false;
 }

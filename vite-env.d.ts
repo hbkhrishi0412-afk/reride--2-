@@ -37,6 +37,11 @@ interface ImportMetaEnv {
   /** Google OAuth Web client ID for native Android/iOS sign-in (see .env.example). */
   readonly VITE_GOOGLE_WEB_CLIENT_ID?: string
   /**
+   * When `true`, Capacitor Android registers for FCM push.
+   * Requires `android/app/google-services.json` and a rebuild (`npm run android:bundle`).
+   */
+  readonly VITE_ANDROID_PUSH_ENABLED?: string
+  /**
    * Support WhatsApp / click-to-call: full international number, digits only (no +).
    * Example: 4471234567890. Used for service booking confirmation and header “call us” links.
    */

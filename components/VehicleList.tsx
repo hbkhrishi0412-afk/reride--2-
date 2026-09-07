@@ -61,8 +61,13 @@ interface VehicleListProps {
   onSaveSearch?: (search: SavedSearch) => void;
   selectedCity?: string;
   onCityChange?: (city: string) => void;
-  /** Total vehicles from source (before filters). When 0, show load-error state with Retry. */
+  /** Total vehicles from source (before filters). When 0 and catalog not ready, show load-error with Retry. */
   sourceVehicleCount?: number;
+  /**
+   * True after the published catalog fetch settled (success or empty).
+   * When false and the source list is empty, show "Unable to load" + Retry instead of "No Vehicles Found".
+   */
+  catalogReady?: boolean;
   /** Called when user taps Retry in the "Unable to load vehicles" state. */
   onRetryLoadVehicles?: () => void | Promise<void>;
   /** Optional CTA when wishlist/filter results are empty */
@@ -356,12 +361,17 @@ const VehicleList: React.FC<VehicleListProps> = React.memo(({
   selectedCity,
   onCityChange,
   sourceVehicleCount,
+  catalogReady,
   onRetryLoadVehicles,
   onBrowseAll,
   onRequestMoreVehicles,
   onCategoryChange,
   catalogTotal,
 }) => {
+  const showCatalogLoadError =
+    sourceVehicleCount === 0 &&
+    Boolean(onRetryLoadVehicles) &&
+    catalogReady === false;
   const [searchQuery, setSearchQuery] = useState(initialSearchQuery);
   
   // Vehicle data for filters
@@ -2542,7 +2552,7 @@ const VehicleList: React.FC<VehicleListProps> = React.memo(({
                   boxShadow: '0 2px 8px rgba(0, 0, 0, 0.06)'
                 }}
               >
-                {sourceVehicleCount === 0 && onRetryLoadVehicles ? (
+                {showCatalogLoadError ? (
                   <>
                     <div className="w-20 h-20 bg-amber-50 rounded-full flex items-center justify-center mx-auto mb-4">
                       <svg className="w-10 h-10 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -2853,7 +2863,7 @@ const VehicleList: React.FC<VehicleListProps> = React.memo(({
               </>
             ) : (
               <div className="col-span-full text-center py-16 bg-white rounded-xl shadow-soft-lg">
-                {sourceVehicleCount === 0 && onRetryLoadVehicles ? (
+                {showCatalogLoadError ? (
                   <>
                     <h3 className="text-xl font-semibold text-reride-text-dark dark:text-brand-gray-200">{t('listings.loadErrorTitle')}</h3>
                     <p className="text-reride-text dark:text-reride-text mt-2">{t('listings.loadErrorHint')}</p>

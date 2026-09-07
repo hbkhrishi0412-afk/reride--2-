@@ -3,7 +3,14 @@
 The app is a **Capacitor** (Vite + React) project. The Play Store testing link serves a pre-built bundle; running from Android Studio uses a **local** build. Follow these steps so the app runs correctly from Android Studio.
 
 > **Important:** Open **`android/`** in Android Studio (File → Open → select the `android` folder).  
-> Do **not** open the repository root — the root `app/` module is a placeholder and will install a broken/outdated APK.
+> Do **not** open the repository root — the root `app/` module is a placeholder and will install a broken/outdated APK.  
+> Safe commands that open the right project: `npm run android` or `npm run cap:open:android` (both call `npx cap open android`).
+
+Verify this machine’s checklist anytime:
+
+```bash
+npm run android:check
+```
 
 ---
 
@@ -20,10 +27,40 @@ The web bundle is built with Vite and bakes in `VITE_*` variables at build time.
   - `VITE_SUPABASE_URL` – your Supabase project URL
   - `VITE_SUPABASE_ANON_KEY` – your Supabase anon key
   - `VITE_GOOGLE_WEB_CLIENT_ID` – required for native Google Sign-In on device
+  - `VITE_ANDROID_PUSH_ENABLED=true` – required for FCM push (with `android/app/google-services.json`)
 
 Get Supabase keys from [Supabase Dashboard](https://app.supabase.com) → your project → **Settings** → **API**.
 
-For Google Sign-In on Android you must also create an **Android** OAuth client in Google Cloud for package `com.reride.app` with your debug/release SHA-1 fingerprints, and enable Google in Supabase Auth. See `docs/SUPABASE_MOBILE.md`.
+### Google Sign-In SHA-1 (required — Google Cloud Console)
+
+Native Google Sign-In needs an **Android** OAuth client for package `com.reride.app` with these SHA-1 fingerprints (from `cd android && gradlew.bat :app:signingReport` on this machine):
+
+| Build | SHA-1 |
+|-------|-------|
+| **Debug** | `6B:A5:75:41:B7:60:23:24:66:A4:F5:D0:C2:B5:F5:6A:FB:E4:CD:54` |
+| **Release** (`reride-newrelease`) | `81:27:33:0C:0E:A7:6B:6B:DB:5E:EE:68:E1:B4:12:49:61:27:81:F7` |
+
+### Google web login `redirect_uri_mismatch` (Error 400)
+
+If Google shows **Access blocked / redirect_uri_mismatch** on `www.reride.co.in`:
+
+1. Open [Google Cloud Credentials](https://console.cloud.google.com/apis/credentials)
+2. Edit the **Web application** OAuth client used by Supabase (see `npm run google:oauth-check`)
+3. Add this **Authorized redirect URI** (exact):
+
+   `https://pqtrsoytudolnvuydvfo.supabase.co/auth/v1/callback`
+
+4. Save and retry. Do **not** put `https://www.reride.co.in/...` in Google’s redirect list for this flow — that URL belongs only in Supabase Redirect URLs.
+
+Steps for Android SHA-1:
+
+1. [Google Cloud Console → Credentials](https://console.cloud.google.com/apis/credentials)
+2. Create (or edit) **OAuth client ID** → Application type **Android** → package `com.reride.app` → paste **Debug** SHA-1 (add a second Android client or extra SHA-1 for **Release**).
+3. Keep your existing **Web application** client (used by Supabase + `VITE_GOOGLE_WEB_CLIENT_ID`).
+4. Supabase → **Authentication** → **Providers** → **Google** → Client IDs: **Web client ID, Android client ID** (comma-separated). Enable **Skip nonce check** if native sign-in fails with a nonce error.
+5. In Firebase Console for project `reride-ade6a`, ensure the Android app has the same SHA-1s, then **re-download** `google-services.json` into `android/app/` (it should then include an Android OAuth client `client_type: 1`, not only the Web client).
+
+See also `docs/SUPABASE_MOBILE.md`.
 
 ---
 
@@ -34,6 +71,13 @@ For Google Sign-In on Android you must also create an **Android** OAuth client i
 From the **project root** (where `package.json` is):
 
 ```bash
+npm install
+npm run android:bundle
+```
+
+Or open Studio after sync:
+
+```bash
 npm run android
 ```
 
@@ -41,13 +85,9 @@ This will:
 
 1. Build the web app for Capacitor (`build:android`).
 2. Sync the build into the Android project (`cap sync android`).
-3. Open the `android` folder in Android Studio.
+3. Open the `android` folder in Android Studio (`npm run android` only).
 
-For a production-style sync that clears any stuck live-reload URL:
-
-```bash
-npm run android:bundle
-```
+`npm run android:bundle` clears any stuck live-reload URL and syncs without opening Studio.
 
 Alternatively, run the steps separately:
 
@@ -72,33 +112,34 @@ npx cap open android
 
 | Step | Action |
 |------|--------|
-| 1 | Have `.env.local` (or `.env`) with `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY`. |
-| 2 | Open **`android/`** only (not the repo root). |
-| 3 | Run `npm run android` or `npm run android:bundle` from the project root. |
-| 4 | In Android Studio: Sync Gradle, set JDK 17, choose **app** and a device, then Run. |
+| 1 | Have `.env.local` with `VITE_SUPABASE_*`, `VITE_GOOGLE_WEB_CLIENT_ID`, `VITE_ANDROID_PUSH_ENABLED=true`. |
+| 2 | `android/app/google-services.json` present for `com.reride.app`. |
+| 3 | Android OAuth SHA-1 registered in Google Cloud + Supabase Google provider. |
+| 4 | Run `npm install` then `npm run android:bundle` from the project root. |
+| 5 | Open **`android/`** only (or use `npm run android` / `cap:open:android`). |
+| 6 | Optional verify: `npm run android:check`. |
 
 ---
 
-## 4. Push notifications (optional)
-
-To enable push notifications on Android:
+## 4. Push notifications
 
 1. **Firebase / Google Services**
-   - Create a project in [Firebase Console](https://console.firebase.google.com) and add an Android app with package name `com.reride.app`.
-   - Download `google-services.json` and place it in `android/app/`.
-   - Set `VITE_ANDROID_PUSH_ENABLED=true` in `.env.local`.
-   - Without this file, the build still succeeds but push notifications will not work (the Gradle script skips applying the Google Services plugin).
-
-2. **Web/PWA push (VAPID key)**
-   - For web push (e.g. from your backend or PWA), set `VITE_VAPID_PUBLIC_KEY` in `.env` to your VAPID public key (from Firebase Cloud Messaging or Web Push).
-   - Generate a key pair if needed: e.g. `npx web-push generate-vapid-keys`, then use the public key in `.env` and the private key on the server.
+   - Project `reride-ade6a` should already have Android app `com.reride.app`.
+   - Keep `google-services.json` in `android/app/`.
+   - Set `VITE_ANDROID_PUSH_ENABLED=true` in `.env.local` **before** `npm run android:bundle` so the flag is baked into the WebView bundle.
+2. **Server push (optional)**
+   - Apply `scripts/add-push-device-tokens.sql` in Supabase.
+   - Set `FIREBASE_SERVICE_ACCOUNT_KEY` on the API host for FCM sends.
+3. **Web/PWA push (VAPID key)**
+   - Set `VITE_VAPID_PUBLIC_KEY` for browser push (separate from Android FCM).
 
 ---
 
 ## If it still doesn't run
 
 - **White screen:** Re-run `npm run android:bundle` so the latest web build is synced (and live-reload URL is cleared); then run again from Android Studio.
-- **Google Sign-In fails (ApiException 10):** Add Android OAuth client SHA-1 for `com.reride.app` and configure Supabase Google provider (`docs/SUPABASE_MOBILE.md`).
+- **Google Sign-In fails (ApiException 10 / DEVELOPER_ERROR):** Android OAuth client missing SHA-1 for `com.reride.app` — use the fingerprints in §1 and re-download `google-services.json`.
+- **Push never registers:** Confirm `VITE_ANDROID_PUSH_ENABLED=true` was set **at build time**, then rebuild; confirm `google-services.json` exists so the Gradle plugin applies.
 - **Gradle / build errors:** Ensure Android SDK is installed (including for compileSdk 36) and JDK 17 is selected.
 - **App not installing:** Use a device or emulator with API 24 or higher.
 
