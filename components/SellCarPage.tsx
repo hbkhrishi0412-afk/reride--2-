@@ -8,6 +8,8 @@ import { WebsitePageGutters } from './WebsitePageShell';
 import AutoT from './AutoT';
 import { useAutoT } from '../hooks/useAutoT';
 import { useApp } from './AppProvider';
+import { verifyVahanRegistration } from '../services/vehicleTrustService';
+import { getBrowserAccessTokenForApi } from '../utils/authStorage.js';
 
 interface SellCarPageProps {
   onNavigate: (view: ViewEnum) => void;
@@ -407,9 +409,45 @@ const SellCarPage: React.FC<SellCarPageProps> = ({ onNavigate }) => {
       setRegistrationError('Please enter a valid registration number (e.g., MH01AB1234)');
       return;
     }
-    setIsVerifying(false);
-    setCarDetails(prev => ({ ...prev, registration: trimmed }));
-    handleNextStep();
+
+    setIsVerifying(true);
+    try {
+      const hasAuth = Boolean(getBrowserAccessTokenForApi());
+      if (hasAuth) {
+        const result = await verifyVahanRegistration(trimmed);
+        setCarDetails((prev) => ({
+          ...prev,
+          registration: trimmed,
+          ...(result.snapshot?.manufacturer ? { make: result.snapshot.manufacturer } : {}),
+          ...(result.snapshot?.model ? { model: result.snapshot.model } : {}),
+          ...(result.snapshot?.fuelType ? { fuelType: result.snapshot.fuelType } : {}),
+          ...(result.snapshot?.ownerCount != null ? { noOfOwners: String(result.snapshot.ownerCount) } : {}),
+        }));
+        if (result.verified) {
+          addToast?.(result.message || 'Registration verified with Vahan', 'success');
+        } else {
+          addToast?.(
+            result.message || 'Could not auto-verify RC. Continue and fill details manually.',
+            'info',
+          );
+        }
+      } else {
+        setCarDetails((prev) => ({ ...prev, registration: trimmed }));
+        addToast?.(
+          'Sign in later to verify this RC with Vahan. You can continue filling details now.',
+          'info',
+        );
+      }
+      handleNextStep();
+    } catch (error) {
+      setCarDetails((prev) => ({ ...prev, registration: trimmed }));
+      const message = error instanceof Error ? error.message : 'Verification unavailable';
+      setRegistrationError('');
+      addToast?.(`${message}. Continue and fill details manually.`, 'info');
+      handleNextStep();
+    } finally {
+      setIsVerifying(false);
+    }
   };
 
   const handleBrandSelect = (brand: CarMake) => {

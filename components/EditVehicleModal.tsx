@@ -27,6 +27,54 @@ interface EditVehicleModalProps {
     onSave: (vehicle: Vehicle) => void;
 }
 
+type EditFormInputProps = {
+    label: string;
+    name: keyof Vehicle | string;
+    type?: string;
+    value: any;
+    required?: boolean;
+    placeholder?: string;
+    error?: string;
+    onChange: (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => void;
+    onBlur: (e: React.FocusEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => void;
+};
+
+const EditFormInput: React.FC<EditFormInputProps> = ({
+    label,
+    name,
+    type = 'text',
+    value,
+    required = false,
+    placeholder,
+    error,
+    onChange,
+    onBlur,
+}) => (
+    <div>
+        <label className="block text-sm font-medium text-reride-text-dark dark:text-gray-200 mb-1">
+            {label}
+            {required && <span className="text-red-500 ml-1">*</span>}
+        </label>
+        <input
+            type={type}
+            name={name as string}
+            value={value}
+            onChange={onChange}
+            onBlur={onBlur}
+            required={required}
+            placeholder={placeholder}
+            className={`mt-1 block w-full px-3 py-2 border rounded-lg bg-white dark:bg-gray-800 text-reride-text-dark dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-reride-orange focus:border-transparent transition-all duration-200 ${
+                error
+                    ? 'border-red-500 focus:ring-red-500'
+                    : 'border-gray-200 dark:border-gray-600 hover:border-gray-300 dark:hover:border-gray-500'
+            }`}
+        />
+        {error && (
+            <p className="mt-1 text-sm text-red-500">{error}</p>
+        )}
+    </div>
+);
+
 const EditVehicleModal: React.FC<EditVehicleModalProps> = ({ vehicle, onClose, onSave }) => {
     const { addToast } = useApp();
     const [formData, setFormData] = useState<Vehicle>(vehicle);
@@ -318,30 +366,20 @@ const EditVehicleModal: React.FC<EditVehicleModalProps> = ({ vehicle, onClose, o
 
     if (!vehicle) return null;
 
-    const FormInput = ({ label, name, type = 'text', value, required = false, placeholder }: { label: string, name: keyof Vehicle | string, type?: string, value: any, required?: boolean, placeholder?: string }) => (
-        <div>
-            <label className="block text-sm font-medium text-reride-text-dark dark:text-gray-200 mb-1">
-                {label}
-                {required && <span className="text-red-500 ml-1">*</span>}
-            </label>
-            <input 
-                type={type} 
-                name={name as string} 
-                value={value} 
-                onChange={handleChange} 
-                onBlur={handleBlur}
-                required={required}
-                placeholder={placeholder}
-                className={`mt-1 block w-full px-3 py-2 border rounded-lg bg-white dark:bg-gray-800 text-reride-text-dark dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-reride-orange focus:border-transparent transition-all duration-200 ${
-                    errors[name as string] 
-                        ? 'border-red-500 focus:ring-red-500' 
-                        : 'border-gray-200 dark:border-gray-600 hover:border-gray-300 dark:hover:border-gray-500'
-                }`}
-            />
-            {errors[name as string] && (
-                <p className="mt-1 text-sm text-red-500">{errors[name as string]}</p>
-            )}
-        </div>
+    const renderFormInput = (props: {
+        label: string;
+        name: keyof Vehicle | string;
+        type?: string;
+        value: any;
+        required?: boolean;
+        placeholder?: string;
+    }) => (
+        <EditFormInput
+            {...props}
+            onChange={handleChange}
+            onBlur={handleBlur}
+            error={errors[props.name as string]}
+        />
     );
 
     type TabId = 'basic' | 'specs' | 'media' | 'offer';
@@ -400,15 +438,15 @@ const EditVehicleModal: React.FC<EditVehicleModalProps> = ({ vehicle, onClose, o
                                         <span>📋</span> Core Details
                                     </h3>
                                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                                        <FormInput label="Make" name="make" value={formData.make} required placeholder="e.g., Maruti Suzuki" />
-                                        <FormInput label="Model" name="model" value={formData.model} required placeholder="e.g., Swift" />
-                                        <FormInput label="Year" name="year" type="number" value={formData.year} required placeholder="2024" />
-                                        <FormInput label="Price (₹)" name="price" type="number" value={formData.price} required placeholder="2340000" />
-                                        <FormInput label="Mileage (kms)" name="mileage" type="number" value={formData.mileage} required placeholder="36916" />
-                                        <FormInput label="Color" name="color" value={formData.color} placeholder="White" />
-                                        <FormInput label="Registration Year" name="registrationYear" type="number" value={formData.registrationYear} placeholder="2024" />
-                                        <FormInput label="No. of Owners" name="noOfOwners" type="number" value={formData.noOfOwners} placeholder="1" />
-                                        <FormInput label="RTO" name="rto" value={formData.rto} placeholder="LA04" />
+                                        {renderFormInput({ label: "Make", name: "make", value: formData.make, required: true, placeholder: "e.g., Maruti Suzuki" })}
+                                        {renderFormInput({ label: "Model", name: "model", value: formData.model, required: true, placeholder: "e.g., Swift" })}
+                                        {renderFormInput({ label: "Year", name: "year", type: "number", value: formData.year, required: true, placeholder: "2024" })}
+                                        {renderFormInput({ label: "Price (₹)", name: "price", type: "number", value: formData.price, required: true, placeholder: "2340000" })}
+                                        {renderFormInput({ label: "Mileage (kms)", name: "mileage", type: "number", value: formData.mileage, required: true, placeholder: "36916" })}
+                                        {renderFormInput({ label: "Color", name: "color", value: formData.color, placeholder: "White" })}
+                                        {renderFormInput({ label: "Registration Year", name: "registrationYear", type: "number", value: formData.registrationYear, placeholder: "2024" })}
+                                        {renderFormInput({ label: "No. of Owners", name: "noOfOwners", type: "number", value: formData.noOfOwners, placeholder: "1" })}
+                                        {renderFormInput({ label: "RTO", name: "rto", value: formData.rto, placeholder: "LA04" })}
                                     </div>
                                 </div>
 
@@ -417,7 +455,7 @@ const EditVehicleModal: React.FC<EditVehicleModalProps> = ({ vehicle, onClose, o
                                         <span>🛡️</span> Insurance Details
                                     </h3>
                                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                        <FormInput label="Insurance Validity" name="insuranceValidity" value={formData.insuranceValidity} placeholder="Aug 2027" />
+                                        {renderFormInput({ label: "Insurance Validity", name: "insuranceValidity", value: formData.insuranceValidity, placeholder: "Aug 2027" })}
                                         <div>
                                             <label className="block text-sm font-medium text-reride-text-dark dark:text-white mb-1">Insurance Type</label>
                                             <select 
@@ -537,9 +575,9 @@ const EditVehicleModal: React.FC<EditVehicleModalProps> = ({ vehicle, onClose, o
                                     <span>⚙️</span> Technical Specifications
                                 </h3>
                                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                    <FormInput label="Transmission" name="transmission" value={formData.transmission} placeholder="DCT" />
-                                    <FormInput label="Fuel Type" name="fuelType" value={formData.fuelType} placeholder="CNG" />
-                                    <FormInput label="Fuel Efficiency" name="fuelEfficiency" value={formData.fuelEfficiency} placeholder="25 KMPL" />
+                                    {renderFormInput({ label: "Transmission", name: "transmission", value: formData.transmission, placeholder: "DCT" })}
+                                    {renderFormInput({ label: "Fuel Type", name: "fuelType", value: formData.fuelType, placeholder: "CNG" })}
+                                    {renderFormInput({ label: "Fuel Efficiency", name: "fuelEfficiency", value: formData.fuelEfficiency, placeholder: "25 KMPL" })}
                                 </div>
                             </div>
                         )}
@@ -687,35 +725,15 @@ const EditVehicleModal: React.FC<EditVehicleModalProps> = ({ vehicle, onClose, o
                                     </label>
                                 </div>
                                 <div className={`space-y-4 pt-2 ${formData.offerEnabled ? '' : 'opacity-50 pointer-events-none'}`}>
-                                    <FormInput label="Headline" name="offerTitle" value={formData.offerTitle ?? ''} placeholder="e.g. Special offer" />
+                                    {renderFormInput({ label: "Headline", name: "offerTitle", value: formData.offerTitle ?? '', placeholder: "e.g. Special offer" })}
                                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                        <FormInput label="Start date" name="offerStartDate" type="date" value={formData.offerStartDate ?? ''} />
-                                        <FormInput label="End date" name="offerEndDate" type="date" value={formData.offerEndDate ?? ''} />
+                                        {renderFormInput({ label: "Start date", name: "offerStartDate", type: "date", value: formData.offerStartDate ?? '' })}
+                                        {renderFormInput({ label: "End date", name: "offerEndDate", type: "date", value: formData.offerEndDate ?? '' })}
                                     </div>
-                                    <FormInput
-                                        label="Date label (optional)"
-                                        name="offerDateLabel"
-                                        value={formData.offerDateLabel ?? ''}
-                                        placeholder="e.g. 8 - 31 DEC"
-                                    />
-                                    <FormInput
-                                        label="Description line"
-                                        name="offerDescription"
-                                        value={formData.offerDescription ?? ''}
-                                        placeholder="e.g. Loan offers on all cars"
-                                    />
-                                    <FormInput
-                                        label="Highlight line"
-                                        name="offerHighlight"
-                                        value={formData.offerHighlight ?? ''}
-                                        placeholder="e.g. ROI starting from 10.5%*"
-                                    />
-                                    <FormInput
-                                        label="Disclaimer (small text)"
-                                        name="offerDisclaimer"
-                                        value={formData.offerDisclaimer ?? ''}
-                                        placeholder="Terms and conditions apply"
-                                    />
+                                    {renderFormInput({ label: "Date label (optional)", name: "offerDateLabel", value: formData.offerDateLabel ?? '', placeholder: "e.g. 8 - 31 DEC" })}
+                                    {renderFormInput({ label: "Description line", name: "offerDescription", value: formData.offerDescription ?? '', placeholder: "e.g. Loan offers on all cars" })}
+                                    {renderFormInput({ label: "Highlight line", name: "offerHighlight", value: formData.offerHighlight ?? '', placeholder: "e.g. ROI starting from 10.5%*" })}
+                                    {renderFormInput({ label: "Disclaimer (small text)", name: "offerDisclaimer", value: formData.offerDisclaimer ?? '', placeholder: "Terms and conditions apply" })}
                                 </div>
                             </div>
                         )}

@@ -63,6 +63,7 @@ class RealtimeChatService {
   private lastUserEmail = '';
   private lastUserRole: 'customer' | 'seller' = 'customer';
   private supabaseEphemeralChannels = new Map<string, RealtimeChannel>();
+  private ephemeralRetryCounts = new Map<string, number>();
   private lastEphemeralSyncArgs: {
     metas: ChatEphemeralThreadMeta[];
     email: string;
@@ -184,9 +185,21 @@ class RealtimeChatService {
         })
         .subscribe((status: string) => {
           if (status === 'SUBSCRIBED') {
+            this.ephemeralRetryCounts.delete(convId);
             void ch.track({ role: myRole, online_at: new Date().toISOString() }).catch(() => {});
           } else if (status === 'CHANNEL_ERROR' || status === 'TIMED_OUT') {
             this.supabaseEphemeralChannels.delete(convId);
+            const retries = this.ephemeralRetryCounts.get(convId) || 0;
+            if (retries >= 3 || !this.lastEphemeralSyncArgs) return;
+            this.ephemeralRetryCounts.set(convId, retries + 1);
+            const { metas, email, role } = this.lastEphemeralSyncArgs;
+            window.setTimeout(() => {
+              try {
+                this.applySupabaseEphemeralSubscriptions(metas, email, role);
+              } catch {
+                /* ignore */
+              }
+            }, 2000 * (retries + 1));
           }
         });
 
@@ -215,9 +228,19 @@ class RealtimeChatService {
   /**
    * Mark service ready — Supabase Realtime subscriptions are wired via useSupabaseRealtime.
    */
+  private ensureOnlineFlushListener(): void {
+    if (typeof window === 'undefined') return;
+    if ((this as { _onlineFlushBound?: boolean })._onlineFlushBound) return;
+    (this as { _onlineFlushBound?: boolean })._onlineFlushBound = true;
+    window.addEventListener('online', () => {
+      void this.flushPendingMessages();
+    });
+  }
+
   async connect(userEmail: string, userRole: 'customer' | 'seller'): Promise<boolean> {
     this.lastUserEmail = userEmail;
     this.lastUserRole = userRole;
+    this.ensureOnlineFlushListener();
 
     if (this.isConnecting) {
       return false;
@@ -230,10 +253,12 @@ class RealtimeChatService {
       const supabase = getSupabaseClient();
       if (supabase) {
         this.onConnectionStatusChanged?.(true);
+        void this.flushPendingMessages();
         return true;
       }
       console.warn('⚠️ Supabase client not available');
       this.onConnectionStatusChanged?.(true);
+      void this.flushPendingMessages();
       return true;
     } catch (supabaseError) {
       console.warn('⚠️ Supabase not available, real-time features will be limited:', supabaseError);
@@ -247,6 +272,64 @@ class RealtimeChatService {
   /**
    * Send a message and persist to Supabase (delivery via Supabase Realtime).
    */
+  private enqueuePendingMessage(conversationId: string, message: ChatMessage): void {
+    const key = String(conversationId);
+    const existing = this.pendingMessages.get(key) || [];
+    if (existing.some((m) => String(m.id) === String(message.id))) return;
+    this.pendingMessages.set(key, [...existing, message]);
+  }
+
+  private isLikelyOfflineOrNetworkError(error?: string): boolean {
+    if (typeof navigator !== 'undefined' && navigator.onLine === false) return true;
+    if (!error) return false;
+    const lower = error.toLowerCase();
+    return (
+      lower.includes('network') ||
+      lower.includes('fetch') ||
+      lower.includes('offline') ||
+      lower.includes('failed to fetch') ||
+      lower.includes('timeout') ||
+      lower.includes('networkerror')
+    );
+  }
+
+  /** Flush queued messages after reconnect / coming back online. */
+  async flushPendingMessages(): Promise<void> {
+    if (this.pendingMessages.size === 0) return;
+    if (typeof navigator !== 'undefined' && navigator.onLine === false) return;
+
+    const entries = [...this.pendingMessages.entries()];
+    for (const [conversationId, messages] of entries) {
+      const remaining: ChatMessage[] = [];
+      for (const message of messages) {
+        try {
+          const messageForPersistence: ChatMessage = { ...message };
+          delete messageForPersistence.status;
+          const saveResult = await addMessageToConversation(conversationId, messageForPersistence);
+          if (!saveResult.success) {
+            if (this.isLikelyOfflineOrNetworkError(saveResult.error)) {
+              remaining.push(message);
+            } else {
+              console.warn('Dropping queued chat message after non-network failure:', saveResult.error);
+            }
+          } else {
+            logInfo('✅ Flushed queued chat message', { conversationId, messageId: message.id });
+          }
+        } catch (error) {
+          const msg = error instanceof Error ? error.message : String(error);
+          if (this.isLikelyOfflineOrNetworkError(msg)) {
+            remaining.push(message);
+          }
+        }
+      }
+      if (remaining.length > 0) {
+        this.pendingMessages.set(conversationId, remaining);
+      } else {
+        this.pendingMessages.delete(conversationId);
+      }
+    }
+  }
+
   async sendMessage(
     conversationId: string,
     message: ChatMessage,
@@ -256,6 +339,15 @@ class RealtimeChatService {
     try {
       const messageForPersistence: ChatMessage = { ...message };
       delete messageForPersistence.status;
+
+      if (typeof navigator !== 'undefined' && navigator.onLine === false) {
+        this.enqueuePendingMessage(conversationId, messageForPersistence);
+        return {
+          success: true,
+          persisted: false,
+          error: 'Queued offline — will send when back online',
+        };
+      }
 
       logInfo('💾 Saving message to database:', { conversationId, messageId: message.id });
       const saveResult = await addMessageToConversation(conversationId, messageForPersistence);
@@ -272,20 +364,39 @@ class RealtimeChatService {
         // Check if conversation doesn't exist
         if (saveResult.error?.includes('not found') || saveResult.error?.includes('404')) {
           console.error('⚠️ Conversation not found in database. Message will not be persisted.');
+        } else if (this.isLikelyOfflineOrNetworkError(saveResult.error)) {
+          this.enqueuePendingMessage(conversationId, messageForPersistence);
+          return {
+            success: true,
+            persisted: false,
+            error: saveResult.error || 'Queued after network failure',
+          };
         } else {
           console.warn('⚠️ Database save failed');
         }
       } else {
         logInfo('✅ Message saved to database successfully');
+        void this.flushPendingMessages();
       }
 
       return { success: saveResult.success, persisted, error: saveResult.error };
     } catch (error) {
       console.error('Error sending message:', error);
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+      if (this.isLikelyOfflineOrNetworkError(errorMessage)) {
+        const messageForPersistence: ChatMessage = { ...message };
+        delete messageForPersistence.status;
+        this.enqueuePendingMessage(conversationId, messageForPersistence);
+        return {
+          success: true,
+          persisted: false,
+          error: 'Queued after network error',
+        };
+      }
       return {
         success: false,
         persisted: false,
-        error: error instanceof Error ? error.message : 'Unknown error',
+        error: errorMessage,
       };
     }
   }
@@ -401,6 +512,7 @@ class RealtimeChatService {
     this.typingTimeouts.forEach((timeout) => clearTimeout(timeout));
     this.typingTimeouts.clear();
     this.messageCallbacks.clear();
+    this.ephemeralRetryCounts.clear();
     this.teardownSupabaseEphemeral();
     this.lastEphemeralSyncArgs = null;
     this.onConnectionStatusChanged?.(false);

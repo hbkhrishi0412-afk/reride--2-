@@ -1230,6 +1230,31 @@ async function handleUsers(req: VercelRequest, res: VercelResponse, _options: co
           });
         }
 
+        // Reject refresh for deleted or inactive accounts before issuing new tokens.
+        const refreshEmail =
+          typeof preVerify.email === 'string' ? preVerify.email.toLowerCase().trim() : '';
+        if (!refreshEmail) {
+          core.clearRefreshTokenCookie(res);
+          return res.status(401).json({
+            success: false,
+            reason: 'Invalid refresh token. Please log in again.',
+            error: 'refresh_token_missing_email',
+          });
+        }
+        const refreshUser = await core.userService.findByEmail(refreshEmail);
+        if (!refreshUser || refreshUser.status === 'inactive') {
+          core.logSecurity('🚨 Refresh denied for missing/inactive user', {
+            email: refreshEmail,
+            userId: preVerify.userId,
+          });
+          core.clearRefreshTokenCookie(res);
+          return res.status(401).json({
+            success: false,
+            reason: 'Account is inactive or no longer exists. Please log in again.',
+            error: 'refresh_user_inactive',
+          });
+        }
+
         const rotated = core.rotateRefreshToken(incomingRefreshToken);
         // Immediately revoke the old jti so it cannot be used again even if it leaked.
         await core.revokeRefreshToken(rotated.oldJti, rotated.oldTtlSeconds);

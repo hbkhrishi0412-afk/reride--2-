@@ -412,8 +412,7 @@ export const MobileBuyerDashboard: React.FC<MobileBuyerDashboardProps> = ({
                       >
                         <img
                           src={getFirstValidImage(vehicle.images, vehicle.id)}
-                          alt=""
-                          aria-hidden="true"
+                          alt={`${vehicle.year} ${vehicle.make} ${vehicle.model}`}
                           className="w-20 h-20 rounded-lg object-cover flex-shrink-0"
                           loading="lazy"
                           decoding="async"
@@ -589,8 +588,7 @@ export const MobileBuyerDashboard: React.FC<MobileBuyerDashboardProps> = ({
                       >
                         <img
                           src={getFirstValidImage(vehicle.images, vehicle.id)}
-                          alt=""
-                          aria-hidden="true"
+                          alt={`${vehicle.year} ${vehicle.make} ${vehicle.model}`}
                           className="w-20 h-20 rounded-lg object-cover flex-shrink-0"
                           loading="lazy"
                           decoding="async"
@@ -681,7 +679,7 @@ export const MobileBuyerDashboard: React.FC<MobileBuyerDashboardProps> = ({
                           >
                             <img
                               src={getFirstValidImage(vehicle.images, vehicle.id)}
-                              alt=""
+                              alt={`${vehicle.year} ${vehicle.make} ${vehicle.model}`}
                               className="h-20 w-24 shrink-0 rounded-lg object-cover"
                               loading="lazy"
                               decoding="async"

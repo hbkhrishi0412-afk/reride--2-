@@ -191,7 +191,12 @@ function supabaseRowToVehicle(row: any): Vehicle {
   const canonicalDatabaseId =
     typeof rawId === 'string' && rawId.trim() !== '' ? rawId.trim() : String(rawId ?? '');
 
+  // Spread metadata first, then always re-apply canonical DB columns so stale/malicious
+  // JSONB cannot override price, status, featured, make, etc.
   return {
+    ...meta,
+    ...(metaSellerPhone ? { sellerPhone: String(metaSellerPhone).trim() } : {}),
+    ...(metaSellerWa ? { sellerWhatsApp: String(metaSellerWa).trim() } : {}),
     category: validateCategory(row.category),
     make: row.make || '',
     model: row.model || '',
@@ -199,7 +204,7 @@ function supabaseRowToVehicle(row: any): Vehicle {
     year: row.year || 0,
     price: Number(row.price) || 0,
     mileage: Number(row.mileage) || 0,
-    images: processedImages, // Use processed images with public URLs
+    images: processedImages,
     features: row.features || [],
     description: mergedDescription,
     sellerName: row.seller_name || undefined,
@@ -222,11 +227,6 @@ function supabaseRowToVehicle(row: any): Vehicle {
     bootSpace: row.boot_space || undefined,
     createdAt: row.created_at || new Date().toISOString(),
     updatedAt: row.updated_at || new Date().toISOString(),
-    // Extract additional fields from metadata; normalize snake_case contact fields for the client Vehicle type
-    ...meta,
-    ...(metaSellerPhone ? { sellerPhone: String(metaSellerPhone).trim() } : {}),
-    ...(metaSellerWa ? { sellerWhatsApp: String(metaSellerWa).trim() } : {}),
-    // Ensure DB columns for listing lifecycle override metadata values
     listingExpiresAt: row.listing_expires_at || meta?.listingExpiresAt || undefined,
     listingStatus: row.listing_status || meta?.listingStatus || 'active',
     listingCycle: row.listing_cycle != null ? Number(row.listing_cycle) : (meta?.listingCycle ?? 1),
@@ -237,7 +237,6 @@ function supabaseRowToVehicle(row: any): Vehicle {
     uniqueViewers: row.unique_viewers ?? meta.uniqueViewers ?? 0,
     phoneViews: row.phone_views ?? meta.phoneViews ?? 0,
     inquiriesCount: row.inquiries_count || 0,
-    // Pin canonical identity after metadata spread.
     id: vehicleId,
     databaseId: canonicalDatabaseId,
     sellerEmail: row.seller_email || '',

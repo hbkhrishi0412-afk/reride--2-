@@ -811,11 +811,7 @@ export const supabaseConversationService = {
       throw new Error(`Conversation not found: ${conversationId}`);
     }
     
-    logInfo('📋 Supabase: Current conversation has', conversation.messages?.length || 0, 'messages');
-    
-    const updatedMessages = [...(conversation.messages || []), sanitizePersistedChatMessage(message)];
-    logInfo('💾 Supabase: Updating conversation with', updatedMessages.length, 'messages');
-
+    const sanitized = sanitizePersistedChatMessage(message);
     const readPatch: Partial<Conversation> = {};
     if (message.sender === 'seller') {
       readPatch.isReadBySeller = true;
@@ -826,15 +822,22 @@ export const supabaseConversationService = {
     }
     
     try {
-      await this.update(conversation.id, {
-        messages: updatedMessages,
+      const supabase = await resolveSupabaseClient();
+      // Prefer append-only messages table (avoids concurrent RMW drops).
+      await upsertMessageRow(supabase, conversation.id, sanitized);
+
+      const patch: Partial<Conversation> = {
         lastMessageAt: message.timestamp,
         lastMessage: message.text,
         ...readPatch,
-      });
-      // Dual-write into normalized messages table (source of truth going forward).
-      const supabase = await resolveSupabaseClient();
-      await upsertMessageRow(supabase, conversation.id, sanitizePersistedChatMessage(message));
+      };
+
+      // Legacy non-UUID conversations cannot use the messages table — keep array dual-write.
+      if (!isConversationUuid(conversation.id)) {
+        patch.messages = [...(conversation.messages || []), sanitized];
+      }
+
+      await this.update(conversation.id, patch);
       logInfo('✅ Supabase: Message added successfully');
     } catch (error) {
       console.error('❌ Supabase: Error updating conversation:', {

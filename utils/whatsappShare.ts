@@ -3,6 +3,8 @@
  * Set `VITE_SUPPORT_WHATSAPP_E164` at build time (e.g. 4471234567890 for UK).
  * If unset, WhatsApp links use `wa.me/?text=…` (no fixed business recipient).
  */
+import { getPublicWebOriginForShareLinks } from './apiConfig.js';
+
 const rawSupport =
   typeof import.meta !== 'undefined' && import.meta.env?.VITE_SUPPORT_WHATSAPP_E164
     ? String(import.meta.env.VITE_SUPPORT_WHATSAPP_E164)
@@ -43,11 +45,19 @@ export type VehicleShareUtm = {
 
 /** Listing URL; with `utm`, query is placed before the `#/` hash (hash-router friendly). */
 export function getVehicleListingUrl(vehicleId: number, utm?: VehicleShareUtm): string {
-  if (typeof window === 'undefined') return '';
-  const { origin, pathname, hash } = window.location;
+  // Use public web origin on Capacitor — WebView origin is https://localhost.
+  const origin = getPublicWebOriginForShareLinks();
+  if (typeof window === 'undefined') {
+    return `${origin}/vehicle/${vehicleId}`;
+  }
+  const { pathname, hash } = window.location;
   const hashPath = `#/vehicle/${vehicleId}`;
-  const baseNoQuery =
-    hash.startsWith('#/') ? `${origin}${pathname}${hashPath}` : `${origin}/vehicle/${vehicleId}`;
+  const useHash =
+    hash.startsWith('#/') ||
+    (typeof navigator !== 'undefined' && /capacitor/i.test(navigator.userAgent || ''));
+  const baseNoQuery = useHash
+    ? `${origin}${pathname || '/'}${hashPath}`
+    : `${origin}/vehicle/${vehicleId}`;
 
   if (!utm) {
     return baseNoQuery;
@@ -60,8 +70,8 @@ export function getVehicleListingUrl(vehicleId: number, utm?: VehicleShareUtm): 
   });
   const qs = params.toString();
 
-  if (hash.startsWith('#/')) {
-    return `${origin}${pathname}?${qs}${hashPath}`;
+  if (useHash) {
+    return `${origin}${pathname || '/'}?${qs}${hashPath}`;
   }
 
   const sep = baseNoQuery.includes('?') ? '&' : '?';

@@ -409,9 +409,9 @@ const MobileSellerProfilePageContent: React.FC<MobileSellerProfilePageProps & { 
     if (!searchQuery.trim()) return vehicles;
     const q = searchQuery.toLowerCase();
     return vehicles.filter(v =>
-      v.make.toLowerCase().includes(q) ||
-      v.model.toLowerCase().includes(q) ||
-      v.description.toLowerCase().includes(q) ||
+      (v.make || '').toLowerCase().includes(q) ||
+      (v.model || '').toLowerCase().includes(q) ||
+      (v.description || '').toLowerCase().includes(q) ||
       (v.variant && v.variant.toLowerCase().includes(q))
     );
   }, [vehicles, searchQuery]);

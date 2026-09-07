@@ -2,9 +2,7 @@ import { logInfo } from '../utils/logger.js';
 import React, { useState, useEffect, useRef } from 'react';
 import type { User } from '../types.js';
 import PasswordInput from './PasswordInput.js';
-import { isTokenLikelyValid, refreshAuthToken, getAuthHeaders } from '../utils/authenticatedFetch.js';
-import { getBrowserAccessTokenForApi } from '../utils/authStorage.js';
-import { logout as rerideLogout } from '../services/userService.js';
+import { isTokenLikelyValid, refreshAuthToken } from '../utils/authenticatedFetch.js';
 import {
   buildSellerQrCodeUrl,
   buildSellerShareUrl,
@@ -598,30 +596,7 @@ const Profile: React.FC<ProfileProps> = ({ currentUser, onUpdateProfile, onUpdat
           (rawError.includes('Please log in again') && (rawError.includes('expired') || rawError.includes('401')));
       
       if (isAuthError) {
-        // Only clear tokens if we're certain it's an auth issue
-        // Check if we still have a token - if not, it was already cleared
-        const hasToken = !!getBrowserAccessTokenForApi();
-        if (hasToken) {
-          try {
-            rerideLogout();
-            if (typeof sessionStorage !== 'undefined') {
-              sessionStorage.removeItem('currentUser');
-              sessionStorage.removeItem('accessToken');
-            }
-          } catch (clearError) {
-            console.error('Error clearing tokens:', clearError);
-          }
-        }
-        
-        setPasswordError('Your session has expired. Please log in again.');
-        
-        // Redirect to login after showing error message
-        setTimeout(() => {
-          if (typeof window !== 'undefined') {
-            // Reload page to trigger login redirect
-            window.location.reload();
-          }
-        }, 2000);
+        setPasswordError('Your session may have expired. Please try again, or log in again if the problem continues.');
       } else {
         // Show user-friendly error message
         setPasswordError('Could not update password. Please try again.');

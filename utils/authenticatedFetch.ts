@@ -429,7 +429,7 @@ export const authenticatedFetch = async (
 
     if (
       shouldFetchCsrfToken() &&
-      (method === 'POST' || method === 'PUT' || method === 'DELETE') &&
+      (method === 'POST' || method === 'PUT' || method === 'DELETE' || method === 'PATCH') &&
       !csrfToken
     ) {
       await ensureCsrfToken();
@@ -666,6 +666,46 @@ export const authenticatedFetch = async (
       // Refresh token is known to be invalid, don't try to refresh
       // This prevents duplicate refresh attempts and console spam
       // The error will be handled by the caller
+    }
+
+    // CSRF token may be missing/stale for PATCH (and other mutations) — refresh once and retry.
+    if (
+      response.status === 403 &&
+      shouldFetchCsrfToken() &&
+      (method === 'POST' || method === 'PUT' || method === 'DELETE' || method === 'PATCH')
+    ) {
+      try {
+        let bodyHint = '';
+        if (!response.bodyUsed) {
+          bodyHint = await response.clone().text();
+        }
+        const looksLikeCsrf =
+          /csrf/i.test(bodyHint) ||
+          /invalid.*(token|origin)/i.test(bodyHint) ||
+          bodyHint === '';
+        if (looksLikeCsrf) {
+          csrfToken = null;
+          csrfTokenPromise = null;
+          await ensureCsrfToken();
+          if (csrfToken) {
+            const retryHeaders: Record<string, string> = {
+              ...mergedHeaders,
+              'X-CSRF-Token': csrfToken,
+            };
+            response = await fetchWithTimeoutAndFallback(
+              resolvedUrl,
+              {
+                ...fetchOptions,
+                headers: retryHeaders,
+                credentials: credentialsMode,
+              },
+              timeoutMs,
+            );
+          }
+        }
+      } catch (csrfRetryError) {
+        logWarn('⚠️ CSRF retry failed:', csrfRetryError);
+      }
     }
 
     if (response.status === 0) {

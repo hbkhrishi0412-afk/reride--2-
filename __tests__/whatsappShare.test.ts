@@ -35,4 +35,12 @@ describe('getVehicleListingUrl', () => {
       'https://example.com/vehicle/9?utm_source=share&utm_medium=social&utm_campaign=listing',
     );
   });
+
+  it('uses public web origin helper (not raw window origin alone)', () => {
+    // On web, getPublicWebOriginForShareLinks returns window.location.origin.
+    // Capacitor paths are covered by getPublicWebOriginForShareLinks unit behavior.
+    assignLocation({ origin: 'https://www.reride.co.in', hash: '#/x' });
+    expect(getVehicleListingUrl(3)).toContain('https://www.reride.co.in');
+    expect(getVehicleListingUrl(3)).not.toContain('localhost');
+  });
 });

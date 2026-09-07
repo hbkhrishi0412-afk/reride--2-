@@ -215,7 +215,7 @@ const CustomerInbox: React.FC<CustomerInboxProps> = ({
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-[380px_1fr] gap-6 bg-white rounded-xl shadow-lg overflow-hidden h-[calc(100vh-220px)] min-h-[600px]">
+      <div className="grid grid-cols-1 lg:grid-cols-[380px_1fr] gap-6 bg-white rounded-xl shadow-lg overflow-hidden min-h-[min(600px,70vh)] h-[calc(100dvh-12rem)] sm:h-[calc(100vh-220px)]">
           {/* Conversation List */}
           <aside
             className={`border-r border-gray-200 flex flex-col bg-gray-50 ${

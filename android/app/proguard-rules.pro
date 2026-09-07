@@ -21,9 +21,21 @@
 # Community plugins (adjust if you add/remove plugins)
 -keep class com.getcapacitor.community.** { *; }
 
+# Capawesome Google Sign-In
+-keep class io.capawesome.** { *; }
+-dontwarn io.capawesome.**
+
+# Aparajita Secure Storage
+-keep class com.aparajita.** { *; }
+-dontwarn com.aparajita.**
+
 # Google Play / Firebase (used when google-services is applied)
 -keep class com.google.firebase.** { *; }
 -dontwarn com.google.firebase.**
+
+# Google Sign-In / Play Services (native Google auth)
+-keep class com.google.android.gms.** { *; }
+-dontwarn com.google.android.gms.**
 
 # OkHttp / Conscrypt (common transitive warnings)
 -dontwarn org.conscrypt.**

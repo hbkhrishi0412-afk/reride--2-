@@ -6,6 +6,8 @@ import { fetchCarDataFromReride, getCarData, getModelsByMake, getVariantsByModel
 import { sellCarAPI } from '../services/sellCarService';
 import { useCamera } from '../hooks/useMobileFeatures';
 import { fetchVehicleSpecs } from '../services/vehicleSpecsService';
+import { verifyVahanRegistration } from '../services/vehicleTrustService';
+import { getBrowserAccessTokenForApi } from '../utils/authStorage.js';
 import AutoT from './AutoT';
 
 interface MobileSellCarPageProps {
@@ -690,35 +692,54 @@ export const MobileSellCarPage: React.FC<MobileSellCarPageProps> = ({ onNavigate
 
   const handleRegistrationSubmit = async () => {
     setRegistrationError('');
+    const trimmed = registrationNumber.trim().toUpperCase();
     
-    if (!registrationNumber.trim()) {
+    if (!trimmed) {
       setRegistrationError('Please enter a registration number');
       return;
     }
     
-    if (!validateRegistration(registrationNumber)) {
+    if (!validateRegistration(trimmed)) {
       setRegistrationError('Please enter a valid registration number (e.g., MH01AB1234)');
       return;
     }
     
     setIsVerifying(true);
     try {
-      // Note: Registration verification API endpoint can be implemented here
-      // This would validate the registration number against a government database
-      // For now, we accept the registration number and proceed to manual entry
-      // Future implementation: Call API endpoint to verify registration number
-      setTimeout(() => {
-        setCarDetails(prev => ({
+      const hasAuth = Boolean(getBrowserAccessTokenForApi());
+      if (hasAuth) {
+        const result = await verifyVahanRegistration(trimmed);
+        setCarDetails((prev) => ({
           ...prev,
-          registration: registrationNumber
+          registration: trimmed,
+          ...(result.snapshot?.manufacturer ? { make: result.snapshot.manufacturer } : {}),
+          ...(result.snapshot?.model ? { model: result.snapshot.model } : {}),
+          ...(result.snapshot?.fuelType ? { fuelType: result.snapshot.fuelType } : {}),
+          ...(result.snapshot?.ownerCount != null ? { noOfOwners: String(result.snapshot.ownerCount) } : {}),
         }));
-        setIsVerifying(false);
-        handleNextStep();
-      }, 1000);
-    } catch (error) {
-      setRegistrationError('Error fetching details. Please fill manually.');
-      setIsVerifying(false);
+        if (result.verified) {
+          addToast?.(result.message || 'Registration verified with Vahan', 'success');
+        } else {
+          addToast?.(
+            result.message || 'Could not auto-verify RC. Continue and fill details manually.',
+            'info',
+          );
+        }
+      } else {
+        setCarDetails((prev) => ({ ...prev, registration: trimmed }));
+        addToast?.(
+          'Sign in later to verify this RC with Vahan. You can continue filling details now.',
+          'info',
+        );
+      }
       handleNextStep();
+    } catch (error) {
+      setCarDetails((prev) => ({ ...prev, registration: trimmed }));
+      const message = error instanceof Error ? error.message : 'Verification unavailable';
+      addToast?.(`${message}. Continue and fill details manually.`, 'info');
+      handleNextStep();
+    } finally {
+      setIsVerifying(false);
     }
   };
 

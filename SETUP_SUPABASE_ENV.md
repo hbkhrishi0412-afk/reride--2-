@@ -4,13 +4,20 @@ Do **not** paste real Supabase keys into this repository or any committed file. 
 
 ## Local web / Vite
 
-1. Copy `env.example` to `.env.local` (keep `.env.local` untracked; it is gitignored).
+1. Copy **`.env.example`** to **`.env.local`** (preferred) or run `npm run env:copy` to create `.env` from `.env.example` if it does not exist.
+   - Do **not** use the stub file `env.example` — it only points at `.env.example`.
 2. From [Supabase Dashboard](https://supabase.com/dashboard) → **Project Settings** → **API**:
    - **Project URL** → `VITE_SUPABASE_URL` (and optionally `SUPABASE_URL` for server tooling).
    - **anon public** key → `VITE_SUPABASE_ANON_KEY` (client-safe).
    - **service_role** key → `SUPABASE_SERVICE_ROLE_KEY` **only** in server-side / CI secrets — never in the browser bundle or mobile app assets.
 
 3. Restart the dev server after changing env vars.
+
+## Android / Capacitor builds
+
+Use the same `VITE_SUPABASE_*` values when running `npm run android` / `npm run android:bundle`. Missing keys produce a white screen or dead auth inside the WebView.
+
+Open **only** the `android/` folder in Android Studio — not the repo root (root `app/` is a placeholder project).
 
 ## Production (example: Vercel)
 
@@ -26,5 +33,6 @@ If a service_role or anon key was ever committed or exposed:
 
 ## Further reading
 
-- `env.example` — variable names and short comments.
+- `.env.example` — canonical variable names and short comments.
+- `ANDROID_BUILD.md` — Android Studio / Capacitor build steps.
 - `docs/SUPABASE_MOBILE.md` — mobile-specific notes.

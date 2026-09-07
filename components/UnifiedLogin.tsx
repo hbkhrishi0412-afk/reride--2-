@@ -349,22 +349,40 @@ const UnifiedLogin: React.FC<UnifiedLoginProps> = ({
 
       if (mode === 'login') {
         if (!email || !password) throw new Error(t('auth.error.emailPasswordRequired'));
+        const emailTrim = email.trim();
+        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailTrim)) {
+          throw new Error(t('auth.error.invalidEmail', { defaultValue: 'Please enter a valid email address' }));
+        }
+        if (password.length < 6) {
+          throw new Error(t('auth.error.passwordTooShort', { defaultValue: 'Password must be at least 6 characters' }));
+        }
         if (selectedRole === 'service_provider') {
           if (!onServiceProviderLogin) {
             throw new Error(t('auth.error.failedAuthenticate'));
           }
-          const sp = await loginServiceProviderWithUsersTable(email, password);
+          const sp = await loginServiceProviderWithUsersTable(emailTrim, password);
           if (!sp.ok) {
             throw new Error(sp.message);
           }
-          await saveRememberedCredentialsAsync(selectedRole, email, password, rememberMe);
+          await saveRememberedCredentialsAsync(selectedRole, emailTrim, password, rememberMe);
           await setRememberMePreferenceAsync(rememberMe);
           onServiceProviderLogin(sp.provider);
           return;
         }
-        result = await login({ email, password, role: selectedRole });
+        result = await login({ email: emailTrim, password, role: selectedRole });
       } else {
         if (!name || !mobile || !email || !password) throw new Error(t('auth.error.registerFieldsRequired'));
+        const emailTrim = email.trim();
+        const mobileDigits = mobile.replace(/\D/g, '');
+        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailTrim)) {
+          throw new Error(t('auth.error.invalidEmail', { defaultValue: 'Please enter a valid email address' }));
+        }
+        if (mobileDigits.length < 10) {
+          throw new Error(t('auth.error.invalidMobile', { defaultValue: 'Please enter a valid 10-digit mobile number' }));
+        }
+        if (password.length < 8) {
+          throw new Error(t('auth.error.passwordTooWeak', { defaultValue: 'Password must be at least 8 characters' }));
+        }
         if (!acceptedTerms) throw new Error(t('auth.error.mustAcceptTerms'));
         // Service provider signup uses extended fields on the car-services page
         if (selectedRole === 'service_provider') {
@@ -376,12 +394,12 @@ const UnifiedLogin: React.FC<UnifiedLoginProps> = ({
           onNavigate(View.CAR_SERVICE_LOGIN);
           return;
         }
-        result = await register({ name, email, password, mobile, role: selectedRole });
+        result = await register({ name, email: emailTrim, password, mobile: mobileDigits, role: selectedRole });
       }
 
       if (result.success && result.user) {
         if (mode === 'login') {
-          await saveRememberedCredentialsAsync(selectedRole, email, password, rememberMe);
+          await saveRememberedCredentialsAsync(selectedRole, email.trim(), password, rememberMe);
           await setRememberMePreferenceAsync(rememberMe);
           onLogin(result.user);
         } else {
@@ -396,10 +414,10 @@ const UnifiedLogin: React.FC<UnifiedLoginProps> = ({
           email &&
           password
         ) {
-          const sp = await loginServiceProviderWithUsersTable(email, password);
+          const sp = await loginServiceProviderWithUsersTable(email.trim(), password);
           if (sp.ok) {
             setSelectedRole('service_provider');
-            await saveRememberedCredentialsAsync('service_provider', email, password, rememberMe);
+            await saveRememberedCredentialsAsync('service_provider', email.trim(), password, rememberMe);
             await setRememberMePreferenceAsync(rememberMe);
             onServiceProviderLogin(sp.provider);
             return;

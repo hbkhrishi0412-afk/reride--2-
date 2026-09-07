@@ -30,7 +30,6 @@ import {
   dispatchPlatformRewrite,
   dispatchPlatformRoute,
 } from './routes-platform.js';
-import { handleUsers } from './marketplace-handlers.js';
 import { verifyProductionSecurityReadiness } from '../production-security.js';
 
 export type ApiBundle = 'marketplace' | 'platform';
@@ -249,6 +248,8 @@ async function runApiCore(
     }
     if ((req.method === 'PUT' || req.method === 'POST') && req.body && (req.body as { email?: string }).email) {
       const b = req.body as Record<string, unknown>;
+      // Explicit service-provider registration fallback only — never route arbitrary
+      // email-bearing bodies to handleUsers (prevents accidental user mutation).
       if (
         bundle === 'marketplace' &&
         req.method === 'POST' &&
@@ -260,9 +261,6 @@ async function runApiCore(
       ) {
         const { handleServiceProviderRegister } = await import('../../api/service-providers.js');
         return await handleServiceProviderRegister(req, res);
-      }
-      if (bundle === 'marketplace') {
-        return await handleUsers(req, res, handlerOptions);
       }
     }
     res.setHeader('Content-Type', 'application/json');

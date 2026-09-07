@@ -1,9 +1,10 @@
 /**
- * Persist login email + password when the user checks "Remember me".
+ * Persist login email when the user checks "Remember me".
  *
- * Web: localStorage (password is base64-obfuscated, not encrypted).
- * Capacitor: also mirrors to native secure/preferences storage so credentials
- * survive WebView localStorage clears on iOS/Android.
+ * Web: localStorage stores email only (never passwords).
+ * Capacitor: email + password may be stored in native secure/preferences KV
+ * so credentials survive WebView localStorage clears — passwords are never
+ * written to localStorage.
  */
 import { isCapacitorNative } from './apiConfig.js';
 import { mirrorSessionKeyToNative, mirrorSessionKeyToNativeSync } from './nativeSessionMirror.js';
@@ -14,6 +15,7 @@ export const LAST_ROLE_KEY = 'reride_last_login_role';
 
 export interface RememberedCredentials {
   email: string;
+  /** Empty on web; may be set on Capacitor from native secure storage only. */
   password: string;
 }
 
@@ -54,6 +56,17 @@ function decodePassword(encoded: string | null): string {
   }
 }
 
+/** Remove legacy plaintext/obfuscated passwords from web localStorage. */
+function scrubLegacyPasswordFromLocal(role: string): void {
+  const ls = getLocal();
+  if (!ls) return;
+  try {
+    ls.removeItem(rememberedPasswordKey(role));
+  } catch {
+    /* ignore */
+  }
+}
+
 function writeLastLoginRole(role: string | null): void {
   const ls = getLocal();
   if (!ls) return;
@@ -77,24 +90,20 @@ function getLocal(): Storage | null {
 function writeLocalCredentials(
   role: string,
   email: string,
-  password: string,
+  _password: string,
   remember: boolean,
 ): void {
   const ek = rememberedEmailKey(role);
   const pk = rememberedPasswordKey(role);
   const ls = getLocal();
   if (!ls) return;
+  // Never persist passwords in localStorage (XSS / shared-device risk).
+  ls.removeItem(pk);
   if (remember && email.trim()) {
     ls.setItem(ek, email.trim());
-    if (password) {
-      ls.setItem(pk, encodePassword(password));
-    } else {
-      ls.removeItem(pk);
-    }
     writeLastLoginRole(role);
   } else {
     ls.removeItem(ek);
-    ls.removeItem(pk);
     const last = ls.getItem(LAST_ROLE_KEY);
     if (last === role) {
       writeLastLoginRole(null);
@@ -102,16 +111,17 @@ function writeLocalCredentials(
   }
 }
 
-/** Synchronous read from localStorage — used for first paint. */
+/** Synchronous read from localStorage — used for first paint (email only on web). */
 export function loadRememberedCredentialsSync(role: string): RememberedCredentials | null {
   const ls = getLocal();
   if (!ls) return null;
   try {
+    scrubLegacyPasswordFromLocal(role);
     const email = ls.getItem(rememberedEmailKey(role));
     if (!email) return null;
     return {
       email,
-      password: decodePassword(ls.getItem(rememberedPasswordKey(role))),
+      password: '',
     };
   } catch {
     return null;
@@ -166,11 +176,8 @@ export async function hydrateRememberedCredentialsFromNative(
     const ls = getLocal();
     if (ls) {
       ls.setItem(rememberedEmailKey(role), email);
-      if (pwdEnc) {
-        ls.setItem(rememberedPasswordKey(role), pwdEnc);
-      } else {
-        ls.removeItem(rememberedPasswordKey(role));
-      }
+      // Keep password out of WebView localStorage even on native.
+      ls.removeItem(rememberedPasswordKey(role));
       writeLastLoginRole(role);
     }
     return { email, password };
@@ -205,7 +212,7 @@ async function persistRememberedCredentialsNative(
   }
 }
 
-/** Save or clear remembered email + password for a role (localStorage only). */
+/** Save or clear remembered email (+ native password on Capacitor only). */
 export function saveRememberedCredentials(
   role: string,
   email: string,
@@ -241,7 +248,7 @@ export async function saveRememberedCredentialsAsync(
     try {
       await persistRememberedCredentialsNative(role, email, password, remember);
     } catch {
-      /* ignore — localStorage copy still available this session */
+      /* ignore — email still in localStorage this session */
     }
   }
 }

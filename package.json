@@ -78,7 +78,7 @@
     "test:e2e:debug": "playwright test --debug",
     "test:e2e:report": "playwright show-report",
     "test:e2e:install": "playwright install",
-    "lint": "eslint api components services utils lib server hooks contexts constants App.tsx index.tsx types.ts vehicle-category.ts vite-env.d.ts --ext .ts,.tsx,.js,.jsx",
+    "lint": "eslint api components services utils lib server hooks contexts features constants App.tsx index.tsx types.ts vehicle-category.ts vite-env.d.ts --ext .ts,.tsx,.js,.jsx",
     "lint:fix": "eslint . --ext .ts,.tsx,.js,.jsx --fix",
     "format": "prettier --write \"**/*.{ts,tsx,js,jsx,json,css,md}\"",
     "format:check": "prettier --check \"**/*.{ts,tsx,js,jsx,json,css,md}\"",

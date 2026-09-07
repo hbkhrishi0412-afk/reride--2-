@@ -534,9 +534,9 @@ const SellerProfilePageContent: React.FC<SellerProfilePageProps & { seller: User
         }
         const lowercasedQuery = searchQuery.toLowerCase();
         return vehicles.filter(vehicle =>
-            vehicle.make.toLowerCase().includes(lowercasedQuery) ||
-            vehicle.model.toLowerCase().includes(lowercasedQuery) ||
-            vehicle.description.toLowerCase().includes(lowercasedQuery) ||
+            (vehicle.make || '').toLowerCase().includes(lowercasedQuery) ||
+            (vehicle.model || '').toLowerCase().includes(lowercasedQuery) ||
+            (vehicle.description || '').toLowerCase().includes(lowercasedQuery) ||
             (vehicle.variant && vehicle.variant.toLowerCase().includes(lowercasedQuery))
         );
     }, [vehicles, searchQuery]);

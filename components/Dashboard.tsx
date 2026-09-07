@@ -3814,7 +3814,7 @@ const Dashboard: React.FC<DashboardProps> = ({ seller, sellerVehicles, reportedV
                                     {thumb ? (
                                       <img
                                         src={thumb}
-                                        alt=""
+                                        alt={`${v.year} ${v.make} ${v.model}`}
                                         loading="lazy"
                                         className="h-full w-full object-cover transition duration-300 group-hover:scale-[1.03]"
                                       />

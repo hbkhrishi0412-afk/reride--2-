@@ -179,8 +179,8 @@ const mockServicePackages: ServicePackage[] = [
 ];
 
 const mockAddresses: Address[] = [
-    { id: 'addr-1', label: 'Home', line1: '221B Baker Street', city: 'London', state: 'LDN', pincode: 'NW16XE' },
-    { id: 'addr-2', label: 'Office', line1: '100 Market Street', city: 'London', state: 'LDN', pincode: 'SW1A1AA' },
+    { id: 'addr-1', label: 'Home', line1: '12, Jubilee Hills Road No. 36', city: 'Hyderabad', state: 'Telangana', pincode: '500033' },
+    { id: 'addr-2', label: 'Office', line1: 'Plot 45, HITEC City, Madhapur', city: 'Hyderabad', state: 'Telangana', pincode: '500081' },
 ];
 
 const YMD_RE = /^\d{4}-\d{2}-\d{2}$/;
@@ -220,8 +220,8 @@ const includedLinePackageId = (serviceType: string, includedId: string) =>
     `line-${serviceType.toLowerCase().replace(/[^a-z0-9]+/g, '-')}-${includedId.toLowerCase().replace(/[^a-z0-9]+/g, '-')}`;
 
 const mockProviders: ServiceProvider[] = [
-    { id: 'sp-1', name: 'City Auto Care', city: 'London', distanceKm: 4.2, rating: 4.7, reviewCount: 128, completedJobs: 340, isVerified: true },
-    { id: 'sp-2', name: 'Prime Garage', city: 'London', distanceKm: 6.8, rating: 4.5, reviewCount: 86, completedJobs: 210, isVerified: true },
+    { id: 'sp-1', name: 'ReRide Auto Care', city: 'Hyderabad', distanceKm: 4.2, rating: 4.7, reviewCount: 128, completedJobs: 340, isVerified: true },
+    { id: 'sp-2', name: 'Prime Garage Hyderabad', city: 'Hyderabad', distanceKm: 6.8, rating: 4.5, reviewCount: 86, completedJobs: 210, isVerified: true },
 ];
 
 const mockCoupons: Coupon[] = [

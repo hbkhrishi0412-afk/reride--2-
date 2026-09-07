@@ -53,82 +53,6 @@ async function fetchPlatformComparables(
   return findSimilarVehicles(vehicle, published).slice(0, 30);
 }
 
-async function fetchExternalBenchmarkViaGemini(
-  vehicle: Pick<Vehicle, 'make' | 'model' | 'year' | 'mileage'> &
-    Partial<Pick<Vehicle, 'city' | 'state' | 'fuelType' | 'transmission'>>,
-): Promise<ExternalMarketBenchmark | null> {
-  const apiKey = process.env.GEMINI_API_KEY;
-  if (!apiKey) return null;
-
-  const location = [vehicle.city, vehicle.state].filter(Boolean).join(', ') || 'India';
-  const prompt = `You are an Indian used-car market analyst. Search current listings and price guides for a ${vehicle.year} ${vehicle.make} ${vehicle.model} in ${location}, India.
-Fuel: ${vehicle.fuelType || 'unknown'}. Transmission: ${vehicle.transmission || 'unknown'}. Odometer: ${vehicle.mileage.toLocaleString('en-IN')} km.
-
-Use realistic 2025-2026 Indian used-car market prices from Spinny, Cars24, CarWale, OLX, or dealer listings — NOT ex-showroom alone.
-For a ${vehicle.year} model, typical used prices are usually 55-85% of original on-road depending on mileage.
-
-Return ONLY valid JSON with INR amounts as integers (no commas, no "Lakh" strings):
-{
-  "newOnRoadPrice": approximate new on-road price in INR when this model-year was new (0 if unknown),
-  "usedFairLow": typical used listing low for this exact year and mileage in INR,
-  "usedFairHigh": typical used listing high for this exact year and mileage in INR,
-  "usedFairAverage": typical fair used price in INR,
-  "summary": one sentence citing current Indian market conditions
-}`;
-
-  try {
-    const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`;
-    const response = await fetch(apiUrl, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        contents: [{ parts: [{ text: prompt }] }],
-        tools: [{ google_search: {} }],
-        generationConfig: {
-          responseMimeType: 'application/json',
-        },
-      }),
-      signal: AbortSignal.timeout(25000),
-    });
-
-    if (!response.ok) return null;
-
-    const data = await response.json();
-    const text = data?.candidates?.[0]?.content?.parts?.[0]?.text;
-    if (!text || typeof text !== 'string') return null;
-
-    const parsed = JSON.parse(text) as {
-      newOnRoadPrice?: number;
-      usedFairLow?: number;
-      usedFairHigh?: number;
-      usedFairAverage?: number;
-      summary?: string;
-    };
-
-    const toInt = (n: unknown): number | null =>
-      typeof n === 'number' && Number.isFinite(n) && n > 0 ? Math.round(n) : null;
-
-    const newOnRoadPrice = toInt(parsed.newOnRoadPrice);
-    const usedFairLow = toInt(parsed.usedFairLow);
-    const usedFairHigh = toInt(parsed.usedFairHigh);
-    const usedFairAverage = toInt(parsed.usedFairAverage);
-
-    if (!newOnRoadPrice && !usedFairAverage) return null;
-
-    return {
-      newOnRoadPrice,
-      usedFairLow,
-      usedFairHigh,
-      usedFairAverage,
-      summary: parsed.summary?.trim() || 'Based on current Indian used-car market listings.',
-      source: 'live_search',
-      fetchedAt: new Date().toISOString(),
-    };
-  } catch {
-    return null;
-  }
-}
-
 function buildEstimateBenchmark(
   vehicle: Pick<Vehicle, 'make' | 'model' | 'year' | 'mileage'>,
 ): ExternalMarketBenchmark {
@@ -148,17 +72,17 @@ function buildEstimateBenchmark(
 export async function buildMarketPricingResponse(
   vehicle: MarketPricingVehicleInput,
 ): Promise<MarketPricingResponse> {
-  const [comparables, surepassExternal, ibbExternal, liveExternal] = await Promise.all([
+  // Public endpoint: Surepass → IBB → platform comparables → static estimate.
+  // Gemini live search removed to prevent unauthenticated API-key cost abuse.
+  const [comparables, surepassExternal, ibbExternal] = await Promise.all([
     fetchPlatformComparables(vehicle),
     fetchSurepassVehicleValuation(vehicle),
     fetchIndianBlueBookValuation(vehicle),
-    fetchExternalBenchmarkViaGemini(vehicle),
   ]);
 
   const external =
     surepassExternal ??
     ibbExternal ??
-    liveExternal ??
     (comparables.length >= 3
       ? (() => {
           const prices = comparables.map((v) => v.price).sort((a, b) => a - b);

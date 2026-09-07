@@ -223,7 +223,10 @@ const SupportChatWidget: React.FC<SupportChatWidgetProps> = memo(({
     };
 
     void connect();
-    void loadChatHistory();
+    // Authenticated users can load history immediately; guests wait for sessionId (see effect below).
+    if (currentUser?.email) {
+      void loadChatHistory();
+    }
 
     return () => {
       cancelled = true;
@@ -232,6 +235,12 @@ const SupportChatWidget: React.FC<SupportChatWidgetProps> = memo(({
       reconnectAttemptsRef.current = 0;
     };
   }, [isOpen, currentUser]);
+
+  // Guest support history depends on WebSocket-assigned sessionId
+  useEffect(() => {
+    if (!isOpen || currentUser?.email || !sessionId) return;
+    void loadChatHistory();
+  }, [isOpen, currentUser?.email, sessionId]);
 
   // Load chat history from API
   const loadChatHistory = async () => {

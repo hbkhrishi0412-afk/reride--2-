@@ -143,9 +143,34 @@ const KeySpec: React.FC<{ label: string; value: string | number; icon?: React.Re
     </div>
 ));
 
-// External hotlink hosts (e.g. logos-world.net) block cross-origin embeds (CORP).
-// BankLogo falls back to the emoji badge when no URL is returned.
+// Prefer local initials badges — external logo CDNs often block CORP embeds.
+const BANK_LOGO_INITIALS: Record<string, string> = {
+  'hdfc bank': 'HDFC',
+  'hdfc': 'HDFC',
+  'icici bank': 'ICICI',
+  'icici': 'ICICI',
+  'sbi': 'SBI',
+  'state bank of india': 'SBI',
+  'axis bank': 'AXIS',
+  'axis': 'AXIS',
+  'kotak': 'KOTAK',
+  'kotak mahindra': 'KOTAK',
+  'yes bank': 'YES',
+  'pnb': 'PNB',
+  'bank of baroda': 'BOB',
+  'canara bank': 'CANARA',
+};
+
 const getBankLogoUrl = (_bankName: string): string => '';
+
+const getBankInitials = (bankName: string): string => {
+  const key = bankName.trim().toLowerCase();
+  if (BANK_LOGO_INITIALS[key]) return BANK_LOGO_INITIALS[key];
+  const parts = bankName.trim().split(/\s+/).filter(Boolean);
+  if (parts.length === 0) return 'BANK';
+  if (parts.length === 1) return parts[0].slice(0, 4).toUpperCase();
+  return parts.map((p) => p[0]).join('').slice(0, 4).toUpperCase();
+};
 
 // Bank Logo Component with fallback
 const BankLogo: React.FC<{ bankName: string; size?: 'sm' | 'md' | 'lg' }> = ({ bankName, size = 'md' }) => {
@@ -162,17 +187,22 @@ const BankLogo: React.FC<{ bankName: string; size?: 'sm' | 'md' | 'lg' }> = ({ b
     md: 'w-16 h-16',
     lg: 'w-20 h-20'
   };
-  const emojiSizes = {
-    sm: 'text-xl',
-    md: 'text-3xl',
-    lg: 'text-4xl'
+  const textSizes = {
+    sm: 'text-[9px]',
+    md: 'text-xs',
+    lg: 'text-sm'
   };
   
   if (!logoUrl || imageError) {
     return (
-      <div className={`${containerClasses[size]} flex items-center justify-center`}>
-        <span className={`${emojiSizes[size]} block text-center`} role="img" aria-label={bankName}>
-          🏦
+      <div
+        className={`${containerClasses[size]} flex items-center justify-center rounded-lg bg-slate-100 border border-slate-200`}
+        role="img"
+        aria-label={bankName}
+        title={bankName}
+      >
+        <span className={`${textSizes[size]} font-bold text-slate-700 tracking-wide`}>
+          {getBankInitials(bankName)}
         </span>
       </div>
     );
@@ -201,7 +231,7 @@ const getBankLogo = (bankName: string, size: 'sm' | 'md' | 'lg' = 'md'): React.R
 };
 
 const SpecDetail: React.FC<{ label: string; value: React.ReactNode }> = ({ label, value }) => (
-    <div className="flex justify-between py-2 border-b border-gray-200-100 dark:border-gray-200 last:border-b-0">
+    <div className="flex justify-between py-2 border-b border-gray-200 dark:border-gray-700 last:border-b-0">
         <dt className="text-sm text-brand-gray-600 dark:text-reride-text">{label}</dt>
         <dd className="text-sm font-semibold text-reride-text-dark dark:text-brand-gray-200 text-right">{value || '-'}</dd>
     </div>
@@ -222,9 +252,9 @@ const DocumentChip: React.FC<{ doc: VehicleDocument }> = ({ doc }) => {
 
 const CertifiedInspectionReport: React.FC<{ report: CertifiedInspection }> = ({ report }) => {
     const scoreColor = (score: number) => {
-        if (score >= 90) return 'bg-reride-orange-light0';
-        if (score >= 75) return 'bg-reride-blue-light0';
-        return 'bg-reride-orange-light0';
+        if (score >= 90) return 'bg-green-500';
+        if (score >= 75) return 'bg-blue-500';
+        return 'bg-orange-500';
     };
     return (
         <div className="p-6">
@@ -346,6 +376,8 @@ export const VehicleDetail: React.FC<VehicleDetailProps> = ({ vehicle, onBack: o
   const [testDriveDate, setTestDriveDate] = useState('');
   const [testDriveTime, setTestDriveTime] = useState('');
   const [isRequestingTestDrive, setIsRequestingTestDrive] = useState(false);
+  const [showReportModal, setShowReportModal] = useState(false);
+  const [reportReason, setReportReason] = useState('');
   const [vehicleDealLead, setVehicleDealLead] = useState<DealLead | null>(null);
   const ratingSuccessTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const emiCalculatorRef = useRef<HTMLDivElement>(null);
@@ -452,13 +484,17 @@ export const VehicleDetail: React.FC<VehicleDetailProps> = ({ vehicle, onBack: o
       void runIfConfirmed(
         'Are you sure you want to report this listing for review by an administrator?',
         () => {
-          const reason = window.prompt("Please provide a reason for reporting this listing (optional):");
-          if (reason !== null) {
-              onFlagContent('vehicle', safeVehicle.id, reason || "No reason provided");
-          }
+          setReportReason('');
+          setShowReportModal(true);
         },
       );
-  }
+  };
+
+  const submitReportListing = () => {
+    onFlagContent('vehicle', safeVehicle.id, reportReason.trim() || 'No reason provided');
+    setShowReportModal(false);
+    setReportReason('');
+  };
 
   const isComparing = comparisonList.includes(safeVehicle.id);
   const isInWishlist = wishlist.includes(safeVehicle.id);
@@ -1779,6 +1815,51 @@ export const VehicleDetail: React.FC<VehicleDetailProps> = ({ vehicle, onBack: o
 
           </div>
       </div>
+
+      {showReportModal ? (
+        <div
+          className="fixed inset-0 z-[120] flex items-center justify-center p-4 bg-black/50"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="report-listing-title"
+        >
+          <div className="w-full max-w-md rounded-xl bg-white dark:bg-gray-900 p-5 shadow-xl">
+            <h3 id="report-listing-title" className="text-lg font-semibold text-gray-900 dark:text-white">
+              Report this listing
+            </h3>
+            <p className="mt-1 text-sm text-gray-600 dark:text-gray-300">
+              Tell us why this listing should be reviewed (optional).
+            </p>
+            <textarea
+              className="mt-3 w-full rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-3 text-sm text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-reride-orange"
+              rows={4}
+              value={reportReason}
+              onChange={(e) => setReportReason(e.target.value)}
+              placeholder="Reason for reporting…"
+              autoFocus
+            />
+            <div className="mt-4 flex justify-end gap-2">
+              <button
+                type="button"
+                className="rounded-lg px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-800"
+                onClick={() => {
+                  setShowReportModal(false);
+                  setReportReason('');
+                }}
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                className="rounded-lg bg-reride-orange px-4 py-2 text-sm font-semibold text-white hover:bg-reride-orange-hover"
+                onClick={submitReportListing}
+              >
+                Submit report
+              </button>
+            </div>
+          </div>
+        </div>
+      ) : null}
 
     </>
   );

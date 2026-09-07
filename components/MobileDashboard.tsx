@@ -1371,7 +1371,7 @@ const MobileDashboard: React.FC<MobileDashboardProps> = memo(({
                     }}
                   >
                     {heroImage ? (
-                      <img src={heroImage} alt="" loading="lazy" decoding="async" className="w-full h-full object-cover" onError={(e) => swapToPlaceholderOnError(e.currentTarget)} />
+                      <img src={heroImage} alt={`${vehicle.year} ${vehicle.make} ${vehicle.model}`} loading="lazy" decoding="async" className="w-full h-full object-cover" onError={(e) => swapToPlaceholderOnError(e.currentTarget)} />
                     ) : (
                       <span className="text-slate-400"><IconCar size={32} stroke={1.6} /></span>
                     )}
@@ -4192,7 +4192,7 @@ const MobileDashboard: React.FC<MobileDashboardProps> = memo(({
                       style={{ background: 'linear-gradient(135deg, #F1F5F9 0%, #E2E8F0 100%)', border: '1px solid rgba(15,23,42,0.05)' }}
                     >
                       {heroImage ? (
-                        <img src={heroImage} alt="" loading="lazy" decoding="async" className="w-full h-full object-cover" onError={(e) => swapToPlaceholderOnError(e.currentTarget)} />
+                        <img src={heroImage} alt={`${vehicle.year} ${vehicle.make} ${vehicle.model}`} loading="lazy" decoding="async" className="w-full h-full object-cover" onError={(e) => swapToPlaceholderOnError(e.currentTarget)} />
                       ) : (
                         <span className="text-slate-400"><IconCar size={28} stroke={1.6} /></span>
                       )}

@@ -164,7 +164,7 @@ const UserManagement: React.FC<UserManagementProps> = ({ users, currentUser, onT
                 backLabel="Back to Admin Dashboard"
                 onBack={() => onNavigate(ViewEnum.ADMIN_PANEL)}
                 rightSlot={
-                    <button onClick={() => setIsCreateModalOpen(true)} className="bg-reride-orange-light0 text-white font-bold py-2 px-4 rounded-lg hover:bg-reride-orange transition-colors">
+                    <button onClick={() => setIsCreateModalOpen(true)} className="bg-reride-orange text-white font-bold py-2 px-4 rounded-lg hover:bg-reride-orange-hover transition-colors">
                         Create User
                     </button>
                 }

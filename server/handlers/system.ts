@@ -2,8 +2,16 @@
  * server/handlers/system.ts — System, health, AI/Gemini, test-connection, and utility handlers
  */
 import type { VercelRequest, VercelResponse } from '@vercel/node';
-import { logError } from '../../utils/logger.js';
-import { USE_SUPABASE, adminRead, adminCreate, adminUpdate, adminDelete, DB_PATHS, HandlerOptions } from '../handler-shared.js';
+import {
+  USE_SUPABASE,
+  adminRead,
+  adminCreate,
+  adminUpdate,
+  adminDelete,
+  DB_PATHS,
+  HandlerOptions,
+  requireAdmin,
+} from '../handler-shared.js';
 
 // ── Health (merged from health.ts) ─────────────────────────────────────────
 export async function handleHealth(_req: VercelRequest, res: VercelResponse) {
@@ -51,74 +59,12 @@ export async function handleAI(
     .json({ success: false, reason: 'AI endpoint not found' });
 }
 
-async function handleGemini(req: VercelRequest, res: VercelResponse) {
-  if (req.method !== 'POST') {
-    return res
-      .status(405)
-      .json({ success: false, reason: 'Method not allowed' });
-  }
-
-  const apiKey = process.env.GEMINI_API_KEY;
-  if (!apiKey) {
-    return res.status(503).json({
-      success: false,
-      reason:
-        'Gemini API key is not configured. Set GEMINI_API_KEY in environment variables.',
-    });
-  }
-
-  try {
-    const { prompt, model = 'gemini-2.0-flash' } = req.body || {};
-
-    if (!prompt || typeof prompt !== 'string') {
-      return res
-        .status(400)
-        .json({ success: false, reason: 'Prompt is required.' });
-    }
-
-    const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
-
-    const response = await fetch(apiUrl, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        contents: [{ parts: [{ text: prompt }] }],
-        generationConfig: {
-          temperature: 0.7,
-          topK: 40,
-          topP: 0.95,
-          maxOutputTokens: 1024,
-        },
-      }),
-    });
-
-    if (!response.ok) {
-      const errorText = await response.text();
-      return res.status(response.status).json({
-        success: false,
-        reason: `Gemini API error: ${response.status}`,
-        error: errorText,
-      });
-    }
-
-    const data = await response.json();
-    const text =
-      data?.candidates?.[0]?.content?.parts?.[0]?.text || 'No response generated';
-
-    return res.status(200).json({
-      success: true,
-      response: text,
-      model,
-      timestamp: new Date().toISOString(),
-    });
-  } catch (error) {
-    logError('Gemini handler error:', error);
-    return res.status(500).json({
-      success: false,
-      reason: 'Failed to process AI request',
-      error: error instanceof Error ? error.message : 'Unknown error',
-    });
-  }
+async function handleGemini(_req: VercelRequest, res: VercelResponse) {
+  // Dead insecure path — AI proxy removed from platform. Keep 410 so accidental rewires fail closed.
+  return res.status(410).json({
+    success: false,
+    reason: 'AI features have been removed from this platform.',
+  });
 }
 
 // ── System & utils ─────────────────────────────────────────────────────────
@@ -127,8 +73,17 @@ export async function handleSystem(req: VercelRequest, res: VercelResponse, _opt
   switch (action) {
     case 'health':
       return await handleHealth(req, res);
-    case 'test-connection':
+    case 'test-connection': {
+      const isProd =
+        process.env.NODE_ENV === 'production' || process.env.VERCEL_ENV === 'production';
+      if (isProd) {
+        return res.status(404).json({ success: false, error: 'Invalid system action' });
+      }
+      if (!(await requireAdmin(req, res, 'System test-connection'))) {
+        return;
+      }
       return await handleTestConnection(req, res);
+    }
     default:
       return res.status(400).json({ success: false, error: 'Invalid system action' });
   }
@@ -137,6 +92,17 @@ export async function handleSystem(req: VercelRequest, res: VercelResponse, _opt
 export async function handleUtils(req: VercelRequest, res: VercelResponse, _options: HandlerOptions) {
   const url = new URL(req.url || '', `http://${req.headers.host}`);
   const pathname = url.pathname;
+
+  // Production: never expose DB write/connection test utilities.
+  const isProd =
+    process.env.NODE_ENV === 'production' || process.env.VERCEL_ENV === 'production';
+  if (isProd) {
+    return res.status(404).json({ success: false, reason: 'Utility endpoint not found' });
+  }
+
+  if (!(await requireAdmin(req, res, 'Utils / test endpoints'))) {
+    return;
+  }
 
   if (pathname.includes('/test-connection')) {
     return await handleTestConnection(req, res);

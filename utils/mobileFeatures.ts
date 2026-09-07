@@ -5,6 +5,7 @@ import { logInfo } from '../utils/logger.js';
  */
 
 import { randomAlphanumeric } from './secureRandom.js';
+import { getPublicWebOriginForShareLinks } from './apiConfig.js';
 
 // ============================================
 // PUSH NOTIFICATIONS
@@ -569,7 +570,8 @@ export async function shareVehicle(vehicle: {
   price: number;
   images?: string[];
 }): Promise<boolean> {
-  const url = `${window.location.origin}/?view=detail&id=${vehicle.id}`;
+  const origin = getPublicWebOriginForShareLinks();
+  const url = `${origin}/?view=detail&id=${vehicle.id}`;
   const text = `Check out this ${vehicle.year} ${vehicle.make} ${vehicle.model} for ₹${vehicle.price.toLocaleString('en-IN')} on ReRide!`;
   
   return shareContent({
@@ -593,7 +595,7 @@ export interface DeepLinkParams {
  * Create deep link URL
  */
 export function createDeepLink(params: DeepLinkParams): string {
-  const url = new URL(window.location.origin);
+  const url = new URL(getPublicWebOriginForShareLinks());
   
   Object.entries(params).forEach(([key, value]) => {
     if (value !== undefined) {
