@@ -575,7 +575,10 @@ export const MobileHomePage: React.FC<MobileHomePageProps> = React.memo(({
               variant="light"
               cities={cities.map((c) => ({ name: c.name, count: c.total }))}
               selectedCity={selectedCity}
-              onSelectCity={onSelectCity}
+              onSelectCity={(name) => {
+                const city = cities.find((c) => c.name === name);
+                handleCityCardClick({ name, total: city?.total ?? 0 });
+              }}
               onBrowseAllIndia={onBrowseAllIndia}
             />
           ) : null}
@@ -1110,8 +1113,9 @@ export const MobileHomePage: React.FC<MobileHomePageProps> = React.memo(({
                 key={category.id}
                 type="button"
                 onClick={() => {
+                  // onSelectCategory already navigates to USED_CARS with { category }.
+                  // A bare onNavigate(USED_CARS) would clear category back to ALL.
                   onSelectCategory(category.id);
-                  onNavigate(ViewEnum.USED_CARS);
                 }}
                 className="vc-tile group relative flex-shrink-0 flex flex-col items-center gap-2.5 p-3 bg-white rounded-2xl shadow-sm border border-gray-100 active:scale-95 transition-all duration-300 hover:shadow-lg w-[112px] snap-start motion-reduce:transition-none motion-reduce:active:scale-100 motion-reduce:hover:shadow-sm"
                 style={{

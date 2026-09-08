@@ -953,8 +953,9 @@ const VehicleList: React.FC<VehicleListProps> = React.memo(({
       initialFilters.ownership;
     if (!hasAny) return;
 
-    if (initialFilters.category) {
-      setCategoryFilter(initialFilters.category);
+    if (initialFilters.category != null && String(initialFilters.category).trim() !== '') {
+      const cat = String(initialFilters.category).trim();
+      setCategoryFilter(cat.toUpperCase() === 'ALL' ? 'ALL' : (cat as VehicleCategory));
     }
     if (initialFilters.make != null) {
       setMakeFilter(initialFilters.make);
@@ -1018,19 +1019,21 @@ const VehicleList: React.FC<VehicleListProps> = React.memo(({
   }, [makeFilter, uniqueMakes]);
 
   // Keep sidebar category in sync with global nav defaults — but never clobber
-  // URL/deep-link state from Home hero chips (`applyFilters` always sends
-  // `category=ALL` + make/price). Previously this effect ran after the
-  // `initialFilters` effect and reset `FOUR_WHEELER` from Home onto the listing,
-  // which ANDed with make/price and hid every row.
+  // a *real* category deep-link. `category=ALL` (or omitting category) means
+  // clear: Home brand/budget chips rely on this so make/price aren't ANDed
+  // with a leftover Home category.
   useEffect(() => {
     if (!initialFilters) {
       setCategoryFilter(initialCategory);
       return;
     }
+    const urlCatRaw = initialFilters.category;
+    const urlCat = urlCatRaw != null ? String(urlCatRaw).trim() : '';
+    const urlCatIsReal = urlCat !== '' && urlCat.toUpperCase() !== 'ALL';
     const hasUrlStructured =
       Boolean(initialFilters.make) ||
       Boolean(initialFilters.model) ||
-      Boolean(initialFilters.category) ||
+      urlCatIsReal ||
       Boolean(initialFilters.fuelType) ||
       Boolean(initialFilters.transmission) ||
       Boolean(initialFilters.location) ||
@@ -1046,8 +1049,7 @@ const VehicleList: React.FC<VehicleListProps> = React.memo(({
       setCategoryFilter(initialCategory);
       return;
     }
-    const urlCat = initialFilters.category;
-    if (urlCat != null && String(urlCat).trim() !== '') {
+    if (urlCatIsReal) {
       return;
     }
     setCategoryFilter('ALL');

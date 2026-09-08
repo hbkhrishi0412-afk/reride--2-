@@ -36,7 +36,7 @@ import MobilePushNotificationManager from './components/MobilePushNotificationMa
 import NativePushRegistration from './components/NativePushRegistration';
 import WebPushRegistration from './components/WebPushRegistration';
 import AppRatingPrompt from './components/AppRatingPrompt';
-import { View as ViewEnum, Vehicle, User, SubscriptionPlan, Notification, Conversation, ChatMessage, LocationCoordinates, type SearchFilters } from './types';
+import { View as ViewEnum, Vehicle, User, SubscriptionPlan, Notification, Conversation, ChatMessage, LocationCoordinates, VehicleCategory, type SearchFilters } from './types';
 import { persistReRideNotifications } from './utils/notificationLocalStorage';
 import { countUnreadMessageThreads } from './utils/unreadCounts';
 import {
@@ -951,7 +951,9 @@ const AppContent: React.FC = () => {
     const location = routerSearchParams.get('location');
     if (make) filters.make = make;
     if (model) filters.model = model;
-    if (category) filters.category = category as SearchFilters['category'];
+    if (category && category.trim().toUpperCase() !== 'ALL') {
+      filters.category = category as SearchFilters['category'];
+    }
     if (fuelType) filters.fuelType = fuelType;
     if (transmission) filters.transmission = transmission;
     if (ownership && ['1', '2', '3plus'].includes(ownership)) {
@@ -995,19 +997,26 @@ const AppContent: React.FC = () => {
       // `/used-cars?make=Hyundai` with `Make = Hyundai` selected in the
       // sidebar but produced 0 results.
       //
-      // Fix: when the caller didn't explicitly pin a category, clear it
-      // here too — both in URL (so refresh/share is faithful) and in app
-      // state (so the existing `setCategoryFilter(initialCategory)` sync
-      // in VehicleList lands on 'ALL' instead of the leftover Home value).
+      // Fix: when the caller didn't explicitly pin a category, clear app
+      // state to ALL (URL omits category — missing means all categories).
+      // Encoding category=ALL used to be treated as a pinned value and
+      // skipped the clear path in VehicleList.
       const explicitCategory =
-        callerFilters.category != null && String(callerFilters.category).trim() !== '';
+        callerFilters.category != null &&
+        String(callerFilters.category).trim() !== '' &&
+        String(callerFilters.category).trim().toUpperCase() !== 'ALL';
       Object.entries(callerFilters).forEach(([k, v]) => {
         if (v === undefined || v === null || v === '') return;
+        // Never encode the sentinel "ALL" — VehicleList treats a missing
+        // category param as all categories (and used to treat category=ALL
+        // as a pinned value, which skipped the clear-to-ALL sync path).
+        if (k === 'category' && String(v).trim().toUpperCase() === 'ALL') return;
         params.set(k, String(v));
       });
       if (!explicitCategory) {
-        params.set('category', 'ALL');
         setSelectedCategory('ALL');
+      } else {
+        setSelectedCategory(String(callerFilters.category).trim() as VehicleCategory | 'ALL');
       }
       if (opts.query && opts.query.trim()) {
         params.set('q', opts.query.trim());

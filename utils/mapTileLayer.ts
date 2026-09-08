@@ -31,8 +31,9 @@ export function getLeafletBasemapConfig(): {
 
   const cartoKey = env?.VITE_CARTO_API_KEY?.trim();
   if (cartoKey) {
+    // CARTO docs use `?key=` (not apikey): https://carto.com/basemaps/apikey
     return {
-      url: `https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png?apikey=${encodeURIComponent(cartoKey)}`,
+      url: `https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png?key=${encodeURIComponent(cartoKey)}`,
       options: {
         subdomains: 'abcd',
         maxZoom: 20,
@@ -42,7 +43,7 @@ export function getLeafletBasemapConfig(): {
     };
   }
 
-  // Default: OpenStreetMap raster tiles (no API key).
+  // Default: OpenStreetMap raster tiles (no API key) — avoids CARTO "API KEY REQUIRED" watermark.
   return {
     url: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
     options: {

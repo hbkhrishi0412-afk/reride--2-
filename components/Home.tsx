@@ -696,7 +696,10 @@ const Home: React.FC<HomeProps> = ({
                             variant="light"
                             cities={citiesWithCounts.map((c) => ({ name: c.name, count: c.total }))}
                             selectedCity={selectedCity}
-                            onSelectCity={onSelectCity}
+                            onSelectCity={(name) => {
+                                const city = citiesWithCounts.find((c) => c.name === name);
+                                handleCityCardClick({ name, total: city?.total ?? 0 });
+                            }}
                             onBrowseAllIndia={onBrowseAllIndia}
                         />
                     ) : null}
@@ -1538,8 +1541,9 @@ const Home: React.FC<HomeProps> = ({
                                     key={category.id}
                                     type="button"
                                     onClick={() => {
+                                        // onSelectCategory already navigates to USED_CARS with { category }.
+                                        // A bare onNavigate(USED_CARS) would clear category back to ALL.
                                         onSelectCategory(category.id);
-                                        onNavigate(ViewEnum.USED_CARS);
                                     }}
                                     className="vc-tile group relative flex flex-col items-center gap-3 p-5 bg-white rounded-2xl shadow-sm border border-gray-100 active:scale-95 transition-all duration-300 hover:shadow-lg hover:-translate-y-0.5 motion-reduce:transition-none motion-reduce:active:scale-100 motion-reduce:hover:translate-y-0"
                                     style={{

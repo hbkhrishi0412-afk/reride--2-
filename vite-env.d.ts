@@ -46,6 +46,11 @@ interface ImportMetaEnv {
    * Example: 4471234567890. Used for service booking confirmation and header “call us” links.
    */
   readonly VITE_SUPPORT_WHATSAPP_E164?: string
+  /** Optional CARTO basemap key (https://carto.com/basemaps/apikey). Without it, dealers map uses OSM. */
+  readonly VITE_CARTO_API_KEY?: string
+  /** Optional custom Leaflet raster tile URL template. Overrides CARTO/OSM defaults. */
+  readonly VITE_MAP_TILE_URL?: string
+  readonly VITE_MAP_TILE_ATTRIBUTION?: string
   readonly MODE: string
   readonly DEV: boolean
   readonly PROD: boolean
