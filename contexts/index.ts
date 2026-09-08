@@ -1,11 +1,8 @@
 /**
- * contexts/index.ts — Barrel exports for all context providers
- *
- * Import from here for clean imports:
- *   import { useAuth, useToast } from '../contexts';
+ * contexts/index.ts — Barrel exports for context providers.
+ * Auth lives in AppProvider / useAppAuthRuntime (not a separate AuthContext).
  */
 
-export { AuthProvider, useAuth } from './AuthContext';
 export { ToastProvider, useToast } from './ToastContext';
 export { CatalogProvider, useCatalog } from './CatalogContext';
 export { ChatProvider, useChat } from './ChatContext';

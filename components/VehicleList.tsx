@@ -483,11 +483,14 @@ const VehicleList: React.FC<VehicleListProps> = React.memo(({
   const [isDesktopFilterVisible, setIsDesktopFilterVisible] = useState(true);
   const [viewMode, setViewMode] = useState<'grid' | 'tile'>('grid');
   const [isLoadingMore, setIsLoadingMore] = useState(false);
-  const [serverHasMore, setServerHasMore] = useState(true);
+  // Default false — true here left "Loading more..." stuck when page 1 already had the full catalog.
+  const [serverHasMore, setServerHasMore] = useState(false);
   const [isBackgroundHydratingVehicles, setIsBackgroundHydratingVehicles] = useState(false);
   const loadMoreRef = useRef<HTMLDivElement>(null);
-  const hasMoreRef = useRef(true);
+  const hasMoreRef = useRef(false);
   const isLoadingMoreRef = useRef(false);
+  const currentPageRef = useRef(1);
+  const totalPagesRef = useRef(1);
   
   // Infinite scroll pagination - load 12 vehicles at a time
 
@@ -1645,16 +1648,34 @@ const VehicleList: React.FC<VehicleListProps> = React.memo(({
     return map;
   }, [vehicles, paginatedVehicles]);
   
-  const totalPages = Math.ceil(processedVehicles.length / BASE_ITEMS_PER_PAGE);
+  const totalPages = Math.max(1, Math.ceil(processedVehicles.length / BASE_ITEMS_PER_PAGE));
   const hasMoreLocal = currentPage < totalPages;
   const hasMore = hasMoreLocal || (!!onRequestMoreVehicles && serverHasMore);
 
+  currentPageRef.current = currentPage;
+  totalPagesRef.current = totalPages;
   hasMoreRef.current = hasMore;
   isLoadingMoreRef.current = isLoadingMore;
 
+  // Keep server pagination in sync with known catalog totals (avoids infinite "Loading more…").
+  useEffect(() => {
+    const loaded = sourceVehicleCount ?? processedVehicles.length;
+    if (typeof catalogTotal === 'number' && catalogTotal >= 0) {
+      setServerHasMore(loaded < catalogTotal);
+      return;
+    }
+    if (!onRequestMoreVehicles) {
+      setServerHasMore(false);
+    }
+  }, [catalogTotal, sourceVehicleCount, processedVehicles.length, onRequestMoreVehicles]);
+
   // Infinite scroll: load-more sentinel must use the real scroll container as root (MobileLayout main), not the viewport.
   useLayoutEffect(() => {
-    if (!hasMore) return;
+    if (!hasMore) {
+      setIsLoadingMore(false);
+      isLoadingMoreRef.current = false;
+      return;
+    }
 
     const node = loadMoreRef.current;
     if (!node) return;
@@ -1679,7 +1700,7 @@ const VehicleList: React.FC<VehicleListProps> = React.memo(({
           };
 
           // Prefer revealing already-loaded rows first; only hit the API when local pages are exhausted.
-          if (currentPage < totalPages) {
+          if (currentPageRef.current < totalPagesRef.current) {
             window.setTimeout(bumpLocalPage, 120);
             return;
           }
@@ -1687,18 +1708,16 @@ const VehicleList: React.FC<VehicleListProps> = React.memo(({
           if (onRequestMoreVehicles) {
             void onRequestMoreVehicles()
               .then((more) => {
-                if (cancelled) return;
                 setServerHasMore(!!more);
-                setCurrentPage((p) => p + 1);
+                if (more) setCurrentPage((p) => p + 1);
               })
               .catch(() => {
-                if (!cancelled) setServerHasMore(false);
+                setServerHasMore(false);
               })
               .finally(() => {
-                if (!cancelled) {
-                  setIsLoadingMore(false);
-                  isLoadingMoreRef.current = false;
-                }
+                // Always clear loading — effect cleanup must not leave the spinner stuck.
+                setIsLoadingMore(false);
+                isLoadingMoreRef.current = false;
               });
             return;
           }
@@ -1725,6 +1744,8 @@ const VehicleList: React.FC<VehicleListProps> = React.memo(({
       cancelAnimationFrame(raf1);
       cancelAnimationFrame(raf2);
       observer?.disconnect();
+      setIsLoadingMore(false);
+      isLoadingMoreRef.current = false;
     };
   }, [hasMore, currentPage, totalPages, processedVehicles.length, isLoading, onRequestMoreVehicles]);
 

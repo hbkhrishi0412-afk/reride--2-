@@ -301,6 +301,40 @@ export const AppViewRenderer: React.FC<AppViewRendererLocals> = (locals) => {
     }
   }, [currentView, selectedVehicle, setSelectedVehicle]);
 
+  const requestMorePublishedVehicles = React.useCallback(async () => {
+    const { fetchNextPublishedVehiclePage } = await import('../../services/dataService');
+    const serverFilters: Record<string, string | number | undefined> = {};
+    if (selectedCity?.trim()) serverFilters.city = selectedCity.trim();
+    if (filtersFromUrl?.make) serverFilters.make = String(filtersFromUrl.make);
+    if (filtersFromUrl?.model) serverFilters.model = String(filtersFromUrl.model);
+    if (filtersFromUrl?.fuelType) serverFilters.fuelType = String(filtersFromUrl.fuelType);
+    if (filtersFromUrl?.minPrice != null) serverFilters.minPrice = Number(filtersFromUrl.minPrice);
+    if (filtersFromUrl?.maxPrice != null) serverFilters.maxPrice = Number(filtersFromUrl.maxPrice);
+    if (currentCategory && currentCategory !== 'ALL') serverFilters.category = String(currentCategory);
+
+    const { vehicles: pageVehicles, hasMore, reset, total } = await fetchNextPublishedVehiclePage(
+      Object.keys(serverFilters).length > 0 ? serverFilters : {},
+    );
+    if (pageVehicles.length > 0) {
+      setVehicles((prev) =>
+        reset ? pageVehicles : mergeVehicleCatalog(prev, pageVehicles, false),
+      );
+    }
+    if (typeof total === 'number' && total > 0) {
+      setPublishedCatalogTotal(total);
+    }
+    return !!hasMore;
+  }, [
+    selectedCity,
+    filtersFromUrl?.make,
+    filtersFromUrl?.model,
+    filtersFromUrl?.fuelType,
+    filtersFromUrl?.minPrice,
+    filtersFromUrl?.maxPrice,
+    currentCategory,
+    setVehicles,
+  ]);
+
   // When Used Cars opens on "All Categories", reset the published catalog cursor
   // so listings from every published category are fetched (not a leftover
   // four-wheeler-only page from a prior Home category click).
@@ -525,32 +559,7 @@ switch (currentView) {
             setSelectedCategory(category);
           }}
           catalogTotal={publishedCatalogTotal || getPublishedCatalogTotal() || undefined}
-          onRequestMoreVehicles={async () => {
-            const { fetchNextPublishedVehiclePage, getPublishedCatalogHasMore } = await import(
-              '../../services/dataService'
-            );
-            const serverFilters: Record<string, string | number | undefined> = {};
-            if (selectedCity?.trim()) serverFilters.city = selectedCity.trim();
-            if (filtersFromUrl?.make) serverFilters.make = String(filtersFromUrl.make);
-            if (filtersFromUrl?.model) serverFilters.model = String(filtersFromUrl.model);
-            if (filtersFromUrl?.fuelType) serverFilters.fuelType = String(filtersFromUrl.fuelType);
-            if (filtersFromUrl?.minPrice != null) serverFilters.minPrice = Number(filtersFromUrl.minPrice);
-            if (filtersFromUrl?.maxPrice != null) serverFilters.maxPrice = Number(filtersFromUrl.maxPrice);
-            if (currentCategory && currentCategory !== 'ALL') serverFilters.category = String(currentCategory);
-
-            const { vehicles: pageVehicles, hasMore, reset, total } = await fetchNextPublishedVehiclePage(
-              Object.keys(serverFilters).length > 0 ? serverFilters : {},
-            );
-            if (pageVehicles.length > 0) {
-              setVehicles((prev) =>
-                reset ? pageVehicles : mergeVehicleCatalog(prev, pageVehicles, false),
-              );
-            }
-            if (typeof total === 'number' && total > 0) {
-              setPublishedCatalogTotal(total);
-            }
-            return hasMore || getPublishedCatalogHasMore();
-          }}
+          onRequestMoreVehicles={requestMorePublishedVehicles}
         />
       </VehicleListErrorBoundary>
     );

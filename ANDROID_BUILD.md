@@ -3,7 +3,7 @@
 The app is a **Capacitor** (Vite + React) project. The Play Store testing link serves a pre-built bundle; running from Android Studio uses a **local** build. Follow these steps so the app runs correctly from Android Studio.
 
 > **Important:** Open **`android/`** in Android Studio (File → Open → select the `android` folder).  
-> Do **not** open the repository root — the root `app/` module is a placeholder and will install a broken/outdated APK.  
+> Do **not** open the repository root — there is no Android project there (the old placeholder `app/` module was removed).  
 > Safe commands that open the right project: `npm run android` or `npm run cap:open:android` (both call `npx cap open android`).
 
 Verify this machine’s checklist anytime:

@@ -191,10 +191,7 @@ export default defineConfig(({ mode }) => {
           ) {
             return 'vendor-motion'
           }
-          if (
-            id.includes('node_modules/leaflet') ||
-            id.includes('node_modules/react-leaflet/')
-          ) {
+          if (id.includes('node_modules/leaflet')) {
             return 'vendor-maps'
           }
           if (
@@ -228,7 +225,6 @@ export default defineConfig(({ mode }) => {
           ) {
             return 'vendor-crypto-sanitize'
           }
-          if (id.includes('node_modules/socket.io-client/')) return 'vendor-socket'
           // react-router / react-helmet-async pull these into vendor-react. If they
           // land in vendor-misc instead, Rollup creates a circular chunk:
           //   vendor-react → vendor-misc → vendor-react
@@ -265,8 +261,7 @@ export default defineConfig(({ mode }) => {
           // React UI helpers that must resolve the same React instance as vendor-react.
           if (
             id.includes('node_modules/react-cookie-consent') ||
-            id.includes('node_modules/react-window') ||
-            id.includes('node_modules/@vis.gl/react-google-maps')
+            id.includes('node_modules/react-window')
           ) {
             return 'vendor-react'
           }

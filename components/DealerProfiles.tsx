@@ -15,6 +15,7 @@ import { isRerideStaffPick } from '../utils/staffPick.js';
 import { getPublicDealerRating } from '../utils/dealerRatingDisplay.js';
 import { searchLocations } from '../utils/reverseGeocode.js';
 import { copyTextToClipboard } from '../utils/copyToClipboard.js';
+import { getLeafletBasemapConfig } from '../utils/mapTileLayer.js';
 
 // Fix for default marker icons in Leaflet
 delete (L.Icon.Default.prototype as any)._getIconUrl;
@@ -537,13 +538,10 @@ export const DealerMap: React.FC<{
       map.fitBounds(bounds, { padding: [50, 50], maxZoom: 12 });
     }
 
-    // Carto basemaps (OSM data) load more reliably from production sites than anonymous OSM tile servers alone.
-    L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
-      subdomains: 'abcd',
-      maxZoom: 20,
-      attribution:
-        '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
-    }).addTo(map);
+    // CARTO free tiles watermark "API KEY REQUIRED" without a key — use OSM by default
+    // (optional VITE_CARTO_API_KEY / VITE_MAP_TILE_URL via getLeafletBasemapConfig).
+    const basemap = getLeafletBasemapConfig();
+    L.tileLayer(basemap.url, basemap.options).addTo(map);
 
     mapRef.current = map;
     markersLayerRef.current = L.layerGroup().addTo(map);

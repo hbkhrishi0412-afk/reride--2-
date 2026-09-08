@@ -172,8 +172,9 @@ check(
   fs.existsSync(syncedIndex) ? 'OK' : 'Run: npm run android:bundle',
 );
 
-// 4) Open path
+// 4) Open path — only Capacitor android/ exists (root Gradle placeholder removed)
 const rootSettings = path.join(root, 'settings.gradle.kts');
+const rootAppModule = path.join(root, 'app');
 const androidSettings = path.join(root, 'android', 'settings.gradle');
 const androidSettingsKts = path.join(root, 'android', 'settings.gradle.kts');
 check(
@@ -181,14 +182,11 @@ check(
   'Capacitor Android project exists at android/',
   'Open ONLY this folder in Android Studio',
 );
-if (fs.existsSync(rootSettings)) {
-  const text = fs.readFileSync(rootSettings, 'utf8');
-  check(
-    /Do NOT open this root project/i.test(text),
-    'Root settings.gradle.kts warns against opening repo root',
-    'Placeholder app/ is not the Play Store / Capacitor app',
-  );
-}
+check(
+  !fs.existsSync(rootSettings) && !fs.existsSync(rootAppModule),
+  'No root Gradle / app/ placeholder',
+  'Open android/ only — repo root must not be an Android Studio project',
+);
 
 const failed = results.filter((r) => !r.ok).length;
 console.log(`\nSummary: ${results.length - failed} passed, ${failed} failed/needs action`);

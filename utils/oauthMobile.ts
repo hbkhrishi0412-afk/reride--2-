@@ -194,7 +194,7 @@ export function initNativeGoogleOAuthReturnHandler(): void {
   });
 }
 
-/** Opens Supabase Google OAuth URL in Custom Tab (Capacitor) or Android bridge; never in embedded WebView. */
+/** Opens Supabase Google OAuth URL in Custom Tab (Capacitor); never in embedded WebView. */
 export async function openGoogleOAuthUrl(oauthUrl: string): Promise<void> {
   if (!oauthUrl) return;
 
@@ -209,13 +209,6 @@ export async function openGoogleOAuthUrl(oauthUrl: string): Promise<void> {
     }
     const { Browser } = await import('@capacitor/browser');
     await Browser.open({ url: oauthUrl });
-    return;
-  }
-
-  const bridge = (window as unknown as { AndroidOAuth?: { openChromeTab?: (u: string) => void } })
-    .AndroidOAuth;
-  if (bridge?.openChromeTab) {
-    bridge.openChromeTab(oauthUrl);
     return;
   }
 

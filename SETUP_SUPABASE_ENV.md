@@ -17,7 +17,7 @@ Do **not** paste real Supabase keys into this repository or any committed file. 
 
 Use the same `VITE_SUPABASE_*` values when running `npm run android` / `npm run android:bundle`. Missing keys produce a white screen or dead auth inside the WebView.
 
-Open **only** the `android/` folder in Android Studio — not the repo root (root `app/` is a placeholder project).
+Open **only** the `android/` folder in Android Studio — not the repo root (there is no Android project at the root).
 
 ## Production (example: Vercel)
 
