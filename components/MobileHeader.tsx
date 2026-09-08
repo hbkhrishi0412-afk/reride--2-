@@ -156,6 +156,14 @@ const MobileHeader: React.FC<MobileHeaderProps> = ({
         tint: '#1E293B',
       });
     }
+    if (currentUser.role === 'service_provider') {
+      items.push({
+        icon: <DashboardIcon />,
+        label: t('nav.dashboard'),
+        view: ViewEnum.CAR_SERVICE_DASHBOARD,
+        tint: '#1E293B',
+      });
+    }
     items.push(
       {
         icon: <HeartIcon />,

@@ -60,6 +60,9 @@ const CommandPalette: React.FC<CommandPaletteProps> = ({ isOpen, onClose, onNavi
       ...(currentUser?.role === 'customer' ? [
         { id: 'buyer_dashboard', title: 'Buyer Dashboard', icon: ICONS.DASHBOARD, action: () => { onNavigate(View.BUYER_DASHBOARD); onClose(); }, section: 'Navigation' as const },
       ] : []),
+      ...(currentUser?.role === 'service_provider' ? [
+        { id: 'service_provider_dashboard', title: 'Service Provider Dashboard', icon: ICONS.DASHBOARD, action: () => { onNavigate(View.CAR_SERVICE_DASHBOARD); onClose(); }, section: 'Navigation' as const },
+      ] : []),
       ...(currentUser?.role === 'admin' ? [
         { id: 'admin_panel', title: 'Admin Panel', icon: ICONS.DASHBOARD, action: () => { onNavigate(View.ADMIN_PANEL); onClose(); }, section: 'Navigation' as const },
       ] : []),

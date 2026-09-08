@@ -427,6 +427,7 @@ const Header: React.FC<HeaderProps> = memo(({
                                                 {currentUser.role === 'customer' && <DropdownLink onClick={onOpenMessages}>{t('nav.inbox')} {inboxCount > 0 && `(${inboxCount})`}</DropdownLink>}
                                                 {currentUser.role === 'seller' && <DropdownLink onClick={() => handleNavigate(ViewEnum.SELLER_DASHBOARD)}>{t('nav.dashboard')}</DropdownLink>}
                                                 {currentUser.role === 'seller' && <DropdownLink onClick={onOpenMessages}>{t('nav.messages')} {inboxCount > 0 && `(${inboxCount})`}</DropdownLink>}
+                                                {currentUser.role === 'service_provider' && <DropdownLink onClick={() => handleNavigate(ViewEnum.CAR_SERVICE_DASHBOARD)}>{t('nav.dashboard')}</DropdownLink>}
                                                 {currentUser.role === 'admin' && <DropdownLink onClick={() => handleNavigate(ViewEnum.ADMIN_PANEL)}>{t('nav.adminPanel')}</DropdownLink>}
                                                 <DropdownLink onClick={() => handleNavigate(ViewEnum.PROFILE)}>{t('nav.myProfile')}</DropdownLink>
                                                 <div className="border-t dark:border-gray-200">
@@ -601,6 +602,7 @@ const Header: React.FC<HeaderProps> = memo(({
                                             {t('nav.messages')}{inboxCount > 0 ? ` (${inboxCount})` : ''}
                                         </button>
                                     )}
+                                    {currentUser.role === 'service_provider' && <button onClick={() => handleNavigate(ViewEnum.CAR_SERVICE_DASHBOARD)} className="block w-full text-left font-semibold text-reride-text-dark py-3 px-4 min-h-[44px] rounded-lg hover:bg-white">{t('nav.dashboard')}</button>}
                                     {currentUser.role === 'admin' && <button onClick={() => handleNavigate(ViewEnum.ADMIN_PANEL)} className="block w-full text-left font-semibold text-reride-text-dark py-3 px-4 min-h-[44px] rounded-lg hover:bg-white">{t('nav.adminPanel')}</button>}
                                     <button onClick={() => handleNavigate(ViewEnum.PROFILE)} className="block w-full text-left font-semibold text-reride-text-dark py-3 px-4 min-h-[44px] rounded-lg hover:bg-white">{t('nav.myProfile')}</button>
                                     <button onClick={onLogout} className="block w-full text-left font-semibold text-reride-text-dark py-3 px-4 min-h-[44px] rounded-lg hover:bg-white">{t('nav.logout')}</button>
@@ -611,6 +613,7 @@ const Header: React.FC<HeaderProps> = memo(({
                                         <p className="font-semibold text-reride-text-dark text-sm">{serviceProvider.name || t('role.serviceProvider')}</p>
                                         {serviceProvider.city && <p className="text-xs text-gray-500">{serviceProvider.city}</p>}
                                     </div>
+                                    <button onClick={() => handleNavigate(ViewEnum.CAR_SERVICE_DASHBOARD)} className="block w-full text-left font-semibold text-reride-text-dark py-3 px-4 min-h-[44px] rounded-lg hover:bg-white">{t('nav.dashboard')}</button>
                                     <button onClick={onLogout} className="block w-full text-left font-semibold text-reride-text-dark py-3 px-4 min-h-[44px] rounded-lg hover:bg-white">{t('nav.logout')}</button>
                                 </>
                             ) : (

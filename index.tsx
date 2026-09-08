@@ -188,29 +188,49 @@ if (typeof window !== 'undefined' && isCapacitorNative()) {
 }
 
 try {
-  root.render(
-    <React.StrictMode>
-      <HelmetProvider>
-        <QueryClientProvider client={queryClient}>
-          <AppRouter>
-            <ErrorBoundary>
-              <Suspense fallback={<AppBootFallback />}>
-                <App />
-              </Suspense>
-            </ErrorBoundary>
-          </AppRouter>
-        </QueryClientProvider>
-      </HelmetProvider>
-    </React.StrictMode>
-  );
-  // Signal to index.html timeout script that React has mounted (clears loading timeout)
-  if (typeof window !== 'undefined') {
-    (window as any).__RERIDE_MOUNTED__ = true;
-    if (isCapacitorNative()) {
-      void import('./utils/hideNativeSplash').then(({ hideNativeSplashScreen }) => {
-        void hideNativeSplashScreen();
-      });
+  const mountApp = () => {
+    root.render(
+      <React.StrictMode>
+        <HelmetProvider>
+          <QueryClientProvider client={queryClient}>
+            <AppRouter>
+              <ErrorBoundary>
+                <Suspense fallback={<AppBootFallback />}>
+                  <App />
+                </Suspense>
+              </ErrorBoundary>
+            </AppRouter>
+          </QueryClientProvider>
+        </HelmetProvider>
+      </React.StrictMode>
+    );
+    // Signal to index.html timeout script that React has mounted (clears loading timeout)
+    if (typeof window !== 'undefined') {
+      (window as any).__RERIDE_MOUNTED__ = true;
+      if (isCapacitorNative()) {
+        void import('./utils/hideNativeSplash').then(({ hideNativeSplashScreen }) => {
+          void hideNativeSplashScreen();
+        });
+      }
     }
+  };
+
+  // PKCE: finish code exchange before first getSession() in AppProvider when returning from Google.
+  const needsOAuthBootstrap =
+    typeof window !== 'undefined' &&
+    !isCapacitorNative() &&
+    new URLSearchParams(window.location.search).has('code');
+
+  if (needsOAuthBootstrap) {
+    void completeWebSupabaseOAuthCallbackIfNeeded()
+      .catch((e) => {
+        console.warn('[ReRide] OAuth bootstrap:', e);
+      })
+      .finally(() => {
+        mountApp();
+      });
+  } else {
+    mountApp();
   }
 } catch (mountError) {
   if (rootElement && typeof window !== 'undefined') {
@@ -231,11 +251,6 @@ try {
   }
 }
 
-if (typeof window !== 'undefined') {
-  void completeWebSupabaseOAuthCallbackIfNeeded().catch((e) => {
-    console.warn('[ReRide] OAuth bootstrap:', e);
-  });
-}
 // Web production builds register the service worker via `pwaRegister.ts` (skipped for Capacitor).
 if (import.meta.env.PROD && !__RERIDE_CAPACITOR__) {
   import('./pwaRegister');

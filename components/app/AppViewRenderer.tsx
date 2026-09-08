@@ -1505,6 +1505,11 @@ switch (currentView) {
                     ? p.city.trim()
                     : '',
               });
+              try {
+                sessionStorage.setItem('reride_last_role', 'service_provider');
+              } catch {
+                /* ignore */
+              }
               navigate(ViewEnum.CAR_SERVICE_DASHBOARD);
               addToast(`Welcome, ${name}!`, 'success');
             }}

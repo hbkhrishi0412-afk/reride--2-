@@ -542,29 +542,81 @@ export function useAppAuthRuntime({
       googleOAuthSyncDoneRef.current = true;
       oauthGoogleProfileSyncInFlightUidRef.current = session.user.id;
       const accessToken = session.access_token;
-      try {
+      const clearOAuthIntent = () => {
         try {
           sessionStorage.removeItem('reride_oauth_role');
           sessionStorage.removeItem('reride_oauth_mode');
           localStorage.removeItem('reride_oauth_role');
           localStorage.removeItem('reride_oauth_mode');
-          sessionStorage.removeItem('reride_oauth_mode');
-          localStorage.removeItem('reride_oauth_mode');
         } catch {
           /* ignore */
         }
-
+      };
+      try {
         try {
           if (pendingRole === 'service_provider') {
             const result = await syncServiceProviderOAuth(
               session.user as unknown as Record<string, unknown>,
               accessToken,
             );
+            if (cancelled) return;
             if (result.success && result.provider) {
+              // Clear intent only after success so a remount can retry if sync failed mid-flight.
+              clearOAuthIntent();
+              const p = result.provider;
+              const emailNorm = String(p.email || session.user.email || '')
+                .toLowerCase()
+                .trim();
+              // Persist provider before handleLogin so App cold-restore / lost CustomEvent
+              // still finds a profile (handleLogin also re-dispatches the SP event).
               try {
-                window.dispatchEvent(
-                  new CustomEvent('reride:service-provider-oauth', { detail: result.provider }),
+                const city =
+                  typeof p.city === 'string' &&
+                  p.city.trim() &&
+                  p.city.trim().toLowerCase() !== 'pending setup'
+                    ? p.city.trim()
+                    : '';
+                localStorage.setItem(
+                  'reRideServiceProvider',
+                  JSON.stringify({
+                    ...p,
+                    name: String(p.name || 'Service provider'),
+                    email: emailNorm || String(p.email || ''),
+                    city,
+                  }),
                 );
+                sessionStorage.setItem('reride_last_role', 'service_provider');
+              } catch {
+                /* ignore */
+              }
+              if (emailNorm) {
+                handleLogin({
+                  id: String(p.id ?? p.uid ?? session.user.id),
+                  name: String(p.name || 'Service provider'),
+                  email: emailNorm,
+                  mobile: String(p.phone ?? (session.user.phone as string) ?? ''),
+                  role: 'service_provider',
+                  location:
+                    typeof p.city === 'string' &&
+                    p.city.trim() &&
+                    p.city.trim().toLowerCase() !== 'pending setup'
+                      ? p.city.trim()
+                      : '',
+                  status: 'active',
+                  createdAt: new Date().toISOString(),
+                  authProvider: 'google',
+                  firebaseUid: session.user.id,
+                });
+              } else {
+                try {
+                  window.dispatchEvent(
+                    new CustomEvent('reride:service-provider-oauth', { detail: p }),
+                  );
+                } catch {
+                  /* ignore */
+                }
+              }
+              try {
                 window.dispatchEvent(new CustomEvent('reride:oauth-complete'));
               } catch {
                 /* ignore */
@@ -574,6 +626,7 @@ export function useAppAuthRuntime({
               addToast(result.reason || t('toast.googleSignInFailed'), 'error');
               await supabase.auth.signOut({ scope: 'local' });
               clearSupabaseAuthStorage();
+              clearOAuthIntent();
               try {
                 window.dispatchEvent(
                   new CustomEvent('reride:oauth-failed', {
@@ -593,7 +646,9 @@ export function useAppAuthRuntime({
             'google',
             accessToken,
           );
+          if (cancelled) return;
           if (result.success && result.user) {
+            clearOAuthIntent();
             if (pendingMode === 'register') {
               handleRegisterRef.current(result.user);
             } else {
@@ -609,6 +664,7 @@ export function useAppAuthRuntime({
             addToast(result.reason || t('toast.googleSignInFailed'), 'error');
             await supabase.auth.signOut({ scope: 'local' });
             clearSupabaseAuthStorage();
+            clearOAuthIntent();
             try {
               window.dispatchEvent(
                 new CustomEvent('reride:oauth-failed', {
@@ -625,6 +681,7 @@ export function useAppAuthRuntime({
           addToast(t('toast.googleSignInFailed'), 'error');
           await supabase.auth.signOut({ scope: 'local' });
           clearSupabaseAuthStorage();
+          clearOAuthIntent();
           try {
             window.dispatchEvent(
               new CustomEvent('reride:oauth-failed', { detail: { message: t('toast.googleSignInFailed') } }),

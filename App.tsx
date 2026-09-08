@@ -653,12 +653,41 @@ const AppContent: React.FC = () => {
         name,
         city: city || '',
       });
+      try {
+        sessionStorage.setItem('reride_last_role', 'service_provider');
+      } catch {
+        /* ignore */
+      }
       navigate(ViewEnum.CAR_SERVICE_DASHBOARD);
     };
     window.addEventListener('reride:service-provider-oauth', onServiceProviderGoogleOAuth as EventListener);
     return () =>
       window.removeEventListener('reride:service-provider-oauth', onServiceProviderGoogleOAuth as EventListener);
   }, [navigate, setServiceProvider]);
+
+  // OAuth may finish (and write reRideServiceProvider) before the listener above mounts.
+  // If state is still empty but storage has a valid profile, hydrate once.
+  React.useEffect(() => {
+    if (serviceProvider) return;
+    try {
+      const raw = localStorage.getItem(SERVICE_PROVIDER_STORAGE_KEY);
+      if (!raw) return;
+      const parsed = JSON.parse(raw) as Record<string, unknown>;
+      if (!parsed || typeof parsed !== 'object' || typeof parsed.email !== 'string') return;
+      setServiceProvider({
+        ...(parsed as unknown as AppServiceProvider),
+        name: typeof parsed.name === 'string' ? parsed.name : 'Provider',
+        city: typeof parsed.city === 'string' ? parsed.city : '',
+      });
+      try {
+        sessionStorage.setItem('reride_last_role', 'service_provider');
+      } catch {
+        /* ignore */
+      }
+    } catch {
+      /* ignore */
+    }
+  }, [serviceProvider, setServiceProvider]);
 
   // Keep `reRideServiceProvider` in sync when the dashboard saves (categories, skills, etc.),
   // so a refresh and the `provider` prop do not drop fields that only exist in the API response.
@@ -720,8 +749,19 @@ const AppContent: React.FC = () => {
     } catch {
       lastRole = null;
     }
+    let oauthRole: string | null = null;
+    try {
+      oauthRole =
+        sessionStorage.getItem('reride_oauth_role') ||
+        localStorage.getItem('reride_oauth_role') ||
+        null;
+    } catch {
+      oauthRole = null;
+    }
     const userLooksLikeProvider =
-      currentUser?.role === 'service_provider' || lastRole === 'service_provider';
+      currentUser?.role === 'service_provider' ||
+      lastRole === 'service_provider' ||
+      oauthRole === 'service_provider';
     if (!userLooksLikeProvider) return;
 
     let cancelled = false;
@@ -794,18 +834,25 @@ const AppContent: React.FC = () => {
     if (serviceProvider) return;
 
     let lastRole: string | null = null;
+    let oauthPending = false;
     try {
       lastRole =
         sessionStorage.getItem('reride_last_role') ||
         localStorage.getItem('reride_last_role') ||
         null;
+      oauthPending = Boolean(
+        sessionStorage.getItem('reride_oauth_role') || localStorage.getItem('reride_oauth_role'),
+      );
     } catch {
       lastRole = null;
     }
     const userLooksLikeProvider =
-      currentUser?.role === 'service_provider' || lastRole === 'service_provider';
+      currentUser?.role === 'service_provider' ||
+      lastRole === 'service_provider' ||
+      oauthPending;
 
-    const delayMs = userLooksLikeProvider ? 2500 : 0;
+    // Give Google OAuth / session restore time to populate provider before bouncing to login.
+    const delayMs = userLooksLikeProvider ? 4000 : 0;
     const timer = window.setTimeout(() => {
       try {
         sessionStorage.setItem('reride_car_service_auth_mode', 'login');
